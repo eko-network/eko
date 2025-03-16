@@ -2,7 +2,7 @@
 Twitter-like social media app created with Flutter.
 
 ### Authors
-* [Eliah Reeves](https://github.com/nunibye)
+* [Eliah Reeves](https://github.com/eliahreeves)
 * [Christian Knab](https://github.com/christianknab)
 * [Eric Chuang](https://github.com/ericbreh)
 
