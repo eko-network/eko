@@ -102,10 +102,10 @@ class _GetInfo extends StatelessWidget {
                             decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 color:
-                                    Theme.of(context).colorScheme.background),
+                                    Theme.of(context).colorScheme.surface),
                             child: Icon(
                               Icons.cancel,
-                              color: Theme.of(context).colorScheme.onBackground,
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                           ),
                         ),
@@ -174,7 +174,7 @@ class _AddPeople extends StatelessWidget {
           pinned: false,
           scrolledUnderElevation: 0.0,
           centerTitle: true,
-          backgroundColor: Theme.of(context).colorScheme.background,
+          backgroundColor: Theme.of(context).colorScheme.surface,
           bottom: PreferredSize(
             //FIXME this may be arbitrary
             preferredSize: Size.fromHeight(height *
@@ -186,7 +186,7 @@ class _AddPeople extends StatelessWidget {
             child: Column(
               children: [
                 TextField(
-                  cursorColor: Theme.of(context).colorScheme.onBackground,
+                  cursorColor: Theme.of(context).colorScheme.onSurface,
                   decoration: InputDecoration(
                     contentPadding: EdgeInsets.all(height * 0.01),
                     prefixIcon: Padding(

@@ -104,7 +104,7 @@ class SignUpController extends ChangeNotifier {
   // }
   void formatTime(DateTime? birthday) {
     if (birthday != null) {
-      final birthdyString = format.format(birthday!);
+      final birthdyString = format.format(birthday);
       final birthdaylist = birthdyString.split('/');
       monthController.text = birthdaylist[0];
       dayController.text = birthdaylist[1];

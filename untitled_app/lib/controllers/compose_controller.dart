@@ -165,7 +165,7 @@ class ComposeController extends ChangeNotifier {
   void audianceButtonPressed() {
     showModalBottomSheet(
       showDragHandle: true,
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       isScrollControlled: true,
       context: context,
       builder: (BuildContext context) {

@@ -22,7 +22,7 @@ class LoginPage extends StatelessWidget {
               .hideKeyboard(),
           child: Scaffold(
             floatingActionButton: getAppFabBuilder(),
-            backgroundColor: Theme.of(context).colorScheme.background,
+            backgroundColor: Theme.of(context).colorScheme.surface,
             extendBodyBehindAppBar: true,
             body: SingleChildScrollView(
               keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
@@ -32,13 +32,13 @@ class LoginPage extends StatelessWidget {
                     icon: Row(
                       children: [
                         Icon(Icons.arrow_back_ios_rounded,
-                            color: Theme.of(context).colorScheme.onBackground),
+                            color: Theme.of(context).colorScheme.onSurface),
                         Consumer<LoginController>(
                           builder: (context, signUpController, _) => Text(
                             AppLocalizations.of(context)!.previous,
                             style: TextStyle(
                               fontWeight: FontWeight.normal,
-                              color: Theme.of(context).colorScheme.onBackground,
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                           ),
                         )
@@ -127,7 +127,7 @@ class LoginPage extends StatelessWidget {
                           fontSize: 13,
                           letterSpacing: 1,
                           fontWeight: FontWeight.normal,
-                          color: Theme.of(context).colorScheme.onBackground,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
                     ),

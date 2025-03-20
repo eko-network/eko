@@ -252,7 +252,7 @@ class PostCard extends StatelessWidget {
                                                       fontSize: 17,
                                                       color: Theme.of(context)
                                                           .colorScheme
-                                                          .onBackground,
+                                                          .onSurface,
                                                     ),
                                                     overflow:
                                                         TextOverflow.ellipsis,
@@ -343,7 +343,7 @@ class PostCard extends StatelessWidget {
                                                   style: TextStyle(
                                                     color: Theme.of(context)
                                                         .colorScheme
-                                                        .onBackground,
+                                                        .onSurface,
                                                   ),
                                                 );
                                               }
@@ -409,7 +409,7 @@ class PostCard extends StatelessWidget {
                                                     fontSize: 14,
                                                     color: Theme.of(context)
                                                         .colorScheme
-                                                        .onBackground,
+                                                        .onSurface,
                                                   ),
                                                 );
                                               }
@@ -447,7 +447,7 @@ class PostCard extends StatelessWidget {
                                           ? const Color(0xFFff3040)
                                           : Theme.of(context)
                                               .colorScheme
-                                              .onBackground,
+                                              .onSurface,
                                     );
                                   },
                                   onTap: (isLiked) async {
@@ -504,7 +504,7 @@ class PostCard extends StatelessWidget {
                                     CupertinoIcons.chat_bubble,
                                     color: Theme.of(context)
                                         .colorScheme
-                                        .onBackground,
+                                        .onSurface,
                                     size: c.postIconSize,
                                   ),
                                 ),
@@ -533,7 +533,7 @@ class PostCard extends StatelessWidget {
                                                 .arrowshape_turn_up_right,
                                     color: Theme.of(context)
                                         .colorScheme
-                                        .onBackground,
+                                        .onSurface,
                                   ),
                                 ),
                               ],

@@ -12,8 +12,8 @@ class AppSafeArea extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
           color: Provider.of<DarkThemeProvider>(context, listen: true).darkTheme
-              ? c.darkThemeColors(context).background
-              : c.lightThemeColors(context).background),
+              ? c.darkThemeColors(context).surface
+              : c.lightThemeColors(context).surface),
       child: SafeArea(
         child: child,
       ),

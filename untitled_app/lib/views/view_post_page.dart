@@ -38,14 +38,14 @@ class ViewPostPage extends StatelessWidget {
                 .hideKeyboard(),
             child: Scaffold(
               appBar: AppBar(
-                backgroundColor: Theme.of(context).colorScheme.background,
+                backgroundColor: Theme.of(context).colorScheme.surface,
                 surfaceTintColor: Colors.transparent,
                 automaticallyImplyLeading: false,
                 leading: Provider.of<PostPageController>(context, listen: false)
                         .isLoggedIn()
                     ? IconButton(
                         icon: Icon(Icons.arrow_back_ios_rounded,
-                            color: Theme.of(context).colorScheme.onBackground),
+                            color: Theme.of(context).colorScheme.onSurface),
                         onPressed: () => context.pop(),
                       )
                     : TextButton(
@@ -105,7 +105,7 @@ class ViewPostPage extends StatelessWidget {
                     color: Theme.of(context).colorScheme.surface,
                     child: Icon(
                       Icons.more_vert,
-                      color: Theme.of(context).colorScheme.onBackground,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                   // IconButton(
@@ -245,7 +245,7 @@ class ViewPostPage extends StatelessWidget {
                                                         fontSize: 18,
                                                         color: Theme.of(context)
                                                             .colorScheme
-                                                            .onBackground),
+                                                            .onSurface),
                                                   ),
                                                 )
                                               : ListView.builder(
@@ -304,7 +304,7 @@ class ViewPostPage extends StatelessWidget {
                                               TextCapitalization.sentences,
                                           cursorColor: Theme.of(context)
                                               .colorScheme
-                                              .onBackground,
+                                              .onSurface,
                                           focusNode:
                                               Provider.of<PostPageController>(
                                                       context,

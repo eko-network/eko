@@ -1,11 +1,9 @@
 import 'dart:async';
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:overlay_support/overlay_support.dart';
-import 'package:untitled_app/controllers/bottom_nav_bar_controller.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:untitled_app/models/notification_service.dart';
 import 'package:untitled_app/models/uri_launcher.dart';

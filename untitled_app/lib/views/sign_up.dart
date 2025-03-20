@@ -18,13 +18,13 @@ class _BackButton extends StatelessWidget {
       icon: Row(
         children: [
           Icon(Icons.arrow_back_ios_rounded,
-              color: Theme.of(context).colorScheme.onBackground),
+              color: Theme.of(context).colorScheme.onSurface),
           Consumer<SignUpController>(
             builder: (context, signUpController, _) => Text(
               AppLocalizations.of(context)!.previous,
               style: TextStyle(
                 fontWeight: FontWeight.normal,
-                color: Theme.of(context).colorScheme.onBackground,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
           )
@@ -97,14 +97,14 @@ class GetInfo extends StatelessWidget {
                   child: Text(AppLocalizations.of(context)!.createAnAccount,
                       style: TextStyle(
                           fontSize: 35,
-                          color: Theme.of(context).colorScheme.onBackground)),
+                          color: Theme.of(context).colorScheme.onSurface)),
                 )),
             Divider(
               height: 0,
               thickness: height * 0.002,
               indent: width * 0.07,
               endIndent: width * 0.07,
-              color: Theme.of(context).colorScheme.onBackground,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
             SizedBox(
               height: height * 0.03,
@@ -191,7 +191,7 @@ class GetInfo extends StatelessWidget {
                                     Icons.help_outline_outlined,
                                     color: Theme.of(context)
                                         .colorScheme
-                                        .onBackground,
+                                        .onSurface,
                                   ))
                             ],
                           ),
@@ -386,14 +386,14 @@ class GetPassword extends StatelessWidget {
                   child: Text(AppLocalizations.of(context)!.createAPassword,
                       style: TextStyle(
                           fontSize: 35,
-                          color: Theme.of(context).colorScheme.onBackground)),
+                          color: Theme.of(context).colorScheme.onSurface)),
                 )),
             Divider(
               height: 0,
               thickness: height * 0.002,
               indent: width * 0.07,
               endIndent: width * 0.07,
-              color: Theme.of(context).colorScheme.onBackground,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
             SizedBox(height: height * 0.04),
             CustomInputFeild(
@@ -492,7 +492,7 @@ class GetPassword extends StatelessWidget {
                   TextSpan(
                     text: AppLocalizations.of(context)!.bySigningUp,
                     style: TextStyle(
-                      color: Theme.of(context).colorScheme.onBackground,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                   TextSpan(

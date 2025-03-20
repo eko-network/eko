@@ -1,11 +1,9 @@
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 import 'package:untitled_app/controllers/bottom_nav_bar_controller.dart';
 import 'package:untitled_app/custom_widgets/warning_dialog.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:untitled_app/models/users.dart';
-import 'package:untitled_app/utilities/themes/dark_theme_provider.dart';
 import '../models/current_user.dart';
 import '../utilities/locator.dart';
 import '../models/post_handler.dart';

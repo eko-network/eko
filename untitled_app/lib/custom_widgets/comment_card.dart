@@ -72,7 +72,7 @@ class CommentCard extends StatelessWidget {
                                   decoration: BoxDecoration(
                                       color: Theme.of(context)
                                           .colorScheme
-                                          .background),
+                                          .surface),
                                   width: width,
                                   child: _Card(post: post))),
                           SizedBox(
@@ -184,7 +184,7 @@ class _Card extends StatelessWidget {
                                         fontSize: 16,
                                         color: Theme.of(context)
                                             .colorScheme
-                                            .onBackground,
+                                            .onSurface,
                                       ),
                                       overflow: TextOverflow.ellipsis,
                                     ),
@@ -265,7 +265,7 @@ class _Card extends StatelessWidget {
                                     fontSize: 14,
                                     color: Theme.of(context)
                                         .colorScheme
-                                        .onBackground,
+                                        .onSurface,
                                   ),
                                 );
                               }
@@ -294,7 +294,7 @@ class _Card extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w300,
-                            color: Theme.of(context).colorScheme.onBackground,
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
                         ),
                       ),
@@ -317,7 +317,7 @@ class _Card extends StatelessWidget {
                             : CupertinoIcons.heart,
                         color: isLiked
                             ? const Color(0xFFff3040)
-                            : Theme.of(context).colorScheme.onBackground,
+                            : Theme.of(context).colorScheme.onSurface,
                       );
                     },
                     onTap: (isLiked) async {
@@ -338,7 +338,7 @@ class _Card extends StatelessWidget {
                       return Text(
                         text,
                         style: TextStyle(
-                            color: Theme.of(context).colorScheme.onBackground),
+                            color: Theme.of(context).colorScheme.onSurface),
                       );
                     },
                     likeCountAnimationType: LikeCountAnimationType.none,

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
-import 'package:flutter/foundation.dart' as foundation;
 import 'package:go_router/go_router.dart';
 
 class EmojiSelector extends StatelessWidget {

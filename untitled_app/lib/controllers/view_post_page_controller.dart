@@ -229,12 +229,12 @@ class PostPageController extends ChangeNotifier {
 
                 maxLines: null,
                 maxLength: 300,
-                cursorColor: Theme.of(context).colorScheme.onBackground,
+                cursorColor: Theme.of(context).colorScheme.onSurface,
                 keyboardType: TextInputType.multiline,
                 style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.normal,
-                    color: Theme.of(context).colorScheme.onBackground),
+                    color: Theme.of(context).colorScheme.onSurface),
                 decoration: InputDecoration(
                   contentPadding: EdgeInsets.all(height * 0.01),
                   hintText: AppLocalizations.of(context)!.addText,

@@ -22,15 +22,15 @@ class UserSettings extends StatelessWidget {
             surfaceTintColor: Colors.transparent,
             leading: IconButton(
               icon: Icon(Icons.arrow_back_ios_rounded,
-                  color: Theme.of(context).colorScheme.onBackground),
+                  color: Theme.of(context).colorScheme.onSurface),
               onPressed: () => context.pop("poped"),
             ),
-            backgroundColor: Theme.of(context).colorScheme.background,
+            backgroundColor: Theme.of(context).colorScheme.surface,
             title: Text(
               AppLocalizations.of(context)!.settings,
               style: TextStyle(
                 fontWeight: FontWeight.normal,
-                color: Theme.of(context).colorScheme.onBackground,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
           ),
@@ -71,7 +71,7 @@ class UserSettings extends StatelessWidget {
                 child: Text(
                   AppLocalizations.of(context)!.logOut,
                   style: TextStyle(
-                      color: Theme.of(context).colorScheme.onBackground),
+                      color: Theme.of(context).colorScheme.onSurface),
                 ),
               ),
               TextButton(
@@ -81,7 +81,7 @@ class UserSettings extends StatelessWidget {
                 child: Text(
                   AppLocalizations.of(context)!.deleteAccount,
                   style: TextStyle(
-                      color: Theme.of(context).colorScheme.onBackground),
+                      color: Theme.of(context).colorScheme.onSurface),
                 ),
               ),
             ],

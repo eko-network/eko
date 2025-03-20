@@ -3,8 +3,6 @@ import 'package:untitled_app/custom_widgets/time_stamp.dart';
 import '../models/post_handler.dart' show RecentActivityCard;
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:go_router/go_router.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'profile_picture_loading.dart';
 import '../custom_widgets/profile_avatar.dart';
 import '../utilities/constants.dart' as c;
 

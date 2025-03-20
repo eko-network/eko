@@ -8,7 +8,6 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:untitled_app/models/firebase_helper.dart';
 import 'package:untitled_app/models/notification_service.dart';
-import 'package:untitled_app/models/presence_manager.dart';
 import 'package:untitled_app/models/version_control.dart';
 import 'utilities/themes/dark_theme_provider.dart';
 import 'utilities/themes/dark_theme_styles.dart';
@@ -24,7 +23,6 @@ import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:untitled_app/firebase_options.dart';
 // import 'package:untitled_app/utilities/firebase_options.dart';
-import 'package:untitled_app/utilities/constants.dart' as c;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 Future<void> _setupAppCheck() async {
@@ -61,6 +59,7 @@ Future<void> main() async {
 
   //init
   await dotenv.load();
+  print('Loaded env variables: ${dotenv.env}');
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );

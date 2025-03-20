@@ -17,7 +17,7 @@ class UpdateRequiredPage extends StatelessWidget {
           title: Text(AppLocalizations.of(context)!.updateRequiredTitle),
           automaticallyImplyLeading: false,
           surfaceTintColor: Colors.transparent,
-          backgroundColor: Theme.of(context).colorScheme.background,
+          backgroundColor: Theme.of(context).colorScheme.surface,
         ),
         body: Center(
             child: Column(

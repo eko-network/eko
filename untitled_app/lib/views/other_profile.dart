@@ -38,13 +38,13 @@ class OtherProfile extends StatelessWidget {
                                 listen: false)
                             .blocksMe())
                 ? AppBar(
-                    backgroundColor: Theme.of(context).colorScheme.background,
+                    backgroundColor: Theme.of(context).colorScheme.surface,
                     surfaceTintColor: Colors.transparent,
                     automaticallyImplyLeading: false,
                     leading: IconButton(
                       icon: Icon(
                         Icons.arrow_back_ios_rounded,
-                        color: Theme.of(context).colorScheme.onBackground,
+                        color: Theme.of(context).colorScheme.onSurface,
                         size: 20,
                       ),
                       onPressed: () => context.pop(),
@@ -92,7 +92,7 @@ class OtherProfile extends StatelessWidget {
                                           Icons.arrow_back_ios_rounded,
                                           color: Theme.of(context)
                                               .colorScheme
-                                              .onBackground,
+                                              .onSurface,
                                           size: 20,
                                         ),
                                         onPressed: () => context.pop("popped"))
@@ -104,7 +104,7 @@ class OtherProfile extends StatelessWidget {
                                             AppLocalizations.of(context)!
                                                 .signIn)),
                                 backgroundColor:
-                                    Theme.of(context).colorScheme.background,
+                                    Theme.of(context).colorScheme.surface,
                                 title: Provider.of<OtherProfileController>(
                                             context,
                                             listen: false)
@@ -120,7 +120,7 @@ class OtherProfile extends StatelessWidget {
                                               fontSize: 20,
                                               color: Theme.of(context)
                                                   .colorScheme
-                                                  .onBackground,
+                                                  .onSurface,
                                             ),
                                           ),
                                           if (Provider.of<
@@ -242,7 +242,7 @@ class _Header extends StatelessWidget {
                           side: BorderSide(
                               width: 2,
                               color:
-                                  Theme.of(context).colorScheme.onBackground),
+                                  Theme.of(context).colorScheme.onSurface),
                         ),
                         onPressed: () => Provider.of<OtherProfileController>(
                                 context,
@@ -258,7 +258,7 @@ class _Header extends StatelessWidget {
                             fontSize: 16,
                             letterSpacing: 1,
                             fontWeight: FontWeight.normal,
-                            color: Theme.of(context).colorScheme.onBackground,
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
                         ),
                       ),

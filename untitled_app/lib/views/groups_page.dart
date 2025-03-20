@@ -51,10 +51,10 @@ class GroupsPage extends StatelessWidget {
                 floating: true,
                 pinned: false,
                 scrolledUnderElevation: 0.0,
-                backgroundColor: Theme.of(context).colorScheme.background,
+                backgroundColor: Theme.of(context).colorScheme.surface,
                 actions: [
                   IconButton(
-                    color: Theme.of(context).colorScheme.onBackground,
+                    color: Theme.of(context).colorScheme.onSurface,
                     onPressed: () => Provider.of<GroupsPageController>(context,
                             listen: false)
                         .createGroupPressed(),

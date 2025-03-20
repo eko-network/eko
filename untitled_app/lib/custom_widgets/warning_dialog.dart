@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 void showLoadingDialog(BuildContext context) {
     showGeneralDialog(
       context: context,
-      barrierColor: Theme.of(context).colorScheme.background,
+      barrierColor: Theme.of(context).colorScheme.surface,
       barrierDismissible: false,
       barrierLabel: 'Dialog',
       transitionDuration: const Duration(milliseconds: 0),

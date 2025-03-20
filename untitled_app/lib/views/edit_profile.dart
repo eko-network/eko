@@ -51,7 +51,7 @@ class EditProfile extends StatelessWidget {
                         IconButton(
                           icon: Icon(Icons.arrow_back_ios_rounded,
                               color:
-                                  Theme.of(context).colorScheme.onBackground),
+                                  Theme.of(context).colorScheme.onSurface),
                           onPressed: () => Provider.of<EditProfileController>(
                                   context,
                                   listen: false)
@@ -64,7 +64,7 @@ class EditProfile extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.normal,
-                            color: Theme.of(context).colorScheme.onBackground,
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
                         ),
                         const Spacer(),
@@ -78,7 +78,7 @@ class EditProfile extends StatelessWidget {
                                 fontSize: 22,
                                 fontWeight: FontWeight.normal,
                                 color:
-                                    Theme.of(context).colorScheme.onBackground,
+                                    Theme.of(context).colorScheme.onSurface,
                               ),
                             ),
                             onPressed: () => Provider.of<EditProfileController>(

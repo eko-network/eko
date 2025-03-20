@@ -26,18 +26,18 @@ class Followers extends StatelessWidget {
                 leading: IconButton(
                   icon: Icon(
                     Icons.arrow_back_ios_rounded,
-                    color: Theme.of(context).colorScheme.onBackground,
+                    color: Theme.of(context).colorScheme.onSurface,
                     size: 20,
                   ),
                   onPressed: () => context.pop("poped"),
                 ),
-                backgroundColor: Theme.of(context).colorScheme.background,
+                backgroundColor: Theme.of(context).colorScheme.surface,
                 title: Text(
                   AppLocalizations.of(context)!.followers,
                   style: TextStyle(
                     fontWeight: FontWeight.normal,
                     fontSize: 20,
-                    color: Theme.of(context).colorScheme.onBackground,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
               ),

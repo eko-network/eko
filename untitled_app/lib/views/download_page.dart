@@ -26,11 +26,11 @@ class DownloadPage extends StatelessWidget {
               automaticallyImplyLeading: false,
               leading: IconButton(
                 icon: Icon(Icons.arrow_back_ios_rounded,
-                    color: Theme.of(context).colorScheme.onBackground),
+                    color: Theme.of(context).colorScheme.onSurface),
                 onPressed: () => context.go("/"),
               ),
               title: Text(AppLocalizations.of(context)!.download),
-              backgroundColor: Theme.of(context).colorScheme.background,
+              backgroundColor: Theme.of(context).colorScheme.surface,
             ),
             body: Center(
               child: Column(
