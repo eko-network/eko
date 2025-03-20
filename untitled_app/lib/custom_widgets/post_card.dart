@@ -320,7 +320,7 @@ class PostCard extends StatelessWidget {
                                         ),
                                       const SizedBox(height: 6.0),
                                       if (post.gifURL != null &&
-                                          post.image == null)
+                                        post.image == null)
                                         GifWidget(url: post.gifURL!),
                                       if (post.image != null)
                                         ImageWidget(text: post.image!),

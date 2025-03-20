@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:untitled_app/custom_widgets/pagination.dart';
 import 'package:untitled_app/custom_widgets/shimmer_loaders.dart'
@@ -60,7 +59,7 @@ class SearchPage extends StatelessWidget {
                       ),
                       hintText: AppLocalizations.of(context)!.search,
                       filled: true,
-                      fillColor: Theme.of(context).colorScheme.surface,
+                      fillColor: Theme.of(context).colorScheme.outlineVariant,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10.0),
                         borderSide: BorderSide.none,
