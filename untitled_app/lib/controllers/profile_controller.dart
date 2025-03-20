@@ -30,6 +30,7 @@ class ProfileController extends ChangeNotifier {
       profilePicture: locator<CurrentUser>().profilePicture,
       bio: locator<CurrentUser>().bio,
       likes: locator<CurrentUser>().likes,
+      dislikes: locator<CurrentUser>().dislikes,
       followers: locator<CurrentUser>().followers,
       following: locator<CurrentUser>().following,
       isVerified: locator<CurrentUser>().isVerified,

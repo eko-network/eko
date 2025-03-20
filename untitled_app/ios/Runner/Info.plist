@@ -37,7 +37,7 @@
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Eko needs access to your photo library to save a profile picture.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Eko needs access to your photo library to save a profile picture.</string>
+	<string>Eko needs access to your photo library to save a profile picture and upload photos.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UIBackgroundModes</key>

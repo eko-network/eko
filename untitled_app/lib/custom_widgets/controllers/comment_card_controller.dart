@@ -16,8 +16,11 @@ class CommentCardController extends ChangeNotifier {
 
   Post post;
   late int likes;
+  late int dislikes;
   late bool liked;
+  late bool disliked;
   bool liking = false;
+  bool disliking = false;
   late bool isSelf;
   final scrollController = ScrollController();
 
@@ -26,7 +29,9 @@ class CommentCardController extends ChangeNotifier {
   }
   _init() async {
     liked = locator<CurrentUser>().checkIsLiked(post.postId);
+    disliked = locator<CurrentUser>().checkIsDisliked(post.postId);
     likes = post.likes;
+    dislikes = post.dislikes;
     isSelf = post.author.uid == locator<CurrentUser>().getUID();
     //scrollController.addListener(scrollListener);
 
@@ -215,6 +220,44 @@ class CommentCardController extends ChangeNotifier {
           liked = false;
           //locator<FeedPostCache>().updateLikes(post.postId, -1);
           likes--;
+          notifyListeners();
+        }
+      }
+      liking = false;
+    }
+    //}
+  }
+  dislikePressed() async {
+    //if (post.author.uid != locator<CurrentUser>().getUID()) {
+    if (!disliking) {
+      disliking = true;
+      disliked = locator<CurrentUser>()
+          .checkIsDisliked(post.postId); //prevent user from double likeing
+
+      if (disliked) {
+        disliked = false;
+        //locator<FeedPostCache>().updateLikes(post.postId, -1);
+        dislikes--;
+        notifyListeners();
+        //undo if it fails. maybe remove this
+        if (!await locator<CurrentUser>()
+            .removeDislike(post.rootPostId!, post.postId)) {
+          disliked = true;
+          //locator<FeedPostCache>().updateLikes(post.postId, 1);
+          dislikes++;
+          notifyListeners();
+        }
+      } else {
+        disliked = true;
+        //locator<FeedPostCache>().updateLikes(post.postId, 1);
+        dislikes++;
+        notifyListeners();
+        //undo if it fails
+        if (!await locator<CurrentUser>()
+            .addDislike(post.rootPostId!, post.postId)) {
+          disliked = false;
+          //locator<FeedPostCache>().updateLikes(post.postId, -1);
+          dislikes--;
           notifyListeners();
         }
       }

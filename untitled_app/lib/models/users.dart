@@ -7,6 +7,7 @@ class AppUser {
   String profilePicture;
   String bio;
   int likes;
+  int dislikes;
   List<dynamic> followers;
   List<dynamic> following;
   String uid;
@@ -18,6 +19,7 @@ class AppUser {
     this.uid = '',
     this.name = '',
     this.likes = 0,
+    this.dislikes = 0,
     this.bio = '',
     this.followers = const [],
     this.following = const [],
@@ -55,6 +57,7 @@ class AppUser {
         name: json['name'],
         profilePicture: json['profileData']['profilePicture'],
         likes: json['profileData']["likes"],
+        dislikes: json['profileData']["dislikes"],
         bio: json['profileData']['bio'],
         followers: json['profileData']['followers'],
         following: json['profileData']['following'],
@@ -71,6 +74,7 @@ class AppUser {
         followers = user.followers;
         following = user.following;
         likes = user.likes;
+        dislikes = user.dislikes;
         username = user.username;
         name = user.name;
         bio = user.bio;
@@ -89,6 +93,7 @@ class AppUser {
       followers = userData['profileData']['followers'];
       following = userData['profileData']['following'];
       likes = userData['profileData']['likes'];
+      dislikes = userData['profileData']['dislikes'] ?? 0;
       username = userData['username'];
       name = userData['name'];
       isVerified = userData['isVerified'] ?? false;

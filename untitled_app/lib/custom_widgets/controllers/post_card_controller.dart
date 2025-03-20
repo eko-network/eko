@@ -17,7 +17,9 @@ class PostCardController extends ChangeNotifier {
   // late int comments;
   // late int likes;
   late bool liked;
+  late bool disliked;
   bool liking = false;
+  bool disliking = false;
   bool sharing = false;
   late bool isSelf;
   bool visible = true;
@@ -33,6 +35,7 @@ class PostCardController extends ChangeNotifier {
   _init() async {
     //print("test");
     liked = locator<CurrentUser>().checkIsLiked(post.postId);
+    disliked = locator<CurrentUser>().checkIsDisliked(post.postId);
     // likes = post.likes;
     // comments = post.commentCount;
     isSelf = post.author.uid == locator<CurrentUser>().getUID();
@@ -244,6 +247,42 @@ class PostCardController extends ChangeNotifier {
       //   Provider.of<PostPageController>(context, listen: false).rebuild();
       // }
       liking = false;
+    }
+  }
+
+  dislikePressed() async {
+    if (!disliking) {
+      //set bool
+      disliking = true;
+      //get action
+      disliked = locator<CurrentUser>()
+          .checkIsDisliked(post.postId); //prevent user from double likeing
+
+      if (disliked) {
+        //set bool
+        disliked = false;
+        //remove like
+        post.dislikes--;
+        notifyListeners();
+        //undo if it fails. maybe remove this
+        if (!await locator<CurrentUser>().removeDislike(post.postId, null)) {
+          disliked = true;
+          post.dislikes++;
+          notifyListeners();
+        }
+      } else {
+        // animation
+        disliked = true;
+        post.dislikes++;
+        notifyListeners();
+        //undo if it fails
+        if (!await locator<CurrentUser>().addDislike(post.postId, null)) {
+          disliked = false;
+          post.dislikes--;
+          notifyListeners();
+        }
+      }
+      disliking = false;
     }
   }
 }

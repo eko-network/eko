@@ -69,6 +69,8 @@ class PostCard extends StatelessWidget {
       postMap[post.postId]!.post = post;
       postMap[post.postId]!.liked =
           locator<CurrentUser>().checkIsLiked(post.postId);
+      postMap[post.postId]!.disliked =
+          locator<CurrentUser>().checkIsDisliked(post.postId);
     }
     return postMap[post.postId]!;
   }
@@ -229,8 +231,7 @@ class PostCard extends StatelessWidget {
                                                       : null;
                                                 }
                                               },
-                                              child:
-                                                  Row(
+                                              child: Row(
                                                 children: [
                                                   Text(
                                                     "@${post.author.username}",
@@ -319,9 +320,65 @@ class PostCard extends StatelessWidget {
                                       const SizedBox(height: 6.0),
                                       if (post.gifURL != null && post.image == null)
                                                 GifWidget(url: post.gifURL!),
+                                      if (post.gifURL != null &&
+                                          post.image == null)
+                                        InkWell(
+                                            onDoubleTap: () {
+                                              if (!isPreview) {
+                                                if (!Provider.of<
+                                                            PostCardController>(
+                                                        context,
+                                                        listen: false)
+                                                    .liked) {
+                                                  Provider.of<PostCardController>(
+                                                          context,
+                                                          listen: false)
+                                                      .likePressed();
+                                                }
+                                                if (!Provider.of<
+                                                            PostCardController>(
+                                                        context,
+                                                        listen: false)
+                                                    .disliked) {
+                                                  Provider.of<PostCardController>(
+                                                          context,
+                                                          listen: false)
+                                                      .dislikePressed();
+                                                }
+                                              }
+                                            },
+                                            child:
+                                                GifWidget(url: post.gifURL!)),
                                       if (post.image != null)
-                                                ImageWidget(text: post.image!),
-                                      if (post.gifURL != null || post.image != null)
+                                        InkWell(
+                                            onDoubleTap: () {
+                                              if (!isPreview) {
+                                                if (!Provider.of<
+                                                            PostCardController>(
+                                                        context,
+                                                        listen: false)
+                                                    .liked) {
+                                                  Provider.of<PostCardController>(
+                                                          context,
+                                                          listen: false)
+                                                      .likePressed();
+                                                }
+                                                if (!Provider.of<
+                                                            PostCardController>(
+                                                        context,
+                                                        listen: false)
+                                                    .disliked) {
+                                                  Provider.of<PostCardController>(
+                                                          context,
+                                                          listen: false)
+                                                      .dislikePressed();
+                                                }
+                                              }
+                                            },
+                                            child:
+                                                ImageWidget(text: post.image!)),
+                                      if (post.gifURL != null ||
+                                          post.image != null)
                                         const SizedBox(height: 6.0),
                                       if (post.body?.isNotEmpty ??
                                           false) //&& post.body != []
@@ -413,6 +470,54 @@ class PostCard extends StatelessWidget {
                                         return !isLiked;
                                       }
                                       return isLiked;
+                                    }
+                                    return false;
+                                  },
+                                  likeCount: null,
+                                  likeCountAnimationType:
+                                      LikeCountAnimationType.none,
+                                  circleSize: 0,
+                                  animationDuration:
+                                      const Duration(milliseconds: 600),
+                                  bubblesSize: 25,
+                                  bubblesColor: const BubblesColor(
+                                      dotPrimaryColor:
+                                          Color.fromARGB(255, 52, 105, 165),
+                                      dotSecondaryColor:
+                                          Color.fromARGB(255, 65, 43, 161),
+                                      dotThirdColor:
+                                          Color.fromARGB(255, 196, 68, 211),
+                                      dotLastColor: Color(0xFFff3040)),
+                                ),
+                                LikeButton(
+                                  isLiked: Provider.of<PostCardController>(
+                                          context,
+                                          listen: true)
+                                      .disliked,
+                                  likeBuilder: (isDisliked) {
+                                    return Icon(
+                                      size: c.postIconSize,
+                                      isDisliked
+                                          ? CupertinoIcons.down_arrow
+                                          : CupertinoIcons.down_arrow,
+                                      color: isDisliked
+                                          ? const Color(0xFFff3040)
+                                          : Theme.of(context)
+                                              .colorScheme
+                                              .onSurface,
+                                    );
+                                  },
+                                  onTap: (isDisliked) async {
+                                    if (Provider.of<PostCardController>(context,
+                                            listen: false)
+                                        .isLoggedIn()) {
+                                      if (!isPreview) {
+                                        Provider.of<PostCardController>(context,
+                                                listen: false)
+                                            .dislikePressed();
+                                        return !isDisliked;
+                                      }
+                                      return isDisliked;
                                     }
                                     return false;
                                   },

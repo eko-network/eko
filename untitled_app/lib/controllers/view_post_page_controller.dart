@@ -356,11 +356,6 @@ class PostPageController extends ChangeNotifier {
     context.pop();
   }
 
-  void changeInternalLikes(int amount) {
-    post!.likes += amount;
-    //notifyListeners();
-  }
-
   void rebuild() {
     notifyListeners();
   }
@@ -401,6 +396,7 @@ class PostPageController extends ChangeNotifier {
           gifSource: null,
           gifUrl: null,
           title: null,
+          dislikes: 0,
         );
         data.items.insert(
             0,
@@ -423,7 +419,8 @@ class PostPageController extends ChangeNotifier {
           gifURL: gif!.images!.fixedWidth.url,
           rootPostId: post!.postId,
           postId: returnedId,
-          commentCount: 0);
+          commentCount: 0,
+          dislikes: 0);
       data.items.insert(0, newComment);
       // if (post!.hasCache) {
       //   locator<FeedPostCache>().updateComments(post!.postId, 1);

@@ -351,6 +351,52 @@ class _Card extends StatelessWidget {
                         dotThirdColor: Color.fromARGB(255, 196, 68, 211),
                         dotLastColor: Color(0xFFff3040)),
                   ),
+                  LikeButton(
+                    isLiked: (Provider.of<CommentCardController>(context,
+                            listen: true)
+                        .disliked),
+                    likeBuilder: (isLiked) {
+                      return Icon(
+                        size: c.commentIconSize,
+                        isLiked
+                            ? CupertinoIcons.heart_solid
+                            : CupertinoIcons.heart,
+                        color: isLiked
+                            ? const Color(0xFFff3040)
+                            : Theme.of(context).colorScheme.onSurface,
+                      );
+                    },
+                    onTap: (isLiked) async {
+                      if (Provider.of<CommentCardController>(context,
+                              listen: false)
+                          .isLoggedIn()) {
+                        Provider.of<CommentCardController>(context,
+                                listen: false)
+                            .likePressed();
+                        return !isLiked;
+                      }
+                      return isLiked;
+                    },
+                    likeCount: Provider.of<CommentCardController>(context,
+                            listen: true)
+                        .likes,
+                    countBuilder: (int? count, bool isLiked, String text) {
+                      return Text(
+                        text,
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface),
+                      );
+                    },
+                    likeCountAnimationType: LikeCountAnimationType.none,
+                    circleSize: 0,
+                    animationDuration: const Duration(milliseconds: 600),
+                    bubblesSize: 25,
+                    bubblesColor: const BubblesColor(
+                        dotPrimaryColor: Color.fromARGB(255, 52, 105, 165),
+                        dotSecondaryColor: Color.fromARGB(255, 65, 43, 161),
+                        dotThirdColor: Color.fromARGB(255, 196, 68, 211),
+                        dotLastColor: Color(0xFFff3040)),
+                  ),
                   // IconButton(
                   //   onPressed: () => Provider.of<CommentCardController>(
                   //           context,

@@ -18,9 +18,11 @@ class CurrentUser extends AppUser {
   bool unreadGroup = false;
   String email = '';
   List<dynamic> likedPosts = [];
+   List<dynamic> dislikedPosts = [];
   List<dynamic> blockedUsers = [];
   List<dynamic> blockedBy = [];
   bool stateIsLiking = false;
+  bool stateIsDisliking = false;
   bool stateIsFollowing = false;
   @override
   bool isVerified = false;
@@ -166,6 +168,7 @@ class CurrentUser extends AppUser {
     if (userData != null) {
       email = userData["email"] ?? "";
       likedPosts = userData["profileData"]["likedPosts"] ?? [];
+      dislikedPosts = userData["profileData"]["dislikedPosts"] ?? [];
       blockedUsers = userData["blockedUsers"] ?? [];
       newActivity = userData["newActivity"] ?? false;
       unreadGroup = userData["unreadGroup"] ?? false;
@@ -277,6 +280,10 @@ class CurrentUser extends AppUser {
     }
   }
 
+   bool checkIsDisliked(String postID) {
+    return dislikedPosts.contains(postID);
+  }
+
   bool checkIsLiked(String postID) {
     return likedPosts.contains(postID);
   }
@@ -322,6 +329,47 @@ class CurrentUser extends AppUser {
     }
   }
 
+  Future<bool> addDislike(String postId, String? commentId) async {
+    if (!stateIsDisliking) {
+      stateIsDisliking = true;
+      try {
+        final firestore = FirebaseFirestore.instance;
+        final user = getUID();
+        await Future.wait([
+          firestore.collection("users").doc(user).update({
+            "profileData.dislikedPosts":
+                FieldValue.arrayUnion([commentId ?? postId])
+          }),
+          (commentId == null)
+              ? firestore
+                  .collection("posts")
+                  .doc(postId)
+                  .update({"dislikes": FieldValue.increment(1)})
+              : firestore
+                  .collection("posts")
+                  .doc(postId)
+                  .collection('comments')
+                  .doc(commentId)
+                  .update({"dislikes": FieldValue.increment(1)})
+        ]);
+
+        if (commentId == null) {
+          dislikedPosts.add(postId);
+        } else {
+          dislikedPosts.add(commentId);
+        }
+
+        stateIsDisliking = false;
+        return true;
+      } catch (e) {
+        stateIsDisliking = false;
+        return false;
+      }
+    } else {
+      return false;
+    }
+  }
+
   Future<bool> removeLike(String postId, String? commentId) async {
     if (!stateIsLiking) {
       stateIsLiking = true;
@@ -356,6 +404,47 @@ class CurrentUser extends AppUser {
         return true;
       } catch (e) {
         stateIsLiking = false;
+        return false;
+      }
+    } else {
+      return false;
+    }
+  }
+
+  Future<bool> removeDislike(String postId, String? commentId) async {
+    if (!stateIsDisliking) {
+      stateIsDisliking = true;
+      try {
+        final firestore = FirebaseFirestore.instance;
+        final user = getUID();
+        await Future.wait([
+          firestore.collection("users").doc(user).update({
+            "profileData.dislikedPosts":
+                FieldValue.arrayRemove([commentId ?? postId])
+          }),
+          (commentId == null)
+              ? firestore
+                  .collection("posts")
+                  .doc(postId)
+                  .update({"dislikes": FieldValue.increment(-1)})
+              : firestore
+                  .collection("posts")
+                  .doc(postId)
+                  .collection('comments')
+                  .doc(commentId)
+                  .update({"dislikes": FieldValue.increment(-1)})
+        ]);
+
+        if (commentId == null) {
+          dislikedPosts.remove(postId);
+        } else {
+          dislikedPosts.remove(commentId);
+        }
+
+        stateIsDisliking = false;
+        return true;
+      } catch (e) {
+        stateIsDisliking = false;
         return false;
       }
     } else {
@@ -505,10 +594,12 @@ class CurrentUser extends AppUser {
       'isVerified': false,
       'profileData': {
         'likedPosts': [],
+        'dislikedPosts': [],
         'bio': '',
         'followers': [],
         'following': [],
         'likes': 0,
+        'dislikes': 0,
         'profilePicture':
             "https://firebasestorage.googleapis.com/v0/b/untitled-2832f.appspot.com/o/profile_pictures%2Fdefault%2Fprofile.jpg?alt=media&token=2543c4eb-f991-468f-9ce8-68c576ffca7c",
       }
@@ -598,6 +689,7 @@ class CurrentUser extends AppUser {
 
     name = '';
     likes = 0;
+    dislikes = 0;
     bio = '';
     followers = [];
     following = [];
@@ -605,6 +697,7 @@ class CurrentUser extends AppUser {
 
     email = '';
     likedPosts = [];
+    dislikedPosts = [];
     profilePicture =
         "https://firebasestorage.googleapis.com/v0/b/untitled-2832f.appspot.com/o/profile_pictures%2Fdefault%2Fprofile.jpg?alt=media&token=2543c4eb-f991-468f-9ce8-68c576ffca7c";
   }

@@ -22,6 +22,7 @@ class Post {
   final List<String>? body;
   final List<String> tags;
   int likes;
+  int dislikes;
   int commentCount;
   final Group? group;
   final bool isVerified;
@@ -40,6 +41,7 @@ class Post {
     required this.author,
     this.body,
     this.group,
+    required this.dislikes,
     required this.likes,
     this.commentCount = 0,
     this.hasCache = false,
@@ -61,6 +63,7 @@ class Post {
       time: rawPost.time,
       image: rawPost.image,
       likes: rawPost.likes,
+      dislikes: rawPost.dislikes,
       commentCount: commentCount,
       rootPostId: rootPostId,
       group: group,
@@ -113,6 +116,7 @@ class RawPostObject {
   final String? gifUrl;
   final String? gifSource;
   final int likes;
+  final int dislikes;
 
   RawPostObject({
     required this.tags,
@@ -125,6 +129,7 @@ class RawPostObject {
     required this.body,
     required this.time,
     required this.likes,
+    required this.dislikes,
   });
   static RawPostObject fromJson(Map<String, dynamic> json, String id) {
     return RawPostObject(
@@ -137,7 +142,8 @@ class RawPostObject {
         title: json["title"],
         body: json["body"],
         time: json["time"] ?? "",
-        likes: json["likes"] ?? 0);
+        likes: json["likes"] ?? 0,
+        dislikes: json["dislikes"] ?? 0);
   }
 }
 
