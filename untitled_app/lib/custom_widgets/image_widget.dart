@@ -7,14 +7,20 @@ class ImageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(text.split('\n').length);
-    return Text(
-      text,
-      style: const TextStyle(
-        fontFamily: 'Courier', // Use a monospaced font for ASCII art
-        fontSize: 5, // Base font size, can be adjusted
-      ),
-    );
+    return Padding(
+        padding: EdgeInsets.only(right: 50),
+        child: FittedBox(
+            fit: BoxFit.contain,
+            child: Text(
+              text,
+              style: TextStyle(
+                fontWeight: FontWeight.w900,
+                color: Theme.of(context).colorScheme.onSurface,
+
+                fontFamily: 'Courier', // Use a monospaced font for ASCII art
+                fontSize: 25, // Base font size, can be adjusted
+              ),
+            )));
 
     // FittedBox(
     //   fit: BoxFit.contain,
