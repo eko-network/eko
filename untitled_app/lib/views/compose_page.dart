@@ -48,14 +48,16 @@ class ComposePage extends StatelessWidget {
                   FloatingActionButton.small(
                     heroTag: null,
                     child: const Icon(Icons.perm_media),
-                    onPressed: () {}, // Ascii the fuck out of it
+                    onPressed: () =>
+                        Provider.of<ComposeController>(context, listen: false)
+                            .addImagePressed(),
                   ),
                   FloatingActionButton.small(
                     heroTag: null,
                     child: const Icon(Icons.search),
                     onPressed: () =>
                         Provider.of<ComposeController>(context, listen: false)
-                            .addImagePressed(),
+                            .addGifPressed(),
                     shape: const CircleBorder(),
                   ),
                 ],
