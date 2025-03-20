@@ -53,7 +53,7 @@ dependencies:
   overlay_support: ^2.1.0
   package_info_plus: ^8.3.0
   share_plus: ^10.1.4
-  image_picker: ^1.0.1
+  image_picker: ^1.1.2
   image_cropper: ^9.0.0
   firebase_storage: ^12.4.4
   provider: ^6.0.5
