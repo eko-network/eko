@@ -6,8 +6,6 @@ import 'package:untitled_app/utilities/locator.dart';
 import '../controllers/compose_controller.dart';
 import '../custom_widgets/searched_user_card.dart';
 import '../utilities/constants.dart' as c;
-import 'package:cached_network_image/cached_network_image.dart';
-import '../custom_widgets/profile_picture_loading.dart';
 import '../models/group_handler.dart' show Group;
 import '../custom_widgets/profile_avatar.dart';
 
