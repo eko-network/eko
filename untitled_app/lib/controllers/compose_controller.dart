@@ -380,6 +380,7 @@ class ComposeController extends ChangeNotifier {
                   titleController.text = "";
                   bodyController.text = "";
                   gif = null;
+                  image = null;
                   context.pop();
 
                   final postID =

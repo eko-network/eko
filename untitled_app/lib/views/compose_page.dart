@@ -59,7 +59,6 @@ class _ComposePageState extends State<ComposePage> {
                       child: const Icon(Icons.perm_media),
                       onPressed: () async {
                         final state = _key.currentState;
-                        print(state);
                         if (state != null) {
                           state.toggle();
                         }

@@ -318,41 +318,9 @@ class PostCard extends StatelessWidget {
                                         ),
                                       const SizedBox(height: 6.0),
                                       if (post.gifURL != null && post.image == null)
-                                        InkWell(
-                                            onDoubleTap: () {
-                                              if (!isPreview) {
-                                                if (!Provider.of<
-                                                            PostCardController>(
-                                                        context,
-                                                        listen: false)
-                                                    .liked) {
-                                                  Provider.of<PostCardController>(
-                                                          context,
-                                                          listen: false)
-                                                      .likePressed();
-                                                }
-                                              }
-                                            },
-                                            child:
-                                                GifWidget(url: post.gifURL!)),
+                                                GifWidget(url: post.gifURL!),
                                       if (post.image != null)
-                                        InkWell(
-                                            onDoubleTap: () {
-                                              if (!isPreview) {
-                                                if (!Provider.of<
-                                                            PostCardController>(
-                                                        context,
-                                                        listen: false)
-                                                    .liked) {
-                                                  Provider.of<PostCardController>(
-                                                          context,
-                                                          listen: false)
-                                                      .likePressed();
-                                                }
-                                              }
-                                            },
-                                            child:
-                                                ImageWidget(text: post.image!)),
+                                                ImageWidget(text: post.image!),
                                       if (post.gifURL != null || post.image != null)
                                         const SizedBox(height: 6.0),
                                       if (post.body?.isNotEmpty ??
