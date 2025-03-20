@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:untitled_app/custom_widgets/controllers/pagination_controller.dart';
 import 'package:untitled_app/custom_widgets/gif_widget.dart';
+import 'package:untitled_app/custom_widgets/image_widget.dart';
 import 'package:untitled_app/custom_widgets/time_stamp.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:untitled_app/models/current_user.dart';
@@ -229,22 +230,7 @@ class PostCard extends StatelessWidget {
                                                 }
                                               },
                                               child:
-                                              // child: Column(
-                                              // mainAxisSize:
-                                              //     MainAxisSize.min,
-                                              // mainAxisAlignment:
-                                              //     MainAxisAlignment
-                                              //         .center,
-                                              // crossAxisAlignment:
-                                              //     CrossAxisAlignment
-                                              //         .start,
-                                              // children: [
-                                              //sized box
-                                              //fit: BoxFit.fill,
-                                              // width: isPreview
-                                              //     ? width * 0.5
-                                              //     : width * 0.7,
-                                              Row(
+                                                  Row(
                                                 children: [
                                                   Text(
                                                     "@${post.author.username}",
@@ -273,20 +259,6 @@ class PostCard extends StatelessWidget {
                                                     ),
                                                 ],
                                               ),
-
-                                              //const SizedBox(width: 8.0),
-                                              // Text(
-                                              //     "@${post.author.username}",
-                                              //     style: TextStyle(
-                                              //       fontSize: 12,
-                                              //       fontWeight: FontWeight.w300,
-                                              //       color: Theme.of(context)
-                                              //           .colorScheme
-                                              //           .onBackground,
-                                              //     ),
-                                              //   ),
-                                              // ],
-                                              // )
                                             ),
                                           ),
                                           // const Spacer(),
@@ -327,12 +299,6 @@ class PostCard extends StatelessWidget {
                                                                 chunk.substring(
                                                                     1),
                                                                 context);
-                                                            // Provider.of<
-                                                            //     PostCardController>(
-                                                            //   context,
-                                                            //   listen: false,
-                                                            // ).tagPressed(
-                                                            //     chunk.substring(1));
                                                           }
                                                         },
                                                 );
@@ -351,7 +317,7 @@ class PostCard extends StatelessWidget {
                                           ),
                                         ),
                                       const SizedBox(height: 6.0),
-                                      if (post.gifURL != null)
+                                      if (post.gifURL != null && post.image == null)
                                         InkWell(
                                             onDoubleTap: () {
                                               if (!isPreview) {
@@ -369,7 +335,25 @@ class PostCard extends StatelessWidget {
                                             },
                                             child:
                                                 GifWidget(url: post.gifURL!)),
-                                      if (post.gifURL != null)
+                                      if (post.image != null)
+                                        InkWell(
+                                            onDoubleTap: () {
+                                              if (!isPreview) {
+                                                if (!Provider.of<
+                                                            PostCardController>(
+                                                        context,
+                                                        listen: false)
+                                                    .liked) {
+                                                  Provider.of<PostCardController>(
+                                                          context,
+                                                          listen: false)
+                                                      .likePressed();
+                                                }
+                                              }
+                                            },
+                                            child:
+                                                ImageWidget(text: post.image!)),
+                                      if (post.gifURL != null || post.image != null)
                                         const SizedBox(height: 6.0),
                                       if (post.body?.isNotEmpty ??
                                           false) //&& post.body != []
@@ -502,9 +486,8 @@ class PostCard extends StatelessWidget {
                                   },
                                   child: Icon(
                                     CupertinoIcons.chat_bubble,
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurface,
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
                                     size: c.postIconSize,
                                   ),
                                 ),
@@ -531,9 +514,8 @@ class PostCard extends StatelessWidget {
                                             ? CupertinoIcons.share
                                             : CupertinoIcons
                                                 .arrowshape_turn_up_right,
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurface,
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
                                   ),
                                 ),
                               ],

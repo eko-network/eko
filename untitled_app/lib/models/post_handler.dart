@@ -17,6 +17,7 @@ class Post {
   final String? gifURL;
   final String? gifSource;
   String time;
+  final String? image;
   final List<String>? title;
   final List<String>? body;
   final List<String> tags;
@@ -31,6 +32,7 @@ class Post {
   Post({
     this.gifSource,
     required this.tags,
+    this.image,
     this.gifURL,
     this.postId = '',
     this.time = '',
@@ -57,6 +59,7 @@ class Post {
       title: parseText(rawPost.title),
       body: parseText(rawPost.body),
       time: rawPost.time,
+      image: rawPost.image,
       likes: rawPost.likes,
       commentCount: commentCount,
       rootPostId: rootPostId,
@@ -106,6 +109,7 @@ class RawPostObject {
   final String? title;
   final String? body;
   final String time;
+  final String? image;
   final String? gifUrl;
   final String? gifSource;
   final int likes;
@@ -117,6 +121,7 @@ class RawPostObject {
     required this.postID,
     required this.author,
     required this.title,
+    required this.image,
     required this.body,
     required this.time,
     required this.likes,
@@ -127,6 +132,7 @@ class RawPostObject {
         gifSource: json["gifSourcef"],
         gifUrl: json["gifUrl"],
         postID: id,
+        image: json["image"],
         author: json["author"] ?? "",
         title: json["title"],
         body: json["body"],

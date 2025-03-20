@@ -59,7 +59,6 @@ Future<void> main() async {
 
   //init
   await dotenv.load();
-  print('Loaded env variables: ${dotenv.env}');
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );

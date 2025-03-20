@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:untitled_app/custom_widgets/selected_user_groups.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
@@ -19,9 +18,9 @@ class CreateGroupPage extends StatelessWidget {
       builder: (context, child) {
         return PopScope(
             canPop: false,
-            onPopInvoked: (didPop) =>
-                Provider.of<CreateGroupPageController>(context, listen: false)
-                    .exitPressed(),
+            onPopInvokedWithResult: (didPop, result) =>
+              Provider.of<CreateGroupPageController>(context, listen: false)
+                .exitPressed(),
             child: PageView(
               physics:
                   Provider.of<CreateGroupPageController>(context, listen: true)

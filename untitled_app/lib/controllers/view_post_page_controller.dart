@@ -391,6 +391,7 @@ class PostPageController extends ChangeNotifier {
             {"body": comment}, post!.postId, post!.author.uid, post!.postId);
 
         final newComment = RawPostObject(
+          image: null,
           tags: ["public"],
           author: locator<CurrentUser>().getUID(),
           likes: 0,
