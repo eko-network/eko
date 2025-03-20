@@ -18,7 +18,7 @@ class ImageWidget extends StatelessWidget {
             text,
             style: GoogleFonts.martianMono(
               textStyle: TextStyle(
-                  fontWeight: FontWeight.w900,
+                  fontWeight: FontWeight.w700,
                   color: Theme.of(context).brightness == Brightness.light
                       ? Colors.black
                       : Colors.white,
