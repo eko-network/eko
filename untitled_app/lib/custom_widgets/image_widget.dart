@@ -13,7 +13,7 @@ class ImageWidget extends StatelessWidget {
       child: FittedBox(
         fit: BoxFit.contain,
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(100),
           child: Text(
             text,
             style: GoogleFonts.martianMono(
