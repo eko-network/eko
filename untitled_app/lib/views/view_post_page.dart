@@ -363,11 +363,8 @@ class ViewPostPage extends StatelessWidget {
                                                     .signInToComment,
                                             fillColor: Theme.of(context)
                                                 .colorScheme
-                                                .surface,
+                                                .outlineVariant,
                                             filled: true,
-                                            focusColor: Theme.of(context)
-                                                .colorScheme
-                                                .surface,
                                             border: OutlineInputBorder(
                                               borderRadius:
                                                   BorderRadius.circular(10.0),
