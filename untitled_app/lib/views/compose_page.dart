@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:untitled_app/custom_widgets/image_widget.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:untitled_app/models/current_user.dart';
 import 'package:untitled_app/utilities/locator.dart';
@@ -10,10 +11,16 @@ import '../models/group_handler.dart' show Group;
 import '../custom_widgets/profile_avatar.dart';
 import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 
-class ComposePage extends StatelessWidget {
+class ComposePage extends StatefulWidget {
+  const ComposePage({super.key, required this.group});
   final Group? group;
-  const ComposePage({super.key, this.group});
+  @override
+  State<ComposePage> createState() => _ComposePageState();
+}
 
+class _ComposePageState extends State<ComposePage> {
+  final _key = GlobalKey<ExpandableFabState>();
+  bool _isLoadingImage = false;
   @override
   Widget build(BuildContext context) {
     final audiance = AppLocalizations.of(context)!.public;
@@ -23,11 +30,12 @@ class ComposePage extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (context) => ComposeController(
         context: context,
-        audience: (group != null) ? group!.name : audiance,
+        audience: (widget.group != null) ? widget.group!.name : audiance,
         // groupEndPoint: group,
       ),
       builder: (context, child) {
-        Provider.of<ComposeController>(context, listen: false).initGroup(group);
+        Provider.of<ComposeController>(context, listen: false)
+            .initGroup(widget.group);
         return PopScope(
           canPop: false,
           onPopInvoked: (didPop) =>
@@ -40,25 +48,45 @@ class ComposePage extends StatelessWidget {
               //
               floatingActionButtonLocation: ExpandableFab.location,
               floatingActionButton: ExpandableFab(
+                key: _key,
                 openButtonBuilder: RotateFloatingActionButtonBuilder(
                     child: const Icon(Icons.add_photo_alternate_outlined)),
                 type: ExpandableFabType.up,
                 distance: 70.0,
                 children: [
                   FloatingActionButton.small(
-                    heroTag: null,
-                    child: const Icon(Icons.perm_media),
-                    onPressed: () =>
-                        Provider.of<ComposeController>(context, listen: false)
-                            .addImagePressed(),
-                  ),
+                      heroTag: null,
+                      child: const Icon(Icons.perm_media),
+                      onPressed: () async {
+                        final state = _key.currentState;
+                        print(state);
+                        if (state != null) {
+                          state.toggle();
+                        }
+                        setState(() {
+                      
+                          _isLoadingImage = true;
+                        });
+                        await Provider.of<ComposeController>(context,
+                                listen: false)
+                            .addImagePressed();
+                        setState(() {
+                     
+                          _isLoadingImage = false;
+                        });
+                      }),
                   FloatingActionButton.small(
                     heroTag: null,
-                    child: const Icon(Icons.search),
-                    onPressed: () =>
-                        Provider.of<ComposeController>(context, listen: false)
-                            .addGifPressed(),
+                    onPressed: () {
+                      final state = _key.currentState;
+                      if (state != null) {
+                        state.toggle();
+                      }
+                      Provider.of<ComposeController>(context, listen: false)
+                          .addGifPressed();
+                    },
                     shape: const CircleBorder(),
+                    child: const Icon(Icons.gif_box_rounded),
                   ),
                 ],
               ),
@@ -224,82 +252,112 @@ class ComposePage extends StatelessWidget {
                                       "${composeController.titleChars}/${c.maxTitleChars} ${AppLocalizations.of(context)!.characters}")
                                   : Container(),
                         ),
-                        Provider.of<ComposeController>(context, listen: true)
+                        if (Provider.of<ComposeController>(context,
+                                        listen: true)
                                     .gif !=
-                                null
-                            ? FittedBox(
-                                fit: BoxFit.scaleDown,
-                                child: Stack(
-                                  alignment: Alignment.topRight,
-                                  children: [
-                                    Container(
-                                      alignment: Alignment.center,
-                                      padding: EdgeInsets.symmetric(
-                                          vertical: height * 0.025,
-                                          horizontal: height * 0.025),
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(10),
-                                        child: Image.network(
-                                          Provider.of<ComposeController>(
-                                                  context,
-                                                  listen: true)
-                                              .gif!
-                                              .images!
-                                              .fixedWidth
-                                              .url,
-                                          loadingBuilder: (BuildContext context,
-                                              Widget child,
-                                              ImageChunkEvent?
-                                                  loadingProgress) {
-                                            if (loadingProgress == null) {
-                                              return child;
-                                            }
-                                            return Container(
-                                              alignment: Alignment.center,
-                                              width: 200,
-                                              height: 150,
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .onSurface,
-                                              child: CircularProgressIndicator(
-                                                value: loadingProgress
-                                                            .expectedTotalBytes !=
-                                                        null
-                                                    ? loadingProgress
-                                                            .cumulativeBytesLoaded /
-                                                        loadingProgress
-                                                            .expectedTotalBytes!
-                                                    : null,
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                      ),
-                                    ),
-                                    IconButton(
-                                      onPressed: () =>
-                                          Provider.of<ComposeController>(
-                                                  context,
-                                                  listen: false)
-                                              .removeGifPressed(),
-                                      icon: DecoratedBox(
-                                        decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .surface),
-                                        child: Icon(
-                                          Icons.cancel,
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .onSurface,
-                                        ),
-                                      ),
-                                    )
-                                  ],
+                                null ||
+                            Provider.of<ComposeController>(context,
+                                        listen: true)
+                                    .image !=
+                                null || _isLoadingImage )
+                          FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Stack(
+                              alignment: Alignment.topRight,
+                              children: [
+                                Container(
+                                  alignment: Alignment.center,
+                                  padding: EdgeInsets.symmetric(
+                                      vertical: height * 0.025,
+                                      horizontal: height * 0.025),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: _isLoadingImage
+                                            ? SizedBox(
+                                                child: Padding(
+                                                    padding: EdgeInsets.all(10),
+                                                    child:
+                                                        CircularProgressIndicator()))
+                                            : Provider.of<ComposeController>(
+                                                    context,
+                                                    listen: true)
+                                                .image !=
+                                            null
+                                        ? ImageWidget(
+                                                text: Provider.of<
+                                                            ComposeController>(
+                                                        context,
+                                                        listen: true)
+                                                    .image!)
+                                        : Image.network(
+                                            Provider.of<ComposeController>(
+                                                    context,
+                                                    listen: true)
+                                                .gif!
+                                                .images!
+                                                .fixedWidth
+                                                .url,
+                                            loadingBuilder:
+                                                (BuildContext context,
+                                                    Widget child,
+                                                    ImageChunkEvent?
+                                                        loadingProgress) {
+                                              if (loadingProgress == null) {
+                                                return child;
+                                              }
+                                              return Container(
+                                                alignment: Alignment.center,
+                                                width: 200,
+                                                height: 150,
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onSurface,
+                                                child:
+                                                    CircularProgressIndicator(
+                                                  value: loadingProgress
+                                                              .expectedTotalBytes !=
+                                                          null
+                                                      ? loadingProgress
+                                                              .cumulativeBytesLoaded /
+                                                          loadingProgress
+                                                              .expectedTotalBytes!
+                                                      : null,
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                  ),
                                 ),
-                              )
-                            : Container(),
+                                IconButton(
+                                  iconSize: Provider.of<ComposeController>(
+                                                      context,
+                                                      listen: true)
+                                                  .image !=
+                                              null &&
+                                          _isLoadingImage == false
+                                      ? 150
+                                      : 30,
+                                  onPressed: () =>
+                                      Provider.of<ComposeController>(context,
+                                              listen: false)
+                                          .removeGifPressed(),
+                                  icon: DecoratedBox(
+                                    decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .surface),
+                                    child: Icon(
+                                      Icons.cancel,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface,
+                                    ),
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
                         ConstrainedBox(
                           constraints: BoxConstraints(maxHeight: height * 0.5),
                           child: TextField(

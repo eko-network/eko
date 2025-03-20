@@ -125,6 +125,7 @@ class ComposeController extends ChangeNotifier {
 
   removeGifPressed() {
     gif = null;
+    image = null;
     notifyListeners();
   }
 
@@ -255,7 +256,7 @@ class ComposeController extends ChangeNotifier {
     }
   }
 
-  addImagePressed() async {
+  Future<void> addImagePressed() async {
     locator<NavBarController>().disable();
     final ImagePicker picker = ImagePicker();
     final XFile? imageLocal =
@@ -266,6 +267,7 @@ class ComposeController extends ChangeNotifier {
       String? ascii = await uploadImage(File(imageFile.path));
       if (ascii != null) {
         image = ascii;
+        gif = null;
       }
       notifyListeners();
     } else {}
@@ -285,6 +287,7 @@ class ComposeController extends ChangeNotifier {
     //only update gif a gif was selected
     if (newGif != null) {
       gif = newGif;
+      image = null;
     }
     notifyListeners();
     locator<NavBarController>().enable();
