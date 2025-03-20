@@ -70,7 +70,7 @@ class _InvalidPage extends StatelessWidget {
                 AppLocalizations.of(context)!.badAuthState,
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                    color: Theme.of(context).colorScheme.onBackground,
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 18),
               ),
             ),
@@ -131,7 +131,7 @@ class _ResetPasswordPage extends StatelessWidget {
                 "${AppLocalizations.of(context)!.resetPasswordPromt} ${Provider.of<AuthActionInterfaceController>(context, listen: true).userEmail}",
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                    color: Theme.of(context).colorScheme.onBackground,
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 20),
               ),
 
@@ -240,7 +240,7 @@ class _ResetPasswordPage extends StatelessWidget {
                   AppLocalizations.of(context)!.cancel,
                   style: TextStyle(
                       decoration: TextDecoration.underline,
-                      color: Theme.of(context).colorScheme.onBackground,
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 18),
                 ),
                 onPressed: () => Provider.of<AuthActionInterfaceController>(

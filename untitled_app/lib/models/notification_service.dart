@@ -6,8 +6,6 @@ import 'package:untitled_app/controllers/bottom_nav_bar_controller.dart';
 import 'package:untitled_app/controllers/feed_controller.dart';
 import 'package:untitled_app/models/feed_post_cache.dart';
 import 'package:untitled_app/utilities/locator.dart';
-import '../models/post_handler.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 class NotificationService extends ChangeNotifier {
   NotificationService() {

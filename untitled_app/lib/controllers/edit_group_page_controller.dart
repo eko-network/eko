@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:untitled_app/controllers/groups_page_controller.dart';
 import 'package:untitled_app/custom_widgets/searched_user_card.dart';
 import 'package:untitled_app/custom_widgets/warning_dialog.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
-import 'package:untitled_app/localization/generated/app_localizations_en.dart';
 import 'package:untitled_app/models/post_handler.dart';
 import 'package:untitled_app/utilities/locator.dart';
 import '../custom_widgets/controllers/pagination_controller.dart';

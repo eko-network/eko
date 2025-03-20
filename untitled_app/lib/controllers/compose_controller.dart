@@ -9,7 +9,6 @@ import '../custom_widgets/error_snack_bar.dart';
 import 'package:giphy_get/giphy_get.dart';
 import '../utilities/locator.dart';
 import '../models/post_handler.dart';
-import '../secrets/secrets.dart' as s;
 import 'bottom_nav_bar_controller.dart';
 import '../custom_widgets/post_card.dart';
 import "package:go_router/go_router.dart";
@@ -20,6 +19,7 @@ import '../custom_widgets/controllers/pagination_controller.dart'
     show PaginationGetterReturn;
 import '../custom_widgets/pagination.dart';
 import '../custom_widgets/group_card.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class ComposeController extends ChangeNotifier {
   final BuildContext context;
@@ -165,7 +165,7 @@ class ComposeController extends ChangeNotifier {
   void audianceButtonPressed() {
     showModalBottomSheet(
       showDragHandle: true,
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       isScrollControlled: true,
       context: context,
       builder: (BuildContext context) {
@@ -237,7 +237,7 @@ class ComposeController extends ChangeNotifier {
     locator<NavBarController>().disable();
     GiphyGif? newGif = await GiphyGet.getGif(
       context: context,
-      apiKey: s.GIPHY_API_KEY,
+      apiKey: dotenv.env["GIPHY_API_KEY"]!,
       lang: GiphyLanguage.english,
       //randomID: "abcd", // Optional - An ID/proxy for a specific user.
       tabColor: Colors.teal,

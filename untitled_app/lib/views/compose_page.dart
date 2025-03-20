@@ -6,8 +6,6 @@ import 'package:untitled_app/utilities/locator.dart';
 import '../controllers/compose_controller.dart';
 import '../custom_widgets/searched_user_card.dart';
 import '../utilities/constants.dart' as c;
-import 'package:cached_network_image/cached_network_image.dart';
-import '../custom_widgets/profile_picture_loading.dart';
 import '../models/group_handler.dart' show Group;
 import '../custom_widgets/profile_avatar.dart';
 
@@ -61,12 +59,12 @@ class ComposePage extends StatelessWidget {
                               .clearPressed(),
                       style: TextButton.styleFrom(
                           backgroundColor:
-                              Theme.of(context).colorScheme.background),
+                              Theme.of(context).colorScheme.surface),
                       child: Text(
                         AppLocalizations.of(context)!.clear,
                         style: TextStyle(
                             fontSize: 16,
-                            color: Theme.of(context).colorScheme.onBackground),
+                            color: Theme.of(context).colorScheme.onSurface),
                       ),
                     ),
                     TextButton(
@@ -75,7 +73,7 @@ class ComposePage extends StatelessWidget {
                               .postPressed(context),
                       style: TextButton.styleFrom(
                           backgroundColor:
-                              Theme.of(context).colorScheme.surfaceVariant),
+                              Theme.of(context).colorScheme.surfaceContainerHighest),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -84,21 +82,21 @@ class ComposePage extends StatelessWidget {
                             style: TextStyle(
                                 fontSize: 20,
                                 color:
-                                    Theme.of(context).colorScheme.onBackground),
+                                    Theme.of(context).colorScheme.onSurface),
                           ),
                           SizedBox(
                             width: width * 0.02,
                           ),
                           Icon(
                             Icons.send,
-                            color: Theme.of(context).colorScheme.onBackground,
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
                         ],
                       ),
                     ),
                   ],
                 ),
-                backgroundColor: Theme.of(context).colorScheme.background,
+                backgroundColor: Theme.of(context).colorScheme.surface,
               ),
               body: IndexedStack(
                 index: !Provider.of<ComposeController>(context, listen: false)
@@ -168,13 +166,13 @@ class ComposePage extends StatelessWidget {
                                 .titleController,
                             maxLines: null,
                             cursorColor:
-                                Theme.of(context).colorScheme.onBackground,
+                                Theme.of(context).colorScheme.onSurface,
                             keyboardType: TextInputType.text,
                             style: TextStyle(
                                 fontSize: 30,
                                 fontWeight: FontWeight.bold,
                                 color:
-                                    Theme.of(context).colorScheme.onBackground),
+                                    Theme.of(context).colorScheme.onSurface),
                             decoration: InputDecoration(
                               contentPadding: EdgeInsets.all(height * 0.01),
                               hintText: AppLocalizations.of(context)!.postTitle,
@@ -249,7 +247,7 @@ class ComposePage extends StatelessWidget {
                                               height: 150,
                                               color: Theme.of(context)
                                                   .colorScheme
-                                                  .onBackground,
+                                                  .onSurface,
                                               child: CircularProgressIndicator(
                                                 value: loadingProgress
                                                             .expectedTotalBytes !=
@@ -276,12 +274,12 @@ class ComposePage extends StatelessWidget {
                                             shape: BoxShape.circle,
                                             color: Theme.of(context)
                                                 .colorScheme
-                                                .background),
+                                                .surface),
                                         child: Icon(
                                           Icons.cancel,
                                           color: Theme.of(context)
                                               .colorScheme
-                                              .onBackground,
+                                              .onSurface,
                                         ),
                                       ),
                                     )
@@ -309,13 +307,13 @@ class ComposePage extends StatelessWidget {
                                 .bodyController,
                             maxLines: null,
                             cursorColor:
-                                Theme.of(context).colorScheme.onBackground,
+                                Theme.of(context).colorScheme.onSurface,
                             keyboardType: TextInputType.multiline,
                             style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.normal,
                                 color:
-                                    Theme.of(context).colorScheme.onBackground),
+                                    Theme.of(context).colorScheme.onSurface),
                             decoration: InputDecoration(
                               contentPadding: EdgeInsets.all(height * 0.01),
                               hintText: AppLocalizations.of(context)!.addText,
@@ -370,13 +368,13 @@ class ComposePage extends StatelessWidget {
                           textCapitalization: TextCapitalization.sentences,
                           maxLines: null,
                           cursorColor:
-                              Theme.of(context).colorScheme.onBackground,
+                              Theme.of(context).colorScheme.onSurface,
                           keyboardType: TextInputType.text,
                           style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.normal,
                               color:
-                                  Theme.of(context).colorScheme.onBackground),
+                                  Theme.of(context).colorScheme.onSurface),
                           decoration: InputDecoration(
                             contentPadding: EdgeInsets.all(height * 0.01),
                             hintText: AppLocalizations.of(context)!.addText,
@@ -408,7 +406,7 @@ class ComposePage extends StatelessWidget {
                                             fontSize: 18,
                                             color: Theme.of(context)
                                                 .colorScheme
-                                                .onBackground),
+                                                .onSurface),
                                       ),
                                     )
                                   : ListView.builder(

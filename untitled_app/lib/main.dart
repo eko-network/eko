@@ -8,7 +8,6 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:untitled_app/models/firebase_helper.dart';
 import 'package:untitled_app/models/notification_service.dart';
-import 'package:untitled_app/models/presence_manager.dart';
 import 'package:untitled_app/models/version_control.dart';
 import 'utilities/themes/dark_theme_provider.dart';
 import 'utilities/themes/dark_theme_styles.dart';
@@ -24,12 +23,11 @@ import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:untitled_app/firebase_options.dart';
 // import 'package:untitled_app/utilities/firebase_options.dart';
-import 'package:untitled_app/utilities/constants.dart' as c;
-import 'secrets/secrets.dart' as s;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 Future<void> _setupAppCheck() async {
   await FirebaseAppCheck.instance.activate(
-    webProvider: ReCaptchaV3Provider(s.reCaptcha),
+    webProvider: ReCaptchaV3Provider(dotenv.env['RE_CAPTCHA']!),
     androidProvider:
         kReleaseMode ? AndroidProvider.playIntegrity : AndroidProvider.debug,
     appleProvider: kReleaseMode ? AppleProvider.appAttest : AppleProvider.debug,
@@ -60,10 +58,12 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   //init
+  await dotenv.load();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  FirebaseDatabase.instance.setPersistenceEnabled(false); // FIXME doesnt seem to work :(
+  FirebaseDatabase.instance
+      .setPersistenceEnabled(false); // FIXME doesnt seem to work :(
 
   //setup appcheck and non-protected services
   await Future.wait([

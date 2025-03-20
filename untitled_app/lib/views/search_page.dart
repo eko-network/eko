@@ -46,7 +46,7 @@ class SearchPage extends StatelessWidget {
                       Provider.of<SearchPageController>(context, listen: false)
                           .startAfterQuery,
                   header: TextField(
-                    cursorColor: Theme.of(context).colorScheme.onBackground,
+                    cursorColor: Theme.of(context).colorScheme.onSurface,
                     decoration: InputDecoration(
                       contentPadding: EdgeInsets.all(height * 0.01),
                       prefixIcon: Padding(

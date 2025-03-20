@@ -62,7 +62,7 @@ class _Header extends StatelessWidget {
                     Text(
                       "@${profileController.user.username}",
                       style: TextStyle(
-                          color: Theme.of(context).colorScheme.onBackground,
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontWeight: FontWeight.bold,
                           fontSize: 20),
                       overflow: TextOverflow.ellipsis,
@@ -123,7 +123,7 @@ class _Header extends StatelessWidget {
                   style: TextButton.styleFrom(
                     side: BorderSide(
                         width: 2,
-                        color: Theme.of(context).colorScheme.onBackground),
+                        color: Theme.of(context).colorScheme.onSurface),
                   ),
                   onPressed: () =>
                       Provider.of<ProfileController>(context, listen: false)
@@ -134,7 +134,7 @@ class _Header extends StatelessWidget {
                       fontSize: 16,
                       letterSpacing: 1,
                       fontWeight: FontWeight.normal,
-                      color: Theme.of(context).colorScheme.onBackground,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                 ),

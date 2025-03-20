@@ -22,6 +22,7 @@ class CurrentUser extends AppUser {
   List<dynamic> blockedBy = [];
   bool stateIsLiking = false;
   bool stateIsFollowing = false;
+  @override
   bool isVerified = false;
   // CurrentUser({this.newActivity = false}) {
   //   // if (likedPosts.isEmpty) {

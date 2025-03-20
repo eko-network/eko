@@ -17,11 +17,11 @@ class GetAppFab extends StatelessWidget {
       style: ButtonStyle(
 
         backgroundColor:
-            MaterialStateProperty.all(Theme.of(context).colorScheme.primary),
-         side: MaterialStateProperty.all(
+            WidgetStateProperty.all(Theme.of(context).colorScheme.primary),
+         side: WidgetStateProperty.all(
             BorderSide.none),
         // Set the shape of the button
-        shape: MaterialStateProperty.all(
+        shape: WidgetStateProperty.all(
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
       ),
       // Set the button label

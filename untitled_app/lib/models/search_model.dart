@@ -1,4 +1,3 @@
-import '../secrets/secrets.dart' as s;
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'users.dart';
@@ -6,15 +5,16 @@ import "../utilities/constants.dart" as c;
 import '../models/current_user.dart';
 import 'package:untitled_app/utilities/locator.dart';
 import 'package:untitled_app/custom_widgets/controllers/pagination_controller.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class SearchModel {
   Future<List<AppUser>> hitsQuery(String query, {int page = 0}) async {
     final response = await http.post(
       Uri.parse(
-          'https://${s.ALGOLIA_APP_ID}-dsn.algolia.net/1/indexes/users/query'),
+          'https://${dotenv.env["ALGOLIA_APP_ID"]!}-dsn.algolia.net/1/indexes/users/query'),
       headers: <String, String>{
-        'X-Algolia-API-Key': s.SEARCH_API_KEY,
-        'X-Algolia-Application-Id': s.ALGOLIA_APP_ID,
+        'X-Algolia-API-Key': dotenv.env["SEARCH_API_KEY"]!,
+        'X-Algolia-Application-Id': dotenv.env["ALGOLIA_APP_ID"]!,
       },
       body: jsonEncode(<String, String>{
         'params': 'query=$query&hitsPerPage=${c.usersOnSearch}&page=$page',

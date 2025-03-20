@@ -117,9 +117,9 @@ class ScaffoldWithNavigationBar extends StatelessWidget {
                   showUnselectedLabels: false,
                   showSelectedLabels: false,
                   unselectedItemColor:
-                      Theme.of(context).colorScheme.onBackground,
-                  selectedItemColor: Theme.of(context).colorScheme.onBackground,
-                  backgroundColor: Theme.of(context).colorScheme.background,
+                      Theme.of(context).colorScheme.onSurface,
+                  selectedItemColor: Theme.of(context).colorScheme.onSurface,
+                  backgroundColor: Theme.of(context).colorScheme.surface,
                   items: [
                     for (int i = 0; i < _passiveIconList.length; i++)
                       BottomNavigationBarItem(

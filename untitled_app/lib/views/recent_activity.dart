@@ -20,16 +20,16 @@ class RecentActivity extends StatelessWidget {
             scrolledUnderElevation: 0.0,
             leading: IconButton(
               icon: Icon(Icons.arrow_back_ios_rounded,
-                  color: Theme.of(context).colorScheme.onBackground),
+                  color: Theme.of(context).colorScheme.onSurface),
               onPressed: () => context.pop("poped"),
             ),
-            backgroundColor: Theme.of(context).colorScheme.background,
+            backgroundColor: Theme.of(context).colorScheme.surface,
             title: Text(
               AppLocalizations.of(context)!.recentActivity,
               style: TextStyle(
                 fontWeight: FontWeight.normal,
                 
-                color: Theme.of(context).colorScheme.onBackground,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
           ),

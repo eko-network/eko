@@ -58,14 +58,14 @@ class WelcomePage extends StatelessWidget {
                     },
                     style: OutlinedButton.styleFrom(
                       side: BorderSide(
-                          color: Theme.of(context).colorScheme.onBackground),
+                          color: Theme.of(context).colorScheme.onSurface),
                       backgroundColor: Colors.transparent,
                       minimumSize: Size(width * .8, height * .07),
                     ),
                     child: Text(AppLocalizations.of(context)!.logIn,
                         style: TextStyle(
                             fontSize: 22,
-                            color: Theme.of(context).colorScheme.onBackground)),
+                            color: Theme.of(context).colorScheme.onSurface)),
                   ),
                   SizedBox(
                     height: height * .03,
@@ -77,14 +77,14 @@ class WelcomePage extends StatelessWidget {
                     },
                     style: OutlinedButton.styleFrom(
                       side: BorderSide(
-                          color: Theme.of(context).colorScheme.onBackground),
+                          color: Theme.of(context).colorScheme.onSurface),
                       backgroundColor: Colors.transparent,
                       minimumSize: Size(width * .8, height * .07),
                     ),
                     child: Text(AppLocalizations.of(context)!.createAccount,
                         style: TextStyle(
                             fontSize: 22,
-                            color: Theme.of(context).colorScheme.onBackground)),
+                            color: Theme.of(context).colorScheme.onSurface)),
                   ),
                 ],
               ),

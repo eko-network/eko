@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:provider/provider.dart';
 import '../controllers/profile_picture_detail_controller.dart';
-import '../custom_widgets/profile_picture_loading.dart';
 import '../custom_widgets/profile_avatar.dart';
 import '../utilities/constants.dart' as c;
 

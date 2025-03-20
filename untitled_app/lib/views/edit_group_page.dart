@@ -69,10 +69,10 @@ class _GroupSettings extends StatelessWidget {
           surfaceTintColor: Colors.transparent,
           leading: IconButton(
             icon: Icon(Icons.arrow_back_ios_rounded,
-                color: Theme.of(context).colorScheme.onBackground),
+                color: Theme.of(context).colorScheme.onSurface),
             onPressed: () => context.pop(),
           ),
-          backgroundColor: Theme.of(context).colorScheme.background,
+          backgroundColor: Theme.of(context).colorScheme.surface,
         ),
         body: Padding(
           padding: EdgeInsets.only(left: height * 0.02, right: height * 0.02),
@@ -130,7 +130,7 @@ class _GroupSettings extends StatelessWidget {
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.onBackground,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                   ],
@@ -142,7 +142,7 @@ class _GroupSettings extends StatelessWidget {
                   children: [
                     IconButton(
                       icon: const Icon(Icons.person_add_outlined),
-                      color: Theme.of(context).colorScheme.onBackground,
+                      color: Theme.of(context).colorScheme.onSurface,
                       onPressed: () {
                         Provider.of<EditGroupPageController>(context,
                                 listen: false)
@@ -154,14 +154,14 @@ class _GroupSettings extends StatelessWidget {
                     ),
                     IconButton(
                       icon: const Icon(Icons.notifications_none),
-                      color: Theme.of(context).colorScheme.onBackground,
+                      color: Theme.of(context).colorScheme.onSurface,
                       onPressed: () {
                         // TODO
                       },
                     ),
                     IconButton(
                       icon: const Icon(Icons.exit_to_app_rounded),
-                      color: Theme.of(context).colorScheme.onBackground,
+                      color: Theme.of(context).colorScheme.onSurface,
                       onPressed: () {
                         Provider.of<EditGroupPageController>(context,
                                 listen: false)
@@ -230,7 +230,7 @@ class _AddPeople extends StatelessWidget {
           pinned: false,
           scrolledUnderElevation: 0.0,
           centerTitle: true,
-          backgroundColor: Theme.of(context).colorScheme.background,
+          backgroundColor: Theme.of(context).colorScheme.surface,
           bottom: PreferredSize(
             //FIXME this may be arbitrary
             preferredSize: Size.fromHeight(height *
@@ -242,7 +242,7 @@ class _AddPeople extends StatelessWidget {
             child: Column(
               children: [
                 TextField(
-                  cursorColor: Theme.of(context).colorScheme.onBackground,
+                  cursorColor: Theme.of(context).colorScheme.onSurface,
                   decoration: InputDecoration(
                     contentPadding: EdgeInsets.all(height * 0.01),
                     prefixIcon: Padding(

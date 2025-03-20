@@ -35,13 +35,13 @@ class ShareProfile extends StatelessWidget {
           appBar: AppBar(
             leading: IconButton(
               icon: Icon(Icons.arrow_back_ios_rounded,
-                  color: Theme.of(context).colorScheme.onBackground),
+                  color: Theme.of(context).colorScheme.onSurface),
               onPressed: () => context.pop("poped"),
             ),
             automaticallyImplyLeading: false,
             centerTitle: true,
             title: Text(AppLocalizations.of(context)!.shareProfile),
-            backgroundColor: Theme.of(context).colorScheme.background,
+            backgroundColor: Theme.of(context).colorScheme.surface,
           ),
           body: Center(
             child: SizedBox(

@@ -3,8 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'controllers/pagination_controller.dart';
 import 'package:untitled_app/models/feed_post_cache.dart' show Cache;
-import 'package:loading_indicator/loading_indicator.dart';
-import '../utilities/constants.dart' as c;
 import 'loading_spinner.dart';
 
 class _DefaultInitialLoader extends StatelessWidget {

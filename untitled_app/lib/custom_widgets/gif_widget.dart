@@ -23,7 +23,7 @@ class GifWidget extends StatelessWidget {
             alignment: Alignment.center,
             width: 200,
             height: 150,
-            color: Theme.of(context).colorScheme.onBackground,
+            color: Theme.of(context).colorScheme.onSurface,
             child: CircularProgressIndicator(
               value: loadingProgress.expectedTotalBytes != null
                   ? loadingProgress.cumulativeBytesLoaded /

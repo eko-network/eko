@@ -2,7 +2,6 @@
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
 import 'package:untitled_app/models/current_user.dart';
 import 'package:untitled_app/models/group_handler.dart';
 import 'package:untitled_app/utilities/locator.dart';
@@ -18,6 +17,7 @@ class Post {
   final String? gifURL;
   final String? gifSource;
   String time;
+  final String? image;
   final List<String>? title;
   final List<String>? body;
   final List<String> tags;
@@ -32,6 +32,7 @@ class Post {
   Post({
     this.gifSource,
     required this.tags,
+    this.image,
     this.gifURL,
     this.postId = '',
     this.time = '',
@@ -58,6 +59,7 @@ class Post {
       title: parseText(rawPost.title),
       body: parseText(rawPost.body),
       time: rawPost.time,
+      image: rawPost.image,
       likes: rawPost.likes,
       commentCount: commentCount,
       rootPostId: rootPostId,
@@ -107,6 +109,7 @@ class RawPostObject {
   final String? title;
   final String? body;
   final String time;
+  final String? image;
   final String? gifUrl;
   final String? gifSource;
   final int likes;
@@ -118,6 +121,7 @@ class RawPostObject {
     required this.postID,
     required this.author,
     required this.title,
+    required this.image,
     required this.body,
     required this.time,
     required this.likes,
@@ -128,6 +132,7 @@ class RawPostObject {
         gifSource: json["gifSourcef"],
         gifUrl: json["gifUrl"],
         postID: id,
+        image: json["image"],
         author: json["author"] ?? "",
         title: json["title"],
         body: json["body"],

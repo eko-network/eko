@@ -22,7 +22,7 @@ import '../custom_widgets/controllers/pagination_controller.dart'
     show PaginationGetterReturn;
 import '../models/feed_post_cache.dart';
 import 'bottom_nav_bar_controller.dart';
-import '../secrets/secrets.dart' as s;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class PostPageController extends ChangeNotifier {
   final Post? passedPost;
@@ -134,7 +134,7 @@ class PostPageController extends ChangeNotifier {
     context.pop();
   }
 
-   void _popDialog() {
+  void _popDialog() {
     Navigator.of(context, rootNavigator: true).pop();
   }
 
@@ -229,12 +229,12 @@ class PostPageController extends ChangeNotifier {
 
                 maxLines: null,
                 maxLength: 300,
-                cursorColor: Theme.of(context).colorScheme.onBackground,
+                cursorColor: Theme.of(context).colorScheme.onSurface,
                 keyboardType: TextInputType.multiline,
                 style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.normal,
-                    color: Theme.of(context).colorScheme.onBackground),
+                    color: Theme.of(context).colorScheme.onSurface),
                 decoration: InputDecoration(
                   contentPadding: EdgeInsets.all(height * 0.01),
                   hintText: AppLocalizations.of(context)!.addText,
@@ -391,6 +391,7 @@ class PostPageController extends ChangeNotifier {
             {"body": comment}, post!.postId, post!.author.uid, post!.postId);
 
         final newComment = RawPostObject(
+          image: null,
           tags: ["public"],
           author: locator<CurrentUser>().getUID(),
           likes: 0,
@@ -444,7 +445,7 @@ class PostPageController extends ChangeNotifier {
     locator<NavBarController>().disable();
     GiphyGif? newGif = await GiphyGet.getGif(
       context: context,
-      apiKey: s.GIPHY_API_KEY,
+      apiKey: dotenv.env["GIPHY_API_KEY"]!,
       lang: GiphyLanguage.english,
       //randomID: "abcd", // Optional - An ID/proxy for a specific user.
       tabColor: Colors.teal,

@@ -150,7 +150,7 @@ class UserCard extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 14,
                                 color:
-                                    Theme.of(context).colorScheme.onBackground,
+                                    Theme.of(context).colorScheme.onSurface,
                               ),
                             ),
                           ),
@@ -189,7 +189,7 @@ class UserCard extends StatelessWidget {
                                 //letterSpacing: 1,
                                 //fontWeight: FontWeight.normal,
                                 color:
-                                    Theme.of(context).colorScheme.onBackground,
+                                    Theme.of(context).colorScheme.onSurface,
                               ),
                             ),
                           ),

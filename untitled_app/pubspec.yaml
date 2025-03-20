@@ -79,6 +79,7 @@ dependencies:
     path: ./like_button-custom/
   giphy_get:
     path: ./giphy_get-custom/
+  flutter_dotenv: ^5.2.1
 dev_dependencies:
   
   # flutter_test:
@@ -106,6 +107,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - images/
+    - .env
 
 
 

@@ -24,11 +24,9 @@ ColorScheme lightThemeColors(context) {
     errorContainer: Color(0xFFFFDAD6),
     onError: Color(0xFFFFFFFF),
     onErrorContainer: Color(0xFF410002),
-    background: Color(0xFFFFFBFF),
-    onBackground: Color.fromARGB(255, 0, 0, 0),
-    surface: Color.fromARGB(255, 240, 239, 239),
+    surface: Color.fromARGB(255, 245, 245, 245),
     onSurface: Color(0xFF1B1B1F),
-    surfaceVariant: Color(0xFFE3E1EC),
+    surfaceContainerHighest: Color(0xFFE3E1EC),
     onSurfaceVariant: Color(0xFF46464F),
     outline: Color.fromARGB(255, 196, 196, 196),
     onInverseSurface: Color(0xFFF3EFF4),
@@ -60,11 +58,9 @@ ColorScheme darkThemeColors(context) {
     errorContainer: Color(0xFF93000A),
     onError: Color(0xFF690005),
     onErrorContainer: Color(0xFFFFDAD6),
-    background: Color(0xFF000000), //0xFF191C1B
-    onBackground: Color(0xFFE5E1E6),
-    surface: Color(0xFF1B1B1F),
+    surface: Color.fromARGB(255, 18, 18, 18),
     onSurface: Color(0xFFE5E1E6),
-    surfaceVariant: Color(0xFF46464F),
+    surfaceContainerHighest: Color(0xFF46464F),
     onSurfaceVariant: Color.fromARGB(255, 133, 132, 139),
     outline: Color.fromARGB(255, 47, 47, 47),
     onInverseSurface: Color(0xFF1B1B1F),
@@ -93,8 +89,8 @@ const List<Color> darkModeGradient = [
 ButtonStyle buttonStyle(context) {
   return ButtonStyle(
     splashFactory: NoSplash.splashFactory,
-    overlayColor: MaterialStateProperty.all(Colors.transparent),
-    mouseCursor: MaterialStateProperty.all(MouseCursor.defer),
+    overlayColor: WidgetStateProperty.all(Colors.transparent),
+    mouseCursor: WidgetStateProperty.all(MouseCursor.defer),
   );
 }
 

@@ -32,7 +32,7 @@ class FeedPage extends StatelessWidget {
           pinned: false,
           scrolledUnderElevation: 0.0,
           centerTitle: true,
-          backgroundColor: Theme.of(context).colorScheme.background,
+          backgroundColor: Theme.of(context).colorScheme.surface,
           bottom: PreferredSize(
             preferredSize: const Size.fromHeight(10),
             child: Column(
@@ -53,7 +53,7 @@ class FeedPage extends StatelessWidget {
                 children: [
                   Icon(
                     Icons.notifications,
-                    color: Theme.of(context).colorScheme.onBackground,
+                    color: Theme.of(context).colorScheme.onSurface,
                     size: 28,
                   ),
                   if (Provider.of<FeedController>(context, listen: true)

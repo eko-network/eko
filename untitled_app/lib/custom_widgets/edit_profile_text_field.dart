@@ -53,7 +53,7 @@ class ProfileInputFeild extends StatelessWidget {
       width: feildWidth,
       //height: 100,
       child: TextFormField(
-        cursorColor: Theme.of(context).colorScheme.onBackground,
+        cursorColor: Theme.of(context).colorScheme.onSurface,
         enabled: enabled,
         inputFormatters: [
           FilteringTextInputFormatter.allow(RegExp(filter)),
@@ -75,27 +75,27 @@ class ProfileInputFeild extends StatelessWidget {
         style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.normal,
-            color: Theme.of(context).colorScheme.onBackground),
+            color: Theme.of(context).colorScheme.onSurface),
         decoration: InputDecoration(
           labelText: label,
           labelStyle: TextStyle(
             fontSize: 18,
             letterSpacing: 1,
             fontWeight: FontWeight.normal,
-            color: Theme.of(context).colorScheme.onBackground,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
           fillColor:
-              Theme.of(context).colorScheme.onBackground.withOpacity(0.2),
+              Theme.of(context).colorScheme.onSurface.withOpacity(0.2),
           filled: true,
           enabledBorder: OutlineInputBorder(
             borderSide:
-                BorderSide(color: Theme.of(context).colorScheme.background),
+                BorderSide(color: Theme.of(context).colorScheme.surface),
             borderRadius: BorderRadius.circular(10.0),
           ),
           focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10.0),
               borderSide: BorderSide(
-                  color: Theme.of(context).colorScheme.onBackground)),
+                  color: Theme.of(context).colorScheme.onSurface)),
         ),
       ),
     );

@@ -85,13 +85,13 @@ class SubGroupPage extends StatelessWidget {
                       appbar: SliverAppBar(
                         automaticallyImplyLeading: false,
                         leading: IconButton(
-                          color: Theme.of(context).colorScheme.onBackground,
+                          color: Theme.of(context).colorScheme.onSurface,
                           onPressed: () => context.pop(),
                           icon: const Icon(Icons.arrow_back_ios_rounded),
                         ),
                         actions: [
                           IconButton(
-                            color: Theme.of(context).colorScheme.onBackground,
+                            color: Theme.of(context).colorScheme.onSurface,
                             onPressed: () => Provider.of<SubGroupController>(
                                     context,
                                     listen: false)
@@ -104,7 +104,7 @@ class SubGroupPage extends StatelessWidget {
                         scrolledUnderElevation: 0.0,
                         centerTitle: true,
                         backgroundColor:
-                            Theme.of(context).colorScheme.background,
+                            Theme.of(context).colorScheme.surface,
                         title: Row(
                           //mainAxisAlignment: MainAxisAlignment.center,
                           children: [
