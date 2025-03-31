@@ -207,7 +207,7 @@ class PostPageController extends ChangeNotifier {
       builder: (BuildContext context) {
         final height = MediaQuery.sizeOf(context).height;
         return AlertDialog(
-          backgroundColor: Theme.of(context).colorScheme.surface,
+          backgroundColor: Theme.of(context).colorScheme.outlineVariant,
           title: Text(
             AppLocalizations.of(context)!.reportDetails,
             style: const TextStyle(fontSize: 18),

@@ -98,7 +98,7 @@ class SearchPage extends StatelessWidget {
 //         
 //                         hintText: AppLocalizations.of(context)!.search,
 //                         filled: true,
-//                         fillColor: Theme.of(context).colorScheme.surface,
+//                         fillColor: Theme.of(context).colorScheme.outlineVariant,
 //                         border: OutlineInputBorder(
 //                           borderRadius: BorderRadius.circular(10.0),
 //                           borderSide: BorderSide.none,

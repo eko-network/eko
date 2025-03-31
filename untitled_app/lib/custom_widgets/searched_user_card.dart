@@ -143,7 +143,7 @@ class UserCard extends StatelessWidget {
                             decoration: BoxDecoration(
                                 borderRadius:
                                     const BorderRadius.all(Radius.circular(5)),
-                                color: Theme.of(context).colorScheme.surface),
+                                color: Theme.of(context).colorScheme.outlineVariant),
                             child: Text(
                               AppLocalizations.of(context)!.unblock,
                               maxLines: 1,
@@ -172,7 +172,7 @@ class UserCard extends StatelessWidget {
                                           context,
                                           listen: true)
                                       .following
-                                  ? Theme.of(context).colorScheme.surface
+                                  ? Theme.of(context).colorScheme.outlineVariant
                                   : Theme.of(context)
                                       .colorScheme
                                       .primaryContainer,

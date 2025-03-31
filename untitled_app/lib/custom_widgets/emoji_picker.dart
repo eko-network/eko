@@ -29,7 +29,7 @@ class EmojiSelector extends StatelessWidget {
         // iconColor: Theme.of(context).colorScheme.outline,
         // iconColorSelected: Theme.of(context).colorScheme.primary,
 
-        // skinToneDialogBgColor: Theme.of(context).colorScheme.surface,
+        // skinToneDialogBgColor: Theme.of(context).colorScheme.outlineVariant,
         // skinToneIndicatorColor: Theme.of(context).colorScheme.outline,
         // enableSkinTones: true,
         // recentTabBehavior: RecentTabBehavior.NONE,

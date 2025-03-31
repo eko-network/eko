@@ -102,7 +102,7 @@ class ViewPostPage extends StatelessWidget {
                       ];
                     },
                     onSelected: (fn) => fn(),
-                    color: Theme.of(context).colorScheme.surface,
+                    color: Theme.of(context).colorScheme.outlineVariant,
                     child: Icon(
                       Icons.more_vert,
                       color: Theme.of(context).colorScheme.onSurface,

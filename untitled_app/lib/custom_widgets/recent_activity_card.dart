@@ -43,7 +43,7 @@ class ActivityCardWidget extends StatelessWidget {
                       width: width * 0.14,
                       decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: Theme.of(context).colorScheme.surface),
+                          color: Theme.of(context).colorScheme.outlineVariant),
                       child: Icon(
                         Icons.comment,
                         size: width * 0.08,

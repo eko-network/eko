@@ -89,7 +89,7 @@ class ProfileInputFeild extends StatelessWidget {
           filled: true,
           enabledBorder: OutlineInputBorder(
             // borderSide:
-            //     BorderSide(color: Theme.of(context).colorScheme.surface),
+            //     BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
             borderRadius: BorderRadius.circular(10.0),
           ),
           focusedBorder: OutlineInputBorder(

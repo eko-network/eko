@@ -170,7 +170,7 @@ class ComposeController extends ChangeNotifier {
   void audianceButtonPressed() {
     showModalBottomSheet(
       showDragHandle: true,
-      backgroundColor: Theme.of(context).colorScheme.surface,
+      backgroundColor: Theme.of(context).colorScheme.outlineVariant,
       isScrollControlled: true,
       context: context,
       builder: (BuildContext context) {
@@ -350,7 +350,7 @@ class ComposeController extends ChangeNotifier {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            backgroundColor: Theme.of(context).colorScheme.surface,
+            backgroundColor: Theme.of(context).colorScheme.outlineVariant,
             title: Text(AppLocalizations.of(context)!.confirmation),
             content: SingleChildScrollView(
               child: PostCard(

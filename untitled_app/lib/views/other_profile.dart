@@ -165,7 +165,7 @@ class OtherProfile extends StatelessWidget {
                                       },
                                       onSelected: (fn) => fn(),
                                       color:
-                                          Theme.of(context).colorScheme.surface,
+                                          Theme.of(context).colorScheme.outlineVariant,
                                       child: Icon(
                                         Icons.more_vert,
                                         size: 20,

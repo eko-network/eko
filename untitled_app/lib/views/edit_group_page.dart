@@ -103,7 +103,7 @@ class _GroupSettings extends StatelessWidget {
                         : Container(
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: Theme.of(context).colorScheme.surface,
+                              color: Theme.of(context).colorScheme.outlineVariant,
                             ),
                             width: width * 0.3,
                             height: width * 0.3,
@@ -256,7 +256,7 @@ class _AddPeople extends StatelessWidget {
                     ),
                     hintText: AppLocalizations.of(context)!.search,
                     filled: true,
-                    fillColor: Theme.of(context).colorScheme.surface,
+                    fillColor: Theme.of(context).colorScheme.outlineVariant,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10.0),
                       borderSide: BorderSide.none,
@@ -362,7 +362,7 @@ class _AddPeople extends StatelessWidget {
       //         ),
       //         hintText: AppLocalizations.of(context)!.search,
       //         filled: true,
-      //         fillColor: Theme.of(context).colorScheme.surface,
+      //         fillColor: Theme.of(context).colorScheme.outlineVariant,
       //         border: OutlineInputBorder(
       //           borderRadius: BorderRadius.circular(10.0),
       //           borderSide: BorderSide.none,

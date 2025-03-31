@@ -60,7 +60,7 @@ class GroupCard extends StatelessWidget {
                       : Container(
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: Theme.of(context).colorScheme.surface,
+                            color: Theme.of(context).colorScheme.outlineVariant,
                           ),
                           width: width * 0.17,
                           height: width * 0.17,

@@ -69,7 +69,7 @@ class LoginController extends ChangeNotifier {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: Theme.of(context).colorScheme.surface,
+          backgroundColor: Theme.of(context).colorScheme.outlineVariant,
           title: Text(AppLocalizations.of(context)!.resetPassword),
           content: SingleChildScrollView(
             child: CustomInputFeild(

@@ -60,7 +60,7 @@ class CommentCard extends StatelessWidget {
                           color: (post.author.uid ==
                                   locator<CurrentUser>().getUID())
                               ? Colors.red
-                              : Theme.of(context).colorScheme.surface),
+                              : Theme.of(context).colorScheme.outlineVariant),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [

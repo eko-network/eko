@@ -27,7 +27,7 @@ class SelectedUser extends StatelessWidget {
               decoration: BoxDecoration(
                 color: selected
                     ? Theme.of(context).colorScheme.primary
-                    : Theme.of(context).colorScheme.surface,
+                    : Theme.of(context).colorScheme.outlineVariant,
                 borderRadius: const BorderRadius.all(
                   Radius.circular(15),
                 ),
