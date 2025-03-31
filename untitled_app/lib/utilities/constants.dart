@@ -106,9 +106,9 @@ const double postPaddingHoriz = 5;
 
 const int signUpAnimationDuration = 300;
 const int maxPostLines = 12;
-const int maxPostChars = 300;
-const int maxCommentChars = 160;
-const int maxTitleChars = 100;
+const int maxPostChars = 500;
+const int maxCommentChars = 200;
+const int maxTitleChars = 200;
 const int maxBioChars = 100;
 const int maxBioLines = 3;
 const int maxNameChars = 24;
