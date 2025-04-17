@@ -30,9 +30,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get addOption => 'Add option';
 
   @override
-  String get poll => 'Poll';
-
-  @override
   String get needTwoOptions => 'You need at least two poll options';
 
   @override

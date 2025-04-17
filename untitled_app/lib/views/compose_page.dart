@@ -24,7 +24,7 @@ class _ComposePageState extends State<ComposePage> {
 
   Widget _buildPollWidget(BuildContext context, double height, double width) {
     final controller = Provider.of<ComposeController>(context, listen: true);
-    
+
     return Container(
       width: width * 0.9,
       decoration: BoxDecoration(
@@ -37,7 +37,7 @@ class _ComposePageState extends State<ComposePage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          ...List.generate( 
+          ...List.generate(
             controller.pollOptions.length,
             (index) => Padding(
               padding: const EdgeInsets.only(bottom: 8.0),
@@ -46,11 +46,14 @@ class _ComposePageState extends State<ComposePage> {
                   Expanded(
                     child: TextField(
                       decoration: InputDecoration(
-                        hintText: AppLocalizations.of(context)?.option ?? "Option ${index + 1}",
+                        hintText:
+                            "${AppLocalizations.of(context)!.option} ${index + 1}",
                         border: OutlineInputBorder(),
-                        contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        contentPadding:
+                            EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                       ),
-                      onChanged: (value) => controller.updatePollOption(index, value),
+                      onChanged: (value) =>
+                          controller.updatePollOption(index, value),
                     ),
                   ),
                   if (controller.pollOptions.length > 2)
@@ -66,7 +69,7 @@ class _ComposePageState extends State<ComposePage> {
             TextButton.icon(
               onPressed: () => controller.addPollOption(),
               icon: Icon(Icons.add),
-              label: Text(AppLocalizations.of(context)?.addOption ?? "Add option"),
+              label: Text(AppLocalizations.of(context)!.addOption),
             ),
         ],
       ),
@@ -343,29 +346,42 @@ class _ComposePageState extends State<ComposePage> {
                                                 child:
                                                     CircularProgressIndicator()))
                                         : Provider.of<ComposeController>(
-                                                        context,
-                                                        listen: true)
-                                                    .isPoll
-                                            ? _buildPollWidget(context, height, width)
-                                            : Provider.of<ComposeController>(context, listen: true).image != null
+                                                    context,
+                                                    listen: true)
+                                                .isPoll
+                                            ? _buildPollWidget(
+                                                context, height, width)
+                                            : Provider.of<ComposeController>(
+                                                            context,
+                                                            listen: true)
+                                                        .image !=
+                                                    null
                                                 ? ImageWidget(
-                                                    text: Provider.of<ComposeController>(context, listen: true).image!)
+                                                    text: Provider.of<
+                                                                ComposeController>(
+                                                            context,
+                                                            listen: true)
+                                                        .image!)
                                                 : Image.network(
-                                                    Provider.of<ComposeController>(context, listen: true)
+                                                    Provider.of<ComposeController>(
+                                                            context,
+                                                            listen: true)
                                                         .gif!
                                                         .images!
                                                         .fixedWidth
                                                         .url,
-                                                    loadingBuilder:
-                                                        (BuildContext context,
-                                                            Widget child,
-                                                            ImageChunkEvent?
-                                                                loadingProgress) {
-                                                      if (loadingProgress == null) {
+                                                    loadingBuilder: (BuildContext
+                                                            context,
+                                                        Widget child,
+                                                        ImageChunkEvent?
+                                                            loadingProgress) {
+                                                      if (loadingProgress ==
+                                                          null) {
                                                         return child;
                                                       }
                                                       return Container(
-                                                        alignment: Alignment.center,
+                                                        alignment:
+                                                            Alignment.center,
                                                         width: 200,
                                                         height: 150,
                                                         color: Theme.of(context)

@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:untitled_app/custom_widgets/controllers/pagination_controller.dart';
 import 'package:untitled_app/custom_widgets/gif_widget.dart';
 import 'package:untitled_app/custom_widgets/image_widget.dart';
+import 'package:untitled_app/custom_widgets/poll_widget.dart';
 import 'package:untitled_app/custom_widgets/time_stamp.dart';
 import 'package:untitled_app/models/current_user.dart';
 import 'package:untitled_app/models/feed_post_cache.dart';
@@ -339,14 +340,26 @@ class PostCard extends StatelessWidget {
                                           ),
                                         ),
                                       const SizedBox(height: 6.0),
+                                      // display gif/image/poll
+                                      if (post.isPoll &&
+                                          post.pollOptions != null &&
+                                          post.pollOptions!.isNotEmpty)
+                                        PollWidget(
+                                          postId: post.postId,
+                                          options: post.pollOptions!,
+                                          isPreview: isPreview,
+                                        ),
                                       if (post.gifURL != null &&
-                                        post.image == null)
+                                          post.image == null &&
+                                          !post.isPoll)
                                         GifWidget(url: post.gifURL!),
-                                      if (post.image != null)
+                                      if (post.image != null && !post.isPoll)
                                         ImageWidget(text: post.image!),
                                       if (post.gifURL != null ||
-                                          post.image != null)
+                                          post.image != null ||
+                                          post.isPoll)
                                         const SizedBox(height: 6.0),
+
                                       if (post.body?.isNotEmpty ??
                                           false) //&& post.body != []
                                         RichText(

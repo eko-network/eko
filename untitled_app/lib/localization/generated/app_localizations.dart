@@ -137,12 +137,6 @@ abstract class AppLocalizations {
   /// **'Add option'**
   String get addOption;
 
-  /// No description provided for @poll.
-  ///
-  /// In en, this message translates to:
-  /// **'Poll'**
-  String get poll;
-
   /// No description provided for @needTwoOptions.
   ///
   /// In en, this message translates to:

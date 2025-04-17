@@ -18,7 +18,7 @@ class CurrentUser extends AppUser {
   bool unreadGroup = false;
   String email = '';
   List<dynamic> likedPosts = [];
-   List<dynamic> dislikedPosts = [];
+  List<dynamic> dislikedPosts = [];
   List<dynamic> blockedUsers = [];
   List<dynamic> blockedBy = [];
   bool stateIsLiking = false;
@@ -26,6 +26,8 @@ class CurrentUser extends AppUser {
   bool stateIsFollowing = false;
   @override
   bool isVerified = false;
+  // Map<String, int> pollVotes = {};
+  // bool stateIsVoting = false;
   // CurrentUser({this.newActivity = false}) {
   //   // if (likedPosts.isEmpty) {
   //   //   likedPosts = [];
@@ -175,6 +177,14 @@ class CurrentUser extends AppUser {
       isVerified = userData["isVerified"] ?? false;
       List<dynamic>? fcmTokens = userData["fcmTokens"];
       blockedBy = await getPeopleWhoBlockedMe();
+      // if (userData["profileData"]["pollVotes"] != null) {
+      //   final Map<String, dynamic> pollVotesData =
+      //       userData["profileData"]["pollVotes"];
+      //   pollVotes =
+      //       pollVotesData.map((key, value) => MapEntry(key, value as int));
+      // } else {
+      //   pollVotes = {};
+      // }
       // print(blockedBy);
       if (fcmTokens == null) {
         addFCM();
@@ -280,7 +290,7 @@ class CurrentUser extends AppUser {
     }
   }
 
-   bool checkIsDisliked(String postID) {
+  bool checkIsDisliked(String postID) {
     return dislikedPosts.contains(postID);
   }
 
@@ -452,6 +462,38 @@ class CurrentUser extends AppUser {
     }
   }
 
+  // int? getPollVote(String postId) {
+  //   return pollVotes[postId];
+  // }
+
+  // Future<bool> addPollVote(String postId, int optionIndex) async {
+  //   if (!stateIsVoting) {
+  //     stateIsVoting = true;
+  //     try {
+  //       final firestore = FirebaseFirestore.instance;
+  //       final user = getUID();
+
+  //       await Future.wait([
+  //         firestore
+  //             .collection("users")
+  //             .doc(user)
+  //             .update({"profileData.pollVotes.$postId": optionIndex})
+  //       ]);
+
+  //       // Update local state
+  //       pollVotes[postId] = optionIndex;
+
+  //       stateIsVoting = false;
+  //       return true;
+  //     } catch (e) {
+  //       stateIsVoting = false;
+  //       return false;
+  //     }
+  //   } else {
+  //     return false;
+  //   }
+  // }
+
   Future<File?> setPreviewProfileImage(
       {ImageSource source = ImageSource.gallery,
       int imageQuality = 100,
@@ -595,6 +637,7 @@ class CurrentUser extends AppUser {
       'profileData': {
         'likedPosts': [],
         'dislikedPosts': [],
+        // 'pollVotes': {},
         'bio': '',
         'followers': [],
         'following': [],
@@ -690,6 +733,7 @@ class CurrentUser extends AppUser {
     name = '';
     likes = 0;
     dislikes = 0;
+    // pollVotes = {};
     bio = '';
     followers = [];
     following = [];
