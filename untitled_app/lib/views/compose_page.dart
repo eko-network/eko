@@ -21,6 +21,58 @@ class ComposePage extends StatefulWidget {
 class _ComposePageState extends State<ComposePage> {
   final _key = GlobalKey<ExpandableFabState>();
   bool _isLoadingImage = false;
+
+  Widget _buildPollWidget(BuildContext context, double height, double width) {
+    final controller = Provider.of<ComposeController>(context, listen: true);
+    
+    return Container(
+      width: width * 0.9,
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainer,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Theme.of(context).colorScheme.outline),
+      ),
+      padding: EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ...List.generate( 
+            controller.pollOptions.length,
+            (index) => Padding(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      decoration: InputDecoration(
+                        hintText: AppLocalizations.of(context)?.option ?? "Option ${index + 1}",
+                        border: OutlineInputBorder(),
+                        contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      ),
+                      onChanged: (value) => controller.updatePollOption(index, value),
+                    ),
+                  ),
+                  if (controller.pollOptions.length > 2)
+                    IconButton(
+                      icon: Icon(Icons.delete_outline),
+                      onPressed: () => controller.removePollOption(index),
+                    ),
+                ],
+              ),
+            ),
+          ),
+          if (controller.pollOptions.length < 4)
+            TextButton.icon(
+              onPressed: () => controller.addPollOption(),
+              icon: Icon(Icons.add),
+              label: Text(AppLocalizations.of(context)?.addOption ?? "Add option"),
+            ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final audiance = AppLocalizations.of(context)!.public;
@@ -55,6 +107,18 @@ class _ComposePageState extends State<ComposePage> {
                 distance: 70.0,
                 children: [
                   FloatingActionButton.small(
+                    heroTag: null,
+                    onPressed: () {
+                      final state = _key.currentState;
+                      if (state != null) {
+                        state.toggle();
+                      }
+                      Provider.of<ComposeController>(context, listen: false)
+                          .addPollPressed();
+                    },
+                    child: const Icon(Icons.poll),
+                  ),
+                  FloatingActionButton.small(
                       heroTag: null,
                       child: const Icon(Icons.perm_media),
                       onPressed: () async {
@@ -63,14 +127,12 @@ class _ComposePageState extends State<ComposePage> {
                           state.toggle();
                         }
                         setState(() {
-                      
                           _isLoadingImage = true;
                         });
                         await Provider.of<ComposeController>(context,
                                 listen: false)
                             .addImagePressed();
                         setState(() {
-                     
                           _isLoadingImage = false;
                         });
                       }),
@@ -257,7 +319,11 @@ class _ComposePageState extends State<ComposePage> {
                             Provider.of<ComposeController>(context,
                                         listen: true)
                                     .image !=
-                                null || _isLoadingImage )
+                                null ||
+                            Provider.of<ComposeController>(context,
+                                    listen: true)
+                                .isPoll ||
+                            _isLoadingImage)
                           FittedBox(
                             fit: BoxFit.scaleDown,
                             child: Stack(
@@ -271,59 +337,54 @@ class _ComposePageState extends State<ComposePage> {
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(10),
                                     child: _isLoadingImage
-                                            ? SizedBox(
-                                                child: Padding(
-                                                    padding: EdgeInsets.all(10),
-                                                    child:
-                                                        CircularProgressIndicator()))
-                                            : Provider.of<ComposeController>(
-                                                    context,
-                                                    listen: true)
-                                                .image !=
-                                            null
-                                        ? ImageWidget(
-                                                text: Provider.of<
-                                                            ComposeController>(
+                                        ? SizedBox(
+                                            child: Padding(
+                                                padding: EdgeInsets.all(10),
+                                                child:
+                                                    CircularProgressIndicator()))
+                                        : Provider.of<ComposeController>(
                                                         context,
                                                         listen: true)
-                                                    .image!)
-                                        : Image.network(
-                                            Provider.of<ComposeController>(
-                                                    context,
-                                                    listen: true)
-                                                .gif!
-                                                .images!
-                                                .fixedWidth
-                                                .url,
-                                            loadingBuilder:
-                                                (BuildContext context,
-                                                    Widget child,
-                                                    ImageChunkEvent?
-                                                        loadingProgress) {
-                                              if (loadingProgress == null) {
-                                                return child;
-                                              }
-                                              return Container(
-                                                alignment: Alignment.center,
-                                                width: 200,
-                                                height: 150,
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .onSurface,
-                                                child:
-                                                    CircularProgressIndicator(
-                                                  value: loadingProgress
-                                                              .expectedTotalBytes !=
-                                                          null
-                                                      ? loadingProgress
-                                                              .cumulativeBytesLoaded /
-                                                          loadingProgress
-                                                              .expectedTotalBytes!
-                                                      : null,
-                                                ),
-                                              );
-                                            },
-                                          ),
+                                                    .isPoll
+                                            ? _buildPollWidget(context, height, width)
+                                            : Provider.of<ComposeController>(context, listen: true).image != null
+                                                ? ImageWidget(
+                                                    text: Provider.of<ComposeController>(context, listen: true).image!)
+                                                : Image.network(
+                                                    Provider.of<ComposeController>(context, listen: true)
+                                                        .gif!
+                                                        .images!
+                                                        .fixedWidth
+                                                        .url,
+                                                    loadingBuilder:
+                                                        (BuildContext context,
+                                                            Widget child,
+                                                            ImageChunkEvent?
+                                                                loadingProgress) {
+                                                      if (loadingProgress == null) {
+                                                        return child;
+                                                      }
+                                                      return Container(
+                                                        alignment: Alignment.center,
+                                                        width: 200,
+                                                        height: 150,
+                                                        color: Theme.of(context)
+                                                            .colorScheme
+                                                            .onSurface,
+                                                        child:
+                                                            CircularProgressIndicator(
+                                                          value: loadingProgress
+                                                                      .expectedTotalBytes !=
+                                                                  null
+                                                              ? loadingProgress
+                                                                      .cumulativeBytesLoaded /
+                                                                  loadingProgress
+                                                                      .expectedTotalBytes!
+                                                              : null,
+                                                        ),
+                                                      );
+                                                    },
+                                                  ),
                                   ),
                                 ),
                                 IconButton(

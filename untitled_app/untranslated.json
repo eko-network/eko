@@ -1,5 +1,9 @@
 {
   "es": [
+    "option",
+    "addOption",
+    "poll",
+    "needTwoOptions",
     "signIn",
     "signInToComment",
     "dislikes",

@@ -125,6 +125,30 @@ abstract class AppLocalizations {
   /// **'Login'**
   String get logIn;
 
+  /// No description provided for @option.
+  ///
+  /// In en, this message translates to:
+  /// **'Option'**
+  String get option;
+
+  /// No description provided for @addOption.
+  ///
+  /// In en, this message translates to:
+  /// **'Add option'**
+  String get addOption;
+
+  /// No description provided for @poll.
+  ///
+  /// In en, this message translates to:
+  /// **'Poll'**
+  String get poll;
+
+  /// No description provided for @needTwoOptions.
+  ///
+  /// In en, this message translates to:
+  /// **'You need at least two poll options'**
+  String get needTwoOptions;
+
   /// No description provided for @invalidUserName.
   ///
   /// In en, this message translates to:

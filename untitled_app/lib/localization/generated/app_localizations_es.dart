@@ -24,6 +24,18 @@ class AppLocalizationsEs extends AppLocalizations {
   String get logIn => 'Iniciar sesión';
 
   @override
+  String get option => 'Option';
+
+  @override
+  String get addOption => 'Add option';
+
+  @override
+  String get poll => 'Poll';
+
+  @override
+  String get needTwoOptions => 'You need at least two poll options';
+
+  @override
   String get invalidUserName => 'Nombre de usuario no cumple los requisitos';
 
   @override

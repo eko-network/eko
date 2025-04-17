@@ -44,6 +44,8 @@ class ComposeController extends ChangeNotifier {
   bool showCount1 = false;
   GiphyGif? gif;
   String? image;
+  bool isPoll = false;
+  List<String> pollOptions = ['', ''];
   bool isAtSymbolTyped = false;
   bool isLoading = false;
   List<AppUser> hits = [];
@@ -126,12 +128,16 @@ class ComposeController extends ChangeNotifier {
   removeGifPressed() {
     gif = null;
     image = null;
+    isPoll = false;
     notifyListeners();
   }
 
   clearPressed() {
     hideKeyboard();
     gif = null;
+    image = null;
+    isPoll = false;
+    pollOptions = ['', ''];
     newLines = 0;
     bodyChars = 0;
     titleChars = 0;
@@ -256,6 +262,34 @@ class ComposeController extends ChangeNotifier {
     }
   }
 
+  addPollPressed() async {
+    locator<NavBarController>().disable();
+    isPoll = true;
+    gif = null;
+    image = null;
+    notifyListeners();
+    locator<NavBarController>().enable();
+  }
+
+  addPollOption() {
+    if (pollOptions.length < 4) {
+      pollOptions.add('');
+      notifyListeners();
+    }
+  }
+
+  removePollOption(int index) {
+    if (pollOptions.length > 2) {
+      pollOptions.removeAt(index);
+      notifyListeners();
+    }
+  }
+
+  updatePollOption(int index, String value) {
+    pollOptions[index] = value;
+    notifyListeners();
+  }
+
   Future<void> addImagePressed() async {
     locator<NavBarController>().disable();
     final ImagePicker picker = ImagePicker();
@@ -312,6 +346,8 @@ class ComposeController extends ChangeNotifier {
     titleController.text = titleController.text.trim();
     updateCountsBody(bodyController.text);
     updateCountsTitle(titleController.text);
+
+    // errors
     if (titleChars > c.maxTitleChars) {
       showSnackBar(
           text: AppLocalizations.of(context)!.tooManyChar, context: context);
@@ -324,12 +360,18 @@ class ComposeController extends ChangeNotifier {
     } else if (titleController.text == "" &&
         bodyController.text == "" &&
         gif == null &&
-        image == null) {
+        image == null &&
+        !isPoll) {
       titleFocus.requestFocus();
       showSnackBar(
           text: AppLocalizations.of(context)!.emptyFieldError,
           context: context);
+    } else if (isPoll && pollOptions.where((option) => option.trim().isNotEmpty).length < 2) {
+      showSnackBar(
+          text: AppLocalizations.of(context)!.needTwoOptions,
+          context: context);
     } else {
+      // create post
       Map<String, dynamic> post = {};
       post["tags"] = tags;
       if (titleController.text != '') {
@@ -345,7 +387,11 @@ class ComposeController extends ChangeNotifier {
       if (image != null) {
         post["image"] = image;
       }
-
+      if (isPoll) {
+        post["isPoll"] = true;
+        post["pollOptions"] = pollOptions.where((option) => option.trim().isNotEmpty).toList();
+      }
+      
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -382,6 +428,8 @@ class ComposeController extends ChangeNotifier {
                   bodyController.text = "";
                   gif = null;
                   image = null;
+                  isPoll = false;
+                  pollOptions = ['', ''];
                   context.pop();
 
                   final postID =

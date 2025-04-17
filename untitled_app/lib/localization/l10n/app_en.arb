@@ -5,6 +5,9 @@
     "password":"Password",
     "confirmPassword":"Confirm Password",
     "logIn":"Login",
+    "option":"Option",
+    "addOption":"Add option",
+    "needTwoOptions":"You need at least two poll options",
 
 
     "invalidUserName":"Username does not meet requirements",
