@@ -21,13 +21,14 @@ class CurrentUser extends AppUser {
   List<dynamic> dislikedPosts = [];
   List<dynamic> blockedUsers = [];
   List<dynamic> blockedBy = [];
+  // Map<String, int> pollVotes = {};
+  // bool stateIsVoting = false;
   bool stateIsLiking = false;
   bool stateIsDisliking = false;
   bool stateIsFollowing = false;
-  @override
   bool isVerified = false;
-  // Map<String, int> pollVotes = {};
-  // bool stateIsVoting = false;
+
+  @override
   // CurrentUser({this.newActivity = false}) {
   //   // if (likedPosts.isEmpty) {
   //   //   likedPosts = [];

@@ -315,7 +315,6 @@ class ComposeController extends ChangeNotifier {
       context: context,
       apiKey: dotenv.env["GIPHY_API_KEY"]!,
       lang: GiphyLanguage.english,
-      //randomID: "abcd", // Optional - An ID/proxy for a specific user.
       tabColor: Colors.teal,
       debounceTimeInMilliseconds: 350,
     );
@@ -391,8 +390,10 @@ class ComposeController extends ChangeNotifier {
       }
       if (isPoll) {
         post["isPoll"] = true;
-        post["pollOptions"] =
+        final validOptions =
             pollOptions.where((option) => option.trim().isNotEmpty).toList();
+        post["pollOptions"] = validOptions;
+        post["pollVoteCounts"] = List<int>.filled(validOptions.length, 0);
       }
 
       showDialog(
@@ -457,6 +458,10 @@ class ComposeController extends ChangeNotifier {
                         body: Post.parseText(post["body"]),
                         likes: 0,
                         dislikes: 0,
+                        isPoll: post["isPoll"] ?? false,
+                        pollOptions: post["pollOptions"] != null
+                            ? List<String>.from(post["pollOptions"])
+                            : null,
                       ),
                     );
 
