@@ -366,10 +366,10 @@ class ComposeController extends ChangeNotifier {
       showSnackBar(
           text: AppLocalizations.of(context)!.emptyFieldError,
           context: context);
-    } else if (isPoll && pollOptions.where((option) => option.trim().isNotEmpty).length < 2) {
+    } else if (isPoll &&
+        pollOptions.where((option) => option.trim().isNotEmpty).length < 2) {
       showSnackBar(
-          text: AppLocalizations.of(context)!.needTwoOptions,
-          context: context);
+          text: AppLocalizations.of(context)!.needTwoOptions, context: context);
     } else {
       // create post
       Map<String, dynamic> post = {};
@@ -389,9 +389,10 @@ class ComposeController extends ChangeNotifier {
       }
       if (isPoll) {
         post["isPoll"] = true;
-        post["pollOptions"] = pollOptions.where((option) => option.trim().isNotEmpty).toList();
+        post["pollOptions"] =
+            pollOptions.where((option) => option.trim().isNotEmpty).toList();
       }
-      
+
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -401,17 +402,22 @@ class ComposeController extends ChangeNotifier {
             content: SingleChildScrollView(
               child: PostCard(
                   post: Post(
-                      tags: tags,
-                      gifSource: post["gifSource"],
-                      gifURL: post["gifUrl"],
-                      postId: "postId",
-                      time: "", //DateTime.now().toUtc().toIso8601String(),
-                      title: Post.parseText(post["title"]),
-                      author: AppUser.fromCurrent(locator<CurrentUser>()),
-                      body: Post.parseText(post["body"]),
-                      image: post["image"],
-                      likes: 0,
-                      dislikes: 0),
+                    tags: tags,
+                    gifSource: post["gifSource"],
+                    gifURL: post["gifUrl"],
+                    postId: "postId",
+                    time: "", //DateTime.now().toUtc().toIso8601String(),
+                    title: Post.parseText(post["title"]),
+                    author: AppUser.fromCurrent(locator<CurrentUser>()),
+                    body: Post.parseText(post["body"]),
+                    image: post["image"],
+                    likes: 0,
+                    dislikes: 0,
+                    isPoll: post["isPoll"] ?? false,
+                    pollOptions: post["pollOptions"] != null
+                        ? List<String>.from(post["pollOptions"])
+                        : null,
+                  ),
                   isPreview: true),
             ),
             actions: <Widget>[

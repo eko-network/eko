@@ -18,6 +18,7 @@ class Post {
   final String? gifSource;
   String time;
   final String? image;
+
   final List<String>? title;
   final List<String>? body;
   final List<String> tags;
@@ -26,6 +27,8 @@ class Post {
   int commentCount;
   final Group? group;
   final bool isVerified;
+  final bool isPoll;
+  final List<String>? pollOptions;
 
   //for comments
   final String? rootPostId;
@@ -47,6 +50,8 @@ class Post {
     this.hasCache = false,
     this.rootPostId,
     this.isVerified = false,
+    this.isPoll = false,
+    this.pollOptions,
   });
 
   static Post fromRaw(RawPostObject rawPost, AppUser user, int commentCount,
@@ -68,6 +73,8 @@ class Post {
       rootPostId: rootPostId,
       group: group,
       isVerified: user.isVerified,
+      isPoll: rawPost.isPoll,
+      pollOptions: rawPost.pollOptions,
     );
   }
 
@@ -117,6 +124,8 @@ class RawPostObject {
   final String? gifSource;
   final int likes;
   final int dislikes;
+  final bool isPoll;
+  final List<String>? pollOptions;
 
   RawPostObject({
     required this.tags,
@@ -130,20 +139,27 @@ class RawPostObject {
     required this.time,
     required this.likes,
     required this.dislikes,
+    this.isPoll = false,
+    this.pollOptions,
   });
   static RawPostObject fromJson(Map<String, dynamic> json, String id) {
     return RawPostObject(
-        tags: (json["tags"] ?? ["public"]).cast<String>(),
-        gifSource: json["gifSourcef"],
-        gifUrl: json["gifUrl"],
-        postID: id,
-        image: json["image"],
-        author: json["author"] ?? "",
-        title: json["title"],
-        body: json["body"],
-        time: json["time"] ?? "",
-        likes: json["likes"] ?? 0,
-        dislikes: json["dislikes"] ?? 0);
+      tags: (json["tags"] ?? ["public"]).cast<String>(),
+      gifSource: json["gifSourcef"],
+      gifUrl: json["gifUrl"],
+      postID: id,
+      image: json["image"],
+      author: json["author"] ?? "",
+      title: json["title"],
+      body: json["body"],
+      time: json["time"] ?? "",
+      likes: json["likes"] ?? 0,
+      dislikes: json["dislikes"] ?? 0,
+      isPoll: json["isPoll"] ?? false,
+      pollOptions: json["pollOptions"] != null
+          ? List<String>.from(json["pollOptions"])
+          : null,
+    );
   }
 }
 
