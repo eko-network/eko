@@ -56,7 +56,7 @@ class _ComposePageState extends State<ComposePage> {
                           controller.updatePollOption(index, value),
                     ),
                   ),
-                  if (controller.pollOptions.length > 2)
+                  if (controller.pollOptions.length > 2 && index == controller.pollOptions.length - 1)
                     IconButton(
                       icon: Icon(Icons.delete_outline),
                       onPressed: () => controller.removePollOption(index),
