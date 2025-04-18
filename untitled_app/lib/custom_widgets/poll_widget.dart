@@ -81,10 +81,11 @@ class PollWidgetState extends State<PollWidget> {
 
     if (success) {
       setState(() {
+        final oldSelected = selectedOption!;
+        voteCounts[oldSelected] = (voteCounts[oldSelected] ?? 1) - 1;
+        totalVotes--;
         selectedOption = null;
         hasVoted = false;
-        // voteCounts[optionIndex] = (voteCounts[optionIndex] ?? 0) - 1;
-        totalVotes--;
       });
     }
   }
@@ -202,6 +203,7 @@ class PollWidgetState extends State<PollWidget> {
             Padding(
               padding: const EdgeInsets.only(top: 8.0),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
                     '$totalVotes ${AppLocalizations.of(context)!.votes}',
