@@ -367,15 +367,14 @@ class ComposeController extends ChangeNotifier {
       showSnackBar(
           text: AppLocalizations.of(context)!.emptyFieldError,
           context: context);
-    } else if (isPoll) {
-      if (pollOptions.where((option) => option.trim().isNotEmpty).length < 2) {
-        showSnackBar(
-            text: AppLocalizations.of(context)!.needTwoOptions,
-            context: context);
-      } else if (pollOptions.any((option) => option.length > c.maxPollChars)) {
-        showSnackBar(
-            text: AppLocalizations.of(context)!.tooManyChar, context: context);
-      }
+    } else if (isPoll &&
+        pollOptions.where((option) => option.trim().isNotEmpty).length < 2) {
+      showSnackBar(
+          text: AppLocalizations.of(context)!.needTwoOptions, context: context);
+    } else if (isPoll &&
+        pollOptions.any((option) => option.length > c.maxPollChars)) {
+      showSnackBar(
+          text: AppLocalizations.of(context)!.tooManyChar, context: context);
     } else {
       // create post
       Map<String, dynamic> post = {};

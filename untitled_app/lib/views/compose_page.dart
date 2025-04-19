@@ -280,7 +280,8 @@ class _ComposePageState extends State<ComposePage> {
                           ],
                         ),
                         SizedBox(height: height * 0.01),
-                        Expanded(
+                        ConstrainedBox(
+                          constraints: BoxConstraints(maxHeight: height * 0.5),
                           child: TextField(
                             textCapitalization: TextCapitalization.sentences,
                             focusNode: Provider.of<ComposeController>(context,
@@ -443,7 +444,8 @@ class _ComposePageState extends State<ComposePage> {
                               ],
                             ),
                           ),
-                        Expanded(
+                        ConstrainedBox(
+                          constraints: BoxConstraints(maxHeight: height * 0.5),
                           child: TextField(
                             textCapitalization: TextCapitalization.sentences,
                             focusNode: Provider.of<ComposeController>(context,
