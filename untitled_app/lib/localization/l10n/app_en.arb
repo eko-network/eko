@@ -107,7 +107,7 @@
 
 
     "createNewPost":"Create new post",
-    "postButton":"POST",
+    "postButton":"Post",
     "clear":"Clear",
     "tooManyChar":"Too many characters.",
     "tooManyLine":"Too many newlines.",

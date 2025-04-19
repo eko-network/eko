@@ -231,7 +231,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get createNewPost => 'Create new post';
 
   @override
-  String get postButton => 'POST';
+  String get postButton => 'Post';
 
   @override
   String get clear => 'Clear';

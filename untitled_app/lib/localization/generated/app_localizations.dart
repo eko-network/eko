@@ -542,7 +542,7 @@ abstract class AppLocalizations {
   /// No description provided for @postButton.
   ///
   /// In en, this message translates to:
-  /// **'POST'**
+  /// **'Post'**
   String get postButton;
 
   /// No description provided for @clear.

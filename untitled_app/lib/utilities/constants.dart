@@ -109,6 +109,7 @@ const int maxPostLines = 12;
 const int maxPostChars = 500;
 const int maxCommentChars = 200;
 const int maxTitleChars = 200;
+const int maxPollChars = 30;
 const int maxBioChars = 100;
 const int maxBioLines = 3;
 const int maxNameChars = 24;

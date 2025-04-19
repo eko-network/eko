@@ -51,12 +51,26 @@ class _ComposePageState extends State<ComposePage> {
                         border: OutlineInputBorder(),
                         contentPadding:
                             EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        errorText: controller.pollOptions[index].length > 50
+                            ? AppLocalizations.of(context)!.tooManyChar
+                            : null,
                       ),
-                      onChanged: (value) =>
-                          controller.updatePollOption(index, value),
+                      maxLength: 50, // Set maximum lengths
+                      buildCounter: (context,
+                              {required currentLength,
+                              required isFocused,
+                              maxLength}) =>
+                          null, // Hide default counter
+                      onChanged: (value) {
+                        // Only update if within limits
+                        if (value.length <= 50) {
+                          controller.updatePollOption(index, value);
+                        }
+                      },
                     ),
                   ),
-                  if (controller.pollOptions.length > 2 && index == controller.pollOptions.length - 1)
+                  if (controller.pollOptions.length > 2 &&
+                      index == controller.pollOptions.length - 1)
                     IconButton(
                       icon: Icon(Icons.delete_outline),
                       onPressed: () => controller.removePollOption(index),
@@ -168,7 +182,7 @@ class _ComposePageState extends State<ComposePage> {
                       child: Text(
                         AppLocalizations.of(context)!.clear,
                         style: TextStyle(
-                            fontSize: 16,
+                            fontSize: 14,
                             color: Theme.of(context).colorScheme.onSurface),
                       ),
                     ),
@@ -177,20 +191,27 @@ class _ComposePageState extends State<ComposePage> {
                           Provider.of<ComposeController>(context, listen: false)
                               .postPressed(context),
                       style: TextButton.styleFrom(
-                          backgroundColor: Theme.of(context)
-                              .colorScheme
-                              .surfaceContainerHighest),
+                        backgroundColor:
+                            Theme.of(context).colorScheme.primaryContainer,
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        elevation: 2,
+                      ),
                       child: Row(
+                        mainAxisSize: MainAxisSize.min,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
                             AppLocalizations.of(context)!.postButton,
                             style: TextStyle(
-                                fontSize: 20,
+                                fontSize: 18,
                                 color: Theme.of(context).colorScheme.onSurface),
                           ),
                           SizedBox(
-                            width: width * 0.02,
+                            width: 6,
                           ),
                           Icon(
                             Icons.send,
@@ -215,7 +236,7 @@ class _ComposePageState extends State<ComposePage> {
                       keyboardDismissBehavior:
                           ScrollViewKeyboardDismissBehavior.onDrag,
                       children: [
-                        SizedBox(height: height * 0.025),
+                        SizedBox(height: height * 0.01),
                         Row(
                           children: [
                             ProfileAvatar(
@@ -225,13 +246,12 @@ class _ComposePageState extends State<ComposePage> {
                             OutlinedButton(
                               style: OutlinedButton.styleFrom(
                                 backgroundColor:
-                                    Theme.of(context).colorScheme.onSecondary,
+                                    Theme.of(context).colorScheme.outline,
                                 side: BorderSide(
-                                  width:
-                                      3.0, // Change this value for border thickness
+                                  width: 0.5,
                                   color: Theme.of(context)
                                       .colorScheme
-                                      .primary, // Change this value for border color
+                                      .onSurfaceVariant,
                                   style: BorderStyle.solid,
                                 ),
                               ),
@@ -242,17 +262,25 @@ class _ComposePageState extends State<ComposePage> {
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Text(Provider.of<ComposeController>(context,
-                                          listen: true)
-                                      .audience),
-                                  const Icon(Icons.expand_more_rounded)
+                                  Text(
+                                      Provider.of<ComposeController>(context,
+                                              listen: true)
+                                          .audience,
+                                      style: TextStyle(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface)),
+                                  Icon(Icons.expand_more_rounded,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface),
                                 ],
                               ),
                             )
                           ],
                         ),
-                        ConstrainedBox(
-                          constraints: BoxConstraints(maxHeight: height * 0.2),
+                        SizedBox(height: height * 0.01),
+                        Expanded(
                           child: TextField(
                             textCapitalization: TextCapitalization.sentences,
                             focusNode: Provider.of<ComposeController>(context,
@@ -274,36 +302,18 @@ class _ComposePageState extends State<ComposePage> {
                                 Theme.of(context).colorScheme.onSurface,
                             keyboardType: TextInputType.text,
                             style: TextStyle(
-                                fontSize: 30,
+                                fontSize: 22,
                                 fontWeight: FontWeight.bold,
                                 color: Theme.of(context).colorScheme.onSurface),
                             decoration: InputDecoration(
                               contentPadding: EdgeInsets.all(height * 0.01),
                               hintText: AppLocalizations.of(context)!.postTitle,
                               hintStyle: TextStyle(
-                                  fontSize: 30,
-                                  fontWeight: FontWeight.bold,
+                                  fontSize: 22,
                                   color: Theme.of(context)
                                       .colorScheme
                                       .onSurfaceVariant),
                               border: InputBorder.none,
-                              // labelText: AppLocalizations.of(context)!.postTitle,
-                              // labelStyle: TextStyle(
-                              //   fontSize: 18,
-                              //   letterSpacing: 1,
-                              //   fontWeight: FontWeight.normal,
-                              //   color: Theme.of(context).colorScheme.onBackground,
-                              // ),
-                              // enabledBorder: OutlineInputBorder(
-                              //   borderSide: BorderSide(
-                              //       color:
-                              //           Theme.of(context).colorScheme.outline),
-                              //   borderRadius: BorderRadius.circular(10.0),
-                              // ),
-                              // focusedBorder: OutlineInputBorder(
-                              //     borderRadius: BorderRadius.circular(10.0),
-                              //     borderSide: BorderSide(
-                              //         color: Theme.of(context).colorScheme.outline)),
                             ),
                           ),
                         ),
@@ -415,7 +425,7 @@ class _ComposePageState extends State<ComposePage> {
                                   onPressed: () =>
                                       Provider.of<ComposeController>(context,
                                               listen: false)
-                                          .removeGifPressed(),
+                                          .removeMediaPressed(),
                                   icon: DecoratedBox(
                                     decoration: BoxDecoration(
                                         shape: BoxShape.circle,
@@ -433,8 +443,7 @@ class _ComposePageState extends State<ComposePage> {
                               ],
                             ),
                           ),
-                        ConstrainedBox(
-                          constraints: BoxConstraints(maxHeight: height * 0.5),
+                        Expanded(
                           child: TextField(
                             textCapitalization: TextCapitalization.sentences,
                             focusNode: Provider.of<ComposeController>(context,
@@ -456,14 +465,14 @@ class _ComposePageState extends State<ComposePage> {
                                 Theme.of(context).colorScheme.onSurface,
                             keyboardType: TextInputType.multiline,
                             style: TextStyle(
-                                fontSize: 20,
+                                fontSize: 16,
                                 fontWeight: FontWeight.normal,
                                 color: Theme.of(context).colorScheme.onSurface),
                             decoration: InputDecoration(
                               contentPadding: EdgeInsets.all(height * 0.01),
                               hintText: AppLocalizations.of(context)!.addText,
                               hintStyle: TextStyle(
-                                  fontSize: 20,
+                                  fontSize: 16,
                                   fontWeight: FontWeight.normal,
                                   color: Theme.of(context)
                                       .colorScheme
