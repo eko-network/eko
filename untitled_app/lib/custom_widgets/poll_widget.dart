@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:untitled_app/custom_widgets/controllers/post_card_controller.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:untitled_app/models/current_user.dart';
 import 'package:untitled_app/utilities/locator.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import '../utilities/constants.dart' as c;
 
 class PollWidget extends StatefulWidget {
@@ -143,8 +140,8 @@ class PollWidgetState extends State<PollWidget> {
                               0.7 *
                               percentage,
                           decoration: BoxDecoration(
-                            color: isSelected
-                                ? Theme.of(context).colorScheme.primary
+                            color: hasVoted
+                                ? Theme.of(context).colorScheme.primaryContainer
                                 : Theme.of(context).colorScheme.outlineVariant,
                             borderRadius: BorderRadius.circular(8),
                           ),
@@ -159,16 +156,8 @@ class PollWidgetState extends State<PollWidget> {
                                 child: Text(
                                   option,
                                   style: TextStyle(
-                                    fontWeight: isSelected
-                                        ? FontWeight.bold
-                                        : FontWeight.normal,
-                                    color: isSelected && hasVoted
-                                        ? Theme.of(context)
-                                            .colorScheme
-                                            .onPrimary
-                                        : Theme.of(context)
-                                            .colorScheme
-                                            .onSurface,
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
                                   ),
                                   overflow: TextOverflow.ellipsis,
                                 ),
@@ -177,16 +166,9 @@ class PollWidgetState extends State<PollWidget> {
                                 Text(
                                   '${(percentage * 100).toStringAsFixed(0)}%',
                                   style: TextStyle(
-                                    fontWeight: isSelected
-                                        ? FontWeight.bold
-                                        : FontWeight.normal,
-                                    color: isSelected
-                                        ? Theme.of(context)
-                                            .colorScheme
-                                            .onPrimary
-                                        : Theme.of(context)
-                                            .colorScheme
-                                            .onSurfaceVariant,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
                                   ),
                                 ),
                             ],
@@ -198,7 +180,7 @@ class PollWidgetState extends State<PollWidget> {
                 ),
               ),
             );
-          }).toList(),
+          }),
           if (hasVoted && !widget.isPreview)
             Padding(
               padding: const EdgeInsets.only(top: 8.0),
