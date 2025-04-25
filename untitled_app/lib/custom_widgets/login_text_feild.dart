@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
+import 'package:provider/provider.dart' as prov;
 import 'controllers/login_text_feild_controller.dart';
 import '../utilities/constants.dart' as c;
 
@@ -52,7 +52,7 @@ class CustomInputFeild extends StatelessWidget {
     } else {
       feildWidth = width!;
     }
-    return ChangeNotifierProvider(
+    return prov.ChangeNotifierProvider(
         create: (context) => LoginFieldController(password: password),
         builder: (context, child) {
           return Container(
@@ -66,7 +66,7 @@ class CustomInputFeild extends StatelessWidget {
               maxLength: maxLen,
               cursorColor: Theme.of(context).colorScheme.onSurface,
               obscureText:
-                  Provider.of<LoginFieldController>(context, listen: true)
+                  prov.Provider.of<LoginFieldController>(context, listen: true)
                       .hidden,
 
               enabled: enabled,
@@ -95,8 +95,10 @@ class CustomInputFeild extends StatelessWidget {
                   fontWeight: FontWeight.normal,
                   color: Theme.of(context).colorScheme.onSurface,
                 ),
-                fillColor:
-                    Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
+                fillColor: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.2),
                 filled: true,
                 enabledBorder: OutlineInputBorder(
                   borderSide: BorderSide(
@@ -109,12 +111,13 @@ class CustomInputFeild extends StatelessWidget {
                         color: Theme.of(context).colorScheme.onSurface)),
                 suffixIcon: password
                     ? IconButton(
-                        icon: Icon(Provider.of<LoginFieldController>(context,
+                        icon: Icon(prov.Provider.of<LoginFieldController>(
+                                    context,
                                     listen: true)
                                 .hidden
                             ? Icons.visibility_off
                             : Icons.visibility),
-                        onPressed: () => Provider.of<LoginFieldController>(
+                        onPressed: () => prov.Provider.of<LoginFieldController>(
                                 context,
                                 listen: false)
                             .bottonPressed(),

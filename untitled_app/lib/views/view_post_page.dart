@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
+import 'package:provider/provider.dart' as prov;
 import 'package:untitled_app/custom_widgets/count_down_timer.dart';
 
 import 'package:untitled_app/custom_widgets/loading_spinner.dart';
@@ -26,98 +26,111 @@ class ViewPostPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final height = MediaQuery.sizeOf(context).height;
     final width = c.widthGetter(context);
-    return ChangeNotifierProvider(
+    return prov.ChangeNotifierProvider(
       create: (context) =>
           PostPageController(passedPost: post, context: context, id: id),
       builder: (context, child) {
         return PopScope(
-          canPop: Provider.of<PostPageController>(context, listen: false)
+          canPop: prov.Provider.of<PostPageController>(context, listen: false)
               .isLoggedIn(),
           child: GestureDetector(
-            onTap: () => Provider.of<PostPageController>(context, listen: false)
-                .hideKeyboard(),
+            onTap: () =>
+                prov.Provider.of<PostPageController>(context, listen: false)
+                    .hideKeyboard(),
             child: Scaffold(
               appBar: AppBar(
                 backgroundColor: Theme.of(context).colorScheme.surface,
                 surfaceTintColor: Colors.transparent,
                 automaticallyImplyLeading: false,
-                leading: Provider.of<PostPageController>(context, listen: false)
-                        .isLoggedIn()
-                    ? IconButton(
-                        icon: Icon(Icons.arrow_back_ios_rounded,
-                            color: Theme.of(context).colorScheme.onSurface),
-                        onPressed: () => context.pop(),
-                      )
-                    : TextButton(
-                        onPressed: () {
-                          context.go('/');
-                        },
-                        child: Text(AppLocalizations.of(context)!.signIn),
-                      ),
-                actions: (Provider.of<PostPageController>(context, listen: true)
-                              .post ==
-                          null) ? null : (Provider.of<PostPageController>(context, listen: false)
-                                  .isBlockedByMe() ||
-                              Provider.of<PostPageController>(context,
-                                      listen: false)
-                                  .blocksMe())
-                          ? null
-                          : [
-                  PopupMenuButton<void Function()>(
-                    itemBuilder: (context) {
-                      return [
-                        if (post!.author.uid != locator<CurrentUser>().getUID())
-                          PopupMenuItem(
-                            height: 25,
-                            value: () => Provider.of<PostPageController>(
-                                    context,
-                                    listen: false)
-                                .reportPressed(),
-                            child: Text(AppLocalizations.of(context)!.report),
+                leading:
+                    prov.Provider.of<PostPageController>(context, listen: false)
+                            .isLoggedIn()
+                        ? IconButton(
+                            icon: Icon(Icons.arrow_back_ios_rounded,
+                                color: Theme.of(context).colorScheme.onSurface),
+                            onPressed: () => context.pop(),
                           )
-                        else
-                          PopupMenuItem(
-                            height: 25,
-                            value: () => Provider.of<PostPageController>(
-                                    context,
-                                    listen: false)
-                                .deletePressed(),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(AppLocalizations.of(context)!.delete),
-                                CountDownTimer(
-                                  dateTime: DateTime.parse(post!.time)
-                                      .toLocal()
-                                      .add(const Duration(hours: 48)),
-                                  textStyle: TextStyle(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurfaceVariant,
-                                      fontSize: 13),
-                                )
-                              ],
-                            ),
+                        : TextButton(
+                            onPressed: () {
+                              context.go('/');
+                            },
+                            child: Text(AppLocalizations.of(context)!.signIn),
                           ),
-                      ];
-                    },
-                    onSelected: (fn) => fn(),
-                    color: Theme.of(context).colorScheme.outlineVariant,
-                    child: Icon(
-                      Icons.more_vert,
-                      color: Theme.of(context).colorScheme.onSurface,
-                    ),
-                  ),
-                  // IconButton(
-                  //   onPressed: () {
+                actions: (prov.Provider.of<PostPageController>(context,
+                                listen: true)
+                            .post ==
+                        null)
+                    ? null
+                    : (prov.Provider.of<PostPageController>(context,
+                                    listen: false)
+                                .isBlockedByMe() ||
+                            prov.Provider.of<PostPageController>(context,
+                                    listen: false)
+                                .blocksMe())
+                        ? null
+                        : [
+                            PopupMenuButton<void Function()>(
+                              itemBuilder: (context) {
+                                return [
+                                  if (post!.author.uid !=
+                                      locator<CurrentUser>().getUID())
+                                    PopupMenuItem(
+                                      height: 25,
+                                      value: () =>
+                                          prov.Provider.of<PostPageController>(
+                                                  context,
+                                                  listen: false)
+                                              .reportPressed(),
+                                      child: Text(
+                                          AppLocalizations.of(context)!.report),
+                                    )
+                                  else
+                                    PopupMenuItem(
+                                      height: 25,
+                                      value: () =>
+                                          prov.Provider.of<PostPageController>(
+                                                  context,
+                                                  listen: false)
+                                              .deletePressed(),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(AppLocalizations.of(context)!
+                                              .delete),
+                                          CountDownTimer(
+                                            dateTime: DateTime.parse(post!.time)
+                                                .toLocal()
+                                                .add(const Duration(hours: 48)),
+                                            textStyle: TextStyle(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onSurfaceVariant,
+                                                fontSize: 13),
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                ];
+                              },
+                              onSelected: (fn) => fn(),
+                              color:
+                                  Theme.of(context).colorScheme.outlineVariant,
+                              child: Icon(
+                                Icons.more_vert,
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+                            ),
+                            // IconButton(
+                            //   onPressed: () {
 
-                  //   },
-                  //   icon: const Icon(Icons.more_vert),
-                  //   color: Theme.of(context).colorScheme.onBackground,
-                  // )
-                ],
+                            //   },
+                            //   icon: const Icon(Icons.more_vert),
+                            //   color: Theme.of(context).colorScheme.onBackground,
+                            // )
+                          ],
               ),
-              body: Provider.of<PostPageController>(context, listen: true)
+              body: prov.Provider.of<PostPageController>(context, listen: true)
                       .postNotFound
                   ? Center(
                       child: Column(
@@ -155,13 +168,14 @@ class ViewPostPage extends StatelessWidget {
                         ],
                       ),
                     )
-                  : Provider.of<PostPageController>(context, listen: true)
+                  : prov.Provider.of<PostPageController>(context, listen: true)
                               .post ==
                           null
                       ? const Center(child: LoadingSpinner())
-                      : (Provider.of<PostPageController>(context, listen: false)
+                      : (prov.Provider.of<PostPageController>(context,
+                                      listen: false)
                                   .isBlockedByMe() ||
-                              Provider.of<PostPageController>(context,
+                              prov.Provider.of<PostPageController>(context,
                                       listen: false)
                                   .blocksMe())
                           ? Center(
@@ -181,7 +195,7 @@ class ViewPostPage extends StatelessWidget {
                                 //                 .colorScheme
                                 //                 .onBackground),
                                 //         onPressed: () =>
-                                //             Provider.of<PostPageController>(
+                                //             prov.Provider.of<PostPageController>(
                                 //                     context,
                                 //                     listen: false)
                                 //                 .onExitPressed(),
@@ -199,39 +213,42 @@ class ViewPostPage extends StatelessWidget {
                                 // ),
                                 Expanded(
                                   child: IndexedStack(
-                                    index: !Provider.of<PostPageController>(
-                                                context,
-                                                listen: false)
-                                            .isAtSymbolTyped
-                                        ? 0
-                                        : 1,
+                                    index:
+                                        !prov.Provider.of<PostPageController>(
+                                                    context,
+                                                    listen: false)
+                                                .isAtSymbolTyped
+                                            ? 0
+                                            : 1,
                                     children: [
                                       PaginationPage(
-                                          externalData:
-                                              Provider.of<PostPageController>(
-                                                      context,
-                                                      listen: true)
-                                                  .data,
-                                          getter:
-                                              Provider.of<PostPageController>(
-                                                      context,
-                                                      listen: false)
-                                                  .getCommentsFromPost,
+                                          externalData: prov.Provider.of<
+                                                      PostPageController>(
+                                                  context,
+                                                  listen: true)
+                                              .data,
+                                          getter: prov.Provider.of<
+                                                      PostPageController>(
+                                                  context,
+                                                  listen: false)
+                                              .getCommentsFromPost,
                                           card: commentCardBuilder,
                                           header: const _Header(),
                                           startAfterQuery:
-                                              Provider.of<PostPageController>(
+                                              prov.Provider.of<PostPageController>(
                                                       context,
                                                       listen: false)
                                                   .getTimeFromPost),
-                                      Provider.of<PostPageController>(context,
+                                      prov.Provider.of<PostPageController>(
+                                                  context,
                                                   listen: true)
                                               .isLoading
                                           ? const Center(
                                               child:
                                                   CircularProgressIndicator(),
                                             )
-                                          : Provider.of<PostPageController>(
+                                          : prov.Provider.of<
+                                                          PostPageController>(
                                                       context,
                                                       listen: true)
                                                   .hits
@@ -250,7 +267,7 @@ class ViewPostPage extends StatelessWidget {
                                                 )
                                               : ListView.builder(
                                                   shrinkWrap: true,
-                                                  itemCount: Provider.of<
+                                                  itemCount: prov.Provider.of<
                                                               PostPageController>(
                                                           context,
                                                           listen: true)
@@ -262,23 +279,26 @@ class ViewPostPage extends StatelessWidget {
                                                     return UserCard(
                                                       tagSearch: true,
                                                       onCardTap: (username) {
-                                                        Provider.of<PostPageController>(
+                                                        prov.Provider.of<
+                                                                    PostPageController>(
                                                                 context,
                                                                 listen: false)
                                                             .updateTextField(
                                                                 username,
-                                                                Provider.of<PostPageController>(
+                                                                prov.Provider.of<
+                                                                            PostPageController>(
                                                                         context,
                                                                         listen:
                                                                             false)
                                                                     .commentFeild,
-                                                                Provider.of<PostPageController>(
+                                                                prov.Provider.of<
+                                                                            PostPageController>(
                                                                         context,
                                                                         listen:
                                                                             false)
                                                                     .commentFeildFocus);
                                                       },
-                                                      user: Provider.of<
+                                                      user: prov.Provider.of<
                                                                   PostPageController>(
                                                               context,
                                                               listen: true)
@@ -305,54 +325,57 @@ class ViewPostPage extends StatelessWidget {
                                           cursorColor: Theme.of(context)
                                               .colorScheme
                                               .onSurface,
-                                          focusNode:
-                                              Provider.of<PostPageController>(
-                                                      context,
-                                                      listen: false)
-                                                  .commentFeildFocus,
-                                          readOnly:
-                                              !Provider.of<PostPageController>(
-                                                      context,
-                                                      listen: false)
-                                                  .isLoggedIn(),
+                                          focusNode: prov.Provider.of<
+                                                      PostPageController>(
+                                                  context,
+                                                  listen: false)
+                                              .commentFeildFocus,
+                                          readOnly: !prov.Provider.of<
+                                                      PostPageController>(
+                                                  context,
+                                                  listen: false)
+                                              .isLoggedIn(),
                                           //  enableInteractiveSelection:
-                                          //     !Provider.of<PostPageController>(
+                                          //     !prov.Provider.of<PostPageController>(
                                           //             context,
                                           //             listen: false)
                                           //         .isLoggedIn(),
                                           onTap: () {
-                                            if (!Provider.of<
+                                            if (!prov.Provider.of<
                                                         PostPageController>(
                                                     context,
                                                     listen: false)
                                                 .isLoggedIn()) {
-                                              Provider.of<PostPageController>(
+                                              prov.Provider.of<
+                                                          PostPageController>(
                                                       context,
                                                       listen: false)
                                                   .showLogInDialog();
                                             }
                                           },
                                           onChanged: (s) {
-                                            Provider.of<PostPageController>(
+                                            prov.Provider.of<
+                                                        PostPageController>(
                                                     context,
                                                     listen: false)
                                                 .updateCount(s);
-                                            Provider.of<PostPageController>(
+                                            prov.Provider.of<
+                                                        PostPageController>(
                                                     context,
                                                     listen: false)
                                                 .checkAtSymbol(s);
                                           },
                                           maxLines: null,
-                                          controller:
-                                              Provider.of<PostPageController>(
-                                                      context,
-                                                      listen: false)
-                                                  .commentFeild,
+                                          controller: prov.Provider.of<
+                                                      PostPageController>(
+                                                  context,
+                                                  listen: false)
+                                              .commentFeild,
                                           keyboardType: TextInputType.text,
                                           decoration: InputDecoration(
                                             contentPadding:
                                                 EdgeInsets.all(height * 0.01),
-                                            hintText: Provider.of<
+                                            hintText: prov.Provider.of<
                                                             PostPageController>(
                                                         context,
                                                         listen: false)
@@ -375,17 +398,19 @@ class ViewPostPage extends StatelessWidget {
                                               children: [
                                                 IconButton(
                                                   onPressed: () {
-                                                    if (Provider.of<
+                                                    if (prov.Provider.of<
                                                                 PostPageController>(
                                                             context,
                                                             listen: false)
                                                         .isLoggedIn()) {
-                                                      Provider.of<PostPageController>(
+                                                      prov.Provider.of<
+                                                                  PostPageController>(
                                                               context,
                                                               listen: false)
                                                           .addGifPressed();
                                                     } else {
-                                                      Provider.of<PostPageController>(
+                                                      prov.Provider.of<
+                                                                  PostPageController>(
                                                               context,
                                                               listen: false)
                                                           .showLogInDialog();
@@ -396,17 +421,19 @@ class ViewPostPage extends StatelessWidget {
                                                 ),
                                                 IconButton(
                                                   onPressed: () {
-                                                    if (Provider.of<
+                                                    if (prov.Provider.of<
                                                                 PostPageController>(
                                                             context,
                                                             listen: false)
                                                         .isLoggedIn()) {
-                                                      Provider.of<PostPageController>(
+                                                      prov.Provider.of<
+                                                                  PostPageController>(
                                                               context,
                                                               listen: false)
                                                           .postCommentPressed();
                                                     } else {
-                                                      Provider.of<PostPageController>(
+                                                      prov.Provider.of<
+                                                                  PostPageController>(
                                                               context,
                                                               listen: false)
                                                           .showLogInDialog();
@@ -441,9 +468,11 @@ class _Header extends StatelessWidget {
       children: [
         PostCard(
           isPostPage: true,
-          post: Provider.of<PostPageController>(context, listen: true).post!,
-          isBuiltFromId: Provider.of<PostPageController>(context, listen: false)
-              .builtFromID,
+          post:
+              prov.Provider.of<PostPageController>(context, listen: true).post!,
+          isBuiltFromId:
+              prov.Provider.of<PostPageController>(context, listen: false)
+                  .builtFromID,
         ),
         // Divider(
         //   color: Theme.of(context).colorScheme.outline,

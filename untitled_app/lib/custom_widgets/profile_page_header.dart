@@ -38,7 +38,7 @@ class ProfileHeader extends StatelessWidget {
                         onPressed: () async {
                           if (loggedIn) {
                             locator<NavBarController>().disable();
-                            await context.pushNamed("profile_picture_detail",
+                            await context.pushNamed('profile_picture_detail',
                                 extra: user.profilePicture);
                             locator<NavBarController>().enable();
                           }
@@ -63,7 +63,7 @@ class ProfileHeader extends StatelessWidget {
                                       AppLocalizations.of(context)!.followers,
                                   onPressed: () {
                                     if (loggedIn) {
-                                      context.push("/profile/followers",
+                                      context.push('/profile/followers',
                                           extra: user);
                                     }
                                   },
@@ -74,7 +74,7 @@ class ProfileHeader extends StatelessWidget {
                                       AppLocalizations.of(context)!.following,
                                   onPressed: () {
                                     if (loggedIn) {
-                                      context.push("/profile/following",
+                                      context.push('/profile/following',
                                           extra: user);
                                     }
                                   },
@@ -92,7 +92,7 @@ class ProfileHeader extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      user.username != ""
+                      user.username != ''
                           ? user.name
                           : AppLocalizations.of(context)!.userNotFound,
                       //user.name,
@@ -145,7 +145,7 @@ class _ProfilePageTopNumberDisplay extends StatelessWidget {
                 fontSize: 17),
             children: [
               TextSpan(
-                text: "\n$label",
+                text: '\n$label',
               )
             ],
           ),
@@ -161,7 +161,7 @@ class _ProfilePageTopNumberDisplay extends StatelessWidget {
 //   // Navigator.push(
 //   //   context,
 //   //   MaterialPageRoute(
-//   //     builder: (context) => ChangeNotifierProvider(
+//   //     builder: (context) => prov.ChangeNotifierProvider(
 //   //       create: (context) =>
 //   //           FollowingController(context: context, following: following),
 //   //       child: Following(
@@ -178,7 +178,7 @@ class _ProfilePageTopNumberDisplay extends StatelessWidget {
 //   await Navigator.push(
 //     context,
 //     MaterialPageRoute(
-//       builder: (context) => ChangeNotifierProvider(
+//       builder: (context) => prov.ChangeNotifierProvider(
 //         create: (context) =>
 //             FollowersController(context: context, followers: followers),
 //         child: Followers(

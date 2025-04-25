@@ -9,7 +9,7 @@ import 'package:giphy_get/src/providers/app_bar_provider.dart';
 import 'package:giphy_get/src/providers/sheet_provider.dart';
 import 'package:giphy_get/src/providers/tab_provider.dart';
 import 'package:giphy_get/src/views/main_view.dart';
-import 'package:provider/provider.dart';
+import 'package:provider/provider.dart' as prov;
 
 // Giphy Client Export
 export 'package:giphy_get/src/client/client.dart';
@@ -70,18 +70,18 @@ class GiphyGet {
           ),
       isScrollControlled: true,
       context: context,
-      builder: (ctx) => MultiProvider(
+      builder: (ctx) => prov.MultiProvider(
         providers: [
-          ChangeNotifierProvider(
+          prov.ChangeNotifierProvider(
             create: (ctx) => AppBarProvider(
               queryText = queryText,
               debounceTimeInMilliseconds,
             ),
           ),
-          ChangeNotifierProvider(
+          prov.ChangeNotifierProvider(
             create: (ctx) => SheetProvider(),
           ),
-          ChangeNotifierProvider(
+          prov.ChangeNotifierProvider(
             create: (ctx) => TabProvider(
               apiKey: apiKey,
               randomID: randomID,

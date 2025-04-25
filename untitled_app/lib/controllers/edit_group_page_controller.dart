@@ -15,7 +15,7 @@ import '../models/group_handler.dart';
 import '../models/current_user.dart';
 
 class EditGroupPageController extends ChangeNotifier {
-  String icon = "";
+  String icon = '';
   final searchTextController = TextEditingController();
   final PageController pageController = PageController();
   final selectedPeopleScroll = ScrollController();
@@ -30,7 +30,7 @@ class EditGroupPageController extends ChangeNotifier {
   final BuildContext context;
   bool canSwipe = false;
   Cache searchedListData = Cache(items: [], end: false);
-  String query = "";
+  String query = '';
   Group group;
   final searchModel = SearchModel();
   EditGroupPageController({required this.context, required this.group}) {
@@ -177,16 +177,16 @@ class EditGroupPageController extends ChangeNotifier {
   }
 
   void pickEmoji() async {
-    context.pushNamed("pick_emoji", extra: _setIcon);
+    context.pushNamed('pick_emoji', extra: _setIcon);
   }
 
   void _setIcon(String returnedString) {
-    if (returnedString != "") icon = returnedString;
+    if (returnedString != '') icon = returnedString;
     notifyListeners();
   }
 
   void clearIcon() {
-    icon = "";
+    icon = '';
     notifyListeners();
   }
 
@@ -210,13 +210,13 @@ class EditGroupPageController extends ChangeNotifier {
     if (members.isNotEmpty) {
       GroupHandler().updateGroupMembers(group, members);
     } else {
-      locator<PostsHandling>().deleteData("groups/${group.id}");
+      locator<PostsHandling>().deleteData('groups/${group.id}');
     }
     locator<FeedPostCache>().groupsCache.items.removeWhere((element) {
       element as Group;
       return element.id == group.id;
     });
-    context.go("/groups", extra: true);
+    context.go('/groups', extra: true);
   }
 
   void leaveGroup() {

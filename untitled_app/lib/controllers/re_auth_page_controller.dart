@@ -24,7 +24,7 @@ class ReAuthPageController extends ChangeNotifier {
       isLoading = true;
       notifyListeners();
       final password = passwordController.text;
-      if (password == "") {
+      if (password == '') {
         passwordFocus.requestFocus();
       } else {
         if (_handleError(await locator<CurrentUser>().signIn(password)) == 0) {

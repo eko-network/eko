@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:giphy_get/giphy_get.dart';
 import 'package:giphy_get/l10n.dart';
 import 'package:giphy_get_demo/providers/theme_provider.dart';
-import 'package:provider/provider.dart';
+import 'package:provider/provider.dart' as prov;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  runApp(MultiProvider(providers: [
-    ChangeNotifierProvider(
+  runApp(prov.MultiProvider(providers: [
+    prov.ChangeNotifierProvider(
         create: (ctx) => ThemeProvider(currentTheme: ThemeMode.system))
   ], child: const MyApp()));
 }
@@ -25,12 +25,12 @@ class MyApp extends StatelessWidget {
           brightness: Brightness.light,
           primarySwatch: Colors.blue,
           visualDensity: VisualDensity.adaptivePlatformDensity,
-          useMaterial3: Provider.of<ThemeProvider>(context).material3),
+          useMaterial3: prov.Provider.of<ThemeProvider>(context).material3),
       darkTheme: ThemeData(
           brightness: Brightness.dark,
           primarySwatch: Colors.purple,
           visualDensity: VisualDensity.adaptivePlatformDensity,
-          useMaterial3: Provider.of<ThemeProvider>(context).material3),
+          useMaterial3: prov.Provider.of<ThemeProvider>(context).material3),
       localizationsDelegates: [
         ...GlobalMaterialLocalizations.delegates,
         GlobalWidgetsLocalizations.delegate,
@@ -43,7 +43,7 @@ class MyApp extends StatelessWidget {
         Locale('fr', ''),
       ],
       home: const MyHomePage(title: 'Giphy Get Demo'),
-      themeMode: Provider.of<ThemeProvider>(context).currentTheme,
+      themeMode: prov.Provider.of<ThemeProvider>(context).currentTheme,
     );
   }
 }
@@ -58,7 +58,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  late ThemeProvider themeProvider = Provider.of<ThemeProvider>(context);
+  late ThemeProvider themeProvider = prov.Provider.of<ThemeProvider>(context);
 
   //Gif
   GiphyGif? currentGif;
@@ -139,7 +139,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   Text("Random ID: $randomId"),
                   const Text(
                     "Selected GIF",
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.normal),
+                    style:
+                        TextStyle(fontSize: 20, fontWeight: FontWeight.normal),
                   ),
                   const SizedBox(
                     height: 10,
@@ -159,7 +160,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
             floatingActionButton: FloatingActionButton(
-              heroTag: null,
+                heroTag: null,
                 onPressed: () async {
                   giphyGetWrapper.getGif(
                     '',

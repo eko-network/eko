@@ -15,7 +15,7 @@ class Group {
   List<String> notSeen;
 
   Group({
-    this.id = "",
+    this.id = '',
     required this.createdOn,
     required this.name,
     required this.lastActivity,
@@ -26,25 +26,25 @@ class Group {
   });
   Map<String, dynamic> toMap() {
     Map<String, dynamic> map = {};
-    map["name"] = name;
-    map["lastActivity"] = lastActivity;
+    map['name'] = name;
+    map['lastActivity'] = lastActivity;
 
-    map["members"] = members;
-    map["description"] = description;
-    map["icon"] = icon;
-    map["createdOn"] = createdOn;
+    map['members'] = members;
+    map['description'] = description;
+    map['icon'] = icon;
+    map['createdOn'] = createdOn;
     return map;
   }
 
   static Group fromJson(Map<String, dynamic> json, String id) {
     return Group(
-        createdOn: json["createdOn"],
-        name: json["name"],
-        lastActivity: json["lastActivity"],
-        icon: json["icon"],
-        members: json["members"].cast<String>(),
-        notSeen: (json["notSeen"] ?? []).cast<String>(),
-        description: json["description"],
+        createdOn: json['createdOn'],
+        name: json['name'],
+        lastActivity: json['lastActivity'],
+        icon: json['icon'],
+        members: json['members'].cast<String>(),
+        notSeen: (json['notSeen'] ?? []).cast<String>(),
+        description: json['description'],
         id: id);
   }
 }
@@ -71,7 +71,7 @@ class GroupHandler {
 
   Future<Group?> getGroupFromId(String id) async {
     final data =
-        await FirebaseFirestore.instance.collection("groups").doc(id).get();
+        await FirebaseFirestore.instance.collection('groups').doc(id).get();
     final postData = data.data();
     if (postData != null) {
       return Group.fromJson(postData, data.id);
@@ -83,7 +83,7 @@ class GroupHandler {
     final user = FirebaseAuth.instance.currentUser!.uid;
     final query = FirebaseFirestore.instance
         .collection('groups')
-        .where("members", arrayContains: user)
+        .where('members', arrayContains: user)
         .orderBy('lastActivity', descending: true);
     //.where("author", isEqualTo: user)
 

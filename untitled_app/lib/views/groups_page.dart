@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:provider/provider.dart' as prov;
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:untitled_app/models/feed_post_cache.dart';
 import 'package:untitled_app/utilities/locator.dart';
@@ -28,25 +28,30 @@ class GroupsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => GroupsPageController(context: context, reload:reload),
+    return prov.ChangeNotifierProvider(
+      create: (context) =>
+          GroupsPageController(context: context, reload: reload),
       builder: (context, child) {
         return PopScope(
           canPop: false,
           onPopInvoked: (didPop) =>
-              Provider.of<GroupsPageController>(context, listen: false)
+              prov.Provider.of<GroupsPageController>(context, listen: false)
                   .onWillPop(),
           child: Scaffold(
             body: PaginationPage(
               externalData: locator<FeedPostCache>().groupsCache,
-              getter: Provider.of<GroupsPageController>(context, listen: true)
-                  .getGroups,
+              getter:
+                  prov.Provider.of<GroupsPageController>(context, listen: true)
+                      .getGroups,
               card: groupCardBuilder,
               startAfterQuery:
-                  Provider.of<GroupsPageController>(context, listen: false)
+                  prov.Provider.of<GroupsPageController>(context, listen: false)
                       .getTimeFromGroup,
               appbar: SliverAppBar(
-                title: Text(AppLocalizations.of(context)!.groups, style: TextStyle(fontSize: 20),),
+                title: Text(
+                  AppLocalizations.of(context)!.groups,
+                  style: TextStyle(fontSize: 20),
+                ),
                 centerTitle: true,
                 floating: true,
                 pinned: false,
@@ -55,10 +60,14 @@ class GroupsPage extends StatelessWidget {
                 actions: [
                   IconButton(
                     color: Theme.of(context).colorScheme.onSurface,
-                    onPressed: () => Provider.of<GroupsPageController>(context,
+                    onPressed: () => prov.Provider.of<GroupsPageController>(
+                            context,
                             listen: false)
                         .createGroupPressed(),
-                    icon: const Icon(Icons.group_add, size: 20,),
+                    icon: const Icon(
+                      Icons.group_add,
+                      size: 20,
+                    ),
                   ),
                 ],
                 bottom: PreferredSize(

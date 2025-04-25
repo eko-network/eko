@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import "../utilities/constants.dart" as c;
+import '../utilities/constants.dart' as c;
 import 'package:universal_html/html.dart' as html;
 
 class DownloadPageController extends ChangeNotifier {

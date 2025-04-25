@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:untitled_app/controllers/following_controller.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
-import 'package:provider/provider.dart';
+import 'package:provider/provider.dart' as prov;
 import 'package:go_router/go_router.dart';
 import 'package:untitled_app/models/users.dart';
 import '../custom_widgets/searched_user_card.dart';
@@ -16,7 +16,7 @@ class Following extends StatelessWidget {
   Widget build(BuildContext context) {
     final height = MediaQuery.sizeOf(context).height;
 
-    return ChangeNotifierProvider(
+    return prov.ChangeNotifierProvider(
       create: (context) =>
           FollowingController(context: context, rootUser: user),
       builder: (context, child) {
@@ -24,9 +24,11 @@ class Following extends StatelessWidget {
           appBar: AppBar(
             surfaceTintColor: Colors.transparent,
             leading: IconButton(
-              icon: Icon(Icons.arrow_back_ios_rounded,
-                  color: Theme.of(context).colorScheme.onSurface,
-                  size: 20,),
+              icon: Icon(
+                Icons.arrow_back_ios_rounded,
+                color: Theme.of(context).colorScheme.onSurface,
+                size: 20,
+              ),
               onPressed: () => context.pop(),
             ),
             backgroundColor: Theme.of(context).colorScheme.surface,
@@ -40,19 +42,20 @@ class Following extends StatelessWidget {
             ),
           ),
           body: Padding(
-            padding: EdgeInsets.symmetric(
-                    vertical: height * 0.01, horizontal: 6),
+            padding:
+                EdgeInsets.symmetric(vertical: height * 0.01, horizontal: 6),
             child: PaginationPage(
-                getter: Provider.of<FollowingController>(context, listen: false)
+                getter: prov.Provider.of<FollowingController>(context,
+                        listen: false)
                     .userGetter,
                 card: searchPageBuilder,
-                startAfterQuery:
-                    Provider.of<FollowingController>(context, listen: false)
-                        .startAfterQuery, extraRefresh:
-                      Provider.of<FollowingController>(context, listen: false)
-                          .onRefresh),
+                startAfterQuery: prov.Provider.of<FollowingController>(context,
+                        listen: false)
+                    .startAfterQuery,
+                extraRefresh: prov.Provider.of<FollowingController>(context,
+                        listen: false)
+                    .onRefresh),
           ),
-          
         );
       },
     );

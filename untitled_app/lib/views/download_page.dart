@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:provider/provider.dart' as prov;
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import '../controllers/download_page_controller.dart';
 import 'package:qr_flutter_new/qr_flutter.dart';
-import "../utilities/constants.dart" as c;
+import '../utilities/constants.dart' as c;
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import '../models/uri_launcher.dart';
@@ -14,20 +14,20 @@ class DownloadPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final width = c.widthGetter(context);
-    return ChangeNotifierProvider(
+    return prov.ChangeNotifierProvider(
       create: (context) => DownloadPageController(),
       builder: (context, child) {
-        Provider.of<DownloadPageController>(context, listen: true);
+        prov.Provider.of<DownloadPageController>(context, listen: true);
         return PopScope(
           canPop: false,
-          onPopInvoked: (didPop) => context.go("/"),
+          onPopInvoked: (didPop) => context.go('/'),
           child: Scaffold(
             appBar: AppBar(
               automaticallyImplyLeading: false,
               leading: IconButton(
                 icon: Icon(Icons.arrow_back_ios_rounded,
                     color: Theme.of(context).colorScheme.onSurface),
-                onPressed: () => context.go("/"),
+                onPressed: () => context.go('/'),
               ),
               title: Text(AppLocalizations.of(context)!.download),
               backgroundColor: Theme.of(context).colorScheme.surface,
@@ -41,13 +41,11 @@ class DownloadPage extends StatelessWidget {
                     width: width * 0.8,
                     child: QrImageView(
                       //gapless: true,
-                      data: "${c.appURL}/download",
-                       backgroundColor: Theme.of(context).colorScheme.surface,
+                      data: '${c.appURL}/download',
+                      backgroundColor: Theme.of(context).colorScheme.surface,
                       dataModuleStyle: QrDataModuleStyle(
-                           borderRadius: 4,
-
-                           color: Theme.of(context).colorScheme.onSurface
-                          ),
+                          borderRadius: 4,
+                          color: Theme.of(context).colorScheme.onSurface),
                       eyeStyle: QrEyeStyle(
                           borderRadius: 4,
                           color: Theme.of(context).colorScheme.onSurface,

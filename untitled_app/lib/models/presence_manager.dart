@@ -6,12 +6,12 @@ import 'package:untitled_app/utilities/locator.dart';
 
 class PresenceManager {
   String? sessionId;
-  String uid = "";
+  String uid = '';
   //final idValue = ;
 
   String _generateSessionID() {
     const randomChars =
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     const charsLength = randomChars.length;
 
     final rand = Random();
@@ -29,7 +29,7 @@ class PresenceManager {
   }
 
   unVerifySession() {
-    if (uid != "") {
+    if (uid != '') {
       DatabaseReference userStatusDatabaseRef =
           FirebaseDatabase.instance.ref().child('/status/$uid');
       Map<String, dynamic> isOfflineForDatabase = {
@@ -39,7 +39,7 @@ class PresenceManager {
       sessionId = null;
       userStatusDatabaseRef.set(isOfflineForDatabase);
       userStatusDatabaseRef.onDisconnect().cancel();
-      uid = "";
+      uid = '';
     }
     
   }

@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:provider/provider.dart' as prov;
 import 'package:untitled_app/models/current_user.dart';
 import 'package:untitled_app/models/shared_pref_model.dart';
 import 'package:untitled_app/utilities/locator.dart';
@@ -25,11 +25,13 @@ class SettingsController extends ChangeNotifier {
   }
 
   bool getThemeValue() {
-    return Provider.of<DarkThemeProvider>(context, listen: false).darkTheme;
+    return prov.Provider.of<DarkThemeProvider>(context, listen: false)
+        .darkTheme;
   }
 
   changeValue(value) {
-    final themeChange = Provider.of<DarkThemeProvider>(context, listen: false);
+    final themeChange =
+        prov.Provider.of<DarkThemeProvider>(context, listen: false);
     themeChange.darkTheme = value;
   }
 
@@ -44,14 +46,14 @@ class SettingsController extends ChangeNotifier {
       locator<NavBarController>().enable();
     } on FirebaseAuthException catch (e) {
       if (e.code == 'requires-recent-login') {
-        context.pushNamed("re_auth");
+        context.pushNamed('re_auth');
       }
     }
   }
 
   toggleActivityNotification(value) async {
     // final notification =
-    //     Provider.of<NotificationProvider>(context, listen: false);
+    //     prov.Provider.of<NotificationProvider>(context, listen: false);
     // notification.notificationEnabled = value;
     // notifyListeners();
     // if (value) {
@@ -72,7 +74,7 @@ class SettingsController extends ChangeNotifier {
   }
 
   void blockedPressed() {
-    context.pushNamed("blocked_users");
+    context.pushNamed('blocked_users');
   }
 
   signOut() async {

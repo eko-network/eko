@@ -1,15 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:giphy_get/giphy_get.dart';
-import 'package:provider/provider.dart';
-import 'package:untitled_app/custom_widgets/controllers/post_card_controller.dart';
-import 'package:untitled_app/custom_widgets/login_text_feild.dart';
 import 'package:untitled_app/custom_widgets/warning_dialog.dart';
 import 'package:untitled_app/models/current_user.dart';
 import 'package:untitled_app/models/group_handler.dart';
-import 'package:untitled_app/utilities/themes/dark_theme_provider.dart';
 import '../models/search_model.dart';
 import '../models/users.dart';
 import '../utilities/constants.dart' as c;
@@ -70,7 +65,7 @@ class PostPageController extends ChangeNotifier {
       if (post == null) {
         final readPost = await locator<PostsHandling>().getPostFromId(id);
         if (readPost != null) {
-          if (readPost.tags.contains("public")) {
+          if (readPost.tags.contains('public')) {
             post = readPost;
             builtFromID = true;
             post!.hasCache = true;
@@ -171,7 +166,7 @@ class PostPageController extends ChangeNotifier {
     locator<FeedPostCache>().removePostFromAllCaches(post!.postId);
     _pop();
     postMap[post!.postId]!.visible = false;
-    locator<PostsHandling>().deleteData("posts/${post!.postId}");
+    locator<PostsHandling>().deleteData('posts/${post!.postId}');
   }
 
   void deletePressed() {
@@ -220,9 +215,9 @@ class PostPageController extends ChangeNotifier {
                 focusNode: reportFocus,
 
                 // onChanged: (s) {
-                //   Provider.of<ComposeController>(context, listen: false)
+                //   prov.Provider.of<ComposeController>(context, listen: false)
                 //       .updateCountsBody(s);
-                //   Provider.of<ComposeController>(context, listen: false)
+                //   prov.Provider.of<ComposeController>(context, listen: false)
                 //       .checkAtSymbol(s);
                 // },
                 controller: reportController,
@@ -265,8 +260,8 @@ class PostPageController extends ChangeNotifier {
               child: Text(AppLocalizations.of(context)!.send),
               onPressed: () async {
                 final message = reportController.text.trim();
-                if (message != "") {
-                  reportController.text = "";
+                if (message != '') {
+                  reportController.text = '';
                   await locator<PostsHandling>()
                       .addReport(post: post!, message: message);
                   _popDialog();
@@ -373,21 +368,21 @@ class PostPageController extends ChangeNotifier {
       if (chars > c.maxCommentChars) {
         showSnackBar(
             text: AppLocalizations.of(context)!.tooManyChar, context: context);
-      } else if (commentFeild.text == "") {
+      } else if (commentFeild.text == '') {
         commentFeildFocus.requestFocus();
         showSnackBar(
             text: AppLocalizations.of(context)!.emptyFieldError,
             context: context);
       } else {
         String comment = commentFeild.text;
-        commentFeild.text = "";
+        commentFeild.text = '';
         hideKeyboard();
         final returnedId = await locator<PostsHandling>().createComment(
-            {"body": comment}, post!.postId, post!.author.uid, post!.postId);
+            {'body': comment}, post!.postId, post!.author.uid, post!.postId);
 
         final newComment = RawPostObject(
           image: null,
-          tags: ["public"],
+          tags: ['public'],
           author: locator<CurrentUser>().getUID(),
           likes: 0,
           time: DateTime.now().toUtc().toIso8601String(),
@@ -404,12 +399,12 @@ class PostPageController extends ChangeNotifier {
       }
     } else {
       final returnedId = await locator<PostsHandling>().createComment(
-          {"gifUrl": gif!.images!.fixedWidth.url, "gifSource": gif!.url},
+          {'gifUrl': gif!.images!.fixedWidth.url, 'gifSource': gif!.url},
           post!.postId,
           post!.author.uid,
           post!.postId);
       final newComment = Post(
-          tags: ["public"],
+          tags: ['public'],
           author: AppUser.fromCurrent(locator<CurrentUser>()),
           likes: 0,
           time: DateTime.now().toUtc().toIso8601String(),
@@ -440,7 +435,7 @@ class PostPageController extends ChangeNotifier {
     locator<NavBarController>().disable();
     GiphyGif? newGif = await GiphyGet.getGif(
       context: context,
-      apiKey: dotenv.env["GIPHY_API_KEY"]!,
+      apiKey: dotenv.env['GIPHY_API_KEY']!,
       lang: GiphyLanguage.english,
       //randomID: "abcd", // Optional - An ID/proxy for a specific user.
       tabColor: Colors.teal,

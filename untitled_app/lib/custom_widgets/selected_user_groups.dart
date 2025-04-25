@@ -38,7 +38,7 @@ class SelectedUser extends StatelessWidget {
                   children: [
                     ProfileAvatar(url: user.profilePicture, size: 22),
                     const SizedBox(width: 5),
-                    Text((user.name != "") ? user.name : user.username)
+                    Text((user.name != '') ? user.name : user.username)
                   ],
                 ),
               ),

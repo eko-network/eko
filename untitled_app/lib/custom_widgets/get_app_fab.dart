@@ -28,7 +28,7 @@ class GetAppFab extends StatelessWidget {
       child: Text(AppLocalizations.of(context)!.getTheApp,
           style: TextStyle(color: Theme.of(context).colorScheme.onPrimary)),
       // Set the button action
-      onPressed: () => context.go("/download"),
+      onPressed: () => context.go('/download'),
     );
   }
 }

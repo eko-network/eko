@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
-import 'package:untitled_app/controllers/bottom_nav_bar_controller.dart';
-import 'package:untitled_app/utilities/themes/dark_theme_provider.dart';
 import '../custom_widgets/error_snack_bar.dart';
 import '../utilities/constants.dart' as c;
 import '../utilities/locator.dart';
@@ -10,7 +7,7 @@ import '../models/current_user.dart';
 
 import '../custom_widgets/warning_dialog.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
-import "package:go_router/go_router.dart";
+import 'package:go_router/go_router.dart';
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 
@@ -54,7 +51,7 @@ class SignUpController extends ChangeNotifier {
   bool goodPassword = false;
   double passwordPercent = 0;
   Timer? _debounce;
-  List<String> passed = ["❌", "❌", "❌", "❌", "❌", "❌"];
+  List<String> passed = ['❌', '❌', '❌', '❌', '❌', '❌'];
 
   SignUpController({required this.context}) {
     // monthController.addListener(onMonthChanged);
@@ -115,21 +112,21 @@ class SignUpController extends ChangeNotifier {
   void onKey(RawKeyEvent event) {
     if (monthFocus.hasFocus) {
       if (monthController.text.length == 2 &&
-          event.logicalKey.keyLabel != "Backspace") {
+          event.logicalKey.keyLabel != 'Backspace') {
         dayFocus.requestFocus();
         dayController.text = event.character ?? '';
       }
     } else if (dayFocus.hasFocus) {
       if (dayController.text.length == 2 &&
-          event.logicalKey.keyLabel != "Backspace") {
+          event.logicalKey.keyLabel != 'Backspace') {
         yearFocus.requestFocus();
         yearController.text = event.character ?? '';
-      } else if (event.logicalKey.keyLabel == "Backspace" &&
+      } else if (event.logicalKey.keyLabel == 'Backspace' &&
           dayController.text.isEmpty) {
         monthFocus.requestFocus();
       }
     } else if (yearFocus.hasFocus) {
-      if (event.logicalKey.keyLabel == "Backspace" &&
+      if (event.logicalKey.keyLabel == 'Backspace' &&
           yearController.text.isEmpty) {
         dayFocus.requestFocus();
       }
@@ -152,34 +149,34 @@ class SignUpController extends ChangeNotifier {
   // void onYearChanged() {}
 
   passwordChanged() {
-    passed = ["❌", "❌", "❌", "❌", "❌", "❌"];
+    passed = ['❌', '❌', '❌', '❌', '❌', '❌'];
     int points = 0;
     String pass1 = passwordController.text;
     String pass2 = passwordConfirmController.text;
     if ((pass1).length >= 7 && (pass1).length <= 32) {
       points++;
-      passed[0] = "✅";
+      passed[0] = '✅';
     }
     if (pass1.contains(RegExp(r'[a-z]'))) {
       points++;
-      passed[1] = "✅";
+      passed[1] = '✅';
     }
     if (pass1.contains(RegExp(r'[A-Z]'))) {
       points++;
-      passed[2] = "✅";
+      passed[2] = '✅';
     }
 
     if (pass1.contains(RegExp(r'[0-9]'))) {
       points++;
-      passed[3] = "✅";
+      passed[3] = '✅';
     }
     if (!pass1.contains(RegExp(r'^[A-Za-z0-9]*$'))) {
       points++;
-      passed[4] = "✅";
+      passed[4] = '✅';
     }
-    if (pass1 == pass2 && pass1 != "") {
+    if (pass1 == pass2 && pass1 != '') {
       points++;
-      passed[5] = "✅";
+      passed[5] = '✅';
     }
     goodPassword = (points == 6);
     if (pass1 != '') {
@@ -200,7 +197,7 @@ class SignUpController extends ChangeNotifier {
 
   void _returnToWelcome() {
     _pop();
-    context.go("/");
+    context.go('/');
   }
 
   void hideKeyboard() {
@@ -310,7 +307,7 @@ class SignUpController extends ChangeNotifier {
       passwordFocus.requestFocus();
     } else {
       if (goodPassword ||
-          (passwordController.text == "password" && kDebugMode)) {
+          (passwordController.text == 'password' && kDebugMode)) {
         loggingIn = true;
         notifyListeners();
         locator<CurrentUser>().email = emailController.text.trim();
@@ -324,13 +321,13 @@ class SignUpController extends ChangeNotifier {
             locator<CurrentUser>().addUserDataToFirestore();
           }
         } else {
-          _handleError("username-taken");
+          _handleError('username-taken');
         }
 
         loggingIn = false;
         notifyListeners();
       } else {
-        _handleError("weak-password");
+        _handleError('weak-password');
       }
     }
   }
@@ -408,7 +405,7 @@ class SignUpController extends ChangeNotifier {
             [AppLocalizations.of(context)!.ok],
             [_popDialog],
             context);
-        return "done";
+        return 'done';
       }
     } else {
 //invalid
@@ -418,11 +415,11 @@ class SignUpController extends ChangeNotifier {
           [AppLocalizations.of(context)!.ok],
           [_popDialog],
           context);
-      return "done";
+      return 'done';
     }
 
     // Request focus for the empty field
-    if (nameController.text == "") {
+    if (nameController.text == '') {
       nameFocus.requestFocus();
     } else if (nameController.text.length > c.maxNameChars) {
       showSnackBar(
@@ -430,7 +427,7 @@ class SignUpController extends ChangeNotifier {
       nameFocus.requestFocus();
     } else if (!validUsername || isChecking || !availableUsername) {
       usernameFocus.requestFocus();
-    } else if (emailController.text == "") {
+    } else if (emailController.text == '') {
       emailFocus.requestFocus();
     } else if (page == 0) {
       //_getPageData(page);
@@ -439,6 +436,6 @@ class SignUpController extends ChangeNotifier {
           duration: const Duration(milliseconds: c.signUpAnimationDuration),
           curve: Curves.decelerate);
     }
-    return "done";
+    return 'done';
   }
 }

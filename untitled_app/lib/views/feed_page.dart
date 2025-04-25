@@ -6,7 +6,7 @@ import 'package:untitled_app/utilities/locator.dart';
 import '../custom_widgets/pagination.dart';
 import '../custom_widgets/tab_bar.dart';
 import '../controllers/feed_controller.dart';
-import 'package:provider/provider.dart';
+import 'package:provider/provider.dart' as prov;
 import '../custom_widgets/post_card.dart';
 import '../utilities/constants.dart' as c;
 
@@ -18,9 +18,9 @@ class FeedPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // print(rebuild);
-    //Provider.of<FeedController>(context, listen: false).checkNewActivity();
+    //prov.Provider.of<FeedController>(context, listen: false).checkNewActivity();
     //return ExampleUiLoadingAnimation();
-    return ChangeNotifierProvider(
+    return prov.ChangeNotifierProvider(
       create: (context) => FeedController(context: context, rebuild: rebuild),
       builder: (context, child) {
         final width = c.widthGetter(context);
@@ -56,7 +56,7 @@ class FeedPage extends StatelessWidget {
                     color: Theme.of(context).colorScheme.onSurface,
                     size: 28,
                   ),
-                  if (Provider.of<FeedController>(context, listen: true)
+                  if (prov.Provider.of<FeedController>(context, listen: true)
                       .newActivity)
                     Positioned(
                       right: 1.5,
@@ -71,7 +71,7 @@ class FeedPage extends StatelessWidget {
                 ],
               ),
               onPressed: () =>
-                  Provider.of<FeedController>(context, listen: false)
+                  prov.Provider.of<FeedController>(context, listen: false)
                       .onNotificationButtonPressed(),
             ),
           ],
@@ -90,14 +90,16 @@ class FeedPage extends StatelessWidget {
             initialLoadingWidget: const FeedLoader(),
             appbar: appBar,
             extraRefresh:
-                Provider.of<FeedController>(context, listen: false).onRefresh,
-            getter:
-                Provider.of<FeedController>(context, listen: false).getPosts,
+                prov.Provider.of<FeedController>(context, listen: false)
+                    .onRefresh,
+            getter: prov.Provider.of<FeedController>(context, listen: false)
+                .getPosts,
             card: postCardBuilder,
-            startAfterQuery: Provider.of<FeedController>(context, listen: false)
-                .getTimeFromPost,
+            startAfterQuery:
+                prov.Provider.of<FeedController>(context, listen: false)
+                    .getTimeFromPost,
             externalData: locator<FeedPostCache>().postsList[
-                Provider.of<FeedController>(context, listen: true).index],
+                prov.Provider.of<FeedController>(context, listen: true).index],
           ),
         );
       },

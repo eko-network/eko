@@ -56,16 +56,16 @@ class PostCardController extends ChangeNotifier {
 
 //FIXME could be optomized
   // void rebuildFeed() {
-  //   Provider.of<PaginationController>(context, listen: false).rebuildFunction();
+  //   prov.Provider.of<PaginationController>(context, listen: false).rebuildFunction();
   // }
 
   void groupBannerPressed() {
     final group = post.group;
     if (group != null) {
       if (group.members.contains(locator<CurrentUser>().getUID())) {
-        context.push("/groups/sub_group/${group.id}", extra: group);
+        context.push('/groups/sub_group/${group.id}', extra: group);
       } else {
-        showMyDialog(AppLocalizations.of(context)!.notInGroup, "",
+        showMyDialog(AppLocalizations.of(context)!.notInGroup, '',
             [AppLocalizations.of(context)!.ok], [_popDialog], context,
             dismissable: true);
       }
@@ -151,7 +151,7 @@ class PostCardController extends ChangeNotifier {
     if (kIsWeb) {
       Clipboard.setData(ClipboardData(
           text:
-              "Check out my post on Echo: ${c.appURL}/feed/post/${post.postId}"));
+              'Check out my post on Echo: ${c.appURL}/feed/post/${post.postId}'));
       showSnackBar(
           context: context,
           text: AppLocalizations.of(context)!.coppiedToClipboard);
@@ -182,7 +182,7 @@ class PostCardController extends ChangeNotifier {
         post.likes--;
         //also remove from parent if not linked to cache
         // if (isBuiltFromId) {
-        //   Provider.of<PostPageController>(context, listen: false)
+        //   prov.Provider.of<PostPageController>(context, listen: false)
         //       .changeInternalLikes(-1);
         // }
         // //update cache if present
@@ -196,7 +196,7 @@ class PostCardController extends ChangeNotifier {
           liked = true;
           post.likes++;
           // if (isBuiltFromId) {
-          //   Provider.of<PostPageController>(context, listen: false)
+          //   prov.Provider.of<PostPageController>(context, listen: false)
           //       .changeInternalLikes(1);
           // }
 
@@ -219,7 +219,7 @@ class PostCardController extends ChangeNotifier {
         //locator<FeedPostCache>().updateLikes(post.postId, 1);
         post.likes++;
         // if (isBuiltFromId) {
-        //   Provider.of<PostPageController>(context, listen: false)
+        //   prov.Provider.of<PostPageController>(context, listen: false)
         //       .changeInternalLikes(1);
         // }
 
@@ -234,7 +234,7 @@ class PostCardController extends ChangeNotifier {
           //locator<FeedPostCache>().updateLikes(post.postId, -1);
           post.likes--;
           // if (isBuiltFromId) {
-          //   Provider.of<PostPageController>(context, listen: false)
+          //   prov.Provider.of<PostPageController>(context, listen: false)
           //       .changeInternalLikes(-1);
           // }
 
@@ -246,7 +246,7 @@ class PostCardController extends ChangeNotifier {
       }
       //only rebuild from parent here to avoid reseting bool
       // if (isBuiltFromId) {
-      //   Provider.of<PostPageController>(context, listen: false).rebuild();
+      //   prov.Provider.of<PostPageController>(context, listen: false).rebuild();
       // }
       liking = false;
     }

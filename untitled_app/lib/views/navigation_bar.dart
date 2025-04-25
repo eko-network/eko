@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
+import 'package:provider/provider.dart' as prov;
 import 'package:untitled_app/custom_widgets/safe_area.dart';
 import '../models/current_user.dart';
 import '../utilities/locator.dart';
@@ -35,7 +35,7 @@ class ScaffoldWithNestedNavigation extends StatelessWidget {
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
     locator<NavBarController>().navigationShell = navigationShell;
-    return ChangeNotifierProvider.value(
+    return prov.ChangeNotifierProvider.value(
       value: locator<NavBarController>(),
       builder: (context, child) {
         return LayoutBuilder(
@@ -51,7 +51,7 @@ class ScaffoldWithNestedNavigation extends StatelessWidget {
                 ]),
                 selectedIndex: navigationShell.currentIndex,
                 onDestinationSelected:
-                    Provider.of<NavBarController>(context, listen: false)
+                    prov.Provider.of<NavBarController>(context, listen: false)
                         .goBranch,
               );
             } else {
@@ -65,7 +65,7 @@ class ScaffoldWithNestedNavigation extends StatelessWidget {
                 ]),
                 selectedIndex: navigationShell.currentIndex,
                 onDestinationSelected:
-                    Provider.of<NavBarController>(context, listen: false)
+                    prov.Provider.of<NavBarController>(context, listen: false)
                         .goBranch,
               );
             }
@@ -93,7 +93,7 @@ class ScaffoldWithNavigationBar extends StatelessWidget {
       child: Scaffold(
         floatingActionButton: getAppFabBuilder(),
         body: body,
-        bottomNavigationBar: Provider.of<NavBarController>(context,
+        bottomNavigationBar: prov.Provider.of<NavBarController>(context,
                     listen: true)
                 .enabled
             ? Container(
@@ -116,8 +116,7 @@ class ScaffoldWithNavigationBar extends StatelessWidget {
                   unselectedFontSize: 0.0,
                   showUnselectedLabels: false,
                   showSelectedLabels: false,
-                  unselectedItemColor:
-                      Theme.of(context).colorScheme.onSurface,
+                  unselectedItemColor: Theme.of(context).colorScheme.onSurface,
                   selectedItemColor: Theme.of(context).colorScheme.onSurface,
                   backgroundColor: Theme.of(context).colorScheme.surface,
                   items: [
@@ -195,7 +194,8 @@ class ScaffoldWithNavigationRail extends StatelessWidget {
         body: Row(
           children: [
             // Fixed navigation rail on the left (start)
-            if (Provider.of<NavBarController>(context, listen: true).enabled)
+            if (prov.Provider.of<NavBarController>(context, listen: true)
+                .enabled)
               NavigationRail(
                 selectedLabelTextStyle: const TextStyle(fontSize: 0),
                 unselectedLabelTextStyle: const TextStyle(fontSize: 0),
@@ -205,7 +205,7 @@ class ScaffoldWithNavigationRail extends StatelessWidget {
                 destinations: [
                   for (int i = 0; i < _passiveIconList.length; i++)
                     NavigationRailDestination(
-                      label: const Text(""),
+                      label: const Text(''),
                       icon: Stack(
                         children: [
                           Icon(

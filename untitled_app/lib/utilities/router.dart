@@ -154,7 +154,7 @@ final goRouter = GoRouter(
                   name: 'sub_profile',
                   builder: (context, state) {
                     AppUser? user = state.extra as AppUser?;
-                    String id = state.pathParameters["id"]!;
+                    String id = state.pathParameters['id']!;
                     return OtherProfile(user: user, id: id);
                   },
                 ),
@@ -171,7 +171,7 @@ final goRouter = GoRouter(
                   name: 'post',
                   builder: (context, state) {
                     Post? post = state.extra as Post?;
-                    String id = state.pathParameters["id"]!;
+                    String id = state.pathParameters['id']!;
                     return ViewPostPage(post: post, id: id);
                   },
                   routes: [
@@ -228,7 +228,7 @@ final goRouter = GoRouter(
                     name: 'sub_group',
                     builder: (context, state) {
                       Group? group = state.extra as Group?;
-                      String id = state.pathParameters["id"]!;
+                      String id = state.pathParameters['id']!;
                       return SubGroupPage(group: group, id: id);
                     },
                     routes: [

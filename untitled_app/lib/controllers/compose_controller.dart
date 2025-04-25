@@ -13,7 +13,7 @@ import '../utilities/locator.dart';
 import '../models/post_handler.dart';
 import 'bottom_nav_bar_controller.dart';
 import '../custom_widgets/post_card.dart';
-import "package:go_router/go_router.dart";
+import 'package:go_router/go_router.dart';
 import 'package:untitled_app/models/feed_post_cache.dart';
 import '../models/users.dart' show AppUser;
 import '../models/group_handler.dart';
@@ -143,9 +143,9 @@ class ComposeController extends ChangeNotifier {
     titleChars = 0;
     showCount0 = false;
     showCount1 = false;
-    titleController.text = "";
-    bodyController.text = "";
-    searchController.text = "";
+    titleController.text = '';
+    bodyController.text = '';
+    searchController.text = '';
     isAtSymbolTyped = false;
     notifyListeners();
   }
@@ -246,8 +246,8 @@ class ComposeController extends ChangeNotifier {
 
   Future<String?> uploadImage(File imageFile) async {
     var url =
-        Uri.parse("https://createimage-146952619766.us-central1.run.app/");
-    var request = http.MultipartRequest("POST", url);
+        Uri.parse('https://createimage-146952619766.us-central1.run.app/');
+    var request = http.MultipartRequest('POST', url);
 
     request.files
         .add(await http.MultipartFile.fromPath('image', imageFile.path));
@@ -313,7 +313,7 @@ class ComposeController extends ChangeNotifier {
     locator<NavBarController>().disable();
     GiphyGif? newGif = await GiphyGet.getGif(
       context: context,
-      apiKey: dotenv.env["GIPHY_API_KEY"]!,
+      apiKey: dotenv.env['GIPHY_API_KEY']!,
       lang: GiphyLanguage.english,
       tabColor: Colors.teal,
       debounceTimeInMilliseconds: 350,
@@ -330,17 +330,17 @@ class ComposeController extends ChangeNotifier {
 
   _goToPage({Group? group}) {
     if (group == null) {
-      context.go("/feed", extra: true);
+      context.go('/feed', extra: true);
     } else {
       groupEndPoint = null;
       audience = AppLocalizations.of(context)!.public;
-      context.go("/groups/sub_group/${group.id}", extra: group);
+      context.go('/groups/sub_group/${group.id}', extra: group);
     }
   }
 
   postPressed(BuildContext context) {
     final List<String> tags = [
-      (groupEndPoint != null) ? groupEndPoint!.id : "public"
+      (groupEndPoint != null) ? groupEndPoint!.id : 'public'
     ];
 
     bodyController.text = bodyController.text.trim();
@@ -358,8 +358,8 @@ class ComposeController extends ChangeNotifier {
     } else if (bodyChars > c.maxPostChars) {
       showSnackBar(
           text: AppLocalizations.of(context)!.tooManyChar, context: context);
-    } else if (titleController.text == "" &&
-        bodyController.text == "" &&
+    } else if (titleController.text == '' &&
+        bodyController.text == '' &&
         gif == null &&
         image == null &&
         !isPoll) {
@@ -378,30 +378,30 @@ class ComposeController extends ChangeNotifier {
     } else {
       // create post
       Map<String, dynamic> post = {};
-      post["tags"] = tags;
+      post['tags'] = tags;
       if (titleController.text != '') {
-        post["title"] = titleController.text;
+        post['title'] = titleController.text;
       }
       if (bodyController.text != '') {
-        post["body"] = bodyController.text;
+        post['body'] = bodyController.text;
       }
       if (gif != null) {
-        post["gifUrl"] = gif!.images!.fixedWidth.url;
-        post["gifSource"] = gif!.url;
+        post['gifUrl'] = gif!.images!.fixedWidth.url;
+        post['gifSource'] = gif!.url;
       }
       if (image != null) {
-        post["image"] = image;
+        post['image'] = image;
       }
       if (isPoll) {
-        post["isPoll"] = true;
+        post['isPoll'] = true;
         final validOptions =
             pollOptions.where((option) => option.trim().isNotEmpty).toList();
-        post["pollOptions"] = validOptions;
+        post['pollOptions'] = validOptions;
         Map<String, int> voteCounts = {};
         for (int i = 0; i < validOptions.length; i++) {
           voteCounts[i.toString()] = 0;
         }
-        post["pollVoteCounts"] = voteCounts;
+        post['pollVoteCounts'] = voteCounts;
       }
 
       showDialog(
@@ -414,19 +414,19 @@ class ComposeController extends ChangeNotifier {
               child: PostCard(
                   post: Post(
                       tags: tags,
-                      gifSource: post["gifSource"],
-                      gifURL: post["gifUrl"],
-                      postId: "postId",
-                      time: "", //DateTime.now().toUtc().toIso8601String(),
-                      title: Post.parseText(post["title"]),
+                      gifSource: post['gifSource'],
+                      gifURL: post['gifUrl'],
+                      postId: 'postId',
+                      time: '', //DateTime.now().toUtc().toIso8601String(),
+                      title: Post.parseText(post['title']),
                       author: AppUser.fromCurrent(locator<CurrentUser>()),
-                      body: Post.parseText(post["body"]),
-                      image: post["image"],
+                      body: Post.parseText(post['body']),
+                      image: post['image'],
                       likes: 0,
                       dislikes: 0,
-                      isPoll: post["isPoll"] ?? false,
-                      pollOptions: post["pollOptions"],
-                      pollVoteCounts: post["pollVoteCounts"]),
+                      isPoll: post['isPoll'] ?? false,
+                      pollOptions: post['pollOptions'],
+                      pollVoteCounts: post['pollVoteCounts']),
                   isPreview: true),
             ),
             actions: <Widget>[
@@ -439,8 +439,8 @@ class ComposeController extends ChangeNotifier {
               TextButton(
                 child: Text(AppLocalizations.of(context)!.post),
                 onPressed: () async {
-                  titleController.text = "";
-                  bodyController.text = "";
+                  titleController.text = '';
+                  bodyController.text = '';
                   gif = null;
                   image = null;
                   isPoll = false;
@@ -449,24 +449,24 @@ class ComposeController extends ChangeNotifier {
 
                   final postID =
                       await locator<PostsHandling>().createPost(post);
-                  if (tags.contains("public")) {
+                  if (tags.contains('public')) {
                     locator<FeedPostCache>().addPost(
                       0,
                       Post(
                         tags: tags,
-                        gifSource: post["gifSource"],
-                        gifURL: post["gifUrl"],
+                        gifSource: post['gifSource'],
+                        gifURL: post['gifUrl'],
                         postId: postID,
                         time: DateTime.now().toUtc().toIso8601String(),
-                        image: post["image"],
-                        title: Post.parseText(post["title"]),
+                        image: post['image'],
+                        title: Post.parseText(post['title']),
                         author: AppUser.fromCurrent(locator<CurrentUser>()),
-                        body: Post.parseText(post["body"]),
+                        body: Post.parseText(post['body']),
                         likes: 0,
                         dislikes: 0,
-                        isPoll: post["isPoll"] ?? false,
-                        pollOptions: post["pollOptions"],
-                        pollVoteCounts: post["pollVoteCounts"],
+                        isPoll: post['isPoll'] ?? false,
+                        pollOptions: post['pollOptions'],
+                        pollVoteCounts: post['pollVoteCounts'],
                       ),
                     );
 

@@ -25,7 +25,7 @@ class GroupsPageController extends ChangeNotifier {
 
   void createGroupPressed() async {
     //notifyListeners();
-    context.push("/groups/create_group").then((v) {
+    context.push('/groups/create_group').then((v) {
       notifyListeners();
     });
   }

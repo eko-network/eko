@@ -86,7 +86,7 @@ class Post {
 
     // const String userNameReqs = c.userNameReqs;
     // RegExp regExp = RegExp('(@$userNameReqs\\b)', caseSensitive: false);
-    RegExp regExp = RegExp(r"@[a-z0-9_]{3,24}", caseSensitive: false);
+    RegExp regExp = RegExp(r'@[a-z0-9_]{3,24}', caseSensitive: false);
 
     List<String> chunks = [];
     int lastEnd = 0;
@@ -149,23 +149,23 @@ class RawPostObject {
   });
   static RawPostObject fromJson(Map<String, dynamic> json, String id) {
     return RawPostObject(
-      tags: (json["tags"] ?? ["public"]).cast<String>(),
-      gifSource: json["gifSource"],
-      gifUrl: json["gifUrl"],
+      tags: (json['tags'] ?? ['public']).cast<String>(),
+      gifSource: json['gifSource'],
+      gifUrl: json['gifUrl'],
       postID: id,
-      image: json["image"],
-      author: json["author"] ?? "",
-      title: json["title"],
-      body: json["body"],
-      time: json["time"] ?? "",
-      likes: json["likes"] ?? 0,
-      dislikes: json["dislikes"] ?? 0,
-      isPoll: json["isPoll"] ?? false,
-      pollOptions: json["pollOptions"] != null
-          ? List<String>.from(json["pollOptions"])
+      image: json['image'],
+      author: json['author'] ?? '',
+      title: json['title'],
+      body: json['body'],
+      time: json['time'] ?? '',
+      likes: json['likes'] ?? 0,
+      dislikes: json['dislikes'] ?? 0,
+      isPoll: json['isPoll'] ?? false,
+      pollOptions: json['pollOptions'] != null
+          ? List<String>.from(json['pollOptions'])
           : null,
-      pollVoteCounts: json["pollVoteCounts"] != null
-          ? Map<String, int>.from(json["pollVoteCounts"])
+      pollVoteCounts: json['pollVoteCounts'] != null
+          ? Map<String, int>.from(json['pollVoteCounts'])
           : null,
     );
   }
@@ -194,11 +194,11 @@ class RecentActivityCard {
       this.sourceUser});
   Map<String, String> toMap() {
     Map<String, String> map = {};
-    map["time"] = time;
-    map["type"] = type;
-    map["content"] = content;
-    map["path"] = path;
-    map["sourceUid"] = sourceUid;
+    map['time'] = time;
+    map['type'] = type;
+    map['content'] = content;
+    map['path'] = path;
+    map['sourceUid'] = sourceUid;
 
     return map;
   }
@@ -206,11 +206,11 @@ class RecentActivityCard {
   static RecentActivityCard fromJson(Map<String, dynamic> json, AppUser user) {
     return RecentActivityCard(
         sourceUser: user,
-        time: json["time"] ?? "",
-        type: json["type"] ?? "",
-        content: json["content"] ?? "",
-        path: json["path"] ?? "",
-        sourceUid: json["sourceUid"] ?? "");
+        time: json['time'] ?? '',
+        type: json['type'] ?? '',
+        content: json['content'] ?? '',
+        path: json['path'] ?? '',
+        sourceUid: json['sourceUid'] ?? '');
   }
 }
 
@@ -222,9 +222,9 @@ class PostsHandling {
     final user = FirebaseAuth.instance.currentUser!;
     final firestore = FirebaseFirestore.instance;
     final String time = DateTime.now().toUtc().toIso8601String();
-    post["author"] = user.uid;
-    post["time"] = time;
-    post["likes"] = 0; //change this
+    post['author'] = user.uid;
+    post['time'] = time;
+    post['likes'] = 0; //change this
 
     String postID = await firestore
         .collection('posts')
@@ -232,8 +232,8 @@ class PostsHandling {
         .then((documentSnapshot) => documentSnapshot.id);
 
     // tags handling
-    List<String> parsedTitle = Post.parseText(post["title"]);
-    List<String> parsedBody = Post.parseText(post["body"]);
+    List<String> parsedTitle = Post.parseText(post['title']);
+    List<String> parsedBody = Post.parseText(post['body']);
     Set<String> taggedUsers = {};
 
     Future<void> addToTaggedUsers(String chunk) async {
@@ -256,10 +256,10 @@ class PostsHandling {
     await Future.wait(futures);
 
     String content;
-    if (post["title"] != null) {
-      content = post["title"];
-    } else if (post["body"] != null) {
-      content = post["body"];
+    if (post['title'] != null) {
+      content = post['title'];
+    } else if (post['body'] != null) {
+      content = post['body'];
     } else {
       content = "${post['author']} tagged you in a post";
     }
@@ -269,7 +269,7 @@ class PostsHandling {
       for (String uid in taggedUsers) {
         futures.add(addActivty(
             time: time,
-            type: "tag",
+            type: 'tag',
             content: content,
             path: postID,
             user: uid));
@@ -295,7 +295,7 @@ class PostsHandling {
           if (members.contains(uid)) {
             futures.add(addActivty(
                 time: time,
-                type: "tag",
+                type: 'tag',
                 content: content,
                 path: postID,
                 user: uid));
@@ -321,11 +321,11 @@ class PostsHandling {
   Future<void> addReport({required Post post, required String message}) async {
     Map<String, dynamic> report = {};
     final firestore = FirebaseFirestore.instance;
-    report["sender"] = locator<CurrentUser>().getUID();
-    report["postId"] = post.postId;
-    report["postAuthor"] = post.author.uid;
-    report["message"] = message;
-    report["time"] = DateTime.now().toUtc().toIso8601String();
+    report['sender'] = locator<CurrentUser>().getUID();
+    report['postId'] = post.postId;
+    report['postAuthor'] = post.author.uid;
+    report['message'] = message;
+    report['time'] = DateTime.now().toUtc().toIso8601String();
     await firestore.collection('reports').add(report);
     // return true;
   }
@@ -335,9 +335,9 @@ class PostsHandling {
     final user = FirebaseAuth.instance.currentUser!;
     final firestore = FirebaseFirestore.instance;
     final String time = DateTime.now().toUtc().toIso8601String();
-    comment["author"] = user.uid;
-    comment["time"] = time;
-    comment["likes"] = 0; //change this
+    comment['author'] = user.uid;
+    comment['time'] = time;
+    comment['likes'] = 0; //change this
     final value = await Future.wait([
       firestore
           .collection('posts')
@@ -347,13 +347,13 @@ class PostsHandling {
       if (user.uid != rootAuthor)
         addActivty(
             time: time,
-            type: "comment",
-            content: comment["body"] ?? 'Click to see gif',
+            type: 'comment',
+            content: comment['body'] ?? 'Click to see gif',
             path: path,
             user: rootAuthor)
     ]);
     final snapshot = value[0] as DocumentReference<Map<String, dynamic>>;
-    List<String> parsedText = Post.parseText(comment["body"]);
+    List<String> parsedText = Post.parseText(comment['body']);
 
     Future<void> notifiyTagedPeople(String chunk) async {
       if (chunk.startsWith('@')) {
@@ -367,8 +367,8 @@ class PostsHandling {
           if (taggedUid != null && taggedUid != user.uid) {
             addActivty(
                 time: time,
-                type: "tag",
-                content: comment["body"],
+                type: 'tag',
+                content: comment['body'],
                 path: path,
                 user: taggedUid);
           }
@@ -386,8 +386,8 @@ class PostsHandling {
                 members.contains(taggedUid)) {
               addActivty(
                   time: time,
-                  type: "tag",
-                  content: comment["body"],
+                  type: 'tag',
+                  content: comment['body'],
                   path: path,
                   user: taggedUid);
             }
@@ -433,7 +433,7 @@ class PostsHandling {
 
   Future<Post?> getPostFromId(String id) async {
     final data =
-        await FirebaseFirestore.instance.collection("posts").doc(id).get();
+        await FirebaseFirestore.instance.collection('posts').doc(id).get();
     final postData = data.data();
     if (postData != null) {
       final rawPostData = RawPostObject.fromJson(postData, data.id);
@@ -453,11 +453,11 @@ class PostsHandling {
     final user = FirebaseAuth.instance.currentUser!.uid;
     final firestore = FirebaseFirestore.instance;
     final firestoreRef = firestore
-        .collection("users")
+        .collection('users')
         .doc(user)
-        .collection("newActivity")
-        .where("type",
-            whereIn: const ["comment", "follow", "tag"]) //update for new types
+        .collection('newActivity')
+        .where('type',
+            whereIn: const ['comment', 'follow', 'tag']) //update for new types
         .orderBy('time', descending: true);
     if (time == null) {
       snapshot = await firestoreRef.limit(c.activitiesPerRequest).get();
@@ -471,7 +471,7 @@ class PostsHandling {
     final list = snapshot.docs.map<Future<RecentActivityCard>>((doc) async {
       var data = doc.data();
       AppUser user = AppUser();
-      await user.readUserData(data["sourceUid"]);
+      await user.readUserData(data['sourceUid']);
       // FIXME: not sure why this gave an error, i had to add these conditionals
       return RecentActivityCard.fromJson(data, user);
 
@@ -498,13 +498,13 @@ class PostsHandling {
       //initial data
       snapshot = await FirebaseFirestore.instance
           .collection('users')
-          .where("profileData.likedPosts", arrayContains: postId)
+          .where('profileData.likedPosts', arrayContains: postId)
           .limit(c.usersOnSearch)
           .get();
     } else {
       snapshot = await FirebaseFirestore.instance
           .collection('users')
-          .where("profileData.likedPosts", arrayContains: postId)
+          .where('profileData.likedPosts', arrayContains: postId)
           .orderBy('uid', descending: true)
           .startAfter([uid])
           .limit(c.usersOnSearch)
@@ -528,13 +528,13 @@ class PostsHandling {
       //initial data
       snapshot = await FirebaseFirestore.instance
           .collection('users')
-          .where("profileData.dislikedPosts", arrayContains: postId)
+          .where('profileData.dislikedPosts', arrayContains: postId)
           .limit(c.usersOnSearch)
           .get();
     } else {
       snapshot = await FirebaseFirestore.instance
           .collection('users')
-          .where("profileData.dislikedPosts", arrayContains: postId)
+          .where('profileData.dislikedPosts', arrayContains: postId)
           .orderBy('uid', descending: true)
           .startAfter([uid])
           .limit(c.usersOnSearch)
@@ -556,12 +556,12 @@ class PostsHandling {
             time,
             FirebaseFirestore.instance
                 .collection('posts')
-                .where("author", isEqualTo: user)
+                .where('author', isEqualTo: user)
                 .orderBy('time', descending: true)))
         .map<Future<Post>>((raw) async {
       return Post.fromRaw(raw, AppUser.fromCurrent(locator<CurrentUser>()),
           await countComments(raw.postID),
-          group: (raw.tags.contains("public"))
+          group: (raw.tags.contains('public'))
               ? null
               : await GroupHandler().getGroupFromId(raw.tags.first),
           hasCache: true);
@@ -579,7 +579,7 @@ class PostsHandling {
             FirebaseFirestore.instance
                 .collection('posts')
                 //.where("author", isEqualTo: user)
-                .where("tags", arrayContains: id)
+                .where('tags', arrayContains: id)
                 .orderBy('time', descending: true)))
         .map<Future<Post>>((raw) async {
       AppUser user = AppUser();
@@ -598,8 +598,8 @@ class PostsHandling {
             time,
             FirebaseFirestore.instance
                 .collection('posts')
-                .where("author", isEqualTo: user.uid)
-                .where("tags", arrayContains: "public")
+                .where('author', isEqualTo: user.uid)
+                .where('tags', arrayContains: 'public')
                 .orderBy('time', descending: true)))
         .map<Future<Post>>((raw) async {
       return Post.fromRaw(raw, user, await countComments(raw.postID));
@@ -618,7 +618,7 @@ class PostsHandling {
             FirebaseFirestore.instance
                 .collection('posts')
                 .doc(rootUid)
-                .collection("comments")
+                .collection('comments')
                 .orderBy('time', descending: false)))
         .map<Future<Post>>((raw) async {
       AppUser user = AppUser();
@@ -707,7 +707,7 @@ class PostsHandling {
           snapshot = await firestore
               .collection('posts')
               .where('author', whereIn: slice)
-              .where("tags", arrayContains: "public")
+              .where('tags', arrayContains: 'public')
               .orderBy('time', descending: true)
               .limit(1)
               .get();
@@ -735,8 +735,8 @@ class PostsHandling {
       while (postsToPassBack.length < c.postsOnRefresh) {
         snapshot = await firestore
             .collection('posts')
-            .where("author", whereIn: feedChunks.first.uids)
-            .where("tags", arrayContains: "public")
+            .where('author', whereIn: feedChunks.first.uids)
+            .where('tags', arrayContains: 'public')
             .orderBy('time', descending: true)
             .startAfter([feedChunks.first.newestPost.time])
             .limit(1)

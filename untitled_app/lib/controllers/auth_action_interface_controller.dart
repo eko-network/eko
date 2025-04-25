@@ -1,10 +1,10 @@
-import "package:firebase_auth/firebase_auth.dart";
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import "package:go_router/go_router.dart";
-import "package:untitled_app/models/current_user.dart";
-import "package:untitled_app/utilities/locator.dart";
+import 'package:go_router/go_router.dart';
+import 'package:untitled_app/models/current_user.dart';
+import 'package:untitled_app/utilities/locator.dart';
 import '../custom_widgets/warning_dialog.dart';
-import "package:untitled_app/localization/generated/app_localizations.dart";
+import 'package:untitled_app/localization/generated/app_localizations.dart';
 
 enum Page {
   loading,
@@ -16,7 +16,7 @@ class AuthActionInterfaceController extends ChangeNotifier {
   final BuildContext context;
   final Map<String, String> urlData;
   final pageController = PageController(initialPage: Page.loading.index);
-  List<String> passed = ["❌", "❌", "❌", "❌", "❌", "❌"];
+  List<String> passed = ['❌', '❌', '❌', '❌', '❌', '❌'];
   bool goodPassword = false;
   double passwordPercent = 0;
   late String userEmail;
@@ -41,10 +41,10 @@ class AuthActionInterfaceController extends ChangeNotifier {
 
   void _init() {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if ((urlData["mode"] ?? "") == "resetPassword") {
+      if ((urlData['mode'] ?? '') == 'resetPassword') {
         try {
           userEmail = await locator<CurrentUser>()
-              .verifyPasswordReset(urlData["oobCode"] ?? "");
+              .verifyPasswordReset(urlData['oobCode'] ?? '');
           pageController.jumpToPage(Page.resetPassword.index);
         } on FirebaseAuthException {
           //Handle later
@@ -66,22 +66,22 @@ class AuthActionInterfaceController extends ChangeNotifier {
 
   void _popTwice() {
     _pop();
-    context.go("/");
+    context.go('/');
   }
 
   void _popAndGo() {
     _pop();
-    context.go("/login");
+    context.go('/login');
   }
 
   void exitOnPagePressed() {
-    context.go("/");
+    context.go('/');
   }
 
   void showExitWarning() {
     showMyDialog(
         AppLocalizations.of(context)!.exitEditProfileTitle,
-        "",
+        '',
         [
           AppLocalizations.of(context)!.exit,
           AppLocalizations.of(context)!.stay
@@ -127,34 +127,34 @@ class AuthActionInterfaceController extends ChangeNotifier {
   }
 
   passwordChanged() {
-    passed = ["❌", "❌", "❌", "❌", "❌", "❌"];
+    passed = ['❌', '❌', '❌', '❌', '❌', '❌'];
     int points = 0;
     String pass1 = passwordController.text;
     String pass2 = passwordConfirmController.text;
     if ((pass1).length >= 7 && (pass1).length <= 32) {
       points++;
-      passed[0] = "✅";
+      passed[0] = '✅';
     }
     if (pass1.contains(RegExp(r'[a-z]'))) {
       points++;
-      passed[1] = "✅";
+      passed[1] = '✅';
     }
     if (pass1.contains(RegExp(r'[A-Z]'))) {
       points++;
-      passed[2] = "✅";
+      passed[2] = '✅';
     }
 
     if (pass1.contains(RegExp(r'[0-9]'))) {
       points++;
-      passed[3] = "✅";
+      passed[3] = '✅';
     }
     if (!pass1.contains(RegExp(r'^[A-Za-z0-9]*$'))) {
       points++;
-      passed[4] = "✅";
+      passed[4] = '✅';
     }
-    if (pass1 == pass2 && pass1 != "") {
+    if (pass1 == pass2 && pass1 != '') {
       points++;
-      passed[5] = "✅";
+      passed[5] = '✅';
     }
     goodPassword = (points == 6);
     if (pass1 != '') {
@@ -182,20 +182,20 @@ class AuthActionInterfaceController extends ChangeNotifier {
 
         if (_handleError(
           await locator<CurrentUser>()
-              .resetPassword(urlData["oobCode"] ?? "", passwordController.text),
+              .resetPassword(urlData['oobCode'] ?? '', passwordController.text),
         )) {
           _goToLogin();
         } else {
-          passwordController.text = "";
-          passwordConfirmController.text = "";
-          passed = ["❌", "❌", "❌", "❌", "❌", "❌"];
+          passwordController.text = '';
+          passwordConfirmController.text = '';
+          passed = ['❌', '❌', '❌', '❌', '❌', '❌'];
           pageController.jumpToPage(Page.invalid.index);
         }
 
         loggingIn = false;
         notifyListeners();
       } else {
-        _handleError("weak-password");
+        _handleError('weak-password');
       }
     }
   }

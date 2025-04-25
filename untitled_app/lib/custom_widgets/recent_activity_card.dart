@@ -21,10 +21,10 @@ class ActivityCardWidget extends StatelessWidget {
     final bool hasUser = card.sourceUser != null;
     return InkWell(
       onTap: () {
-        if (card.type == "comment" || card.type == "tag") {
-          context.push("/feed/post/${card.path}");
-        } else if (card.type == "follow") {
-          context.push("/feed/sub_profile/${card.path}");
+        if (card.type == 'comment' || card.type == 'tag') {
+          context.push('/feed/post/${card.path}');
+        } else if (card.type == 'follow') {
+          context.push('/feed/sub_profile/${card.path}');
         }
       },
       child: Padding(
@@ -53,12 +53,12 @@ class ActivityCardWidget extends StatelessWidget {
             Column(children: [
               SizedBox(
                   width: width * 0.8,
-                  child: card.type == "follow"
+                  child: card.type == 'follow'
                       ? Text(
                           "${(hasUser && card.sourceUser!.username != "") ? "@${card.sourceUser!.username}" : AppLocalizations.of(context)!.someone} ${AppLocalizations.of(context)!.followText}",
                           softWrap: true,
                         )
-                      : card.type == "tag"
+                      : card.type == 'tag'
                           ? Text(
                               "${(hasUser && card.sourceUser!.username != "") ? "@${card.sourceUser!.username}" : AppLocalizations.of(context)!.someone} ${AppLocalizations.of(context)!.taggedText} ${card.content}",
                               softWrap: true,

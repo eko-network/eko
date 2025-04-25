@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:provider/provider.dart' as prov;
 import 'package:untitled_app/controllers/sign_up_controller.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -19,7 +19,7 @@ class _BackButton extends StatelessWidget {
         children: [
           Icon(Icons.arrow_back_ios_rounded,
               color: Theme.of(context).colorScheme.onSurface),
-          Consumer<SignUpController>(
+          prov.Consumer<SignUpController>(
             builder: (context, signUpController, _) => Text(
               AppLocalizations.of(context)!.previous,
               style: TextStyle(
@@ -31,7 +31,8 @@ class _BackButton extends StatelessWidget {
         ],
       ),
       onPressed: () =>
-          Provider.of<SignUpController>(context, listen: false).backPressed(),
+          prov.Provider.of<SignUpController>(context, listen: false)
+              .backPressed(),
     );
   }
 }
@@ -41,12 +42,13 @@ class SignUp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
+    return prov.ChangeNotifierProvider(
       create: (context) => SignUpController(context: context),
       builder: (context, child) {
         return GestureDetector(
-          onTap: () => Provider.of<SignUpController>(context, listen: false)
-              .hideKeyboard(),
+          onTap: () =>
+              prov.Provider.of<SignUpController>(context, listen: false)
+                  .hideKeyboard(),
           child: Scaffold(
             floatingActionButton: getAppFabBuilder(),
             body: Center(
@@ -55,7 +57,7 @@ class SignUp extends StatelessWidget {
                 child: PageView(
                   physics: const NeverScrollableScrollPhysics(),
                   controller:
-                      Provider.of<SignUpController>(context, listen: false)
+                      prov.Provider.of<SignUpController>(context, listen: false)
                           .pageController,
                   children: const <Widget>[
                     GetInfo(),
@@ -110,35 +112,37 @@ class GetInfo extends StatelessWidget {
               height: height * 0.03,
             ),
             CustomInputFeild(
-              focus: Provider.of<SignUpController>(context, listen: false)
+              focus: prov.Provider.of<SignUpController>(context, listen: false)
                   .nameFocus,
               label: AppLocalizations.of(context)!.name,
-              controller: Provider.of<SignUpController>(context, listen: false)
-                  .nameController,
+              controller:
+                  prov.Provider.of<SignUpController>(context, listen: false)
+                      .nameController,
               inputType: TextInputType.text,
               // maxLen: c.maxNameChars,
             ),
             // SizedBox(height: height * c.loginPadding),
             CustomInputFeild(
               onChanged: (s) =>
-                  Provider.of<SignUpController>(context, listen: false)
+                  prov.Provider.of<SignUpController>(context, listen: false)
                       .onUsernameChanged(s),
-              focus: Provider.of<SignUpController>(context, listen: false)
+              focus: prov.Provider.of<SignUpController>(context, listen: false)
                   .usernameFocus,
               label: AppLocalizations.of(context)!.userName,
-              controller: Provider.of<SignUpController>(context, listen: false)
-                  .usernameController,
+              controller:
+                  prov.Provider.of<SignUpController>(context, listen: false)
+                      .usernameController,
               inputType: TextInputType.text,
               // maxLen: c.maxUsernameChars,
             ),
-            if (Provider.of<SignUpController>(context, listen: true)
+            if (prov.Provider.of<SignUpController>(context, listen: true)
                     .usernameController
                     .text !=
                 '')
               Row(
                 children: [
                   const SizedBox(width: 5),
-                  Consumer<SignUpController>(
+                  prov.Consumer<SignUpController>(
                     builder: (context, signUpController, _) => signUpController
                             .validUsername
                         ? signUpController.isChecking
@@ -183,15 +187,14 @@ class GetInfo extends StatelessWidget {
                               ),
                               InkWell(
                                   onTap: () {
-                                    Provider.of<SignUpController>(context,
+                                    prov.Provider.of<SignUpController>(context,
                                             listen: false)
                                         .showUserNameReqs();
                                   },
                                   child: Icon(
                                     Icons.help_outline_outlined,
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurface,
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
                                   ))
                             ],
                           ),
@@ -199,15 +202,16 @@ class GetInfo extends StatelessWidget {
                 ],
               ),
 
-            // ElevatedButton(onPressed:()=> Provider.of<SignUpController>(context, listen: false)
+            // ElevatedButton(onPressed:()=> prov.Provider.of<SignUpController>(context, listen: false)
             //       .isUsernameAvailable(), child: Text("check")),
             SizedBox(height: height * c.loginPadding),
             CustomInputFeild(
               label: AppLocalizations.of(context)!.email,
-              focus: Provider.of<SignUpController>(context, listen: false)
+              focus: prov.Provider.of<SignUpController>(context, listen: false)
                   .emailFocus,
-              controller: Provider.of<SignUpController>(context, listen: false)
-                  .emailController,
+              controller:
+                  prov.Provider.of<SignUpController>(context, listen: false)
+                      .emailController,
               inputType: TextInputType.emailAddress,
             ),
 
@@ -218,9 +222,11 @@ class GetInfo extends StatelessWidget {
             ),
             RawKeyboardListener(
                 onKey:
-                    Provider.of<SignUpController>(context, listen: false).onKey,
-                focusNode: Provider.of<SignUpController>(context, listen: false)
-                    .keyFocus,
+                    prov.Provider.of<SignUpController>(context, listen: false)
+                        .onKey,
+                focusNode:
+                    prov.Provider.of<SignUpController>(context, listen: false)
+                        .keyFocus,
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -235,10 +241,11 @@ class GetInfo extends StatelessWidget {
                           maxLen: 2,
                           padding: false,
                           width: width * 0.15,
-                          focus: Provider.of<SignUpController>(context,
+                          focus: prov.Provider.of<SignUpController>(context,
                                   listen: false)
                               .monthFocus,
-                          controller: Provider.of<SignUpController>(context,
+                          controller: prov.Provider.of<SignUpController>(
+                                  context,
                                   listen: false)
                               .monthController,
                           inputType: TextInputType.number,
@@ -258,10 +265,11 @@ class GetInfo extends StatelessWidget {
                             maxLen: 2,
                             padding: false,
                             width: width * 0.15,
-                            focus: Provider.of<SignUpController>(context,
+                            focus: prov.Provider.of<SignUpController>(context,
                                     listen: false)
                                 .dayFocus,
-                            controller: Provider.of<SignUpController>(context,
+                            controller: prov.Provider.of<SignUpController>(
+                                    context,
                                     listen: false)
                                 .dayController,
                             inputType: TextInputType.number,
@@ -276,17 +284,18 @@ class GetInfo extends StatelessWidget {
                         Text(AppLocalizations.of(context)!.year),
                         CustomInputFeild(
                           // validator: AutovalidateMode.always,
-                          // validatorFunction: Provider.of<SignUpController>(context,
+                          // validatorFunction: prov.Provider.of<SignUpController>(context,
                           //         listen: false).validateYear,
                           filter: r'[0-9]*',
                           showCounter: false,
                           maxLen: 4,
                           padding: false,
                           width: width * 0.3,
-                          focus: Provider.of<SignUpController>(context,
+                          focus: prov.Provider.of<SignUpController>(context,
                                   listen: false)
                               .yearFocus,
-                          controller: Provider.of<SignUpController>(context,
+                          controller: prov.Provider.of<SignUpController>(
+                                  context,
                                   listen: false)
                               .yearController,
                           inputType: TextInputType.number,
@@ -298,7 +307,8 @@ class GetInfo extends StatelessWidget {
                       const Text(''),
                       IconButton(
                         onPressed: () async {
-                          Provider.of<SignUpController>(context, listen: false)
+                          prov.Provider.of<SignUpController>(context,
+                                  listen: false)
                               .formatTime(
                             await showDatePicker(
                               context: context,
@@ -318,19 +328,20 @@ class GetInfo extends StatelessWidget {
             Text(
               AppLocalizations.of(context)!.birthdayExplanation,
               style: TextStyle(
-                  fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                  fontSize: 12,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant),
             ),
             SizedBox(
               height: height * 0.08,
             ),
             // CustomInputFeild(
-            //   focus: Provider.of<SignUpController>(context, listen: false)
+            //   focus: prov.Provider.of<SignUpController>(context, listen: false)
             //       .dobFocus,
             //   onEditingComplete: () =>
-            //       Provider.of<SignUpController>(context, listen: false)
+            //       prov.Provider.of<SignUpController>(context, listen: false)
             //           .keyboardGoToNextPage(),
             //   label: AppLocalizations.of(context)!.dateOfBirth,
-            //   controller: Provider.of<SignUpController>(context, listen: false)
+            //   controller: prov.Provider.of<SignUpController>(context, listen: false)
             //       .dobController,
             //   textInputAction: TextInputAction.send,
             //   inputType: TextInputType.datetime,
@@ -343,7 +354,7 @@ class GetInfo extends StatelessWidget {
               height: width * 0.15,
               child: TextButton(
                 onPressed: () =>
-                    Provider.of<SignUpController>(context, listen: false)
+                    prov.Provider.of<SignUpController>(context, listen: false)
                         .forwardPressed(),
                 style: TextButton.styleFrom(
                     backgroundColor: Theme.of(context).colorScheme.primary),
@@ -398,34 +409,36 @@ class GetPassword extends StatelessWidget {
             SizedBox(height: height * 0.04),
             CustomInputFeild(
               onChanged: (s) =>
-                  Provider.of<SignUpController>(context, listen: false)
+                  prov.Provider.of<SignUpController>(context, listen: false)
                       .passwordChanged(),
               onEditingComplete: () =>
-                  Provider.of<SignUpController>(context, listen: false)
+                  prov.Provider.of<SignUpController>(context, listen: false)
                       .passwordConfirmFocus
                       .requestFocus(),
               label: AppLocalizations.of(context)!.password,
-              focus: Provider.of<SignUpController>(context, listen: false)
+              focus: prov.Provider.of<SignUpController>(context, listen: false)
                   .passwordFocus,
-              controller: Provider.of<SignUpController>(context, listen: false)
-                  .passwordController,
+              controller:
+                  prov.Provider.of<SignUpController>(context, listen: false)
+                      .passwordController,
               inputType: TextInputType.visiblePassword,
               password: true,
             ),
             SizedBox(height: height * c.loginPadding),
             CustomInputFeild(
               onChanged: (s) =>
-                  Provider.of<SignUpController>(context, listen: false)
+                  prov.Provider.of<SignUpController>(context, listen: false)
                       .passwordChanged(),
               onEditingComplete: () =>
-                  Provider.of<SignUpController>(context, listen: false)
+                  prov.Provider.of<SignUpController>(context, listen: false)
                       .signUpPressed(),
               textInputAction: TextInputAction.done,
               label: AppLocalizations.of(context)!.confirmPassword,
-              focus: Provider.of<SignUpController>(context, listen: false)
+              focus: prov.Provider.of<SignUpController>(context, listen: false)
                   .passwordConfirmFocus,
-              controller: Provider.of<SignUpController>(context, listen: false)
-                  .passwordConfirmController,
+              controller:
+                  prov.Provider.of<SignUpController>(context, listen: false)
+                      .passwordConfirmController,
               inputType: TextInputType.visiblePassword,
               password: true,
             ),
@@ -436,14 +449,14 @@ class GetPassword extends StatelessWidget {
               ),
               child: LinearProgressIndicator(
                 minHeight: 12,
-                value: Provider.of<SignUpController>(context, listen: true)
+                value: prov.Provider.of<SignUpController>(context, listen: true)
                     .passwordPercent,
                 color: Theme.of(context).colorScheme.primary,
               ),
             ),
             Container(
               alignment: Alignment.centerLeft,
-              child: Consumer<SignUpController>(
+              child: prov.Consumer<SignUpController>(
                 builder: (context, signUpController, _) => Text(
                   "${signUpController.passed[0]}${AppLocalizations.of(context)!.passwordLen}\n"
                   "${signUpController.passed[1]}${AppLocalizations.of(context)!.passwordLower}\n"
@@ -464,11 +477,11 @@ class GetPassword extends StatelessWidget {
               height: width * 0.15,
               child: TextButton(
                 onPressed: () =>
-                    Provider.of<SignUpController>(context, listen: false)
+                    prov.Provider.of<SignUpController>(context, listen: false)
                         .signUpPressed(),
                 style: TextButton.styleFrom(
                     backgroundColor: Theme.of(context).colorScheme.primary),
-                child: Provider.of<SignUpController>(context, listen: true)
+                child: prov.Provider.of<SignUpController>(context, listen: true)
                         .loggingIn
                     ? CircularProgressIndicator(
                         color: Theme.of(context).colorScheme.onPrimary,

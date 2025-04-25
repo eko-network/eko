@@ -115,25 +115,25 @@ class NotificationService extends ChangeNotifier {
     cancelNotification();
     switch (type) {
       case 'comment':
-        context.push("/feed/post/$path");
+        context.push('/feed/post/$path');
         break;
       case 'post':
         List<String> parts = path.split('/');
         String lastPart = parts.last;
-        context.push("/feed/post/$lastPart").then((value) {
-          context.go("/feed", extra: true);
+        context.push('/feed/post/$lastPart').then((value) {
+          context.go('/feed', extra: true);
         });
         break;
       case 'tag':
         List<String> parts = path.split('/');
         String lastPart = parts.last;
-        context.push("/feed/post/$lastPart").then((value) {
-          context.go("/feed", extra: true);
+        context.push('/feed/post/$lastPart').then((value) {
+          context.go('/feed', extra: true);
         });
         locator<NavBarController>().enable();
         break;
       case 'follow':
-        context.push("/feed/sub_profile/$path");
+        context.push('/feed/sub_profile/$path');
         break;
     }
   }
@@ -151,17 +151,17 @@ class NotificationService extends ChangeNotifier {
     //     2);
     switch (type) {
       case 'comment':
-        context.push("/feed/post/$path");
+        context.push('/feed/post/$path');
         break;
       case 'post':
         List<String> parts = path.split('/');
         String lastPart = parts.last;
-        context.push("/feed/post/$lastPart");
+        context.push('/feed/post/$lastPart');
         break;
       case 'tag':
         List<String> parts = path.split('/');
         String lastPart = parts.last;
-        context.push("/feed/post/$lastPart");
+        context.push('/feed/post/$lastPart');
         locator<NavBarController>().enable();
         break;
     }

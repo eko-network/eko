@@ -29,8 +29,8 @@ showOverlayNote(BuildContext context, RemoteMessage message) {
               color: Colors.black,
             )),
           ),
-          title: Text(message.notification?.title ?? "New Notification"),
-          subtitle: Text(message.notification?.body ?? ""),
+          title: Text(message.notification?.title ?? 'New Notification'),
+          subtitle: Text(message.notification?.body ?? ''),
           trailing: IconButton(
             icon: const Icon(Icons.close),
             onPressed: () {
@@ -71,7 +71,7 @@ class FeedController extends ChangeNotifier {
         if (locator<Version>().lessThanTarget) {
           showMyDialog(
               AppLocalizations.of(context)!.updateAvailable,
-              "",
+              '',
               [
                 AppLocalizations.of(context)!.ok,
                 AppLocalizations.of(context)!.update
@@ -174,14 +174,14 @@ class FeedController extends ChangeNotifier {
 
       case 1:
         query = FirebaseFirestore.instance
-            .collection("posts")
-            .where("tags", arrayContains: "public")
+            .collection('posts')
+            .where('tags', arrayContains: 'public')
             .orderBy('time', descending: true);
         break;
       case 2:
         query = FirebaseFirestore.instance
-            .collection("posts")
-            .where("tags", arrayContains: "public")
+            .collection('posts')
+            .where('tags', arrayContains: 'public')
             .orderBy('likes', descending: true);
         break;
       // case 3:

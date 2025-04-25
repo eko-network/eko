@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
+import 'package:provider/provider.dart' as prov;
 import 'package:untitled_app/controllers/view_post_page_controller.dart';
 import 'package:untitled_app/custom_widgets/warning_dialog.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
@@ -62,7 +62,7 @@ class CommentCardController extends ChangeNotifier {
           if (scrollPercentage >= 0.9) {
             scrollToStart();
             if (isLoggedIn()) {
-              Provider.of<PostPageController>(context, listen: false)
+              prov.Provider.of<PostPageController>(context, listen: false)
                   .replyPressed(post.author.username);
             }
           } else {
@@ -93,7 +93,7 @@ class CommentCardController extends ChangeNotifier {
 
   avatarPressed() async {
     if (post.author.uid != locator<CurrentUser>().getUID()) {
-      await context.push("/feed/sub_profile/${post.author.uid}",
+      await context.push('/feed/sub_profile/${post.author.uid}',
           extra: post.author);
       //update post liked in sub menu
       final newvalue = locator<CurrentUser>().checkIsLiked(post.postId);
@@ -103,7 +103,7 @@ class CommentCardController extends ChangeNotifier {
       }
       notifyListeners();
     } else {
-      context.go("/profile");
+      context.go('/profile');
     }
   }
 
@@ -111,9 +111,9 @@ class CommentCardController extends ChangeNotifier {
     if (isLoggedIn()) {
       String? uid = await locator<CurrentUser>().getUidFromUsername(username);
       if (locator<CurrentUser>().getUID() == uid) {
-        context.go("/profile");
+        context.go('/profile');
       } else {
-        context.push("/feed/sub_profile/$uid");
+        context.push('/feed/sub_profile/$uid');
       }
     }
   }
@@ -153,11 +153,12 @@ class CommentCardController extends ChangeNotifier {
 
   void _deletePostFromDialog() async {
     _popDialog();
-    Provider.of<PostPageController>(context, listen: false).reduceComments();
+    prov.Provider.of<PostPageController>(context, listen: false)
+        .reduceComments();
     await locator<PostsHandling>()
-        .deleteData("posts/${post.rootPostId}/comments/${post.postId}");
+        .deleteData('posts/${post.rootPostId}/comments/${post.postId}');
 
-    Provider.of<PostPageController>(context, listen: false)
+    prov.Provider.of<PostPageController>(context, listen: false)
         .removeComment(post.postId);
   }
 
@@ -195,7 +196,7 @@ class CommentCardController extends ChangeNotifier {
       liking = true;
       liked = locator<CurrentUser>()
           .checkIsLiked(post.postId); //prevent user from double likeing
-if (disliked) {
+      if (disliked) {
         dislikePressed();
       }
       if (liked) {

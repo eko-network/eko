@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:provider/provider.dart' as prov;
 import 'package:untitled_app/custom_widgets/selected_user_groups.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import '../controllers/create_group_page_controller.dart';
@@ -13,23 +13,24 @@ class CreateGroupPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
+    return prov.ChangeNotifierProvider(
       create: (context) => CreateGroupPageController(context: context),
       builder: (context, child) {
         return PopScope(
             canPop: false,
             onPopInvokedWithResult: (didPop, result) =>
-              Provider.of<CreateGroupPageController>(context, listen: false)
-                .exitPressed(),
+                prov.Provider.of<CreateGroupPageController>(context,
+                        listen: false)
+                    .exitPressed(),
             child: PageView(
-              physics:
-                  Provider.of<CreateGroupPageController>(context, listen: true)
-                          .canSwipe
-                      ? null
-                      : const NeverScrollableScrollPhysics(),
-              controller:
-                  Provider.of<CreateGroupPageController>(context, listen: false)
-                      .pageController,
+              physics: prov.Provider.of<CreateGroupPageController>(context,
+                          listen: true)
+                      .canSwipe
+                  ? null
+                  : const NeverScrollableScrollPhysics(),
+              controller: prov.Provider.of<CreateGroupPageController>(context,
+                      listen: false)
+                  .pageController,
               children: const [_GetInfo(), _AddPeople()],
             ));
       },
@@ -50,14 +51,14 @@ class _GetInfo extends StatelessWidget {
           Row(
             children: [
               TextButton(
-                  onPressed: () => Provider.of<CreateGroupPageController>(
+                  onPressed: () => prov.Provider.of<CreateGroupPageController>(
                           context,
                           listen: false)
                       .exitPressed(),
                   child: Text(AppLocalizations.of(context)!.cancel)),
               const Spacer(),
               TextButton(
-                  onPressed: () => Provider.of<CreateGroupPageController>(
+                  onPressed: () => prov.Provider.of<CreateGroupPageController>(
                           context,
                           listen: false)
                       .goForward(),
@@ -66,12 +67,14 @@ class _GetInfo extends StatelessWidget {
           ),
           IconButton(
             //iconSize: width * 0.2,
-            onPressed: () =>
-                Provider.of<CreateGroupPageController>(context, listen: false)
-                    .pickEmoji(),
-            icon: (Provider.of<CreateGroupPageController>(context, listen: true)
+            onPressed: () => prov.Provider.of<CreateGroupPageController>(
+                    context,
+                    listen: false)
+                .pickEmoji(),
+            icon: (prov.Provider.of<CreateGroupPageController>(context,
+                            listen: true)
                         .icon ==
-                    "")
+                    '')
                 ? Icon(Icons.add_reaction_outlined, size: width * 0.3)
                 : FittedBox(
                     fit: BoxFit.scaleDown,
@@ -84,7 +87,8 @@ class _GetInfo extends StatelessWidget {
                           child: FittedBox(
                             fit: BoxFit.contain,
                             child: Text(
-                              Provider.of<CreateGroupPageController>(context,
+                              prov.Provider.of<CreateGroupPageController>(
+                                      context,
                                       listen: true)
                                   .icon,
                               //style: TextStyle(fontSize: width * 0.25),
@@ -94,14 +98,16 @@ class _GetInfo extends StatelessWidget {
                         IconButton(
                           //iconSize: width * 0.1,
                           onPressed: () =>
-                              Provider.of<CreateGroupPageController>(context,
+                              prov.Provider.of<CreateGroupPageController>(
+                                      context,
                                       listen: false)
                                   .clearIcon(),
                           icon: DecoratedBox(
                             decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color:
-                                    Theme.of(context).colorScheme.outlineVariant),
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .outlineVariant),
                             child: Icon(
                               Icons.cancel,
                               color: Theme.of(context).colorScheme.onSurface,
@@ -113,25 +119,26 @@ class _GetInfo extends StatelessWidget {
                   ),
           ),
           ProfileInputFeild(
-              onChanged: (s) =>
-                  Provider.of<CreateGroupPageController>(context, listen: false)
-                      .updateCanSwipe(),
-              focus:
-                  Provider.of<CreateGroupPageController>(context, listen: false)
-                      .nameFocus,
+              onChanged: (s) => prov.Provider.of<CreateGroupPageController>(
+                      context,
+                      listen: false)
+                  .updateCanSwipe(),
+              focus: prov.Provider.of<CreateGroupPageController>(context,
+                      listen: false)
+                  .nameFocus,
               maxLength: c.maxGroupName,
               width: width * 0.9,
               label: AppLocalizations.of(context)!.name,
-              controller:
-                  Provider.of<CreateGroupPageController>(context, listen: false)
-                      .nameController),
+              controller: prov.Provider.of<CreateGroupPageController>(context,
+                      listen: false)
+                  .nameController),
           ProfileInputFeild(
               maxLength: c.maxGroupDesc,
               width: width * 0.9,
               label: AppLocalizations.of(context)!.description,
-              controller:
-                  Provider.of<CreateGroupPageController>(context, listen: false)
-                      .descriptionController),
+              controller: prov.Provider.of<CreateGroupPageController>(context,
+                      listen: false)
+                  .descriptionController),
         ],
       ),
     );
@@ -143,30 +150,35 @@ class _AddPeople extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    //print(Provider.of<CreateGroupPageController>(context, listen: true).searchedList);
+    //print(prov.Provider.of<CreateGroupPageController>(context, listen: true).searchedList);
     final width = c.widthGetter(context);
     final height = MediaQuery.sizeOf(context).height;
-    return GestureDetector( 
+    return GestureDetector(
       onPanDown: (details) =>
-          Provider.of<CreateGroupPageController>(context, listen: false)
+          prov.Provider.of<CreateGroupPageController>(context, listen: false)
               .hideKeyboard(),
       onTap: () =>
-          Provider.of<CreateGroupPageController>(context, listen: false)
+          prov.Provider.of<CreateGroupPageController>(context, listen: false)
               .hideKeyboard(),
       child: PaginationPage(
-        header: Provider.of<CreateGroupPageController>(context,
-                          listen: true).selectedPeople.isEmpty ? SizedBox(height: height * 0.05):null,
-        getter: Provider.of<CreateGroupPageController>(context, listen: true)
-            .getter,
-        card: Provider.of<CreateGroupPageController>(context, listen: false)
-            .groupSearchPageBuilder,
+        header:
+            prov.Provider.of<CreateGroupPageController>(context, listen: true)
+                    .selectedPeople
+                    .isEmpty
+                ? SizedBox(height: height * 0.05)
+                : null,
+        getter:
+            prov.Provider.of<CreateGroupPageController>(context, listen: true)
+                .getter,
+        card:
+            prov.Provider.of<CreateGroupPageController>(context, listen: false)
+                .groupSearchPageBuilder,
         startAfterQuery:
-            Provider.of<CreateGroupPageController>(context, listen: false)
+            prov.Provider.of<CreateGroupPageController>(context, listen: false)
                 .startAfterQuery,
         externalData:
-            Provider.of<CreateGroupPageController>(context, listen: true)
+            prov.Provider.of<CreateGroupPageController>(context, listen: true)
                 .searchedListData,
-
         appbar: SliverAppBar(
           toolbarHeight: height * 0.1,
           floating: true,
@@ -177,7 +189,8 @@ class _AddPeople extends StatelessWidget {
           bottom: PreferredSize(
             //FIXME this may be arbitrary
             preferredSize: Size.fromHeight(height *
-                (Provider.of<CreateGroupPageController>(context, listen: true)
+                (prov.Provider.of<CreateGroupPageController>(context,
+                            listen: true)
                         .selectedPeople
                         .isNotEmpty
                     ? 0.1
@@ -190,8 +203,12 @@ class _AddPeople extends StatelessWidget {
                     contentPadding: EdgeInsets.all(height * 0.01),
                     prefixIcon: Padding(
                       padding: EdgeInsets.all(width * 0.035),
-                      child:  Image.asset((Theme.of(context).brightness == Brightness.dark)? 'images/algolia_logo_white.png':'images/algolia_logo_blue.png',
-                          width: width * 0.05, height: width * 0.05),
+                      child: Image.asset(
+                          (Theme.of(context).brightness == Brightness.dark)
+                              ? 'images/algolia_logo_white.png'
+                              : 'images/algolia_logo_blue.png',
+                          width: width * 0.05,
+                          height: width * 0.05),
                     ),
                     hintText: AppLocalizations.of(context)!.search,
                     filled: true,
@@ -201,17 +218,18 @@ class _AddPeople extends StatelessWidget {
                       borderSide: BorderSide.none,
                     ),
                   ),
-                  onChanged: (s) => Provider.of<CreateGroupPageController>(
+                  onChanged: (s) => prov.Provider.of<CreateGroupPageController>(
                           context,
                           listen: false)
                       .onSearchTextChanged(s),
-                  controller: Provider.of<CreateGroupPageController>(context,
+                  controller: prov.Provider.of<CreateGroupPageController>(
+                          context,
                           listen: false)
                       .searchTextController,
                   keyboardType: TextInputType.text,
                   style: const TextStyle(fontSize: 20),
                 ),
-                Consumer<CreateGroupPageController>(
+                prov.Consumer<CreateGroupPageController>(
                   builder: (context, createGroupPageController, _) {
                     return Container(
                       padding: const EdgeInsets.only(top: 5),
@@ -220,7 +238,7 @@ class _AddPeople extends StatelessWidget {
                               ? height * 0.05
                               : 0,
                       child: ListView.builder(
-                        controller: Provider.of<CreateGroupPageController>(
+                        controller: prov.Provider.of<CreateGroupPageController>(
                                 context,
                                 listen: false)
                             .selectedPeopleScroll,
@@ -237,10 +255,11 @@ class _AddPeople extends StatelessWidget {
                               index: index,
                               selected: (index ==
                                   createGroupPageController.selectedToDelete),
-                              setter: Provider.of<CreateGroupPageController>(
-                                      context,
-                                      listen: false)
-                                  .setSelectedToDelete,
+                              setter:
+                                  prov.Provider.of<CreateGroupPageController>(
+                                          context,
+                                          listen: false)
+                                      .setSelectedToDelete,
                             ),
                           );
                         },
@@ -255,26 +274,27 @@ class _AddPeople extends StatelessWidget {
           leading: Align(
               alignment: Alignment.centerLeft,
               child: TextButton(
-                onPressed: () => Provider.of<CreateGroupPageController>(context,
+                onPressed: () => prov.Provider.of<CreateGroupPageController>(
+                        context,
                         listen: false)
                     .goBack(),
                 child: Text(AppLocalizations.of(context)!.goBack),
               )),
           actions: [
             TextButton(
-              onPressed: () =>
-                  Provider.of<CreateGroupPageController>(context, listen: false)
-                      .createGroup(),
-              child: Text(
-                  Provider.of<CreateGroupPageController>(context, listen: true)
-                          .selectedPeople
-                          .isEmpty
-                      ? AppLocalizations.of(context)!.skip
-                      : AppLocalizations.of(context)!.done),
+              onPressed: () => prov.Provider.of<CreateGroupPageController>(
+                      context,
+                      listen: false)
+                  .createGroup(),
+              child: Text(prov.Provider.of<CreateGroupPageController>(context,
+                          listen: true)
+                      .selectedPeople
+                      .isEmpty
+                  ? AppLocalizations.of(context)!.skip
+                  : AppLocalizations.of(context)!.done),
             )
           ],
         ),
-        
       ),
     );
   }

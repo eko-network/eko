@@ -5,7 +5,7 @@ import '../models/current_user.dart';
 import 'package:flutter/material.dart';
 import '../custom_widgets/warning_dialog.dart';
 import '../utilities/locator.dart';
-import "package:go_router/go_router.dart";
+import 'package:go_router/go_router.dart';
 
 class LoginController extends ChangeNotifier {
   // BuildContext context;
@@ -54,13 +54,13 @@ class LoginController extends ChangeNotifier {
 
   void signUp() {
     hideKeyboard();
-    context.go("/signup");
+    context.go('/signup');
   }
 
   void previousPressed() {
     hideKeyboard();
-    context.go("/");
-    // Provider.of<DarkThemeProvider>(context, listen: false).toggleWelcome(true);
+    context.go('/');
+    // prov.Provider.of<DarkThemeProvider>(context, listen: false).toggleWelcome(true);
   }
 
   void forgotPasswordPressed(countryCode) {

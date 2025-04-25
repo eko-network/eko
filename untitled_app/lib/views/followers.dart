@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:untitled_app/controllers/followers_controller.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
-import 'package:provider/provider.dart';
+import 'package:provider/provider.dart' as prov;
 import 'package:go_router/go_router.dart';
 import '../custom_widgets/searched_user_card.dart';
 import '../custom_widgets/pagination.dart';
@@ -16,7 +16,7 @@ class Followers extends StatelessWidget {
   Widget build(BuildContext context) {
     final height = MediaQuery.sizeOf(context).height;
 
-    return ChangeNotifierProvider(
+    return prov.ChangeNotifierProvider(
         create: (context) =>
             FollowersController(context: context, rootUser: user),
         builder: (context, child) {
@@ -29,7 +29,7 @@ class Followers extends StatelessWidget {
                     color: Theme.of(context).colorScheme.onSurface,
                     size: 20,
                   ),
-                  onPressed: () => context.pop("poped"),
+                  onPressed: () => context.pop('poped'),
                 ),
                 backgroundColor: Theme.of(context).colorScheme.surface,
                 title: Text(
@@ -45,16 +45,17 @@ class Followers extends StatelessWidget {
                 padding: EdgeInsets.symmetric(
                     vertical: height * 0.01, horizontal: 6),
                 child: PaginationPage(
-                    getter:
-                        Provider.of<FollowersController>(context, listen: false)
-                            .userGetter,
+                    getter: prov.Provider.of<FollowersController>(context,
+                            listen: false)
+                        .userGetter,
                     card: searchPageBuilder,
-                    startAfterQuery:
-                        Provider.of<FollowersController>(context, listen: false)
-                            .startAfterQuery,
-                    extraRefresh:
-                        Provider.of<FollowersController>(context, listen: false)
-                            .onRefresh),
+                    startAfterQuery: prov.Provider.of<FollowersController>(
+                            context,
+                            listen: false)
+                        .startAfterQuery,
+                    extraRefresh: prov.Provider.of<FollowersController>(context,
+                            listen: false)
+                        .onRefresh),
               ));
         });
   }

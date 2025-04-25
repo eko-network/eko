@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
+import 'package:provider/provider.dart' as prov;
 import 'package:untitled_app/controllers/blocked_users_page_controller.dart';
 import 'package:untitled_app/custom_widgets/pagination.dart';
 import 'package:untitled_app/custom_widgets/searched_user_card.dart';
@@ -12,7 +12,7 @@ class BlockedUsersPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.sizeOf(context).width;
-    return ChangeNotifierProvider(
+    return prov.ChangeNotifierProvider(
       create: (context) => BlockedUsersPageController(),
       builder: (context, child) {
         return Scaffold(
@@ -35,15 +35,21 @@ class BlockedUsersPage extends StatelessWidget {
           body: Padding(
             padding: EdgeInsets.all(height * 0.02),
             child: PaginationPage(
-              externalData:Provider.of<BlockedUsersPageController>(context, listen: true).users ,
-                getter: Provider.of<BlockedUsersPageController>(context, listen: false)
+                externalData: prov.Provider.of<BlockedUsersPageController>(context,
+                        listen: true)
+                    .users,
+                getter: prov.Provider.of<BlockedUsersPageController>(context,
+                        listen: false)
                     .userGetter,
                 card: blockedPageBuilder,
-                startAfterQuery:
-                    Provider.of<BlockedUsersPageController>(context, listen: false)
-                        .startAfterQuery, extraRefresh:
-                      Provider.of<BlockedUsersPageController>(context, listen: false)
-                          .onRefresh),
+                startAfterQuery: prov.Provider.of<BlockedUsersPageController>(
+                        context,
+                        listen: false)
+                    .startAfterQuery,
+                extraRefresh: prov.Provider.of<BlockedUsersPageController>(
+                        context,
+                        listen: false)
+                    .onRefresh),
           ),
         );
       },

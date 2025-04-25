@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:provider/provider.dart' as prov;
 import 'package:untitled_app/controllers/blocked_users_page_controller.dart';
 import 'package:untitled_app/models/current_user.dart';
 import 'package:untitled_app/models/users.dart';
@@ -55,11 +55,12 @@ class SearchedUserController extends ChangeNotifier {
   }
 
   void onCardPressed() {
-    if (!blockPage) context.push("/feed/sub_profile/${user.uid}", extra: user);
+    if (!blockPage) context.push('/feed/sub_profile/${user.uid}', extra: user);
   }
 
   void unblockPressed() {
-    Provider.of<BlockedUsersPageController>(context, listen: false).unblockUser(user.uid);
+    prov.Provider.of<BlockedUsersPageController>(context, listen: false)
+        .unblockUser(user.uid);
   }
   // onFollowPressed() async {
   //   if (following) {
