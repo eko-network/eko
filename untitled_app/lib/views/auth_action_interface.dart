@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:untitled_app/custom_widgets/loading_spinner.dart';
+import 'package:untitled_app/widgets/loading_spinner.dart';
 import '../custom_widgets/login_text_feild.dart';
 
 import 'package:provider/provider.dart' as prov;
@@ -198,12 +198,12 @@ class _ResetPasswordPage extends StatelessWidget {
                 alignment: Alignment.centerLeft,
                 child: prov.Consumer<AuthActionInterfaceController>(
                   builder: (context, signUpController, _) => Text(
-                    "${signUpController.passed[0]}${AppLocalizations.of(context)!.passwordLen}\n"
-                    "${signUpController.passed[1]}${AppLocalizations.of(context)!.passwordLower}\n"
-                    "${signUpController.passed[2]}${AppLocalizations.of(context)!.passwordUpper}\n"
-                    "${signUpController.passed[3]}${AppLocalizations.of(context)!.passwordNumber}\n"
-                    "${signUpController.passed[4]}${AppLocalizations.of(context)!.passwordSpecial}\n"
-                    "${signUpController.passed[5]}${AppLocalizations.of(context)!.passwordMatch}\n",
+                    '${signUpController.passed[0]}${AppLocalizations.of(context)!.passwordLen}\n'
+                    '${signUpController.passed[1]}${AppLocalizations.of(context)!.passwordLower}\n'
+                    '${signUpController.passed[2]}${AppLocalizations.of(context)!.passwordUpper}\n'
+                    '${signUpController.passed[3]}${AppLocalizations.of(context)!.passwordNumber}\n'
+                    '${signUpController.passed[4]}${AppLocalizations.of(context)!.passwordSpecial}\n'
+                    '${signUpController.passed[5]}${AppLocalizations.of(context)!.passwordMatch}\n',
                     style: const TextStyle(fontSize: 16),
                   ),
                 ),

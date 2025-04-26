@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart' as prov;
 import 'package:untitled_app/custom_widgets/count_down_timer.dart';
 
-import 'package:untitled_app/custom_widgets/loading_spinner.dart';
+import 'package:untitled_app/widgets/loading_spinner.dart';
 import 'package:untitled_app/custom_widgets/post_card.dart';
 
 import 'package:untitled_app/localization/generated/app_localizations.dart';

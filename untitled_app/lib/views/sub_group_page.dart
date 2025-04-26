@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:untitled_app/custom_widgets/loading_spinner.dart';
+import 'package:untitled_app/widgets/loading_spinner.dart';
 import 'package:untitled_app/custom_widgets/shimmer_loaders.dart'
     show FeedLoader;
 import 'package:untitled_app/localization/generated/app_localizations.dart';
