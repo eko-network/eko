@@ -3,6 +3,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:provider/provider.dart' as prov;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -80,7 +81,7 @@ Future<void> main() async {
     FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true)
   ]);
 
-  runApp(const MyApp());
+  runApp(ProviderScope(child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {
