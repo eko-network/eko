@@ -7,7 +7,7 @@ import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../custom_widgets/login_text_feild.dart';
 import '../utilities/constants.dart' as c;
-import '../custom_widgets/get_app_fab.dart';
+import '../custom_widgets/download_button_if_web.dart';
 
 class _BackButton extends StatelessWidget {
   const _BackButton();
@@ -50,7 +50,7 @@ class SignUp extends StatelessWidget {
               prov.Provider.of<SignUpController>(context, listen: false)
                   .hideKeyboard(),
           child: Scaffold(
-            floatingActionButton: getAppFabBuilder(),
+            floatingActionButton: downloadButtonIfWeb(),
             body: Center(
               child: SizedBox(
                 width: c.widthGetter(context),

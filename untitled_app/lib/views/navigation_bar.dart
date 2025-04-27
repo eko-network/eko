@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart' as prov;
+import 'package:untitled_app/custom_widgets/download_button_if_web.dart';
 import 'package:untitled_app/custom_widgets/safe_area.dart';
 import '../models/current_user.dart';
 import '../utilities/locator.dart';
 import '../controllers/bottom_nav_bar_controller.dart';
 import '../utilities/constants.dart' as c;
-import '../custom_widgets/get_app_fab.dart';
 
 const List<IconData> _passiveIconList = [
   Icons.home_outlined,
@@ -91,7 +91,7 @@ class ScaffoldWithNavigationBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return AppSafeArea(
       child: Scaffold(
-        floatingActionButton: getAppFabBuilder(),
+        floatingActionButton: downloadButtonIfWeb(),
         body: body,
         bottomNavigationBar: prov.Provider.of<NavBarController>(context,
                     listen: true)
@@ -190,7 +190,7 @@ class ScaffoldWithNavigationRail extends StatelessWidget {
   Widget build(BuildContext context) {
     return AppSafeArea(
       child: Scaffold(
-        floatingActionButton: getAppFabBuilder(),
+        floatingActionButton: downloadButtonIfWeb(),
         body: Row(
           children: [
             // Fixed navigation rail on the left (start)

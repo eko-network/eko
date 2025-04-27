@@ -29,7 +29,6 @@ class CurrentUser extends AppUser {
   @override
   bool isVerified = false;
 
-  @override
   // CurrentUser({this.newActivity = false}) {
   //   // if (likedPosts.isEmpty) {
   //   //   likedPosts = [];
