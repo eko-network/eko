@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import '../controllers/login_controller.dart';
 import '../custom_widgets/login_text_feild.dart';
-import 'package:provider/provider.dart';
+import 'package:provider/provider.dart' as prov;
 import '../utilities/constants.dart' as c;
 import '../custom_widgets/get_app_fab.dart';
 
@@ -14,11 +14,11 @@ class LoginPage extends StatelessWidget {
     final width = c.widthGetter(context);
     final height = MediaQuery.sizeOf(context).height;
 
-    return ChangeNotifierProvider(
+    return prov.ChangeNotifierProvider(
       create: (context) => LoginController(context: context),
       builder: (context, child) {
         return GestureDetector(
-          onTap: () => Provider.of<LoginController>(context, listen: false)
+          onTap: () => prov.Provider.of<LoginController>(context, listen: false)
               .hideKeyboard(),
           child: Scaffold(
             floatingActionButton: getAppFabBuilder(),
@@ -33,7 +33,7 @@ class LoginPage extends StatelessWidget {
                       children: [
                         Icon(Icons.arrow_back_ios_rounded,
                             color: Theme.of(context).colorScheme.onSurface),
-                        Consumer<LoginController>(
+                        prov.Consumer<LoginController>(
                           builder: (context, signUpController, _) => Text(
                             AppLocalizations.of(context)!.previous,
                             style: TextStyle(
@@ -44,9 +44,9 @@ class LoginPage extends StatelessWidget {
                         )
                       ],
                     ),
-                    onPressed: () =>
-                        Provider.of<LoginController>(context, listen: false)
-                            .previousPressed(),
+                    onPressed: () => prov.Provider.of<LoginController>(context,
+                            listen: false)
+                        .previousPressed(),
                   ),
                   SizedBox(
                     height: height * .055,
@@ -61,25 +61,28 @@ class LoginPage extends StatelessWidget {
                   ),
                   SizedBox(height: height * .05),
                   CustomInputFeild(
-                    focus: Provider.of<LoginController>(context, listen: false)
+                    focus: prov.Provider.of<LoginController>(context,
+                            listen: false)
                         .emailFocus,
                     label: AppLocalizations.of(context)!.email,
-                    controller:
-                        Provider.of<LoginController>(context, listen: false)
-                            .emailController,
+                    controller: prov.Provider.of<LoginController>(context,
+                            listen: false)
+                        .emailController,
                     inputType: TextInputType.emailAddress,
                   ),
                   CustomInputFeild(
                     textInputAction: TextInputAction.go,
-                    onEditingComplete: () =>
-                        Provider.of<LoginController>(context, listen: false)
-                            .logInPressed(),
-                    focus: Provider.of<LoginController>(context, listen: false)
+                    onEditingComplete: () => prov.Provider.of<LoginController>(
+                            context,
+                            listen: false)
+                        .logInPressed(),
+                    focus: prov.Provider.of<LoginController>(context,
+                            listen: false)
                         .passwordFocus,
                     label: AppLocalizations.of(context)!.password,
-                    controller:
-                        Provider.of<LoginController>(context, listen: false)
-                            .passwordController,
+                    controller: prov.Provider.of<LoginController>(context,
+                            listen: false)
+                        .passwordController,
                     inputType: TextInputType.visiblePassword,
                     password: true,
                   ),
@@ -88,15 +91,16 @@ class LoginPage extends StatelessWidget {
                     width: width * 0.9,
                     height: width * 0.15,
                     child: TextButton(
-                        onPressed: () =>
-                            Provider.of<LoginController>(context, listen: false)
-                                .logInPressed(),
+                        onPressed: () => prov.Provider.of<LoginController>(
+                                context,
+                                listen: false)
+                            .logInPressed(),
                         style: TextButton.styleFrom(
                             backgroundColor: Theme.of(context)
                                 .colorScheme
                                 .primary
                                 .withOpacity(.55)),
-                        child: Consumer<LoginController>(
+                        child: prov.Consumer<LoginController>(
                           builder: (context, loginController, _) =>
                               loginController.loggingIn
                                   ? const CircularProgressIndicator()
@@ -117,10 +121,11 @@ class LoginPage extends StatelessWidget {
                     width: width * 0.9,
                     height: width * 0.1,
                     child: TextButton(
-                      onPressed: () =>
-                          Provider.of<LoginController>(context, listen: false)
-                              .forgotPasswordPressed(
-                                  AppLocalizations.of(context)!.localeName),
+                      onPressed: () => prov.Provider.of<LoginController>(
+                              context,
+                              listen: false)
+                          .forgotPasswordPressed(
+                              AppLocalizations.of(context)!.localeName),
                       child: Text(
                         AppLocalizations.of(context)!.forgotPassword,
                         style: TextStyle(

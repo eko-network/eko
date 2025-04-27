@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:untitled_app/custom_widgets/loading_spinner.dart';
+import 'package:untitled_app/widgets/loading_spinner.dart';
 import 'package:untitled_app/custom_widgets/shimmer_loaders.dart'
     show FeedLoader;
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import '../models/group_handler.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
+import 'package:provider/provider.dart' as prov;
 import '../controllers/sub_group_controller.dart';
 import '../custom_widgets/pagination.dart';
 import '../custom_widgets/post_card.dart';
@@ -19,7 +19,7 @@ class SubGroupPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final width = c.widthGetter(context);
-    return ChangeNotifierProvider(
+    return prov.ChangeNotifierProvider(
       create: (context) =>
           SubGroupController(passedGroup: group, context: context, id: id),
       builder: (context, child) {
@@ -29,15 +29,15 @@ class SubGroupPage extends StatelessWidget {
             child: FloatingActionButton.large(
               heroTag: null,
               onPressed: () =>
-                  Provider.of<SubGroupController>(context, listen: false)
+                  prov.Provider.of<SubGroupController>(context, listen: false)
                       .addPost(),
               shape: const CircleBorder(),
               child: const Icon(Icons.add, size: 40),
             ),
           ),
-          body: (Provider.of<SubGroupController>(context, listen: true)
+          body: (prov.Provider.of<SubGroupController>(context, listen: true)
                       .groupNotFound ||
-                  Provider.of<SubGroupController>(context, listen: true)
+                  prov.Provider.of<SubGroupController>(context, listen: true)
                       .notInGroup)
               ? Center(
                   child: Column(
@@ -46,7 +46,7 @@ class SubGroupPage extends StatelessWidget {
                       SizedBox(
                         width: width * 0.8,
                         child: Text(
-                          (Provider.of<SubGroupController>(context,
+                          (prov.Provider.of<SubGroupController>(context,
                                       listen: true)
                                   .groupNotFound)
                               ? AppLocalizations.of(context)!.groupNotFound
@@ -78,7 +78,8 @@ class SubGroupPage extends StatelessWidget {
                     ],
                   ),
                 )
-              : (Provider.of<SubGroupController>(context, listen: true).group ==
+              : (prov.Provider.of<SubGroupController>(context, listen: true)
+                          .group ==
                       null)
                   ? const Center(child: LoadingSpinner())
                   : PaginationPage(
@@ -92,10 +93,10 @@ class SubGroupPage extends StatelessWidget {
                         actions: [
                           IconButton(
                             color: Theme.of(context).colorScheme.onSurface,
-                            onPressed: () => Provider.of<SubGroupController>(
-                                    context,
-                                    listen: false)
-                                .editGroup(),
+                            onPressed: () =>
+                                prov.Provider.of<SubGroupController>(context,
+                                        listen: false)
+                                    .editGroup(),
                             icon: const Icon(Icons.create),
                           ),
                         ],
@@ -103,23 +104,23 @@ class SubGroupPage extends StatelessWidget {
                         pinned: false,
                         scrolledUnderElevation: 0.0,
                         centerTitle: true,
-                        backgroundColor:
-                            Theme.of(context).colorScheme.surface,
+                        backgroundColor: Theme.of(context).colorScheme.surface,
                         title: Row(
                           //mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            if (Provider.of<SubGroupController>(context,
+                            if (prov.Provider.of<SubGroupController>(context,
                                         listen: true)
                                     .group!
                                     .icon !=
-                                "")
+                                '')
                               SizedBox(
                                 width: width * 0.13,
                                 height: width * 0.13,
                                 child: FittedBox(
                                   fit: BoxFit.contain,
                                   child: Text(
-                                    Provider.of<SubGroupController>(context,
+                                    prov.Provider.of<SubGroupController>(
+                                            context,
                                             listen: true)
                                         .group!
                                         .icon,
@@ -129,7 +130,8 @@ class SubGroupPage extends StatelessWidget {
                             SizedBox(
                                 width: width * 0.4,
                                 child: Text(
-                                    Provider.of<SubGroupController>(context,
+                                    prov.Provider.of<SubGroupController>(
+                                            context,
                                             listen: true)
                                         .group!
                                         .name,
@@ -146,11 +148,12 @@ class SubGroupPage extends StatelessWidget {
                         ),
                       ),
                       //header: const _Header(),
-                      getter: Provider.of<SubGroupController>(context,
+                      getter: prov.Provider.of<SubGroupController>(context,
                               listen: false)
                           .getGroupPosts,
                       card: postCardBuilder,
-                      startAfterQuery: Provider.of<SubGroupController>(context,
+                      startAfterQuery: prov.Provider.of<SubGroupController>(
+                              context,
                               listen: false)
                           .getTimeFromPost,
                       initialLoadingWidget: const FeedLoader(),

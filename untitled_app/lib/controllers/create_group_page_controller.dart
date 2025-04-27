@@ -15,7 +15,7 @@ import 'package:untitled_app/models/feed_post_cache.dart';
 import '../custom_widgets/searched_user_card.dart';
 
 class CreateGroupPageController extends ChangeNotifier {
-  String icon = "";
+  String icon = '';
   final nameController = TextEditingController();
   final nameFocus = FocusNode();
   final descriptionController = TextEditingController();
@@ -31,7 +31,7 @@ class CreateGroupPageController extends ChangeNotifier {
   final BuildContext context;
   bool canSwipe = false;
   final searchModel = SearchModel();
-  String query = "";
+  String query = '';
   Cache searchedListData = Cache(items: [], end: false);
   bool creatingGroup = false;
 
@@ -88,9 +88,9 @@ class CreateGroupPageController extends ChangeNotifier {
 
   void exitPressed() {
     if (selectedPeople.isEmpty &&
-        icon == "" &&
-        nameController.text == "" &&
-        descriptionController.text == "") {
+        icon == '' &&
+        nameController.text == '' &&
+        descriptionController.text == '') {
       _pop();
     } else {
       showMyDialog(
@@ -215,16 +215,16 @@ class CreateGroupPageController extends ChangeNotifier {
   }
 
   void pickEmoji() {
-    context.pushNamed("pick_emoji", extra: _setIcon);
+    context.pushNamed('pick_emoji', extra: _setIcon);
   }
 
   void _setIcon(String returnedString) {
-    if (returnedString != "") icon = returnedString;
+    if (returnedString != '') icon = returnedString;
     notifyListeners();
   }
 
   void clearIcon() {
-    icon = "";
+    icon = '';
     notifyListeners();
   }
 }

@@ -9,7 +9,7 @@ class EmojiSelector extends StatelessWidget {
   Widget build(BuildContext context) {
     return EmojiPicker(
       onEmojiSelected: (Category? category, Emoji? emoji) {
-        onPressed((emoji?.emoji) ?? "");
+        onPressed((emoji?.emoji) ?? '');
         context.pop();
       },
       config: Config(

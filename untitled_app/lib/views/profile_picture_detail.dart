@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:provider/provider.dart' as prov;
 import '../controllers/profile_picture_detail_controller.dart';
 import '../custom_widgets/profile_avatar.dart';
 import '../utilities/constants.dart' as c;
@@ -12,11 +12,12 @@ class ProfilePictureDetail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final width = c.widthGetter(context);
-    return ChangeNotifierProvider(
+    return prov.ChangeNotifierProvider(
         create: (context) => ProfilePictureDetailController(context: context),
         builder: (context, child) {
           return InkWell(
-            onTap: () => Provider.of<ProfilePictureDetailController>(context,
+            onTap: () => prov.Provider.of<ProfilePictureDetailController>(
+                    context,
                     listen: false)
                 .backgroundPressed(),
             child: Container(

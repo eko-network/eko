@@ -3,8 +3,9 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:overlay_support/overlay_support.dart';
-import 'package:provider/provider.dart';
+import 'package:provider/provider.dart' as prov;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:untitled_app/models/firebase_helper.dart';
 import 'package:untitled_app/models/notification_service.dart';
@@ -35,11 +36,11 @@ Future<void> _setupAppCheck() async {
 }
 
 Future<void> _checkFirstInstall() async {
-  if ((await getBool("NOT_FIRST_INSTALL")) == null) {
+  if ((await getBool('NOT_FIRST_INSTALL')) == null) {
     if (FirebaseAuth.instance.currentUser != null) {
       FirebaseAuth.instance.signOut();
     }
-    setBool("NOT_FIRST_INSTALL", true);
+    setBool('NOT_FIRST_INSTALL', true);
   } else if (FirebaseAuth.instance.currentUser != null) {
     await locator<CurrentUser>().readCurrentUserData();
   }
@@ -80,7 +81,7 @@ Future<void> main() async {
     FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true)
   ]);
 
-  runApp(const MyApp());
+  runApp(ProviderScope(child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -96,12 +97,14 @@ class MyApp extends StatelessWidget {
     return FutureBuilder(
       future: SharedPreferences.getInstance(),
       builder: (context, snapshot) {
-        return MultiProvider(
+        return prov.MultiProvider(
           providers: [
-            ChangeNotifierProvider(create: (context) => DarkThemeProvider()),
+            prov.ChangeNotifierProvider(
+                create: (context) => DarkThemeProvider()),
           ],
           builder: (context, child) {
-            final themeChangeProvider = Provider.of<DarkThemeProvider>(context);
+            final themeChangeProvider =
+                prov.Provider.of<DarkThemeProvider>(context);
             return OverlaySupport(
               child: MaterialApp.router(
                 title: 'Eko',

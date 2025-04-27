@@ -1,15 +1,10 @@
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:provider/provider.dart';
+import 'package:provider/provider.dart' as prov;
 import 'package:untitled_app/controllers/edit_group_page_controller.dart';
-import 'package:untitled_app/controllers/group_members_controller.dart';
 import 'package:untitled_app/custom_widgets/selected_user_groups.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
-import 'package:untitled_app/models/current_user.dart';
 import 'package:untitled_app/models/group_handler.dart';
 import 'package:go_router/go_router.dart';
-import 'package:untitled_app/models/users.dart';
 import '../custom_widgets/pagination.dart';
 import '../custom_widgets/searched_user_card.dart';
 import '../utilities/constants.dart' as c;
@@ -20,24 +15,25 @@ class EditGroupPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
+    return prov.ChangeNotifierProvider(
       create: (context) =>
           EditGroupPageController(context: context, group: group),
       builder: (context, child) {
         return PopScope(
             canPop: false,
-            onPopInvoked: (didPop) =>
-                Provider.of<EditGroupPageController>(context, listen: false)
-                    .goBack(didPop: didPop),
+            onPopInvoked: (didPop) => prov.Provider.of<EditGroupPageController>(
+                    context,
+                    listen: false)
+                .goBack(didPop: didPop),
             child: PageView(
-              physics:
-                  Provider.of<EditGroupPageController>(context, listen: true)
-                          .canSwipe
-                      ? null
-                      : const NeverScrollableScrollPhysics(),
-              controller:
-                  Provider.of<EditGroupPageController>(context, listen: false)
-                      .pageController,
+              physics: prov.Provider.of<EditGroupPageController>(context,
+                          listen: true)
+                      .canSwipe
+                  ? null
+                  : const NeverScrollableScrollPhysics(),
+              controller: prov.Provider.of<EditGroupPageController>(context,
+                      listen: false)
+                  .pageController,
               children: const [_GroupSettings(), _AddPeople()],
             ));
       },
@@ -53,7 +49,7 @@ class _GroupSettings extends StatelessWidget {
     final width = c.widthGetter(context);
     final height = MediaQuery.sizeOf(context).height;
 
-    if (Provider.of<EditGroupPageController>(context, listen: true)
+    if (prov.Provider.of<EditGroupPageController>(context, listen: true)
         .membersList
         .isEmpty) {
       return const Center(
@@ -81,7 +77,7 @@ class _GroupSettings extends StatelessWidget {
               SliverToBoxAdapter(
                 child: Column(
                   children: [
-                    (Provider.of<EditGroupPageController>(context,
+                    (prov.Provider.of<EditGroupPageController>(context,
                                     listen: false)
                                 .group
                                 .icon !=
@@ -92,7 +88,8 @@ class _GroupSettings extends StatelessWidget {
                             child: FittedBox(
                               fit: BoxFit.contain,
                               child: Text(
-                                Provider.of<EditGroupPageController>(context,
+                                prov.Provider.of<EditGroupPageController>(
+                                        context,
                                         listen: false)
                                     .group
                                     .icon,
@@ -103,14 +100,16 @@ class _GroupSettings extends StatelessWidget {
                         : Container(
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: Theme.of(context).colorScheme.outlineVariant,
+                              color:
+                                  Theme.of(context).colorScheme.outlineVariant,
                             ),
                             width: width * 0.3,
                             height: width * 0.3,
                             child: FittedBox(
                               fit: BoxFit.contain,
                               child: Text(
-                                Provider.of<EditGroupPageController>(context,
+                                prov.Provider.of<EditGroupPageController>(
+                                        context,
                                         listen: false)
                                     .group
                                     .name[0],
@@ -123,7 +122,7 @@ class _GroupSettings extends StatelessWidget {
                           ),
                     //FIXME: how can i get there to be less padding between the emoji and title
                     Text(
-                      Provider.of<EditGroupPageController>(context,
+                      prov.Provider.of<EditGroupPageController>(context,
                               listen: false)
                           .group
                           .name,
@@ -144,10 +143,10 @@ class _GroupSettings extends StatelessWidget {
                       icon: const Icon(Icons.person_add_outlined),
                       color: Theme.of(context).colorScheme.onSurface,
                       onPressed: () {
-                        Provider.of<EditGroupPageController>(context,
+                        prov.Provider.of<EditGroupPageController>(context,
                                 listen: false)
                             .initializeSearch();
-                        Provider.of<EditGroupPageController>(context,
+                        prov.Provider.of<EditGroupPageController>(context,
                                 listen: false)
                             .goForward();
                       },
@@ -163,7 +162,7 @@ class _GroupSettings extends StatelessWidget {
                       icon: const Icon(Icons.exit_to_app_rounded),
                       color: Theme.of(context).colorScheme.onSurface,
                       onPressed: () {
-                        Provider.of<EditGroupPageController>(context,
+                        prov.Provider.of<EditGroupPageController>(context,
                                 listen: false)
                             .leaveGroup();
                       },
@@ -175,12 +174,12 @@ class _GroupSettings extends StatelessWidget {
                 delegate: SliverChildBuilderDelegate(
                   (BuildContext context, int index) {
                     return UserCard(
-                      user: Provider.of<EditGroupPageController>(context,
+                      user: prov.Provider.of<EditGroupPageController>(context,
                               listen: true)
                           .membersList[index],
                     );
                   },
-                  childCount: Provider.of<EditGroupPageController>(context,
+                  childCount: prov.Provider.of<EditGroupPageController>(context,
                           listen: true)
                       .membersList
                       .length,
@@ -204,25 +203,26 @@ class _AddPeople extends StatelessWidget {
 
     return GestureDetector(
       onPanDown: (details) =>
-          Provider.of<EditGroupPageController>(context, listen: false)
+          prov.Provider.of<EditGroupPageController>(context, listen: false)
               .hideKeyboard(),
-      onTap: () => Provider.of<EditGroupPageController>(context, listen: false)
-          .hideKeyboard(),
+      onTap: () =>
+          prov.Provider.of<EditGroupPageController>(context, listen: false)
+              .hideKeyboard(),
       child: PaginationPage(
-        header: Provider.of<EditGroupPageController>(context, listen: true)
+        header: prov.Provider.of<EditGroupPageController>(context, listen: true)
                 .selectedPeople
                 .isEmpty
             ? SizedBox(height: height * 0.05)
             : null,
-        getter:
-            Provider.of<EditGroupPageController>(context, listen: true).getter,
-        card: Provider.of<EditGroupPageController>(context, listen: false)
+        getter: prov.Provider.of<EditGroupPageController>(context, listen: true)
+            .getter,
+        card: prov.Provider.of<EditGroupPageController>(context, listen: false)
             .groupSearchPageBuilder,
         startAfterQuery:
-            Provider.of<EditGroupPageController>(context, listen: false)
+            prov.Provider.of<EditGroupPageController>(context, listen: false)
                 .startAfterQuery,
         externalData:
-            Provider.of<EditGroupPageController>(context, listen: true)
+            prov.Provider.of<EditGroupPageController>(context, listen: true)
                 .searchedListData,
         appbar: SliverAppBar(
           toolbarHeight: height * 0.1,
@@ -234,7 +234,8 @@ class _AddPeople extends StatelessWidget {
           bottom: PreferredSize(
             //FIXME this may be arbitrary
             preferredSize: Size.fromHeight(height *
-                (Provider.of<EditGroupPageController>(context, listen: true)
+                (prov.Provider.of<EditGroupPageController>(context,
+                            listen: true)
                         .selectedPeople
                         .isNotEmpty
                     ? 0.1
@@ -262,17 +263,17 @@ class _AddPeople extends StatelessWidget {
                       borderSide: BorderSide.none,
                     ),
                   ),
-                  onChanged: (s) => Provider.of<EditGroupPageController>(
+                  onChanged: (s) => prov.Provider.of<EditGroupPageController>(
                           context,
                           listen: false)
                       .onSearchTextChanged(s),
-                  controller: Provider.of<EditGroupPageController>(context,
+                  controller: prov.Provider.of<EditGroupPageController>(context,
                           listen: false)
                       .searchTextController,
                   keyboardType: TextInputType.text,
                   style: const TextStyle(fontSize: 20),
                 ),
-                Consumer<EditGroupPageController>(
+                prov.Consumer<EditGroupPageController>(
                   builder: (context, createGroupPageController, _) {
                     return Container(
                       padding: const EdgeInsets.only(top: 5),
@@ -281,7 +282,7 @@ class _AddPeople extends StatelessWidget {
                               ? height * 0.05
                               : 0,
                       child: ListView.builder(
-                        controller: Provider.of<EditGroupPageController>(
+                        controller: prov.Provider.of<EditGroupPageController>(
                                 context,
                                 listen: false)
                             .selectedPeopleScroll,
@@ -298,7 +299,7 @@ class _AddPeople extends StatelessWidget {
                               index: index,
                               selected: (index ==
                                   createGroupPageController.selectedToDelete),
-                              setter: Provider.of<EditGroupPageController>(
+                              setter: prov.Provider.of<EditGroupPageController>(
                                       context,
                                       listen: false)
                                   .setSelectedToDelete,
@@ -316,19 +317,21 @@ class _AddPeople extends StatelessWidget {
           leading: Align(
               alignment: Alignment.centerLeft,
               child: TextButton(
-                onPressed: () =>
-                    Provider.of<EditGroupPageController>(context, listen: false)
-                        .goBack(),
+                onPressed: () => prov.Provider.of<EditGroupPageController>(
+                        context,
+                        listen: false)
+                    .goBack(),
                 child: Text(AppLocalizations.of(context)!.cancel),
               )),
           actions: [
-            if (Provider.of<EditGroupPageController>(context, listen: true)
+            if (prov.Provider.of<EditGroupPageController>(context, listen: true)
                 .selectedPeople
                 .isNotEmpty)
               TextButton(
-                onPressed: () =>
-                    Provider.of<EditGroupPageController>(context, listen: false)
-                        .updateGroupMembers(),
+                onPressed: () => prov.Provider.of<EditGroupPageController>(
+                        context,
+                        listen: false)
+                    .updateGroupMembers(),
                 child: Text(AppLocalizations.of(context)!.save),
               )
           ],
@@ -341,16 +344,16 @@ class _AddPeople extends StatelessWidget {
       //       children: [
       //         TextButton(
       //             onPressed: () => {
-      //                   Provider.of<EditGroupPageController>(context,
+      //                   prov.Provider.of<EditGroupPageController>(context,
       //                           listen: false)
       //                       .exitPressed(),
       //                 },
       //             child: Text(AppLocalizations.of(context)!.cancel)),
       //         const Spacer(),
-      //         if(Provider.of<EditGroupPageController>(context,
+      //         if(prov.Provider.of<EditGroupPageController>(context,
       //                           listen: true).selectedPeople.isNotEmpty)TextButton(
       //           onPressed: () =>
-      //               Provider.of<EditGroupPageController>(context, listen: false)
+      //               prov.Provider.of<EditGroupPageController>(context, listen: false)
       //                   .updateGroupMembers(),
       //           child: Text(AppLocalizations.of(context)!.save)),
 
@@ -369,44 +372,44 @@ class _AddPeople extends StatelessWidget {
       //         ),
       //       ),
       //       onChanged: (s) =>
-      //           Provider.of<EditGroupPageController>(context, listen: false)
+      //           prov.Provider.of<EditGroupPageController>(context, listen: false)
       //               .onSearchTextChanged(s),
       //       controller:
-      //           Provider.of<EditGroupPageController>(context, listen: false)
+      //           prov.Provider.of<EditGroupPageController>(context, listen: false)
       //               .searchTextController,
       //       keyboardType: TextInputType.text,
       //       style: const TextStyle(fontSize: 20),
       //     ),
       //     Container(
       //       padding: const EdgeInsets.only(top: 5),
-      //       height: Provider.of<EditGroupPageController>(context, listen: true)
+      //       height: prov.Provider.of<EditGroupPageController>(context, listen: true)
       //               .selectedPeople
       //               .isNotEmpty
       //           ? height * 0.05
       //           : 0,
       //       child: ListView.builder(
       //         controller:
-      //             Provider.of<EditGroupPageController>(context, listen: true)
+      //             prov.Provider.of<EditGroupPageController>(context, listen: true)
       //                 .selectedPeopleScroll,
       //         shrinkWrap: true,
       //         scrollDirection: Axis.horizontal,
       //         itemCount:
-      //             Provider.of<EditGroupPageController>(context, listen: true)
+      //             prov.Provider.of<EditGroupPageController>(context, listen: true)
       //                 .selectedPeople
       //                 .length,
       //         itemBuilder: (BuildContext context, int index) {
       //           return Padding(
       //             padding: const EdgeInsets.only(right: 10),
       //             child: SelectedUser(
-      //               user: Provider.of<EditGroupPageController>(context,
+      //               user: prov.Provider.of<EditGroupPageController>(context,
       //                       listen: true)
       //                   .selectedPeople[index],
       //               index: index,
       //               selected: (index ==
-      //                   Provider.of<EditGroupPageController>(context,
+      //                   prov.Provider.of<EditGroupPageController>(context,
       //                           listen: true)
       //                       .selectedToDelete),
-      //               setter: Provider.of<EditGroupPageController>(context,
+      //               setter: prov.Provider.of<EditGroupPageController>(context,
       //                       listen: false)
       //                   .setSelectedToDelete,
       //             ),
@@ -415,12 +418,12 @@ class _AddPeople extends StatelessWidget {
       //       ),
       //     ),
       //     Expanded(
-      //       child: Provider.of<EditGroupPageController>(context, listen: true)
+      //       child: prov.Provider.of<EditGroupPageController>(context, listen: true)
       //               .isLoading
       //           ? const Center(
       //               child: CircularProgressIndicator(),
       //             )
-      //           : Provider.of<EditGroupPageController>(context, listen: true)
+      //           : prov.Provider.of<EditGroupPageController>(context, listen: true)
       //                   .hits
       //                   .isEmpty
       //               ? Center(
@@ -434,25 +437,25 @@ class _AddPeople extends StatelessWidget {
       //                 )
       //               : ListView.builder(
       //                   //keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-      //                   itemCount: Provider.of<EditGroupPageController>(context,
+      //                   itemCount: prov.Provider.of<EditGroupPageController>(context,
       //                           listen: true)
       //                       .hits
       //                       .length,
       //                   itemBuilder: (BuildContext context, int index) {
       //                     return UserCard(
-      //                       initialBool: Provider.of<EditGroupPageController>(
+      //                       initialBool: prov.Provider.of<EditGroupPageController>(
       //                               context,
       //                               listen: false)
       //                           .isUserSelected(
-      //                               Provider.of<EditGroupPageController>(
+      //                               prov.Provider.of<EditGroupPageController>(
       //                                       context,
       //                                       listen: true)
       //                                   .hits[index]),
-      //                       adder: Provider.of<EditGroupPageController>(context,
+      //                       adder: prov.Provider.of<EditGroupPageController>(context,
       //                               listen: false)
       //                           .addRemovePersonToList,
       //                       groupSearch: true,
-      //                       user: Provider.of<EditGroupPageController>(context,
+      //                       user: prov.Provider.of<EditGroupPageController>(context,
       //                               listen: true)
       //                           .hits[index],
       //                     );

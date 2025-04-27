@@ -4,7 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
+import 'package:provider/provider.dart' as prov;
 import 'package:qr_flutter_new/qr_flutter.dart';
 import 'package:untitled_app/controllers/share_profile_page_controller.dart';
 
@@ -22,13 +22,13 @@ class ShareProfile extends StatelessWidget {
   Widget build(BuildContext context) {
     final width = c.widthGetter(context);
     final url =
-        "${c.appURL}/feed/sub_profile/${locator<CurrentUser>().getUID()}";
+        '${c.appURL}/feed/sub_profile/${locator<CurrentUser>().getUID()}';
     final icon = kIsWeb
         ? CupertinoIcons.arrowshape_turn_up_right
         : Platform.isIOS
             ? CupertinoIcons.share
             : CupertinoIcons.arrowshape_turn_up_right;
-    return ChangeNotifierProvider(
+    return prov.ChangeNotifierProvider(
       create: (context) => ShareProfilePageController(),
       builder: (context, child) {
         return Scaffold(
@@ -36,7 +36,7 @@ class ShareProfile extends StatelessWidget {
             leading: IconButton(
               icon: Icon(Icons.arrow_back_ios_rounded,
                   color: Theme.of(context).colorScheme.onSurface),
-              onPressed: () => context.pop("poped"),
+              onPressed: () => context.pop('poped'),
             ),
             automaticallyImplyLeading: false,
             centerTitle: true,
@@ -65,7 +65,7 @@ class ShareProfile extends StatelessWidget {
                         children: [
                           const SizedBox(height: 12),
                           Text(
-                            "@${locator<CurrentUser>().username}",
+                            '@${locator<CurrentUser>().username}',
                             style: TextStyle(fontSize: 24),
                           ),
                           QrImageView(
@@ -94,7 +94,7 @@ class ShareProfile extends StatelessWidget {
                         _Icon(
                           icon: icon,
                           text: AppLocalizations.of(context)!.share,
-                          onTap: Provider.of<ShareProfilePageController>(
+                          onTap: prov.Provider.of<ShareProfilePageController>(
                                   context,
                                   listen: false)
                               .sharePressed,
@@ -102,12 +102,14 @@ class ShareProfile extends StatelessWidget {
                       if (!kIsWeb) const Spacer(),
                       _Icon(
                         icon: Icons.link,
-                        text: !Provider.of<ShareProfilePageController>(context,
+                        text: !prov.Provider.of<ShareProfilePageController>(
+                                    context,
                                     listen: true)
                                 .linkCopied
                             ? AppLocalizations.of(context)!.copyLink
                             : AppLocalizations.of(context)!.copied,
-                        onTap: Provider.of<ShareProfilePageController>(context,
+                        onTap: prov.Provider.of<ShareProfilePageController>(
+                                context,
                                 listen: false)
                             .copyLinkPressed,
                       )

@@ -11,31 +11,32 @@ import 'package:untitled_app/views/re_auth_page.dart';
 import 'package:untitled_app/views/share_profile_page.dart';
 import 'package:untitled_app/views/sign_up.dart';
 import 'package:untitled_app/views/user_settings.dart';
-import '../views/compose_page.dart';
-import '../views/feed_page.dart';
-import '../views/search_page.dart';
-import '../views/profile_page.dart';
-import '../views/edit_profile.dart';
-import 'router_notifier.dart';
-import '../views/navigation_bar.dart';
-import '../models/post_handler.dart';
-import '../views/other_profile.dart';
-import '../views/view_post_page.dart';
-import '../views/profile_picture_detail.dart';
-import '../views/welcome.dart';
-import '../views/followers.dart';
-import '../views/following.dart';
-import '../views/recent_activity.dart';
-import '../views/groups_page.dart';
-import '../views/create_group_page.dart';
-import '../models/group_handler.dart';
-import '../custom_widgets/emoji_picker.dart';
-import '../views/sub_group_page.dart';
-import '../models/group_handler.dart' show Group;
-import '../views/auth_action_interface.dart';
+import 'package:untitled_app/views/compose_page.dart';
+import 'package:untitled_app/views/feed_page.dart';
+import 'package:untitled_app/views/search_page.dart';
+import 'package:untitled_app/views/profile_page.dart';
+import 'package:untitled_app/views/edit_profile.dart';
+import 'package:untitled_app/views/navigation_bar.dart';
+import 'package:untitled_app/models/post_handler.dart';
+import 'package:untitled_app/views/other_profile.dart';
+import 'package:untitled_app/views/view_post_page.dart';
+import 'package:untitled_app/views/profile_picture_detail.dart';
+import 'package:untitled_app/views/welcome.dart';
+import 'package:untitled_app/views/followers.dart';
+import 'package:untitled_app/views/following.dart';
+import 'package:untitled_app/views/recent_activity.dart';
+import 'package:untitled_app/views/groups_page.dart';
+import 'package:untitled_app/views/create_group_page.dart';
+import 'package:untitled_app/models/group_handler.dart';
+import 'package:untitled_app/custom_widgets/emoji_picker.dart';
+import 'package:untitled_app/views/sub_group_page.dart';
+import 'package:untitled_app/models/group_handler.dart' show Group;
+import 'package:untitled_app/views/auth_action_interface.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
-import '../views/view_likes_page.dart';
-import '../views/update_required_page.dart';
+import 'package:untitled_app/views/view_likes_page.dart';
+import 'package:untitled_app/views/update_required_page.dart';
+import 'package:untitled_app/widgets/require_auth.dart';
+import 'package:untitled_app/widgets/require_no_auth.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorFeedKey = GlobalKey<NavigatorState>(debugLabel: 'Feed');
@@ -47,25 +48,15 @@ final _shellNavigatorProfileKey =
     GlobalKey<NavigatorState>(debugLabel: 'Profile');
 final _shellNavigatorGroupsKey =
     GlobalKey<NavigatorState>(debugLabel: 'Groups');
-final routerNotifier = RouterNotifier();
 final goRouter = GoRouter(
   observers: [
     FirebaseAnalyticsObserver(analytics: FirebaseAnalytics.instance),
   ],
-  refreshListenable: routerNotifier,
-  redirect: routerNotifier.redirect,
-  initialLocation: '/',
+  initialLocation: '/feed',
   navigatorKey: _rootNavigatorKey,
   debugLogDiagnostics: true,
   redirectLimit: 15,
   routes: [
-    // GoRoute(
-    //   path: '/',
-    //   builder: (context, state) {
-    //     return const RootPage();
-    //   },
-    // ),
-
     GoRoute(
       path: '/profile_picture_detail',
       name: 'profile_picture_detail',
@@ -74,19 +65,18 @@ final goRouter = GoRouter(
         return ProfilePictureDetail(imageURL: url);
       },
     ),
-
     GoRoute(
         path: '/',
         name: 'root',
         builder: (context, state) {
-          return const WelcomePage();
+          return const RequireNoAuth(child: WelcomePage());
         },
         routes: [
           GoRoute(
             path: 'signup',
             name: 'signup',
             builder: (context, state) {
-              return const AppSafeArea(child: SignUp());
+              return const RequireNoAuth(child: AppSafeArea(child: SignUp()));
             },
           ),
           GoRoute(
@@ -127,10 +117,11 @@ final goRouter = GoRouter(
             },
           ),
         ]),
-
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) {
-        return ScaffoldWithNestedNavigation(navigationShell: navigationShell);
+        return RequireAuth(
+            child:
+                ScaffoldWithNestedNavigation(navigationShell: navigationShell));
       },
       branches: [
         StatefulShellBranch(
@@ -154,7 +145,7 @@ final goRouter = GoRouter(
                   name: 'sub_profile',
                   builder: (context, state) {
                     AppUser? user = state.extra as AppUser?;
-                    String id = state.pathParameters["id"]!;
+                    String id = state.pathParameters['id']!;
                     return OtherProfile(user: user, id: id);
                   },
                 ),
@@ -171,7 +162,7 @@ final goRouter = GoRouter(
                   name: 'post',
                   builder: (context, state) {
                     Post? post = state.extra as Post?;
-                    String id = state.pathParameters["id"]!;
+                    String id = state.pathParameters['id']!;
                     return ViewPostPage(post: post, id: id);
                   },
                   routes: [
@@ -228,7 +219,7 @@ final goRouter = GoRouter(
                     name: 'sub_group',
                     builder: (context, state) {
                       Group? group = state.extra as Group?;
-                      String id = state.pathParameters["id"]!;
+                      String id = state.pathParameters['id']!;
                       return SubGroupPage(group: group, id: id);
                     },
                     routes: [
@@ -268,11 +259,6 @@ final goRouter = GoRouter(
           navigatorKey: _shellNavigatorComposeKey,
           routes: [
             GoRoute(
-              // FIXME
-              // onExit: (context) {
-              //   locator<NavBarController>().enable();
-              //   return true;
-              // },
               path: '/compose',
               name: 'compose',
               pageBuilder: (context, state) {
@@ -313,21 +299,11 @@ final goRouter = GoRouter(
                   builder: (context, state) => const ShareProfile(),
                 ),
                 GoRoute(
-                  // FIXME
-                  // onExit: (context) {
-                  //   locator<NavBarController>().enable();
-                  //   return true;
-                  // },
                   path: 'edit_profile',
                   name: 'edit_profile',
                   builder: (context, state) => const EditProfile(),
                 ),
                 GoRoute(
-                    // FIXME
-                    // onExit: (context) {
-                    //   locator<NavBarController>().enable();
-                    //   return true;
-                    // },
                     path: 'user_settings',
                     name: 'user_settings',
                     builder: (context, state) => const UserSettings(),

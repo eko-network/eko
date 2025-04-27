@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:untitled_app/custom_widgets/loading_spinner.dart';
+import 'package:untitled_app/widgets/loading_spinner.dart';
 import 'package:untitled_app/custom_widgets/shimmer_loaders.dart'
     show FeedLoader;
 import 'package:untitled_app/custom_widgets/profile_page_header.dart';
 import 'package:untitled_app/models/users.dart' show AppUser;
-import 'package:untitled_app/utilities/themes/dark_theme_provider.dart';
 import '../controllers/other_profile_controller.dart';
-import 'package:provider/provider.dart';
+import 'package:provider/provider.dart' as prov;
 import '../custom_widgets/pagination.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import '../custom_widgets/post_card.dart';
@@ -21,42 +20,47 @@ class OtherProfile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final width = c.widthGetter(context);
-    return ChangeNotifierProvider(
+    return prov.ChangeNotifierProvider(
       create: (context) =>
           OtherProfileController(context: context, passedUser: user, id: id),
       builder: (context, child) {
         return PopScope(
-          canPop: Provider.of<OtherProfileController>(context, listen: false)
-              .isLoggedIn(),
+          canPop:
+              prov.Provider.of<OtherProfileController>(context, listen: false)
+                  .isLoggedIn(),
           child: Scaffold(
-            appBar: Provider.of<OtherProfileController>(context, listen: true)
-                            .loadedUser ==
-                        null ||
-                    (Provider.of<OtherProfileController>(context, listen: false)
-                            .isBlockedByMe() ||
-                        Provider.of<OtherProfileController>(context,
-                                listen: false)
-                            .blocksMe())
-                ? AppBar(
-                    backgroundColor: Theme.of(context).colorScheme.surface,
-                    surfaceTintColor: Colors.transparent,
-                    automaticallyImplyLeading: false,
-                    leading: IconButton(
-                      icon: Icon(
-                        Icons.arrow_back_ios_rounded,
-                        color: Theme.of(context).colorScheme.onSurface,
-                        size: 20,
-                      ),
-                      onPressed: () => context.pop(),
-                    ))
-                : null,
-            body: Provider.of<OtherProfileController>(context, listen: true)
+            appBar:
+                prov.Provider.of<OtherProfileController>(context, listen: true)
+                                .loadedUser ==
+                            null ||
+                        (prov.Provider.of<OtherProfileController>(context,
+                                    listen: false)
+                                .isBlockedByMe() ||
+                            prov.Provider.of<OtherProfileController>(context,
+                                    listen: false)
+                                .blocksMe())
+                    ? AppBar(
+                        backgroundColor: Theme.of(context).colorScheme.surface,
+                        surfaceTintColor: Colors.transparent,
+                        automaticallyImplyLeading: false,
+                        leading: IconButton(
+                          icon: Icon(
+                            Icons.arrow_back_ios_rounded,
+                            color: Theme.of(context).colorScheme.onSurface,
+                            size: 20,
+                          ),
+                          onPressed: () => context.pop(),
+                        ))
+                    : null,
+            body: prov.Provider.of<OtherProfileController>(context,
+                            listen: true)
                         .loadedUser ==
                     null
                 ? const Center(child: LoadingSpinner())
-                : (Provider.of<OtherProfileController>(context, listen: false)
+                : (prov.Provider.of<OtherProfileController>(context,
+                                listen: false)
                             .isBlockedByMe() ||
-                        Provider.of<OtherProfileController>(context,
+                        prov.Provider.of<OtherProfileController>(context,
                                 listen: false)
                             .blocksMe())
                     ? Center(
@@ -66,7 +70,8 @@ class OtherProfile extends StatelessWidget {
                             AppLocalizations.of(context)!.blockedByUserMessage),
                       ))
                     : PaginationPage(
-                        appbar: Provider.of<OtherProfileController>(context,
+                        appbar: prov.Provider.of<OtherProfileController>(
+                                        context,
                                         listen: true)
                                     .loadedUser ==
                                 null
@@ -77,14 +82,14 @@ class OtherProfile extends StatelessWidget {
                                 scrolledUnderElevation: 0.0,
                                 centerTitle: false,
                                 leadingWidth:
-                                    !Provider.of<OtherProfileController>(
+                                    !prov.Provider.of<OtherProfileController>(
                                                 context,
                                                 listen: false)
                                             .isLoggedIn()
                                         ? 100
                                         : null,
-                                leading: Provider.of<OtherProfileController>(
-                                            context,
+                                leading: prov.Provider.of<
+                                                OtherProfileController>(context,
                                             listen: false)
                                         .isLoggedIn()
                                     ? IconButton(
@@ -95,7 +100,7 @@ class OtherProfile extends StatelessWidget {
                                               .onSurface,
                                           size: 20,
                                         ),
-                                        onPressed: () => context.pop("popped"))
+                                        onPressed: () => context.pop('popped'))
                                     : TextButton(
                                         onPressed: () {
                                           context.go('/');
@@ -105,7 +110,7 @@ class OtherProfile extends StatelessWidget {
                                                 .signIn)),
                                 backgroundColor:
                                     Theme.of(context).colorScheme.surface,
-                                title: Provider.of<OtherProfileController>(
+                                title: prov.Provider.of<OtherProfileController>(
                                             context,
                                             listen: false)
                                         .isLoggedIn()
@@ -114,7 +119,7 @@ class OtherProfile extends StatelessWidget {
                                             MainAxisAlignment.center,
                                         children: [
                                           Text(
-                                            "@${Provider.of<OtherProfileController>(context, listen: true).loadedUser!.username}",
+                                            '@${prov.Provider.of<OtherProfileController>(context, listen: true).loadedUser!.username}',
                                             style: TextStyle(
                                               fontWeight: FontWeight.bold,
                                               fontSize: 20,
@@ -123,7 +128,7 @@ class OtherProfile extends StatelessWidget {
                                                   .onSurface,
                                             ),
                                           ),
-                                          if (Provider.of<
+                                          if (prov.Provider.of<
                                                       OtherProfileController>(
                                                   context,
                                                   listen: true)
@@ -152,7 +157,7 @@ class OtherProfile extends StatelessWidget {
                                         return [
                                           PopupMenuItem(
                                             height: 25,
-                                            value: () => Provider.of<
+                                            value: () => prov.Provider.of<
                                                         OtherProfileController>(
                                                     context,
                                                     listen: false)
@@ -164,12 +169,15 @@ class OtherProfile extends StatelessWidget {
                                         ];
                                       },
                                       onSelected: (fn) => fn(),
-                                      color:
-                                          Theme.of(context).colorScheme.outlineVariant,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .outlineVariant,
                                       child: Icon(
                                         Icons.more_vert,
                                         size: 20,
-                                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurfaceVariant,
                                       ),
                                     ),
                                   )
@@ -183,20 +191,21 @@ class OtherProfile extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                        getter: Provider.of<OtherProfileController>(context,
+                        getter: prov.Provider.of<OtherProfileController>(
+                                context,
                                 listen: false)
                             .getPosts,
                         card: otherProfilePostCardBuilder,
-                        startAfterQuery: Provider.of<OtherProfileController>(
-                                context,
-                                listen: false)
-                            .getTimeFromPost,
+                        startAfterQuery:
+                            prov.Provider.of<OtherProfileController>(context,
+                                    listen: false)
+                                .getTimeFromPost,
                         header: const _Header(),
-                        externalData: Provider.of<OtherProfileController>(
+                        externalData: prov.Provider.of<OtherProfileController>(
                                 context,
                                 listen: false)
                             .loadedPostData,
-                        extraRefresh: Provider.of<OtherProfileController>(
+                        extraRefresh: prov.Provider.of<OtherProfileController>(
                                 context,
                                 listen: false)
                             .onPageRefresh,
@@ -217,7 +226,7 @@ class _Header extends StatelessWidget {
     final width = c.widthGetter(context);
     return Column(
       children: [
-        Consumer<OtherProfileController>(
+        prov.Consumer<OtherProfileController>(
           builder: (context, otherProfileController, _) => ProfileHeader(
             user: otherProfileController.loadedUser!,
             loggedIn: otherProfileController.isLoggedIn(),
@@ -232,7 +241,7 @@ class _Header extends StatelessWidget {
               SizedBox(
                 width: width * 0.4,
                 height: width * 0.1,
-                child: Provider.of<OtherProfileController>(context,
+                child: prov.Provider.of<OtherProfileController>(context,
                                 listen: true)
                             .loadedUser ==
                         null
@@ -241,15 +250,14 @@ class _Header extends StatelessWidget {
                         style: TextButton.styleFrom(
                           side: BorderSide(
                               width: 2,
-                              color:
-                                  Theme.of(context).colorScheme.onSurface),
+                              color: Theme.of(context).colorScheme.onSurface),
                         ),
-                        onPressed: () => Provider.of<OtherProfileController>(
-                                context,
-                                listen: false)
-                            .onFollowPressed(),
+                        onPressed: () =>
+                            prov.Provider.of<OtherProfileController>(context,
+                                    listen: false)
+                                .onFollowPressed(),
                         child: Text(
-                          Provider.of<OtherProfileController>(context,
+                          prov.Provider.of<OtherProfileController>(context,
                                       listen: true)
                                   .following
                               ? AppLocalizations.of(context)!.following

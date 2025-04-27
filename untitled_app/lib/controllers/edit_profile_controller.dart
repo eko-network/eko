@@ -72,7 +72,7 @@ class EditProfileController extends ChangeNotifier {
   }
 
   void _pop() {
-    context.pop("poped");
+    context.pop('poped');
   }
 
   void _popDialog() {
@@ -173,20 +173,20 @@ class EditProfileController extends ChangeNotifier {
   Future<void> _saveBioData(String bio) async {
     // TODO: This will eventually need to upload all the data that changed as profile editing gets larger
     // Im thinking a 'save' and 'cancel' button pops up on the app bar is an edit is detected
-    if (await locator<CurrentUser>().uploadProfileBio(bio) == "success") {
+    if (await locator<CurrentUser>().uploadProfileBio(bio) == 'success') {
       locator<CurrentUser>().bio = bio;
     }
   }
 
   Future<void> _saveNameData(String name) async {
-    if (await locator<CurrentUser>().uploadProfileName(name) == "success") {
+    if (await locator<CurrentUser>().uploadProfileName(name) == 'success') {
       locator<CurrentUser>().name = name;
     }
   }
 
   Future<void> _saveUsernameData(String username) async {
     if (await locator<CurrentUser>().uploadProfileUsername(username) ==
-        "success") {
+        'success') {
       locator<CurrentUser>().username = username;
     }
   }

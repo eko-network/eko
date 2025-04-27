@@ -7,7 +7,8 @@ import 'package:giphy_get/src/client/models/gif.dart';
 import 'package:giphy_get/src/client/models/type.dart';
 import 'package:giphy_get/src/providers/app_bar_provider.dart';
 import 'package:giphy_get/src/providers/tab_provider.dart';
-import 'package:provider/provider.dart';
+import 'package:provider/provider.dart' as prov;
+
 //
 double widthGetter(BuildContext context) {
   final realWidth = MediaQuery.sizeOf(context).width;
@@ -63,10 +64,10 @@ class _GiphyTabDetailState extends State<GiphyTabDetail> {
     super.initState();
 
     // Tab Provider
-    _tabProvider = Provider.of<TabProvider>(context, listen: false);
+    _tabProvider = prov.Provider.of<TabProvider>(context, listen: false);
 
     // AppBar Provider
-    _appBarProvider = Provider.of<AppBarProvider>(context, listen: false);
+    _appBarProvider = prov.Provider.of<AppBarProvider>(context, listen: false);
 
     // Gif WIDTH
     switch (widget.type) {

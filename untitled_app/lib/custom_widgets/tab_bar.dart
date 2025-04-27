@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:untitled_app/controllers/feed_controller.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 
-import 'package:provider/provider.dart';
+import 'package:provider/provider.dart' as prov;
 import '../utilities/constants.dart' as c;
 
 // TODO: I changed it to this does it look fine
@@ -41,10 +41,10 @@ class _Button extends StatelessWidget {
   Widget build(BuildContext context) {
     final width = c.widthGetter(context);
     final isActive =
-        Provider.of<FeedController>(context, listen: true).index == index;
+        prov.Provider.of<FeedController>(context, listen: true).index == index;
 
     return InkWell(
-      onTap: () => Provider.of<FeedController>(context, listen: false)
+      onTap: () => prov.Provider.of<FeedController>(context, listen: false)
           .onTabPressed(index),
       child: SizedBox(
           width: width * 0.3,

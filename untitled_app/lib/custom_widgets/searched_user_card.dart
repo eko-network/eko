@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:untitled_app/models/users.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import '../models/current_user.dart';
 import '../utilities/locator.dart';
-import 'profile_picture_loading.dart';
-import 'package:provider/provider.dart';
+import 'package:provider/provider.dart' as prov;
 import 'controllers/searched_user_controller.dart';
 import '../custom_widgets/profile_avatar.dart';
 import '../utilities/constants.dart' as c;
@@ -43,7 +41,7 @@ class UserCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final width = c.widthGetter(context);
     final height = MediaQuery.sizeOf(context).height;
-    return ChangeNotifierProvider.value(
+    return prov.ChangeNotifierProvider.value(
       value: SearchedUserController(
           blockPage: blockedPage,
           user: user,
@@ -53,25 +51,30 @@ class UserCard extends StatelessWidget {
           initialBool: initialBool),
       builder: (context, child) {
         return (!blockedPage &&
-                (Provider.of<SearchedUserController>(context, listen: false)
+                (prov.Provider.of<SearchedUserController>(context,
+                            listen: false)
                         .isBlockedByMe() ||
-                    Provider.of<SearchedUserController>(context, listen: false)
+                    prov.Provider.of<SearchedUserController>(context,
+                            listen: false)
                         .blocksMe()))
             ? const SizedBox.shrink()
             : InkWell(
                 onTap: () {
                   if (groupSearch) {
-                    Provider.of<SearchedUserController>(context, listen: false)
+                    prov.Provider.of<SearchedUserController>(context,
+                            listen: false)
                         .onAddPressed();
                   } else if (tagSearch) {
                     onCardTap!(user.username);
                   } else {
-                    Provider.of<SearchedUserController>(context, listen: false)
+                    prov.Provider.of<SearchedUserController>(context,
+                            listen: false)
                         .onCardPressed();
                   }
                 },
                 child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: height * 0.01, horizontal: 6),
+                  padding: EdgeInsets.symmetric(
+                      vertical: height * 0.01, horizontal: 6),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -86,7 +89,7 @@ class UserCard extends StatelessWidget {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    if (user.name != "")
+                                    if (user.name != '')
                                       Row(
                                         children: [
                                           Text(
@@ -110,7 +113,7 @@ class UserCard extends StatelessWidget {
                                         ],
                                       ),
                                     Text(
-                                      "@${user.username}",
+                                      '@${user.username}',
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                   ],
@@ -123,7 +126,8 @@ class UserCard extends StatelessWidget {
                       else if (groupSearch)
                         Padding(
                             padding: const EdgeInsets.only(right: 15),
-                            child: Provider.of<SearchedUserController>(context,
+                            child: prov.Provider.of<SearchedUserController>(
+                                        context,
                                         listen: true)
                                     .added
                                 ? const Icon(Icons.check_circle)
@@ -132,7 +136,7 @@ class UserCard extends StatelessWidget {
                         Container()
                       else if (blockedPage)
                         InkWell(
-                          onTap: () => Provider.of<SearchedUserController>(
+                          onTap: () => prov.Provider.of<SearchedUserController>(
                                   context,
                                   listen: false)
                               .unblockPressed(),
@@ -143,21 +147,22 @@ class UserCard extends StatelessWidget {
                             decoration: BoxDecoration(
                                 borderRadius:
                                     const BorderRadius.all(Radius.circular(5)),
-                                color: Theme.of(context).colorScheme.outlineVariant),
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .outlineVariant),
                             child: Text(
                               AppLocalizations.of(context)!.unblock,
                               maxLines: 1,
                               style: TextStyle(
                                 fontSize: 14,
-                                color:
-                                    Theme.of(context).colorScheme.onSurface,
+                                color: Theme.of(context).colorScheme.onSurface,
                               ),
                             ),
                           ),
                         )
                       else
                         InkWell(
-                          onTap: () => Provider.of<SearchedUserController>(
+                          onTap: () => prov.Provider.of<SearchedUserController>(
                                   context,
                                   listen: false)
                               .onFollowPressed(),
@@ -168,7 +173,7 @@ class UserCard extends StatelessWidget {
                             decoration: BoxDecoration(
                               borderRadius:
                                   const BorderRadius.all(Radius.circular(10)),
-                              color: Provider.of<SearchedUserController>(
+                              color: prov.Provider.of<SearchedUserController>(
                                           context,
                                           listen: true)
                                       .following
@@ -178,7 +183,7 @@ class UserCard extends StatelessWidget {
                                       .primaryContainer,
                             ),
                             child: Text(
-                              Provider.of<SearchedUserController>(context,
+                              prov.Provider.of<SearchedUserController>(context,
                                           listen: true)
                                       .following
                                   ? AppLocalizations.of(context)!.following
@@ -188,8 +193,7 @@ class UserCard extends StatelessWidget {
                                 fontSize: 13,
                                 //letterSpacing: 1,
                                 //fontWeight: FontWeight.normal,
-                                color:
-                                    Theme.of(context).colorScheme.onSurface,
+                                color: Theme.of(context).colorScheme.onSurface,
                               ),
                             ),
                           ),

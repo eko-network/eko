@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:provider/provider.dart' as prov;
 import 'package:untitled_app/custom_widgets/image_widget.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:untitled_app/models/current_user.dart';
@@ -23,7 +23,8 @@ class _ComposePageState extends State<ComposePage> {
   bool _isLoadingImage = false;
 
   Widget _buildPollWidget(BuildContext context, double height, double width) {
-    final controller = Provider.of<ComposeController>(context, listen: true);
+    final controller =
+        prov.Provider.of<ComposeController>(context, listen: true);
 
     return Container(
       width: width * 0.9,
@@ -47,7 +48,7 @@ class _ComposePageState extends State<ComposePage> {
                     child: TextField(
                       decoration: InputDecoration(
                         hintText:
-                            "${AppLocalizations.of(context)!.option} ${index + 1}",
+                            '${AppLocalizations.of(context)!.option} ${index + 1}',
                         border: OutlineInputBorder(),
                         contentPadding:
                             EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -96,23 +97,24 @@ class _ComposePageState extends State<ComposePage> {
     final width = c.widthGetter(context);
     final height = MediaQuery.sizeOf(context).height;
 
-    return ChangeNotifierProvider(
+    return prov.ChangeNotifierProvider(
       create: (context) => ComposeController(
         context: context,
         audience: (widget.group != null) ? widget.group!.name : audiance,
         // groupEndPoint: group,
       ),
       builder: (context, child) {
-        Provider.of<ComposeController>(context, listen: false)
+        prov.Provider.of<ComposeController>(context, listen: false)
             .initGroup(widget.group);
         return PopScope(
           canPop: false,
           onPopInvoked: (didPop) =>
-              Provider.of<ComposeController>(context, listen: false)
+              prov.Provider.of<ComposeController>(context, listen: false)
                   .onWillPop(),
           child: GestureDetector(
-            onTap: () => Provider.of<ComposeController>(context, listen: false)
-                .hideKeyboard(),
+            onTap: () =>
+                prov.Provider.of<ComposeController>(context, listen: false)
+                    .hideKeyboard(),
             child: Scaffold(
               //
               floatingActionButtonLocation: ExpandableFab.location,
@@ -130,7 +132,8 @@ class _ComposePageState extends State<ComposePage> {
                       if (state != null) {
                         state.toggle();
                       }
-                      Provider.of<ComposeController>(context, listen: false)
+                      prov.Provider.of<ComposeController>(context,
+                              listen: false)
                           .addPollPressed();
                     },
                     child: const Icon(Icons.poll),
@@ -146,7 +149,7 @@ class _ComposePageState extends State<ComposePage> {
                         setState(() {
                           _isLoadingImage = true;
                         });
-                        await Provider.of<ComposeController>(context,
+                        await prov.Provider.of<ComposeController>(context,
                                 listen: false)
                             .addImagePressed();
                         setState(() {
@@ -160,7 +163,8 @@ class _ComposePageState extends State<ComposePage> {
                       if (state != null) {
                         state.toggle();
                       }
-                      Provider.of<ComposeController>(context, listen: false)
+                      prov.Provider.of<ComposeController>(context,
+                              listen: false)
                           .addGifPressed();
                     },
                     child: const Icon(Icons.gif_box_rounded),
@@ -173,9 +177,10 @@ class _ComposePageState extends State<ComposePage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     TextButton(
-                      onPressed: () =>
-                          Provider.of<ComposeController>(context, listen: false)
-                              .clearPressed(),
+                      onPressed: () => prov.Provider.of<ComposeController>(
+                              context,
+                              listen: false)
+                          .clearPressed(),
                       style: TextButton.styleFrom(
                           backgroundColor:
                               Theme.of(context).colorScheme.surface),
@@ -187,9 +192,10 @@ class _ComposePageState extends State<ComposePage> {
                       ),
                     ),
                     TextButton(
-                      onPressed: () =>
-                          Provider.of<ComposeController>(context, listen: false)
-                              .postPressed(context),
+                      onPressed: () => prov.Provider.of<ComposeController>(
+                              context,
+                              listen: false)
+                          .postPressed(context),
                       style: TextButton.styleFrom(
                         backgroundColor:
                             Theme.of(context).colorScheme.primaryContainer,
@@ -225,10 +231,11 @@ class _ComposePageState extends State<ComposePage> {
                 backgroundColor: Theme.of(context).colorScheme.surface,
               ),
               body: IndexedStack(
-                index: !Provider.of<ComposeController>(context, listen: false)
-                        .isAtSymbolTyped
-                    ? 0
-                    : 1,
+                index:
+                    !prov.Provider.of<ComposeController>(context, listen: false)
+                            .isAtSymbolTyped
+                        ? 0
+                        : 1,
                 children: [
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: width * 0.04),
@@ -255,15 +262,16 @@ class _ComposePageState extends State<ComposePage> {
                                   style: BorderStyle.solid,
                                 ),
                               ),
-                              onPressed: () => Provider.of<ComposeController>(
-                                      context,
-                                      listen: false)
-                                  .audianceButtonPressed(),
+                              onPressed: () =>
+                                  prov.Provider.of<ComposeController>(context,
+                                          listen: false)
+                                      .audianceButtonPressed(),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Text(
-                                      Provider.of<ComposeController>(context,
+                                      prov.Provider.of<ComposeController>(
+                                              context,
                                               listen: true)
                                           .audience,
                                       style: TextStyle(
@@ -284,18 +292,20 @@ class _ComposePageState extends State<ComposePage> {
                           constraints: BoxConstraints(maxHeight: height * 0.5),
                           child: TextField(
                             textCapitalization: TextCapitalization.sentences,
-                            focusNode: Provider.of<ComposeController>(context,
+                            focusNode: prov.Provider.of<ComposeController>(
+                                    context,
                                     listen: false)
                                 .titleFocus,
                             onChanged: (s) {
-                              Provider.of<ComposeController>(context,
+                              prov.Provider.of<ComposeController>(context,
                                       listen: false)
                                   .updateCountsTitle(s);
-                              Provider.of<ComposeController>(context,
+                              prov.Provider.of<ComposeController>(context,
                                       listen: false)
                                   .checkAtSymbol(s);
                             },
-                            controller: Provider.of<ComposeController>(context,
+                            controller: prov.Provider.of<ComposeController>(
+                                    context,
                                     listen: false)
                                 .titleController,
                             maxLines: null,
@@ -318,23 +328,23 @@ class _ComposePageState extends State<ComposePage> {
                             ),
                           ),
                         ),
-                        Consumer<ComposeController>(
+                        prov.Consumer<ComposeController>(
                           builder: (context, composeController, _) =>
                               (composeController.showCount0 &&
                                       composeController.titleChars != 0)
                                   ? Text(
-                                      "${composeController.titleChars}/${c.maxTitleChars} ${AppLocalizations.of(context)!.characters}")
+                                      '${composeController.titleChars}/${c.maxTitleChars} ${AppLocalizations.of(context)!.characters}')
                                   : Container(),
                         ),
-                        if (Provider.of<ComposeController>(context,
+                        if (prov.Provider.of<ComposeController>(context,
                                         listen: true)
                                     .gif !=
                                 null ||
-                            Provider.of<ComposeController>(context,
+                            prov.Provider.of<ComposeController>(context,
                                         listen: true)
                                     .image !=
                                 null ||
-                            Provider.of<ComposeController>(context,
+                            prov.Provider.of<ComposeController>(context,
                                     listen: true)
                                 .isPoll ||
                             _isLoadingImage)
@@ -356,25 +366,26 @@ class _ComposePageState extends State<ComposePage> {
                                                 padding: EdgeInsets.all(10),
                                                 child:
                                                     CircularProgressIndicator()))
-                                        : Provider.of<ComposeController>(
+                                        : prov.Provider.of<ComposeController>(
                                                     context,
                                                     listen: true)
                                                 .isPoll
                                             ? _buildPollWidget(
                                                 context, height, width)
-                                            : Provider.of<ComposeController>(
+                                            : prov.Provider.of<ComposeController>(
                                                             context,
                                                             listen: true)
                                                         .image !=
                                                     null
                                                 ? ImageWidget(
-                                                    text: Provider.of<
+                                                    text: prov.Provider.of<
                                                                 ComposeController>(
                                                             context,
                                                             listen: true)
                                                         .image!)
                                                 : Image.network(
-                                                    Provider.of<ComposeController>(
+                                                    prov.Provider.of<
+                                                                ComposeController>(
                                                             context,
                                                             listen: true)
                                                         .gif!
@@ -415,7 +426,7 @@ class _ComposePageState extends State<ComposePage> {
                                   ),
                                 ),
                                 IconButton(
-                                  iconSize: Provider.of<ComposeController>(
+                                  iconSize: prov.Provider.of<ComposeController>(
                                                       context,
                                                       listen: true)
                                                   .image !=
@@ -424,7 +435,8 @@ class _ComposePageState extends State<ComposePage> {
                                       ? 150
                                       : 30,
                                   onPressed: () =>
-                                      Provider.of<ComposeController>(context,
+                                      prov.Provider.of<ComposeController>(
+                                              context,
                                               listen: false)
                                           .removeMediaPressed(),
                                   icon: DecoratedBox(
@@ -448,18 +460,20 @@ class _ComposePageState extends State<ComposePage> {
                           constraints: BoxConstraints(maxHeight: height * 0.5),
                           child: TextField(
                             textCapitalization: TextCapitalization.sentences,
-                            focusNode: Provider.of<ComposeController>(context,
+                            focusNode: prov.Provider.of<ComposeController>(
+                                    context,
                                     listen: false)
                                 .bodyFocus,
                             onChanged: (s) {
-                              Provider.of<ComposeController>(context,
+                              prov.Provider.of<ComposeController>(context,
                                       listen: false)
                                   .updateCountsBody(s);
-                              Provider.of<ComposeController>(context,
+                              prov.Provider.of<ComposeController>(context,
                                       listen: false)
                                   .checkAtSymbol(s);
                             },
-                            controller: Provider.of<ComposeController>(context,
+                            controller: prov.Provider.of<ComposeController>(
+                                    context,
                                     listen: false)
                                 .bodyController,
                             maxLines: null,
@@ -483,18 +497,18 @@ class _ComposePageState extends State<ComposePage> {
                             ),
                           ),
                         ),
-                        Consumer<ComposeController>(
+                        prov.Consumer<ComposeController>(
                           builder: (context, composeController, _) =>
                               (composeController.showCount1 &&
                                       composeController.bodyChars != 0)
                                   ? Row(
                                       children: [
                                         Text(
-                                            "${composeController.bodyChars}/${c.maxPostChars} ${AppLocalizations.of(context)!.characters}"),
+                                            '${composeController.bodyChars}/${c.maxPostChars} ${AppLocalizations.of(context)!.characters}'),
                                         const Spacer(),
                                         if (composeController.newLines != 0)
                                           Text(
-                                              "${composeController.newLines}/${c.maxPostLines} ${AppLocalizations.of(context)!.newLines}"),
+                                              '${composeController.newLines}/${c.maxPostLines} ${AppLocalizations.of(context)!.newLines}'),
                                       ],
                                     )
                                   : Container(),
@@ -507,14 +521,16 @@ class _ComposePageState extends State<ComposePage> {
                     child: Column(
                       children: [
                         TextField(
-                          focusNode: Provider.of<ComposeController>(context,
+                          focusNode: prov.Provider.of<ComposeController>(
+                                  context,
                                   listen: false)
                               .searchFocus,
-                          controller: Provider.of<ComposeController>(context,
+                          controller: prov.Provider.of<ComposeController>(
+                                  context,
                                   listen: false)
                               .searchController,
                           onChanged: (s) {
-                            Provider.of<ComposeController>(context,
+                            prov.Provider.of<ComposeController>(context,
                                     listen: false)
                                 .checkAtSymbol(s);
                           },
@@ -539,13 +555,13 @@ class _ComposePageState extends State<ComposePage> {
                           ),
                         ),
                         Expanded(
-                          child: Provider.of<ComposeController>(context,
+                          child: prov.Provider.of<ComposeController>(context,
                                       listen: true)
                                   .isLoading
                               ? const Center(
                                   child: CircularProgressIndicator(),
                                 )
-                              : Provider.of<ComposeController>(context,
+                              : prov.Provider.of<ComposeController>(context,
                                           listen: true)
                                       .hits
                                       .isEmpty
@@ -562,48 +578,55 @@ class _ComposePageState extends State<ComposePage> {
                                     )
                                   : ListView.builder(
                                       shrinkWrap: true,
-                                      itemCount: Provider.of<ComposeController>(
-                                              context,
-                                              listen: true)
-                                          .hits
-                                          .length,
+                                      itemCount:
+                                          prov.Provider.of<ComposeController>(
+                                                  context,
+                                                  listen: true)
+                                              .hits
+                                              .length,
                                       itemBuilder:
                                           (BuildContext context, int index) {
                                         return UserCard(
                                             tagSearch: true,
                                             onCardTap: (username) {
-                                              Provider.of<ComposeController>(
+                                              prov.Provider.of<
+                                                          ComposeController>(
                                                       context,
                                                       listen: false)
                                                   .updateTextField(
                                                       username,
-                                                      Provider.of<ComposeController>(
+                                                      prov.Provider.of<
+                                                                  ComposeController>(
                                                               context,
                                                               listen: false)
                                                           .titleController,
-                                                      Provider.of<ComposeController>(
+                                                      prov.Provider.of<
+                                                                  ComposeController>(
                                                               context,
                                                               listen: false)
                                                           .titleFocus);
-                                              Provider.of<ComposeController>(
+                                              prov.Provider.of<
+                                                          ComposeController>(
                                                       context,
                                                       listen: false)
                                                   .updateTextField(
                                                       username,
-                                                      Provider.of<ComposeController>(
+                                                      prov.Provider.of<
+                                                                  ComposeController>(
                                                               context,
                                                               listen: false)
                                                           .bodyController,
-                                                      Provider.of<ComposeController>(
+                                                      prov.Provider.of<
+                                                                  ComposeController>(
                                                               context,
                                                               listen: false)
                                                           .bodyFocus);
                                             },
-                                            user:
-                                                Provider.of<ComposeController>(
-                                                        context,
-                                                        listen: true)
-                                                    .hits[index]);
+                                            user: prov.Provider.of<
+                                                        ComposeController>(
+                                                    context,
+                                                    listen: true)
+                                                .hits[index]);
                                       },
                                     ),
                         )

@@ -5,7 +5,7 @@ import '../models/group_handler.dart';
 import '../custom_widgets/time_stamp.dart';
 import '../utilities/constants.dart' as c;
 import '../utilities/locator.dart';
-import 'package:provider/provider.dart';
+import 'package:provider/provider.dart' as prov;
 import '../controllers/groups_page_controller.dart';
 
 Widget groupCardBuilder(dynamic group) {
@@ -28,9 +28,10 @@ class GroupCard extends StatelessWidget {
     return InkWell(
         onTap: () async {
           if (onPressedSearched == null) {
-            context.push("/groups/sub_group/${group.id}", extra: group).then(
+            context.push('/groups/sub_group/${group.id}', extra: group).then(
                 (value) => unseen
-                    ? Provider.of<GroupsPageController>(context, listen: false)
+                    ? prov.Provider.of<GroupsPageController>(context,
+                            listen: false)
                         .rebuild()
                     : null);
             await locator<CurrentUser>().setUnreadGroup(false);

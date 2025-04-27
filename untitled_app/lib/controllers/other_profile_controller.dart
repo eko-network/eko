@@ -37,7 +37,7 @@ class OtherProfileController extends ChangeNotifier {
       loadedUser = user;
     }
     if (loadedUser!.uid == locator<CurrentUser>().getUID()) {
-      context.go("/profile");
+      context.go('/profile');
     }
     following = locator<CurrentUser>().checkIsFollowing(loadedUser!.uid);
     //set blocked
@@ -126,7 +126,7 @@ class OtherProfileController extends ChangeNotifier {
     if (!isLoggedIn()) {
       showLogInDialog();
     } else {
-      if ((loadedUser!.username != "") &&
+      if ((loadedUser!.username != '') &&
           (loadedUser!.uid != locator<CurrentUser>().uid)) {
         if (!isFollowing) {
           isFollowing = true;

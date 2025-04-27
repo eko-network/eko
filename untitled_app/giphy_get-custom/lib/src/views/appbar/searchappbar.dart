@@ -8,7 +8,7 @@ import 'package:giphy_get/src/providers/app_bar_provider.dart';
 import 'package:giphy_get/src/providers/sheet_provider.dart';
 import 'package:giphy_get/src/providers/tab_provider.dart';
 import 'package:giphy_get/src/tools/debouncer.dart';
-import 'package:provider/provider.dart';
+import 'package:provider/provider.dart' as prov;
 
 class SearchAppBar extends StatefulWidget {
   // Scroll Controller
@@ -48,7 +48,8 @@ class _SearchAppBarState extends State<SearchAppBar> {
 
     //Set Texfield Controller
     _textEditingController = new TextEditingController(
-        text: Provider.of<AppBarProvider>(context, listen: false).queryText);
+        text:
+            prov.Provider.of<AppBarProvider>(context, listen: false).queryText);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // Establish the debouncer
@@ -74,12 +75,12 @@ class _SearchAppBarState extends State<SearchAppBar> {
   @override
   void didChangeDependencies() {
     // Providers
-    _tabProvider = Provider.of<TabProvider>(context);
+    _tabProvider = prov.Provider.of<TabProvider>(context);
 
-    _sheetProvider = Provider.of<SheetProvider>(context);
+    _sheetProvider = prov.Provider.of<SheetProvider>(context);
 
     // AppBar Provider
-    _appBarProvider = Provider.of<AppBarProvider>(context);
+    _appBarProvider = prov.Provider.of<AppBarProvider>(context);
 
     super.didChangeDependencies();
   }

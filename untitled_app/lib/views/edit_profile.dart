@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:untitled_app/custom_widgets/edit_profile_text_field.dart';
-import 'package:untitled_app/custom_widgets/profile_picture_loading.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import '../controllers/edit_profile_controller.dart';
-import 'package:provider/provider.dart';
+import 'package:provider/provider.dart' as prov;
 import '../utilities/constants.dart' as c;
 import '../custom_widgets/profile_avatar.dart';
 
@@ -15,27 +13,28 @@ class EditProfile extends StatelessWidget {
   Widget build(BuildContext context) {
     final width = c.widthGetter(context);
 
-    return ChangeNotifierProvider(
+    return prov.ChangeNotifierProvider(
       create: (context) => EditProfileController(context: context),
       builder: (context, child) {
         final height = MediaQuery.sizeOf(context).height;
         return PopScope(
-          canPop: !Provider.of<EditProfileController>(context, listen: true)
-              .showSave,
+          canPop:
+              !prov.Provider.of<EditProfileController>(context, listen: true)
+                  .showSave,
           onPopInvoked: (didPop) {
             if (!didPop) {
-              Provider.of<EditProfileController>(context, listen: false)
+              prov.Provider.of<EditProfileController>(context, listen: false)
                   .showWarning();
             }
           },
           // onWillPop: () async {
-          //   Provider.of<EditProfileController>(context, listen: false)
+          //   prov.Provider.of<EditProfileController>(context, listen: false)
           //       .exitPressed();
           //   return false;
           // },
           child: GestureDetector(
             onTap: () =>
-                Provider.of<EditProfileController>(context, listen: false)
+                prov.Provider.of<EditProfileController>(context, listen: false)
                     .hideKeyboard(),
             child: Scaffold(
               body: Padding(
@@ -50,12 +49,11 @@ class EditProfile extends StatelessWidget {
                       children: [
                         IconButton(
                           icon: Icon(Icons.arrow_back_ios_rounded,
-                              color:
-                                  Theme.of(context).colorScheme.onSurface),
-                          onPressed: () => Provider.of<EditProfileController>(
-                                  context,
-                                  listen: false)
-                              .exitPressed(),
+                              color: Theme.of(context).colorScheme.onSurface),
+                          onPressed: () =>
+                              prov.Provider.of<EditProfileController>(context,
+                                      listen: false)
+                                  .exitPressed(),
                         ),
 
                         Text(
@@ -68,7 +66,7 @@ class EditProfile extends StatelessWidget {
                           ),
                         ),
                         const Spacer(),
-                        if (Provider.of<EditProfileController>(context,
+                        if (prov.Provider.of<EditProfileController>(context,
                                 listen: true)
                             .showSave)
                           TextButton(
@@ -77,14 +75,13 @@ class EditProfile extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 22,
                                 fontWeight: FontWeight.normal,
-                                color:
-                                    Theme.of(context).colorScheme.onSurface,
+                                color: Theme.of(context).colorScheme.onSurface,
                               ),
                             ),
-                            onPressed: () => Provider.of<EditProfileController>(
-                                    context,
-                                    listen: false)
-                                .savePressed(),
+                            onPressed: () =>
+                                prov.Provider.of<EditProfileController>(context,
+                                        listen: false)
+                                    .savePressed(),
                           ),
 
                         //const Spacer(),
@@ -102,30 +99,30 @@ class EditProfile extends StatelessWidget {
                                 height: width * 0.4,
                                 width: width * 0.4,
                                 child: ClipOval(
-                                    child: Provider.of<EditProfileController>(
+                                    child: prov.Provider.of<EditProfileController>(
                                                     context,
                                                     listen: true)
                                                 .newProfileImage !=
                                             null
                                         ? Image.file(
                                             fit: BoxFit.fill,
-                                            Provider.of<EditProfileController>(
+                                            prov.Provider.of<EditProfileController>(
                                                     context,
                                                     listen: true)
                                                 .newProfileImage!)
                                         : ProfileAvatar(
-                                            url: Provider.of<
-                                                        EditProfileController>(
-                                                    context,
-                                                    listen: true)
-                                                .profileImage)),
+                                            url:
+                                                prov.Provider.of<EditProfileController>(
+                                                        context,
+                                                        listen: true)
+                                                    .profileImage)),
                               ),
                               ElevatedButton(
                                   style: ElevatedButton.styleFrom(
                                       shape: const CircleBorder(),
                                       padding: const EdgeInsets.all(15)),
                                   onPressed: () =>
-                                      Provider.of<EditProfileController>(
+                                      prov.Provider.of<EditProfileController>(
                                               context,
                                               listen: false)
                                           .editProfileImagePressed(),
@@ -142,10 +139,11 @@ class EditProfile extends StatelessWidget {
                       ),
                     ),
                     ProfileInputFeild(
-                      controller: Provider.of<EditProfileController>(context,
+                      controller: prov.Provider.of<EditProfileController>(
+                              context,
                               listen: false)
                           .nameController,
-                      onChanged: (s) => Provider.of<EditProfileController>(
+                      onChanged: (s) => prov.Provider.of<EditProfileController>(
                               context,
                               listen: false)
                           .checkChanges(),
@@ -154,10 +152,11 @@ class EditProfile extends StatelessWidget {
                     ),
                     SizedBox(height: height * 0.01),
                     ProfileInputFeild(
-                      controller: Provider.of<EditProfileController>(context,
+                      controller: prov.Provider.of<EditProfileController>(
+                              context,
                               listen: false)
                           .bioController,
-                      onChanged: (s) => Provider.of<EditProfileController>(
+                      onChanged: (s) => prov.Provider.of<EditProfileController>(
                               context,
                               listen: false)
                           .checkChanges(),
@@ -167,21 +166,22 @@ class EditProfile extends StatelessWidget {
                     ),
                     SizedBox(height: height * 0.01),
                     ProfileInputFeild(
-                      onChanged: (s) => Provider.of<EditProfileController>(
+                      onChanged: (s) => prov.Provider.of<EditProfileController>(
                               context,
                               listen: false)
                           .onUsernameChanged(s),
-                      focus: Provider.of<EditProfileController>(context,
+                      focus: prov.Provider.of<EditProfileController>(context,
                               listen: false)
                           .usernameFocus,
                       label: AppLocalizations.of(context)!.userName,
-                      controller: Provider.of<EditProfileController>(context,
+                      controller: prov.Provider.of<EditProfileController>(
+                              context,
                               listen: false)
                           .usernameController,
                       inputType: TextInputType.text,
                       //maxLength: c.maxUsernameChars,
                     ),
-                    if (Provider.of<EditProfileController>(context,
+                    if (prov.Provider.of<EditProfileController>(context,
                                 listen: true)
                             .usernameController
                             .text !=
@@ -189,7 +189,7 @@ class EditProfile extends StatelessWidget {
                       Row(
                         children: [
                           const SizedBox(width: 5),
-                          Consumer<EditProfileController>(
+                          prov.Consumer<EditProfileController>(
                             builder: (context, signUpController, _) =>
                                 signUpController.validUsername
                                     ? signUpController.isChecking
@@ -241,7 +241,8 @@ class EditProfile extends StatelessWidget {
                                           ),
                                           IconButton(
                                               onPressed: () {
-                                                Provider.of<EditProfileController>(
+                                                prov.Provider.of<
+                                                            EditProfileController>(
                                                         context,
                                                         listen: false)
                                                     .showUserNameReqs();

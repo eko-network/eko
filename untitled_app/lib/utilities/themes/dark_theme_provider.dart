@@ -10,7 +10,7 @@ class DarkThemeProvider with ChangeNotifier {
 
   DarkThemeProvider() {
     _loadDarkThemeFromPrefs(); // Initialize _darkTheme during construction
-    if (locator<CurrentUser>().getUID() == "") {
+    if (locator<CurrentUser>().getUID() == '') {
       onWelcomePage = true;
     }
   }

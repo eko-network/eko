@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:giphy_get/l10n.dart';
 import 'package:giphy_get/src/client/models/type.dart';
 import 'package:giphy_get/src/providers/tab_provider.dart';
-import 'package:provider/provider.dart';
+import 'package:provider/provider.dart' as prov;
 
 class GiphyTabBar extends StatefulWidget {
   final TabController tabController;
@@ -41,7 +41,7 @@ class _GiphyTabBarState extends State<GiphyTabBar> {
     super.initState();
 
     // TabProvider
-    _tabProvider = Provider.of<TabProvider>(context, listen: false);
+    _tabProvider = prov.Provider.of<TabProvider>(context, listen: false);
 
     //  Listen Tab Controller
     widget.tabController.addListener(() {
@@ -78,7 +78,7 @@ class _GiphyTabBarState extends State<GiphyTabBar> {
 
   @override
   Widget build(BuildContext context) {
-    _tabProvider = Provider.of<TabProvider>(context);
+    _tabProvider = prov.Provider.of<TabProvider>(context);
 
     if (_tabs.length == 1) return SizedBox();
 

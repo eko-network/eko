@@ -43,7 +43,7 @@ return MaterialApp(
         Locale('da', ''),
       ],
       home: MyHomePage(title: 'Giphy Get Demo'),
-      themeMode: Provider.of<ThemeProvider>(context).currentTheme,
+      themeMode: prov.Provider.of<ThemeProvider>(context).currentTheme,
     );
 ```
 

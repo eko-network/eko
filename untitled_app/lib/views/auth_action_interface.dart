@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import "package:untitled_app/custom_widgets/loading_spinner.dart";
+import 'package:untitled_app/widgets/loading_spinner.dart';
 import '../custom_widgets/login_text_feild.dart';
 
-import "package:provider/provider.dart";
-import "package:untitled_app/localization/generated/app_localizations.dart";
-import "../controllers/auth_action_interface_controller.dart";
-import "../utilities/constants.dart" as c;
+import 'package:provider/provider.dart' as prov;
+import 'package:untitled_app/localization/generated/app_localizations.dart';
+import '../controllers/auth_action_interface_controller.dart';
+import '../utilities/constants.dart' as c;
 
 class AuthActionInterface extends StatelessWidget {
   final Map<String, String> urlData;
@@ -13,20 +13,22 @@ class AuthActionInterface extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
+    return prov.ChangeNotifierProvider(
       create: (context) =>
           AuthActionInterfaceController(context: context, urlData: urlData),
       builder: (context, child) {
         return PopScope(
           canPop: false,
           onPopInvoked: (didPop) =>
-              Provider.of<AuthActionInterfaceController>(context, listen: false)
+              prov.Provider.of<AuthActionInterfaceController>(context,
+                      listen: false)
                   .backPressed(didPop: didPop),
           child: Center(
             child: SizedBox(
               width: c.widthGetter(context),
               child: PageView(
-                controller: Provider.of<AuthActionInterfaceController>(context,
+                controller: prov.Provider.of<AuthActionInterfaceController>(
+                        context,
                         listen: false)
                     .pageController,
                 physics: const NeverScrollableScrollPhysics(),
@@ -75,7 +77,7 @@ class _InvalidPage extends StatelessWidget {
               ),
             ),
             TextButton(
-              onPressed: () => Provider.of<AuthActionInterfaceController>(
+              onPressed: () => prov.Provider.of<AuthActionInterfaceController>(
                       context,
                       listen: false)
                   .exitOnPagePressed(),
@@ -128,7 +130,7 @@ class _ResetPasswordPage extends StatelessWidget {
                 height: height * 0.03,
               ),
               Text(
-                "${AppLocalizations.of(context)!.resetPasswordPromt} ${Provider.of<AuthActionInterfaceController>(context, listen: true).userEmail}",
+                '${AppLocalizations.of(context)!.resetPasswordPromt} ${prov.Provider.of<AuthActionInterfaceController>(context, listen: true).userEmail}',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                     color: Theme.of(context).colorScheme.onSurface,
@@ -137,20 +139,21 @@ class _ResetPasswordPage extends StatelessWidget {
 
               SizedBox(height: height * c.loginPadding),
               CustomInputFeild(
-                onChanged: (s) => Provider.of<AuthActionInterfaceController>(
-                        context,
-                        listen: false)
-                    .passwordChanged(),
+                onChanged: (s) =>
+                    prov.Provider.of<AuthActionInterfaceController>(context,
+                            listen: false)
+                        .passwordChanged(),
                 onEditingComplete: () =>
-                    Provider.of<AuthActionInterfaceController>(context,
+                    prov.Provider.of<AuthActionInterfaceController>(context,
                             listen: false)
                         .passwordConfirmFocus
                         .requestFocus(),
                 label: AppLocalizations.of(context)!.password,
-                focus: Provider.of<AuthActionInterfaceController>(context,
+                focus: prov.Provider.of<AuthActionInterfaceController>(context,
                         listen: false)
                     .passwordFocus,
-                controller: Provider.of<AuthActionInterfaceController>(context,
+                controller: prov.Provider.of<AuthActionInterfaceController>(
+                        context,
                         listen: false)
                     .passwordController,
                 inputType: TextInputType.visiblePassword,
@@ -158,20 +161,21 @@ class _ResetPasswordPage extends StatelessWidget {
               ),
               SizedBox(height: height * c.loginPadding),
               CustomInputFeild(
-                onChanged: (s) => Provider.of<AuthActionInterfaceController>(
-                        context,
-                        listen: false)
-                    .passwordChanged(),
+                onChanged: (s) =>
+                    prov.Provider.of<AuthActionInterfaceController>(context,
+                            listen: false)
+                        .passwordChanged(),
                 onEditingComplete: () =>
-                    Provider.of<AuthActionInterfaceController>(context,
+                    prov.Provider.of<AuthActionInterfaceController>(context,
                             listen: false)
                         .setPasswordPressed(),
                 textInputAction: TextInputAction.done,
                 label: AppLocalizations.of(context)!.confirmPassword,
-                focus: Provider.of<AuthActionInterfaceController>(context,
+                focus: prov.Provider.of<AuthActionInterfaceController>(context,
                         listen: false)
                     .passwordConfirmFocus,
-                controller: Provider.of<AuthActionInterfaceController>(context,
+                controller: prov.Provider.of<AuthActionInterfaceController>(
+                        context,
                         listen: false)
                     .passwordConfirmController,
                 inputType: TextInputType.visiblePassword,
@@ -183,7 +187,8 @@ class _ResetPasswordPage extends StatelessWidget {
                 ),
                 child: LinearProgressIndicator(
                   minHeight: 12,
-                  value: Provider.of<AuthActionInterfaceController>(context,
+                  value: prov.Provider.of<AuthActionInterfaceController>(
+                          context,
                           listen: true)
                       .passwordPercent,
                   color: Theme.of(context).colorScheme.primary,
@@ -191,14 +196,14 @@ class _ResetPasswordPage extends StatelessWidget {
               ),
               Container(
                 alignment: Alignment.centerLeft,
-                child: Consumer<AuthActionInterfaceController>(
+                child: prov.Consumer<AuthActionInterfaceController>(
                   builder: (context, signUpController, _) => Text(
-                    "${signUpController.passed[0]}${AppLocalizations.of(context)!.passwordLen}\n"
-                    "${signUpController.passed[1]}${AppLocalizations.of(context)!.passwordLower}\n"
-                    "${signUpController.passed[2]}${AppLocalizations.of(context)!.passwordUpper}\n"
-                    "${signUpController.passed[3]}${AppLocalizations.of(context)!.passwordNumber}\n"
-                    "${signUpController.passed[4]}${AppLocalizations.of(context)!.passwordSpecial}\n"
-                    "${signUpController.passed[5]}${AppLocalizations.of(context)!.passwordMatch}\n",
+                    '${signUpController.passed[0]}${AppLocalizations.of(context)!.passwordLen}\n'
+                    '${signUpController.passed[1]}${AppLocalizations.of(context)!.passwordLower}\n'
+                    '${signUpController.passed[2]}${AppLocalizations.of(context)!.passwordUpper}\n'
+                    '${signUpController.passed[3]}${AppLocalizations.of(context)!.passwordNumber}\n'
+                    '${signUpController.passed[4]}${AppLocalizations.of(context)!.passwordSpecial}\n'
+                    '${signUpController.passed[5]}${AppLocalizations.of(context)!.passwordMatch}\n',
                     style: const TextStyle(fontSize: 16),
                   ),
                 ),
@@ -211,13 +216,14 @@ class _ResetPasswordPage extends StatelessWidget {
                 width: width * 0.9,
                 height: width * 0.15,
                 child: TextButton(
-                  onPressed: () => Provider.of<AuthActionInterfaceController>(
-                          context,
-                          listen: false)
-                      .setPasswordPressed(),
+                  onPressed: () =>
+                      prov.Provider.of<AuthActionInterfaceController>(context,
+                              listen: false)
+                          .setPasswordPressed(),
                   style: TextButton.styleFrom(
                       backgroundColor: Theme.of(context).colorScheme.primary),
-                  child: Provider.of<AuthActionInterfaceController>(context,
+                  child: prov.Provider.of<AuthActionInterfaceController>(
+                              context,
                               listen: true)
                           .loggingIn
                       ? CircularProgressIndicator(
@@ -243,10 +249,10 @@ class _ResetPasswordPage extends StatelessWidget {
                       color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 18),
                 ),
-                onPressed: () => Provider.of<AuthActionInterfaceController>(
-                        context,
-                        listen: false)
-                    .showExitWarning(),
+                onPressed: () =>
+                    prov.Provider.of<AuthActionInterfaceController>(context,
+                            listen: false)
+                        .showExitWarning(),
               ),
               SizedBox(height: height * 0.03),
             ],

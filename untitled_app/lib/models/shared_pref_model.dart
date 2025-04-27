@@ -1,7 +1,7 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future<bool> getActivityNotification() async {
-  const activityNotification = "ACTIVITY_NOTIFICATION";
+  const activityNotification = 'ACTIVITY_NOTIFICATION';
   SharedPreferences prefs = await SharedPreferences.getInstance();
   final bool? value = prefs.getBool(activityNotification);
   if (value == null) {
@@ -12,7 +12,7 @@ Future<bool> getActivityNotification() async {
 }
 
 void setActivityNotification(bool value) async {
-  const activityNotification = "ACTIVITY_NOTIFICATION";
+  const activityNotification = 'ACTIVITY_NOTIFICATION';
   SharedPreferences prefs = await SharedPreferences.getInstance();
   prefs.setBool(activityNotification, value);
 }

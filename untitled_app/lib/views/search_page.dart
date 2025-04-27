@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:provider/provider.dart' as prov;
 import 'package:untitled_app/custom_widgets/pagination.dart';
 import 'package:untitled_app/custom_widgets/shimmer_loaders.dart'
     show SearchLoader;
@@ -16,20 +16,20 @@ class SearchPage extends StatelessWidget {
     final width = c.widthGetter(context);
     final height = MediaQuery.sizeOf(context).height;
 
-    return ChangeNotifierProvider(
+    return prov.ChangeNotifierProvider(
       create: (context) => SearchPageController(context: context),
       builder: (context, child) {
         return PopScope(
           canPop: false,
           onPopInvoked: (didPop) =>
-              Provider.of<SearchPageController>(context, listen: false)
+              prov.Provider.of<SearchPageController>(context, listen: false)
                   .onWillPop(),
           child: GestureDetector(
             onPanDown: (details) =>
-                Provider.of<SearchPageController>(context, listen: false)
+                prov.Provider.of<SearchPageController>(context, listen: false)
                     .hideKeyboard(),
             onTap: () =>
-                Provider.of<SearchPageController>(context, listen: false)
+                prov.Provider.of<SearchPageController>(context, listen: false)
                     .hideKeyboard(),
             child: Scaffold(
               body: Padding(
@@ -37,13 +37,14 @@ class SearchPage extends StatelessWidget {
                 child: PaginationPage(
                   initialLoadingWidget: const SearchLoader(),
                   //forceLoadingState: true,
-                  getter:
-                      Provider.of<SearchPageController>(context, listen: true)
-                          .getter,
+                  getter: prov.Provider.of<SearchPageController>(context,
+                          listen: true)
+                      .getter,
                   card: searchPageBuilder,
-                  startAfterQuery:
-                      Provider.of<SearchPageController>(context, listen: false)
-                          .startAfterQuery,
+                  startAfterQuery: prov.Provider.of<SearchPageController>(
+                          context,
+                          listen: false)
+                      .startAfterQuery,
                   header: TextField(
                     cursorColor: Theme.of(context).colorScheme.onSurface,
                     decoration: InputDecoration(
@@ -65,10 +66,11 @@ class SearchPage extends StatelessWidget {
                         borderSide: BorderSide.none,
                       ),
                     ),
-                    onChanged: (s) => Provider.of<SearchPageController>(context,
+                    onChanged: (s) => prov.Provider.of<SearchPageController>(
+                            context,
                             listen: false)
                         .onSearchTextChanged(s),
-                    controller: Provider.of<SearchPageController>(context,
+                    controller: prov.Provider.of<SearchPageController>(context,
                             listen: false)
                         .searchTextController,
                     keyboardType: TextInputType.text,
@@ -104,24 +106,24 @@ class SearchPage extends StatelessWidget {
 //                           borderSide: BorderSide.none,
 //                         ),
 //                       ),
-//                       onChanged: (s) => Provider.of<SearchPageController>(
+//                       onChanged: (s) => prov.Provider.of<SearchPageController>(
 //                               context,
 //                               listen: false)
 //                           .onSearchTextChanged(s),
-//                       controller: Provider.of<SearchPageController>(context,
+//                       controller: prov.Provider.of<SearchPageController>(context,
 //                               listen: false)
 //                           .searchTextController,
 //                       keyboardType: TextInputType.text,
 //                       style: const TextStyle(fontSize: 20),
 //                     ),
 //                     Expanded(
-//                       child: Provider.of<SearchPageController>(context,
+//                       child: prov.Provider.of<SearchPageController>(context,
 //                                   listen: true)
 //                               .isLoading
 //                           ? const Center(
 //                               child: CircularProgressIndicator(),
 //                             )
-//                           : Provider.of<SearchPageController>(context,
+//                           : prov.Provider.of<SearchPageController>(context,
 //                                       listen: true)
 //                                   .hits
 //                                   .isEmpty
@@ -138,7 +140,7 @@ class SearchPage extends StatelessWidget {
 //                                 )
 //                               : ListView.builder(
 //                                   //keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-//                                   itemCount: Provider.of<SearchPageController>(
+//                                   itemCount: prov.Provider.of<SearchPageController>(
 //                                           context,
 //                                           listen: true)
 //                                       .hits
@@ -146,7 +148,7 @@ class SearchPage extends StatelessWidget {
 //                                   itemBuilder:
 //                                       (BuildContext context, int index) {
 //                                     return UserCard(
-//                                         user: Provider.of<SearchPageController>(
+//                                         user: prov.Provider.of<SearchPageController>(
 //                                                 context,
 //                                                 listen: true)
 //                                             .hits[index]);

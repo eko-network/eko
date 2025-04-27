@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:untitled_app/custom_widgets/controllers/pagination_controller.dart';
 import 'package:untitled_app/models/users.dart';
-import "../utilities/constants.dart" as c;
+import '../utilities/constants.dart' as c;
 
 class FollowingController extends ChangeNotifier {
   final BuildContext context;

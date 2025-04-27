@@ -12,7 +12,7 @@ class SearchPageController extends ChangeNotifier {
   final BuildContext context;
   SearchPageController({required this.context});
   bool isLoading = false;
-  String query = "";
+  String query = '';
   Timer? _debounce;
   final searchModel = SearchModel();
 

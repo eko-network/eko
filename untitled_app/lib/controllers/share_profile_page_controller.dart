@@ -18,7 +18,7 @@ class ShareProfilePageController extends ChangeNotifier {
     linkCopied = true;
     Clipboard.setData(ClipboardData(
         text:
-            "${c.appURL}/feed/sub_profile/${locator<CurrentUser>().getUID()}"));
+            '${c.appURL}/feed/sub_profile/${locator<CurrentUser>().getUID()}'));
     notifyListeners();
   }
 
@@ -33,12 +33,12 @@ class ShareProfilePageController extends ChangeNotifier {
       Uint8List pngBytes = byteData!.buffer.asUint8List();
       final Directory appDocumentsDir =
           await getApplicationDocumentsDirectory();
-      File imgFile = File("${appDocumentsDir.path}/qr.png");
+      File imgFile = File('${appDocumentsDir.path}/qr.png');
       await imgFile.writeAsBytes(pngBytes);
 
       Share.shareXFiles(
         [XFile(imgFile.path)],
-        text: "${c.appURL}/feed/sub_profile/${locator<CurrentUser>().getUID()}",
+        text: '${c.appURL}/feed/sub_profile/${locator<CurrentUser>().getUID()}',
       );
       sharing = false;
     }

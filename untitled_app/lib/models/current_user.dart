@@ -26,6 +26,7 @@ class CurrentUser extends AppUser {
   bool stateIsLiking = false;
   bool stateIsDisliking = false;
   bool stateIsFollowing = false;
+  @override
   bool isVerified = false;
 
   @override
@@ -41,7 +42,7 @@ class CurrentUser extends AppUser {
 //gets uid making sure it is current. idk if this is neccesary but it will be easy to remove.
   String getUID() {
     if (uid == '') {
-      uid = FirebaseAuth.instance.currentUser?.uid ?? "";
+      uid = FirebaseAuth.instance.currentUser?.uid ?? '';
     }
     return uid;
   }
@@ -51,7 +52,7 @@ class CurrentUser extends AppUser {
       final firestore = FirebaseFirestore.instance;
       final user = getUID();
       final querySnapshot = await firestore
-          .collection("users")
+          .collection('users')
           .where('blockedUsers', arrayContains: user)
           .get();
       //blockedUsers.add(blockedUid);
@@ -68,8 +69,8 @@ class CurrentUser extends AppUser {
       try {
         final firestore = FirebaseFirestore.instance;
         final user = getUID();
-        await firestore.collection("users").doc(user).update({
-          "blockedUsers": FieldValue.arrayUnion([blockedUid])
+        await firestore.collection('users').doc(user).update({
+          'blockedUsers': FieldValue.arrayUnion([blockedUid])
         });
 
         blockedUsers.add(blockedUid);
@@ -88,8 +89,8 @@ class CurrentUser extends AppUser {
       try {
         final firestore = FirebaseFirestore.instance;
         final user = getUID();
-        await firestore.collection("users").doc(user).update({
-          "blockedUsers": FieldValue.arrayRemove([blockedUid])
+        await firestore.collection('users').doc(user).update({
+          'blockedUsers': FieldValue.arrayRemove([blockedUid])
         });
 
         blockedUsers.remove(blockedUid);
@@ -109,7 +110,7 @@ class CurrentUser extends AppUser {
       );
       uid = FirebaseAuth.instance.currentUser!.uid;
       // await addFCM();
-      return ("success");
+      return ('success');
     } on FirebaseAuthException catch (e) {
       return (e.code);
     }
@@ -120,7 +121,7 @@ class CurrentUser extends AppUser {
       await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: password);
       uid = FirebaseAuth.instance.currentUser!.uid;
-      return ("success");
+      return ('success');
     } on FirebaseAuthException catch (e) {
       return (e.code);
     }
@@ -130,7 +131,7 @@ class CurrentUser extends AppUser {
     await FirebaseAuth.instance.setLanguageCode(countryCode);
     try {
       await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
-      return ("success");
+      return ('success');
     } on FirebaseAuthException catch (e) {
       return (e.code);
     }
@@ -148,7 +149,7 @@ class CurrentUser extends AppUser {
     try {
       await FirebaseAuth.instance
           .confirmPasswordReset(code: code, newPassword: password);
-      return "success";
+      return 'success';
     } on FirebaseAuthException catch (e) {
       return (e.code);
     }
@@ -169,29 +170,29 @@ class CurrentUser extends AppUser {
     final user = getUID();
     final userData = await readUserData(user); //uses function from parent class
     if (userData != null) {
-      email = userData["email"] ?? "";
-      likedPosts = userData["profileData"]["likedPosts"] ?? [];
-      dislikedPosts = userData["profileData"]["dislikedPosts"] ?? [];
-      blockedUsers = userData["blockedUsers"] ?? [];
-      newActivity = userData["newActivity"] ?? false;
-      unreadGroup = userData["unreadGroup"] ?? false;
-      isVerified = userData["isVerified"] ?? false;
-      List<dynamic>? fcmTokens = userData["fcmTokens"];
+      email = userData['email'] ?? '';
+      likedPosts = userData['profileData']['likedPosts'] ?? [];
+      dislikedPosts = userData['profileData']['dislikedPosts'] ?? [];
+      blockedUsers = userData['blockedUsers'] ?? [];
+      newActivity = userData['newActivity'] ?? false;
+      unreadGroup = userData['unreadGroup'] ?? false;
+      isVerified = userData['isVerified'] ?? false;
+      List<dynamic>? fcmTokens = userData['fcmTokens'];
       blockedBy = await getPeopleWhoBlockedMe();
       pollVotes =
-          Map<String, int>.from(userData["profileData"]["pollVotes"] ?? {});
+          Map<String, int>.from(userData['profileData']['pollVotes'] ?? {});
       // print(blockedBy);
       if (fcmTokens == null) {
         addFCM();
       } else if (await getActivityNotification()) {
         List<String> fcmTokens = List<String>.from(userData['fcmTokens'] ?? []);
         final String currentDeviceToken =
-            await FirebaseMessaging.instance.getToken() ?? "";
+            await FirebaseMessaging.instance.getToken() ?? '';
         // check to see if contained in array
         if (!fcmTokens.contains(currentDeviceToken)) {
           fcmTokens.add(currentDeviceToken);
           final DocumentReference userDocRef =
-              FirebaseFirestore.instance.collection("users").doc(user);
+              FirebaseFirestore.instance.collection('users').doc(user);
           // Update the Firestore document with the modified FCM tokens array
           await userDocRef.update({'fcmTokens': fcmTokens});
         }
@@ -212,15 +213,15 @@ class CurrentUser extends AppUser {
         final firestore = FirebaseFirestore.instance;
         final user = getUID();
         await Future.wait([
-          firestore.collection("users").doc(user).update({
-            "profileData.following": FieldValue.arrayUnion([otherUid])
+          firestore.collection('users').doc(user).update({
+            'profileData.following': FieldValue.arrayUnion([otherUid])
           }),
-          firestore.collection("users").doc(otherUid).update({
-            "profileData.followers": FieldValue.arrayUnion([user])
+          firestore.collection('users').doc(otherUid).update({
+            'profileData.followers': FieldValue.arrayUnion([user])
           }),
           locator<PostsHandling>().addActivty(
-              type: "follow",
-              content: "Someone followed you",
+              type: 'follow',
+              content: 'Someone followed you',
               path: user,
               user: otherUid)
         ]);
@@ -243,7 +244,7 @@ class CurrentUser extends AppUser {
     uid ??= getUID();
     newActivity = value;
     await firestore
-        .collection("users")
+        .collection('users')
         .doc(uid)
         .set({'newActivity': value}, SetOptions(merge: true));
   }
@@ -253,7 +254,7 @@ class CurrentUser extends AppUser {
     uid ??= getUID();
     unreadGroup = value;
     await firestore
-        .collection("users")
+        .collection('users')
         .doc(uid)
         .set({'unreadGroup': value}, SetOptions(merge: true));
   }
@@ -265,11 +266,11 @@ class CurrentUser extends AppUser {
         final firestore = FirebaseFirestore.instance;
         final user = getUID();
         await Future.wait([
-          firestore.collection("users").doc(user).update({
-            "profileData.following": FieldValue.arrayRemove([otherUid])
+          firestore.collection('users').doc(user).update({
+            'profileData.following': FieldValue.arrayRemove([otherUid])
           }),
-          firestore.collection("users").doc(otherUid).update({
-            "profileData.followers": FieldValue.arrayRemove([user])
+          firestore.collection('users').doc(otherUid).update({
+            'profileData.followers': FieldValue.arrayRemove([user])
           })
         ]);
 
@@ -304,21 +305,21 @@ class CurrentUser extends AppUser {
         final firestore = FirebaseFirestore.instance;
         final user = getUID();
         await Future.wait([
-          firestore.collection("users").doc(user).update({
-            "profileData.likedPosts":
+          firestore.collection('users').doc(user).update({
+            'profileData.likedPosts':
                 FieldValue.arrayUnion([commentId ?? postId])
           }),
           (commentId == null)
               ? firestore
-                  .collection("posts")
+                  .collection('posts')
                   .doc(postId)
-                  .update({"likes": FieldValue.increment(1)})
+                  .update({'likes': FieldValue.increment(1)})
               : firestore
-                  .collection("posts")
+                  .collection('posts')
                   .doc(postId)
                   .collection('comments')
                   .doc(commentId)
-                  .update({"likes": FieldValue.increment(1)})
+                  .update({'likes': FieldValue.increment(1)})
         ]);
 
         if (commentId == null) {
@@ -345,21 +346,21 @@ class CurrentUser extends AppUser {
         final firestore = FirebaseFirestore.instance;
         final user = getUID();
         await Future.wait([
-          firestore.collection("users").doc(user).update({
-            "profileData.dislikedPosts":
+          firestore.collection('users').doc(user).update({
+            'profileData.dislikedPosts':
                 FieldValue.arrayUnion([commentId ?? postId])
           }),
           (commentId == null)
               ? firestore
-                  .collection("posts")
+                  .collection('posts')
                   .doc(postId)
-                  .update({"dislikes": FieldValue.increment(1)})
+                  .update({'dislikes': FieldValue.increment(1)})
               : firestore
-                  .collection("posts")
+                  .collection('posts')
                   .doc(postId)
                   .collection('comments')
                   .doc(commentId)
-                  .update({"dislikes": FieldValue.increment(1)})
+                  .update({'dislikes': FieldValue.increment(1)})
         ]);
 
         if (commentId == null) {
@@ -386,21 +387,21 @@ class CurrentUser extends AppUser {
         final firestore = FirebaseFirestore.instance;
         final user = getUID();
         await Future.wait([
-          firestore.collection("users").doc(user).update({
-            "profileData.likedPosts":
+          firestore.collection('users').doc(user).update({
+            'profileData.likedPosts':
                 FieldValue.arrayRemove([commentId ?? postId])
           }),
           (commentId == null)
               ? firestore
-                  .collection("posts")
+                  .collection('posts')
                   .doc(postId)
-                  .update({"likes": FieldValue.increment(-1)})
+                  .update({'likes': FieldValue.increment(-1)})
               : firestore
-                  .collection("posts")
+                  .collection('posts')
                   .doc(postId)
                   .collection('comments')
                   .doc(commentId)
-                  .update({"likes": FieldValue.increment(-1)})
+                  .update({'likes': FieldValue.increment(-1)})
         ]);
 
         if (commentId == null) {
@@ -427,21 +428,21 @@ class CurrentUser extends AppUser {
         final firestore = FirebaseFirestore.instance;
         final user = getUID();
         await Future.wait([
-          firestore.collection("users").doc(user).update({
-            "profileData.dislikedPosts":
+          firestore.collection('users').doc(user).update({
+            'profileData.dislikedPosts':
                 FieldValue.arrayRemove([commentId ?? postId])
           }),
           (commentId == null)
               ? firestore
-                  .collection("posts")
+                  .collection('posts')
                   .doc(postId)
-                  .update({"dislikes": FieldValue.increment(-1)})
+                  .update({'dislikes': FieldValue.increment(-1)})
               : firestore
-                  .collection("posts")
+                  .collection('posts')
                   .doc(postId)
                   .collection('comments')
                   .doc(commentId)
-                  .update({"dislikes": FieldValue.increment(-1)})
+                  .update({'dislikes': FieldValue.increment(-1)})
         ]);
 
         if (commentId == null) {
@@ -470,14 +471,14 @@ class CurrentUser extends AppUser {
 
         await Future.wait([
           // Update user's pollVotes in Firestore
-          firestore.collection("users").doc(user).update({
-            "profileData.pollVotes.$postId": optionIndex,
+          firestore.collection('users').doc(user).update({
+            'profileData.pollVotes.$postId': optionIndex,
           }),
           // Update poll vote count in the post document
           firestore
-              .collection("posts")
+              .collection('posts')
               .doc(postId)
-              .update({"pollVoteCounts.$optionIndex": FieldValue.increment(1)}),
+              .update({'pollVoteCounts.$optionIndex': FieldValue.increment(1)}),
         ]);
 
         // Update local state
@@ -506,12 +507,12 @@ class CurrentUser extends AppUser {
 
         await Future.wait([
           // Update user's pollVotes in Firestore
-          firestore.collection("users").doc(user).update({
-            "profileData.pollVotes.$postId": FieldValue.delete(),
+          firestore.collection('users').doc(user).update({
+            'profileData.pollVotes.$postId': FieldValue.delete(),
           }),
           // Update poll vote count in the post document
-          firestore.collection("posts").doc(postId).update(
-              {"pollVoteCounts.$currentVoteOption": FieldValue.increment(-1)}),
+          firestore.collection('posts').doc(postId).update(
+              {'pollVoteCounts.$currentVoteOption': FieldValue.increment(-1)}),
         ]);
 
         // Remove from local state
@@ -571,22 +572,22 @@ class CurrentUser extends AppUser {
     final user = getUID();
     await FirebaseStorage.instance
         .ref()
-        .child("profile_pictures/$user/profile.jpg")
+        .child('profile_pictures/$user/profile.jpg')
         .putFile(profile);
     try {
       final ref = FirebaseStorage.instance
           .ref()
-          .child("profile_pictures/$user/profile.jpg");
+          .child('profile_pictures/$user/profile.jpg');
 
       profilePicture = await ref.getDownloadURL();
 
       firestore
           .collection('users')
           .doc(user)
-          .update({"profileData.profilePicture": profilePicture});
-      return "success";
+          .update({'profileData.profilePicture': profilePicture});
+      return 'success';
     } catch (e) {
-      return "fail";
+      return 'fail';
     }
   }
 
@@ -597,12 +598,12 @@ class CurrentUser extends AppUser {
     final user = getUID();
     try {
       await firestore
-          .collection("users")
+          .collection('users')
           .doc(user)
-          .update({"profileData.bio": bio});
-      return "success";
+          .update({'profileData.bio': bio});
+      return 'success';
     } catch (e) {
-      return "fail";
+      return 'fail';
     }
   }
 
@@ -636,10 +637,10 @@ class CurrentUser extends AppUser {
     final firestore = FirebaseFirestore.instance;
     final user = getUID();
     try {
-      await firestore.collection("users").doc(user).update({"name": name});
-      return "success";
+      await firestore.collection('users').doc(user).update({'name': name});
+      return 'success';
     } catch (e) {
-      return "fail";
+      return 'fail';
     }
   }
 
@@ -648,12 +649,12 @@ class CurrentUser extends AppUser {
     final user = getUID();
     try {
       await firestore
-          .collection("users")
+          .collection('users')
           .doc(user)
-          .update({"username": username});
-      return "success";
+          .update({'username': username});
+      return 'success';
     } catch (e) {
-      return "fail";
+      return 'fail';
     }
   }
 
@@ -678,7 +679,7 @@ class CurrentUser extends AppUser {
         'likes': 0,
         'dislikes': 0,
         'profilePicture':
-            "https://firebasestorage.googleapis.com/v0/b/untitled-2832f.appspot.com/o/profile_pictures%2Fdefault%2Fprofile.jpg?alt=media&token=2543c4eb-f991-468f-9ce8-68c576ffca7c",
+            'https://firebasestorage.googleapis.com/v0/b/untitled-2832f.appspot.com/o/profile_pictures%2Fdefault%2Fprofile.jpg?alt=media&token=2543c4eb-f991-468f-9ce8-68c576ffca7c',
       }
     };
     await firestore.collection('users').doc(user).set(userData);
@@ -696,14 +697,14 @@ class CurrentUser extends AppUser {
       // TODO: eventually needs to support timestamp
       final user = getUID();
       final DocumentReference userDocRef =
-          FirebaseFirestore.instance.collection("users").doc(user);
+          FirebaseFirestore.instance.collection('users').doc(user);
 
       try {
         // Get the current data
         final DocumentSnapshot userSnapshot = await userDocRef.get();
         if (userSnapshot.exists) {
           final String currentDeviceToken =
-              await FirebaseMessaging.instance.getToken() ?? "";
+              await FirebaseMessaging.instance.getToken() ?? '';
           // Retrieve the FCM tokens array
           // TODO: will change when in a collection
           if (userSnapshot.data().toString().contains('fcmTokens')) {
@@ -734,7 +735,7 @@ class CurrentUser extends AppUser {
       // TODO: eventually needs to support timestamp
       final user = getUID();
       final DocumentReference userDocRef =
-          FirebaseFirestore.instance.collection("users").doc(user);
+          FirebaseFirestore.instance.collection('users').doc(user);
 
       try {
         // Get the current data
@@ -777,7 +778,7 @@ class CurrentUser extends AppUser {
     likedPosts = [];
     dislikedPosts = [];
     profilePicture =
-        "https://firebasestorage.googleapis.com/v0/b/untitled-2832f.appspot.com/o/profile_pictures%2Fdefault%2Fprofile.jpg?alt=media&token=2543c4eb-f991-468f-9ce8-68c576ffca7c";
+        'https://firebasestorage.googleapis.com/v0/b/untitled-2832f.appspot.com/o/profile_pictures%2Fdefault%2Fprofile.jpg?alt=media&token=2543c4eb-f991-468f-9ce8-68c576ffca7c';
   }
 
   signOut() async {

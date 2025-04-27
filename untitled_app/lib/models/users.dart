@@ -26,7 +26,7 @@ class AppUser {
     this.username = '',
     this.isVerified = false,
     this.profilePicture =
-        "https://firebasestorage.googleapis.com/v0/b/untitled-2832f.appspot.com/o/profile_pictures%2Fdefault%2Fprofile.jpg?alt=media&token=2543c4eb-f991-468f-9ce8-68c576ffca7c",
+        'https://firebasestorage.googleapis.com/v0/b/untitled-2832f.appspot.com/o/profile_pictures%2Fdefault%2Fprofile.jpg?alt=media&token=2543c4eb-f991-468f-9ce8-68c576ffca7c',
   }) {
     if (followers.isEmpty) {
       followers = [];
@@ -57,8 +57,8 @@ class AppUser {
         uid: json['uid'],
         name: json['name'],
         profilePicture: json['profileData']['profilePicture'],
-        likes: json['profileData']["likes"],
-        dislikes: json['profileData']["dislikes"] ?? 0,
+        likes: json['profileData']['likes'],
+        dislikes: json['profileData']['dislikes'] ?? 0,
         bio: json['profileData']['bio'],
         followers: json['profileData']['followers'],
         following: json['profileData']['following'],
@@ -84,7 +84,7 @@ class AppUser {
       }
     }
 
-    final userRef = FirebaseFirestore.instance.collection("users");
+    final userRef = FirebaseFirestore.instance.collection('users');
     final data =
         await userRef.doc(uid).get(); //FIXME need exception handleing all below
 

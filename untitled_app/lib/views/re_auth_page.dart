@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
+import 'package:provider/provider.dart' as prov;
 import 'package:untitled_app/controllers/re_auth_page_controller.dart';
 import 'package:untitled_app/custom_widgets/login_text_feild.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
@@ -12,7 +12,7 @@ class ReAuthPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final width = c.widthGetter(context);
-    return ChangeNotifierProvider(
+    return prov.ChangeNotifierProvider(
       create: (context) => ReAuthPageController(context: context),
       builder: (context, child) {
         return Scaffold(
@@ -32,41 +32,41 @@ class ReAuthPage extends StatelessWidget {
               ),
             ),
           ),
-          body: Center(child:Column(
+          body: Center(
+              child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             // =mainAxisSize: MainAxisSize.min,
-            
 
-            
             children: [
               SizedBox(
-                    height: width * 0.05,
-                  ),
+                height: width * 0.05,
+              ),
               SizedBox(
                   width: width * 0.7,
                   child: Text(
                       AppLocalizations.of(context)!.deleteAcountReAuthWarning,
                       textAlign: TextAlign.center)),
               SizedBox(
-                    height: width * 0.2,
-                  ),
+                height: width * 0.2,
+              ),
               CustomInputFeild(
                 textInputAction: TextInputAction.go,
                 // onEditingComplete: () =>
-                //     Provider.of<LoginController>(context, listen: false)
+                //     prov.Provider.of<LoginController>(context, listen: false)
                 //         .logInPressed(),
-                focus: Provider.of<ReAuthPageController>(context, listen: false)
+                focus: prov.Provider.of<ReAuthPageController>(context,
+                        listen: false)
                     .passwordFocus,
                 label: AppLocalizations.of(context)!.password,
-                controller:
-                    Provider.of<ReAuthPageController>(context, listen: false)
-                        .passwordController,
+                controller: prov.Provider.of<ReAuthPageController>(context,
+                        listen: false)
+                    .passwordController,
                 inputType: TextInputType.visiblePassword,
                 password: true,
               ),
               SizedBox(
-                    height: width * 0.05,
-                  ),
+                height: width * 0.05,
+              ),
               InkWell(
                 child: Container(
                   alignment: Alignment.center,
@@ -81,7 +81,8 @@ class ReAuthPage extends StatelessWidget {
                           color: Theme.of(context).colorScheme.onPrimary),
                       textAlign: TextAlign.center),
                 ),
-                onTap: ()=> Provider.of<ReAuthPageController>(context, listen: false)
+                onTap: () => prov.Provider.of<ReAuthPageController>(context,
+                        listen: false)
                     .buttonTap(),
               ),
               SizedBox(height: width * 0.05)

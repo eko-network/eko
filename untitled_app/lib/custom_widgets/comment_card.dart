@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -12,8 +11,7 @@ import '../localization/generated/app_localizations.dart';
 import 'controllers/comment_card_controller.dart';
 import '../utilities/constants.dart' as c;
 import '../models/post_handler.dart' show Post;
-import 'package:provider/provider.dart';
-import 'profile_picture_loading.dart';
+import 'package:provider/provider.dart' as prov;
 import '../custom_widgets/profile_avatar.dart';
 import 'package:like_button/like_button.dart';
 import 'package:flutter/cupertino.dart';
@@ -31,26 +29,28 @@ class CommentCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final width = c.widthGetter(context);
 
-    return ChangeNotifierProvider.value(
+    return prov.ChangeNotifierProvider.value(
       value: CommentCardController(post: post, context: context),
       builder: (context, child) {
-        return (Provider.of<CommentCardController>(context, listen: false)
+        return (prov.Provider.of<CommentCardController>(context, listen: false)
                     .isBlockedByMe() ||
-                Provider.of<CommentCardController>(context, listen: false)
+                prov.Provider.of<CommentCardController>(context, listen: false)
                     .blocksMe())
             ? const SizedBox.shrink()
             : TapRegion(
-                onTapOutside: (v) =>
-                    Provider.of<CommentCardController>(context, listen: false)
-                        .scrollToStart(),
+                onTapOutside: (v) => prov.Provider.of<CommentCardController>(
+                        context,
+                        listen: false)
+                    .scrollToStart(),
                 child: NotificationListener<ScrollEndNotification>(
                   onNotification: (notification) {
-                    Provider.of<CommentCardController>(context, listen: false)
+                    prov.Provider.of<CommentCardController>(context,
+                            listen: false)
                         .onScrollEnd();
                     return true;
                   },
                   child: SingleChildScrollView(
-                    controller: Provider.of<CommentCardController>(context,
+                    controller: prov.Provider.of<CommentCardController>(context,
                             listen: false)
                         .scrollController,
                     physics: ClampingScrollPhysics(),
@@ -66,7 +66,8 @@ class CommentCard extends StatelessWidget {
                         children: [
                           GestureDetector(
                               onTapDown: (v) =>
-                                  Provider.of<CommentCardController>(context,
+                                  prov.Provider.of<CommentCardController>(
+                                          context,
                                           listen: false)
                                       .scrollToStart(),
                               child: Container(
@@ -83,7 +84,7 @@ class CommentCard extends StatelessWidget {
                                     locator<CurrentUser>().getUID())
                                 ? GestureDetector(
                                     onTap: () =>
-                                        Provider.of<CommentCardController>(
+                                        prov.Provider.of<CommentCardController>(
                                                 context,
                                                 listen: false)
                                             .deletePressed(),
@@ -142,10 +143,10 @@ class _Card extends StatelessWidget {
                 // Display the profile picture as a CircleAvatar
                 IconButton(
                     onPressed: () {
-                      if (Provider.of<CommentCardController>(context,
+                      if (prov.Provider.of<CommentCardController>(context,
                               listen: false)
                           .isLoggedIn()) {
-                        Provider.of<CommentCardController>(context,
+                        prov.Provider.of<CommentCardController>(context,
                                 listen: false)
                             .avatarPressed();
                       }
@@ -162,10 +163,11 @@ class _Card extends StatelessWidget {
                         children: [
                           TextButton(
                             onPressed: () {
-                              if (Provider.of<CommentCardController>(context,
+                              if (prov.Provider.of<CommentCardController>(
+                                      context,
                                       listen: false)
                                   .isLoggedIn()) {
-                                Provider.of<CommentCardController>(context,
+                                prov.Provider.of<CommentCardController>(context,
                                         listen: false)
                                     .avatarPressed();
                               }
@@ -180,7 +182,7 @@ class _Card extends StatelessWidget {
                                 child: Row(
                                   children: [
                                     Text(
-                                      "@${post.author.username}",
+                                      '@${post.author.username}',
                                       style: TextStyle(
                                         fontSize: 16,
                                         color: Theme.of(context)
@@ -225,7 +227,7 @@ class _Card extends StatelessWidget {
                                           .surfaceTint),
                                   recognizer: TapGestureRecognizer()
                                     ..onTap = () =>
-                                        Provider.of<CommentCardController>(
+                                        prov.Provider.of<CommentCardController>(
                                                 context,
                                                 listen: false)
                                             .tagPressed(chunk.substring(1)),
@@ -248,10 +250,10 @@ class _Card extends StatelessWidget {
                       const SizedBox(height: 4.0),
                       TextButton(
                         onPressed: () {
-                          if (Provider.of<CommentCardController>(context,
+                          if (prov.Provider.of<CommentCardController>(context,
                                   listen: false)
                               .isLoggedIn()) {
-                            Provider.of<PostPageController>(context,
+                            prov.Provider.of<PostPageController>(context,
                                     listen: false)
                                 .replyPressed(post.author.username);
                           }
@@ -278,7 +280,7 @@ class _Card extends StatelessWidget {
                   TimeStamp(time: post.time),
 
                   LikeButton(
-                    isLiked: (Provider.of<CommentCardController>(context,
+                    isLiked: (prov.Provider.of<CommentCardController>(context,
                             listen: true)
                         .liked),
                     likeBuilder: (isLiked) {
@@ -296,17 +298,17 @@ class _Card extends StatelessWidget {
                       );
                     },
                     onTap: (isLiked) async {
-                      if (Provider.of<CommentCardController>(context,
+                      if (prov.Provider.of<CommentCardController>(context,
                               listen: false)
                           .isLoggedIn()) {
-                        Provider.of<CommentCardController>(context,
+                        prov.Provider.of<CommentCardController>(context,
                                 listen: false)
                             .likePressed();
                         return !isLiked;
                       }
                       return isLiked;
                     },
-                    likeCount: Provider.of<CommentCardController>(context,
+                    likeCount: prov.Provider.of<CommentCardController>(context,
                             listen: true)
                         .likes,
                     countBuilder: (int? count, bool isLiked, String text) {
@@ -327,7 +329,7 @@ class _Card extends StatelessWidget {
                         dotLastColor: Color(0xFFff3040)),
                   ),
                   LikeButton(
-                    isLiked: (Provider.of<CommentCardController>(context,
+                    isLiked: (prov.Provider.of<CommentCardController>(context,
                             listen: true)
                         .disliked),
                     likeBuilder: (isDisliked) {
@@ -343,17 +345,17 @@ class _Card extends StatelessWidget {
                       );
                     },
                     onTap: (isDisliked) async {
-                      if (Provider.of<CommentCardController>(context,
+                      if (prov.Provider.of<CommentCardController>(context,
                               listen: false)
                           .isLoggedIn()) {
-                        Provider.of<CommentCardController>(context,
+                        prov.Provider.of<CommentCardController>(context,
                                 listen: false)
                             .dislikePressed();
                         return !isDisliked;
                       }
                       return isDisliked;
                     },
-                    likeCount: Provider.of<CommentCardController>(context,
+                    likeCount: prov.Provider.of<CommentCardController>(context,
                             listen: true)
                         .dislikes,
                     countBuilder: (int? count, bool isLiked, String text) {
@@ -374,14 +376,14 @@ class _Card extends StatelessWidget {
                         dotLastColor: Color(0xFFff3040)),
                   ),
                   // IconButton(
-                  //   onPressed: () => Provider.of<CommentCardController>(
+                  //   onPressed: () => prov.Provider.of<CommentCardController>(
                   //           context,
                   //           listen: false)
                   //       .likePressed(),
                   //   icon: Row(
                   //     children: [
                   //       Icon(
-                  // (Provider.of<CommentCardController>(context,
+                  // (prov.Provider.of<CommentCardController>(context,
                   //             listen: true)
                   //         .liked)
                   //             ? Icons.favorite
@@ -391,7 +393,7 @@ class _Card extends StatelessWidget {
                   //       ),
                   //       const SizedBox(width: 5),
                   //       Text(
-                  //         '${Provider.of<CommentCardController>(context, listen: true).likes}',
+                  //         '${prov.Provider.of<CommentCardController>(context, listen: true).likes}',
                   //         style: TextStyle(
                   //             color: Theme.of(context)
                   //                 .colorScheme

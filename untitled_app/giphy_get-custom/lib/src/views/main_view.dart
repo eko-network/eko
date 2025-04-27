@@ -6,7 +6,7 @@ import 'package:giphy_get/src/views/tab/giphy_tab_bar.dart';
 import 'package:giphy_get/src/views/tab/giphy_tab_bottom.dart';
 import 'package:giphy_get/src/views/tab/giphy_tab_top.dart';
 import 'package:giphy_get/src/views/tab/giphy_tab_view.dart';
-import 'package:provider/provider.dart';
+import 'package:provider/provider.dart' as prov;
 
 class MainView extends StatefulWidget {
   MainView({
@@ -57,7 +57,7 @@ class _MainViewState extends State<MainView>
 
   @override
   void didChangeDependencies() {
-    _sheetProvider = Provider.of<SheetProvider>(context, listen: false);
+    _sheetProvider = prov.Provider.of<SheetProvider>(context, listen: false);
 
     super.didChangeDependencies();
   }
@@ -73,7 +73,6 @@ class _MainViewState extends State<MainView>
   }
 
   Widget _draggableScrollableSheet() => DraggableScrollableSheet(
-    
       expand: _sheetProvider.isExpanded,
       minChildSize: SheetProvider.minExtent,
       maxChildSize: SheetProvider.maxExtent,

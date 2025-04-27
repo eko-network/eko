@@ -5,9 +5,9 @@ import 'package:package_info_plus/package_info_plus.dart';
 class Version {
   bool lessThanMin = false;
   bool lessThanTarget = false;
-  String currentVersion = "";
-  String targetVersion = "";
-  String minimumVersion = "";
+  String currentVersion = '';
+  String targetVersion = '';
+  String minimumVersion = '';
   Future<void> init() async {
     await getCurrentAppVersion();
     await getAppVersion();
@@ -29,18 +29,18 @@ class Version {
     late DocumentSnapshot<Map<String, dynamic>> snapshot;
 
     if (ios) {
-      snapshot = await collectrionRef.doc("iosVersion").get();
+      snapshot = await collectrionRef.doc('iosVersion').get();
     } else if (android) {
-      snapshot = await collectrionRef.doc("androidVersion").get();
+      snapshot = await collectrionRef.doc('androidVersion').get();
     } else {
-      minimumVersion = "0.0.0";
-      targetVersion = "0.0.0";
+      minimumVersion = '0.0.0';
+      targetVersion = '0.0.0';
       return;
     }
     final data = snapshot.data();
     if (data != null) {
-      minimumVersion = data["minimum"];
-      targetVersion = data["target"];
+      minimumVersion = data['minimum'];
+      targetVersion = data['target'];
     }
   }
 

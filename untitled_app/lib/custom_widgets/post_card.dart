@@ -13,7 +13,7 @@ import 'package:untitled_app/utilities/locator.dart';
 import 'controllers/post_card_controller.dart';
 import '../utilities/constants.dart' as c;
 import '../models/post_handler.dart' show Post;
-import 'package:provider/provider.dart';
+import 'package:provider/provider.dart' as prov;
 import '../custom_widgets/profile_avatar.dart';
 import 'dart:io' show Platform;
 import 'package:like_button/like_button.dart';
@@ -48,10 +48,10 @@ class CountDisplay extends StatelessWidget {
   final VoidCallback onTap;
 
   const CountDisplay({
-    Key? key,
+    super.key,
     required this.count,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -108,24 +108,24 @@ class PostCard extends StatelessWidget {
   tagPressed(String username, BuildContext context) async {
     String? uid = await locator<CurrentUser>().getUidFromUsername(username);
     if (locator<CurrentUser>().getUID() == uid) {
-      context.go("/profile");
+      context.go('/profile');
     } else {
-      context.push("/feed/sub_profile/$uid");
+      context.push('/feed/sub_profile/$uid');
     }
   }
 
   avatarPressed(BuildContext context) async {
     if (post.author.uid != locator<CurrentUser>().getUID()) {
-      await context.push("/feed/sub_profile/${post.author.uid}",
+      await context.push('/feed/sub_profile/${post.author.uid}',
           extra: post.author);
     } else {
-      context.go("/profile");
+      context.go('/profile');
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider.value(
+    return prov.ChangeNotifierProvider.value(
       //lazy: true,
 
       key: Key(post.postId),
@@ -134,16 +134,16 @@ class PostCard extends StatelessWidget {
         //  PostCardController(
         //     post: post, context: context, isBuiltFromId: isBuiltFromId),
         //builder: (context, child) {
-        return Consumer<PostCardController>(
+        return prov.Consumer<PostCardController>(
           builder: (context, notifier, child) {
             final width = c.widthGetter(context);
             final likeCommentTextStyle = TextStyle(
                 fontFamily: DefaultTextStyle.of(context).style.fontFamily,
                 color: Theme.of(context).colorScheme.onSurfaceVariant);
             return (!notifier.visible ||
-                    Provider.of<PostCardController>(context, listen: false)
+                    prov.Provider.of<PostCardController>(context, listen: false)
                         .isBlockedByMe() ||
-                    Provider.of<PostCardController>(context, listen: false)
+                    prov.Provider.of<PostCardController>(context, listen: false)
                         .blocksMe())
                 ? const SizedBox.shrink()
                 : Padding(
@@ -151,11 +151,11 @@ class PostCard extends StatelessWidget {
                     child: InkWell(
                       onTap: () => (!isPreview &&
                               !isPostPage &&
-                              Provider.of<PostCardController>(context,
+                              prov.Provider.of<PostCardController>(context,
                                       listen: false)
                                   .isLoggedIn())
                           ? context
-                              .push("/feed/post/${post.postId}", extra: post)
+                              .push('/feed/post/${post.postId}', extra: post)
                               .then((v) async {})
                           : null,
                       child: Column(
@@ -166,10 +166,11 @@ class PostCard extends StatelessWidget {
                               padding:
                                   EdgeInsets.only(left: width * 0.115 + 20),
                               child: InkWell(
-                                onTap: () => Provider.of<PostCardController>(
-                                        context,
-                                        listen: false)
-                                    .groupBannerPressed(),
+                                onTap: () =>
+                                    prov.Provider.of<PostCardController>(
+                                            context,
+                                            listen: false)
+                                        .groupBannerPressed(),
                                 child: Container(
                                   padding:
                                       const EdgeInsets.only(left: 6, right: 6),
@@ -212,7 +213,8 @@ class PostCard extends StatelessWidget {
                                 // Display the profile picture as a CircleAvatar
                                 IconButton(
                                   onPressed: () {
-                                    if (Provider.of<PostCardController>(context,
+                                    if (prov.Provider.of<PostCardController>(
+                                            context,
                                             listen: false)
                                         .isLoggedIn()) {
                                       (!isPreview && !isOnProfile)
@@ -242,7 +244,7 @@ class PostCard extends StatelessWidget {
                                           Expanded(
                                             child: InkWell(
                                               onTap: () {
-                                                if (Provider.of<
+                                                if (prov.Provider.of<
                                                             PostCardController>(
                                                         context,
                                                         listen: false)
@@ -255,7 +257,7 @@ class PostCard extends StatelessWidget {
                                               child: Row(
                                                 children: [
                                                   Text(
-                                                    "@${post.author.username}",
+                                                    '@${post.author.username}',
                                                     style: TextStyle(
                                                       fontSize: 17,
                                                       color: Theme.of(context)
@@ -418,7 +420,7 @@ class PostCard extends StatelessWidget {
                               children: [
                                 SizedBox(width: width * 0.115 + 8),
                                 LikeButton(
-                                  isLiked: Provider.of<PostCardController>(
+                                  isLiked: prov.Provider.of<PostCardController>(
                                           context,
                                           listen: true)
                                       .liked,
@@ -437,11 +439,13 @@ class PostCard extends StatelessWidget {
                                     );
                                   },
                                   onTap: (isLiked) async {
-                                    if (Provider.of<PostCardController>(context,
+                                    if (prov.Provider.of<PostCardController>(
+                                            context,
                                             listen: false)
                                         .isLoggedIn()) {
                                       if (!isPreview) {
-                                        Provider.of<PostCardController>(context,
+                                        prov.Provider.of<PostCardController>(
+                                                context,
                                                 listen: false)
                                             .likePressed();
                                         return !isLiked;
@@ -468,23 +472,24 @@ class PostCard extends StatelessWidget {
                                   ),
                                 ),
                                 CountDisplay(
-                                  count: Provider.of<PostCardController>(
+                                  count: prov.Provider.of<PostCardController>(
                                           context,
                                           listen: true)
                                       .post
                                       .likes,
                                   onTap: () {
-                                    if (Provider.of<PostCardController>(context,
+                                    if (prov.Provider.of<PostCardController>(
+                                            context,
                                             listen: false)
                                         .isLoggedIn()) {
                                       context.push(
-                                          "/feed/post/${post.postId}/likes",
+                                          '/feed/post/${post.postId}/likes',
                                           extra: post.postId);
                                     }
                                   },
                                 ),
                                 LikeButton(
-                                  isLiked: Provider.of<PostCardController>(
+                                  isLiked: prov.Provider.of<PostCardController>(
                                           context,
                                           listen: true)
                                       .disliked,
@@ -503,11 +508,13 @@ class PostCard extends StatelessWidget {
                                     );
                                   },
                                   onTap: (isDisliked) async {
-                                    if (Provider.of<PostCardController>(context,
+                                    if (prov.Provider.of<PostCardController>(
+                                            context,
                                             listen: false)
                                         .isLoggedIn()) {
                                       if (!isPreview) {
-                                        Provider.of<PostCardController>(context,
+                                        prov.Provider.of<PostCardController>(
+                                                context,
                                                 listen: false)
                                             .dislikePressed();
                                         return !isDisliked;
@@ -534,17 +541,18 @@ class PostCard extends StatelessWidget {
                                   ),
                                 ),
                                 CountDisplay(
-                                  count: Provider.of<PostCardController>(
+                                  count: prov.Provider.of<PostCardController>(
                                           context,
                                           listen: true)
                                       .post
                                       .dislikes,
                                   onTap: () {
-                                    if (Provider.of<PostCardController>(context,
+                                    if (prov.Provider.of<PostCardController>(
+                                            context,
                                             listen: false)
                                         .isLoggedIn()) {
                                       context.push(
-                                          "/feed/post/${post.postId}/dislikes",
+                                          '/feed/post/${post.postId}/dislikes',
                                           extra: post.postId);
                                     }
                                   },
@@ -554,15 +562,17 @@ class PostCard extends StatelessWidget {
                                 ),
                                 InkWell(
                                   onTap: () {
-                                    if (Provider.of<PostCardController>(context,
+                                    if (prov.Provider.of<PostCardController>(
+                                            context,
                                             listen: false)
                                         .isLoggedIn()) {
                                       if (!isPreview && !isPostPage) {
                                         context
-                                            .push("/feed/post/${post.postId}",
+                                            .push('/feed/post/${post.postId}',
                                                 extra: post)
                                             .then((v) async {
-                                          Provider.of<PaginationController>(
+                                          prov.Provider.of<
+                                                      PaginationController>(
                                                   context,
                                                   listen: false)
                                               .rebuildFunction();
@@ -580,21 +590,23 @@ class PostCard extends StatelessWidget {
                                   width: 3,
                                 ),
                                 CountDisplay(
-                                  count: Provider.of<PostCardController>(
+                                  count: prov.Provider.of<PostCardController>(
                                           context,
                                           listen: true)
                                       .post
                                       .commentCount,
                                   onTap: () {
-                                    if (Provider.of<PostCardController>(context,
+                                    if (prov.Provider.of<PostCardController>(
+                                            context,
                                             listen: false)
                                         .isLoggedIn()) {
                                       if (!isPreview && !isPostPage) {
                                         context
-                                            .push("/feed/post/${post.postId}",
+                                            .push('/feed/post/${post.postId}',
                                                 extra: post)
                                             .then((v) async {
-                                          Provider.of<PaginationController>(
+                                          prov.Provider.of<
+                                                      PaginationController>(
                                                   context,
                                                   listen: false)
                                               .rebuildFunction();
@@ -606,12 +618,14 @@ class PostCard extends StatelessWidget {
                                 const SizedBox(width: 5),
                                 InkWell(
                                   onTap: () {
-                                    if (Provider.of<PostCardController>(context,
+                                    if (prov.Provider.of<PostCardController>(
+                                            context,
                                             listen: false)
                                         .isLoggedIn()) {
                                       isPreview
                                           ? null
-                                          : Provider.of<PostCardController>(
+                                          : prov.Provider.of<
+                                                      PostCardController>(
                                                   context,
                                                   listen: false)
                                               .sharePressed();

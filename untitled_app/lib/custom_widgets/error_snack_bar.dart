@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../utilities/constants.dart' as c;
 
 showSnackBar(
-    {String text = "", int time = 1500, required BuildContext context}) {
+    {String text = '', int time = 1500, required BuildContext context}) {
   final width = c.widthGetter(context);
   //final height = MediaQuery.sizeOf(context).height;
   ScaffoldMessenger.of(context).showSnackBar(

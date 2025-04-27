@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:provider/provider.dart' as prov;
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'controllers/pagination_controller.dart';
 import 'package:untitled_app/models/feed_post_cache.dart' show Cache;
-import 'loading_spinner.dart';
+import 'package:untitled_app/widgets/loading_spinner.dart';
 
 class _DefaultInitialLoader extends StatelessWidget {
   const _DefaultInitialLoader();
@@ -51,7 +51,7 @@ class PaginationPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider.value(
+    return prov.ChangeNotifierProvider.value(
       value: PaginationController(
         //hasAppbar: (appbar != null),
         externalData: externalData,
@@ -65,17 +65,19 @@ class PaginationPage extends StatelessWidget {
           child: CustomScrollView(
             shrinkWrap: shrinkWrap,
             keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-            physics: ((!Provider.of<PaginationController>(context, listen: true)
-                        .data
-                        .end) &&
-                    Provider.of<PaginationController>(context, listen: true)
-                        .data
-                        .items
-                        .isEmpty)
-                ? const NeverScrollableScrollPhysics()
-                : const AlwaysScrollableScrollPhysics(),
+            physics:
+                ((!prov.Provider.of<PaginationController>(context, listen: true)
+                            .data
+                            .end) &&
+                        prov.Provider.of<PaginationController>(context,
+                                listen: true)
+                            .data
+                            .items
+                            .isEmpty)
+                    ? const NeverScrollableScrollPhysics()
+                    : const AlwaysScrollableScrollPhysics(),
             controller:
-                Provider.of<PaginationController>(context, listen: false)
+                prov.Provider.of<PaginationController>(context, listen: false)
                     .scrollController,
             slivers: [
               if (appbar != null) appbar!,
@@ -85,68 +87,69 @@ class PaginationPage extends StatelessWidget {
               //   floating: true,
               //   pinned: false,
               // ),
-              // if ((!Provider.of<PaginationController>(context, listen: true)
+              // if ((!prov.Provider.of<PaginationController>(context, listen: true)
               //         .data
               //         .end) &&
-              //     Provider.of<PaginationController>(context, listen: true)
+              //     prov.Provider.of<PaginationController>(context, listen: true)
               //         .data
               //         .items
               //         .isEmpty)
               //   SizedBox()
               // else
               SliverList.builder(
-                itemCount:
-                    Provider.of<PaginationController>(context, listen: true)
-                            .data
-                            .items
-                            .length +
-                        2,
+                itemCount: prov.Provider.of<PaginationController>(context,
+                            listen: true)
+                        .data
+                        .items
+                        .length +
+                    2,
                 itemBuilder: (BuildContext context, int index) {
                   if (index == 0) {
                     //build header
                     return header ?? const SizedBox();
-                  } else if (Provider.of<PaginationController>(context, listen: true)
+                  } else if (prov.Provider.of<PaginationController>(context, listen: true)
                           .data
                           .items
                           .isNotEmpty &&
                       index <
-                          Provider.of<PaginationController>(context, listen: true)
+                          prov.Provider.of<PaginationController>(context, listen: true)
                                   .data
                                   .items
                                   .length +
                               1) {
                     //normal case put cards
-                    return card(
-                        Provider.of<PaginationController>(context, listen: true)
-                            .data
-                            .items[index - 1]);
-                  } else if (Provider.of<PaginationController>(context, listen: true)
+                    return card(prov.Provider.of<PaginationController>(context,
+                            listen: true)
+                        .data
+                        .items[index - 1]);
+                  } else if (prov.Provider.of<PaginationController>(context, listen: true)
                           .data
                           .end &&
-                      Provider.of<PaginationController>(context, listen: true)
+                      prov.Provider.of<PaginationController>(context, listen: true)
                           .data
                           .items
                           .isEmpty) {
                     //what to return if dataset is empty
                     return emptySetNotice ??
-                        Padding(padding: EdgeInsets.all(10),child: Center(
-                            child: Text(AppLocalizations.of(context)!
-                                .nothingToSeeHere)));
-                  } else if ((!Provider.of<PaginationController>(context,
-                              listen: true)
+                        Padding(
+                            padding: EdgeInsets.all(10),
+                            child: Center(
+                                child: Text(AppLocalizations.of(context)!
+                                    .nothingToSeeHere)));
+                  } else if ((!prov.Provider.of<PaginationController>(context, listen: true)
                           .data
                           .end) &&
-                      Provider.of<PaginationController>(context, listen: true)
+                      prov.Provider.of<PaginationController>(context, listen: true)
                           .data
                           .items
                           .isEmpty) {
                     //what to return if dataset is under initial load sequence
                     return initialLoadingWidget ??
                         const _DefaultInitialLoader();
-                  } else if (Provider.of<PaginationController>(context, listen: true)
+                  } else if (prov.Provider.of<PaginationController>(context, listen: true)
                           .data
                           .end &&
-                      Provider.of<PaginationController>(context, listen: true)
+                      prov.Provider.of<PaginationController>(context, listen: true)
                           .data
                           .items
                           .isNotEmpty) {
@@ -167,7 +170,7 @@ class PaginationPage extends StatelessWidget {
             ],
           ),
           onRefresh: () =>
-              Provider.of<PaginationController>(context, listen: false)
+              prov.Provider.of<PaginationController>(context, listen: false)
                   .onRefresh(),
         );
       },
