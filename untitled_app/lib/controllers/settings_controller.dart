@@ -52,15 +52,6 @@ class SettingsController extends ChangeNotifier {
   }
 
   toggleActivityNotification(value) async {
-    // final notification =
-    //     prov.Provider.of<NotificationProvider>(context, listen: false);
-    // notification.notificationEnabled = value;
-    // notifyListeners();
-    // if (value) {
-    //   await FirebaseHelper.subscribeToTopic('new_post');
-    // } else {
-    //   await FirebaseHelper.unsubscribeFromTopic('new_post');
-    // }
     setActivityNotification(value);
     if (value) {
       locator<CurrentUser>().addFCM();
