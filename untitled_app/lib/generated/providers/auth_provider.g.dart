@@ -1,12 +1,12 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of '../../riverpod_providers/auth_provider.dart';
+part of '../../providers/auth_provider.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$authHash() => r'b5294aeb70454c69e8ea931fbd7dd0ec966fa44a';
+String _$authHash() => r'd61083021cdf309faeec3d843f989f04a5e1902c';
 
 /// See also [Auth].
 @ProviderFor(Auth)

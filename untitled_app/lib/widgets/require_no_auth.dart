@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:untitled_app/riverpod_providers/auth_provider.dart';
+import 'package:untitled_app/providers/auth_provider.dart';
 import 'package:untitled_app/widgets/loading_spinner.dart';
 
 class RequireNoAuth extends ConsumerWidget {
