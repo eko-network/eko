@@ -1,0 +1,52 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:untitled_app/types/current_user.dart';
+part '../generated/types/user.freezed.dart';
+part '../generated/types/user.g.dart';
+
+@freezed
+abstract class UserModel with _$UserModel {
+  @JsonSerializable(explicitToJson: true)
+  const factory UserModel({
+    required String name,
+    required String username,
+    required String profilePicture,
+    required String bio,
+    required List<String> followers,
+    required List<String> following,
+    required String uid,
+    required bool isVerified,
+  }) = _UserModel;
+
+  factory UserModel.userNotFound() {
+    return UserModel(
+      isVerified: false,
+      username: '',
+      name: '',
+      profilePicture:
+          'https://firebasestorage.googleapis.com/v0/b/untitled-2832f.appspot.com/o/profile_pictures%2Fdefault%2Fprofile.jpg?alt=media&token=2543c4eb-f991-468f-9ce8-68c576ffca7c',
+      bio: '',
+      followers: [],
+      following: [],
+      uid: '',
+    );
+  }
+
+  factory UserModel.fromCurrent(CurrentUserModel cur) {
+    return cur.user;
+  }
+
+  factory UserModel.fromJson(Map<String, dynamic>? json) {
+    if (json == null) return UserModel.userNotFound();
+    final profileData = json['profileData'] ?? {};
+    return UserModel(
+      name: profileData['name'] ?? '',
+      username: json['username'] ?? '',
+      profilePicture: profileData['profilePicture'] ?? '',
+      bio: profileData['bio'] ?? '',
+      followers: List<String>.from(profileData['followers'] ?? []),
+      following: List<String>.from(profileData['following'] ?? []),
+      uid: json['uid'] ?? '',
+      isVerified: json['isVerified'] ?? false,
+    );
+  }
+}

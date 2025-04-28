@@ -1,24 +1,25 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of '../../providers/auth_provider.dart';
+part of '../../providers/current_user_provider.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$authHash() => r'26310bbed80c796555a5b9b08304f7ecbd2f7101';
+String _$currentUserHash() => r'f8620ab1ce1da5b1a7104a7633ed53fa5053213f';
 
-/// See also [Auth].
-@ProviderFor(Auth)
-final authProvider = NotifierProvider<Auth, AuthModel>.internal(
-  Auth.new,
-  name: r'authProvider',
+/// See also [CurrentUser].
+@ProviderFor(CurrentUser)
+final currentUserProvider =
+    NotifierProvider<CurrentUser, CurrentUserModel?>.internal(
+  CurrentUser.new,
+  name: r'currentUserProvider',
   debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$authHash,
+      const bool.fromEnvironment('dart.vm.product') ? null : _$currentUserHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$Auth = Notifier<AuthModel>;
+typedef _$CurrentUser = Notifier<CurrentUserModel?>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

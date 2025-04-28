@@ -117,15 +117,16 @@ class EditProfileController extends ChangeNotifier {
     if (locator<CurrentUser>().bio != bioController.text) {
       await _saveBioData(bioController.text);
     }
-    if (locator<CurrentUser>().username != usernameController.text.trim()) {
-      if (await locator<CurrentUser>()
-          .isUsernameAvailable(usernameController.text.trim())) {
-        await _saveUsernameData(usernameController.text.trim());
-      } else {
-        shouldPop = false;
-        usernameTakenDialog();
-      }
-    }
+    //TODO
+    // if (locator<CurrentUser>().username != usernameController.text.trim()) {
+    //   if (await locator<CurrentUser>()
+    //       .isUsernameAvailable(usernameController.text.trim())) {
+    //     await _saveUsernameData(usernameController.text.trim());
+    //   } else {
+    //     shouldPop = false;
+    //     usernameTakenDialog();
+    //   }
+    // }
     if (newProfileImage != null) {
       _showLoadingDialog();
       await locator<CurrentUser>().uploadProfilePicture(newProfileImage!);
@@ -204,16 +205,17 @@ class EditProfileController extends ChangeNotifier {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
     _debounce =
         Timer(const Duration(milliseconds: c.searchPageDebounce), () async {
-      if (s != '') {
-        if (s == locator<CurrentUser>().username) {
-          availableUsername = true;
-        } else {
-          availableUsername = await locator<CurrentUser>()
-              .isUsernameAvailable(usernameController.text.trim());
-        }
-        isChecking = false;
-        notifyListeners();
-      }
+      //TODO
+      // if (s != '') {
+      //   if (s == locator<CurrentUser>().username) {
+      //     availableUsername = true;
+      //   } else {
+      //     availableUsername = await locator<CurrentUser>()
+      //         .isUsernameAvailable(usernameController.text.trim());
+      //   }
+      //   isChecking = false;
+      //   notifyListeners();
+      // }
     });
     if (locator<CurrentUser>().username != usernameController.text.trim() &&
         validUsername == true) {
