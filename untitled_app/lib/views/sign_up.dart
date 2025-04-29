@@ -1,16 +1,23 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart' as prov;
 import 'package:untitled_app/controllers/sign_up_controller.dart';
+import 'package:untitled_app/custom_widgets/warning_dialog.dart';
+import 'package:untitled_app/interfaces/user.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
+import 'package:untitled_app/providers/auth_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../custom_widgets/login_text_feild.dart';
 import '../utilities/constants.dart' as c;
 import '../custom_widgets/download_button_if_web.dart';
 
 class _BackButton extends StatelessWidget {
-  const _BackButton();
+  final PageController pageController;
+  const _BackButton({required this.pageController});
 
   @override
   Widget build(BuildContext context) {
@@ -19,26 +26,188 @@ class _BackButton extends StatelessWidget {
         children: [
           Icon(Icons.arrow_back_ios_rounded,
               color: Theme.of(context).colorScheme.onSurface),
-          prov.Consumer<SignUpController>(
-            builder: (context, signUpController, _) => Text(
-              AppLocalizations.of(context)!.previous,
-              style: TextStyle(
-                fontWeight: FontWeight.normal,
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
+          Text(
+            AppLocalizations.of(context)!.previous,
+            style: TextStyle(
+              fontWeight: FontWeight.normal,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
-          )
+          ),
         ],
       ),
-      onPressed: () =>
-          prov.Provider.of<SignUpController>(context, listen: false)
-              .backPressed(),
+      onPressed: () async {
+        if (pageController.page != 0.0) {
+          await pageController.previousPage(
+              duration: const Duration(milliseconds: c.signUpAnimationDuration),
+              curve: Curves.decelerate);
+        } else {
+          showMyDialog(
+              AppLocalizations.of(context)!.exitCreateAccountTitle,
+              AppLocalizations.of(context)!.exitCreateAccountBody,
+              [
+                AppLocalizations.of(context)!.goBack,
+                AppLocalizations.of(context)!.stay
+              ],
+              [
+                () {
+                  context.pop();
+                  context.go('/');
+                },
+                context.pop
+              ],
+              context);
+        }
+      },
     );
   }
 }
 
-class SignUp extends StatelessWidget {
+class SignUp extends ConsumerStatefulWidget {
   const SignUp({super.key});
+
+  @override
+  ConsumerState<SignUp> createState() => _SignUpState();
+}
+
+class _SignUpState extends ConsumerState<SignUp> {
+  final pageController = PageController();
+  final passwordController = TextEditingController();
+  final passwordConfirmController = TextEditingController();
+  final emailController = TextEditingController();
+  final usernameController = TextEditingController();
+  final nameController = TextEditingController();
+  final passwordFocus = FocusNode();
+  final usernameFocus = FocusNode();
+
+  bool isLoading = false;
+  bool goodPassword = false;
+
+  @override
+  void dispose() {
+    pageController.dispose();
+    pageController.dispose();
+    passwordController.dispose();
+    passwordConfirmController.dispose();
+    emailController.dispose();
+    usernameController.dispose();
+    usernameFocus.dispose();
+    nameController.dispose();
+    passwordFocus.dispose();
+    super.dispose();
+  }
+
+  bool _handleError(String errorCode) {
+    switch (errorCode) {
+      case 'success':
+        return true;
+      case 'username-taken':
+        showMyDialog(
+            AppLocalizations.of(context)!.usernameTakenTitle,
+            AppLocalizations.of(context)!.usernameTakenBody,
+            [AppLocalizations.of(context)!.goBack],
+            [
+              () async {
+                context.pop();
+
+                if (pageController.page != 0.0) {
+                  await pageController.previousPage(
+                      duration: const Duration(
+                          milliseconds: c.signUpAnimationDuration),
+                      curve: Curves.decelerate);
+                } else {
+                  showMyDialog(
+                      AppLocalizations.of(context)!.exitCreateAccountTitle,
+                      AppLocalizations.of(context)!.exitCreateAccountBody,
+                      [
+                        AppLocalizations.of(context)!.goBack,
+                        AppLocalizations.of(context)!.stay
+                      ],
+                      [
+                        () {
+                          context.pop();
+                          context.go('/');
+                        },
+                        context.pop
+                      ],
+                      context);
+                }
+                usernameFocus.requestFocus();
+              }
+            ],
+            context);
+        break;
+      case 'invalid-email':
+        showMyDialog(
+            AppLocalizations.of(context)!.invalidEmailTittle,
+            AppLocalizations.of(context)!.invalidEmailBody,
+            [AppLocalizations.of(context)!.tryAgain],
+            [context.pop],
+            context);
+        break;
+      case 'weak-password':
+        showMyDialog(
+            AppLocalizations.of(context)!.weakPasswordTitle,
+            AppLocalizations.of(context)!.weakPasswordBody,
+            [AppLocalizations.of(context)!.tryAgain],
+            [context.pop],
+            context);
+        break;
+      case 'email-already-in-use':
+        showMyDialog(
+            AppLocalizations.of(context)!.emailAlreadyInUseTitle,
+            AppLocalizations.of(context)!.emailAlreadyInUseBody,
+            [
+              AppLocalizations.of(context)!.logIn,
+              AppLocalizations.of(context)!.tryAgain
+            ],
+            [
+              () {
+                context.pop();
+                context.go('/');
+              },
+              context.pop
+            ],
+            context);
+        break;
+      default:
+        showMyDialog(
+            AppLocalizations.of(context)!.defaultErrorTittle,
+            AppLocalizations.of(context)!.defaultErrorBody,
+            [AppLocalizations.of(context)!.tryAgain],
+            [context.pop],
+            context);
+        break;
+    }
+    return false;
+  }
+
+  void signUpPressed() async {
+    if (passwordController.text == '') {
+      passwordFocus.requestFocus();
+    } else {
+      if (goodPassword ||
+          (passwordController.text == 'password' && kDebugMode)) {
+        setState(() {
+          isLoading = true;
+        });
+        if (await isUsernameAvailable(usernameController.text.trim())) {
+          if (_handleError(await ref.read(authProvider.notifier).signUp(
+              email: emailController.text.trim(),
+              password: passwordController.text))) {
+                //FIXME SIGNUP BROKEN
+            // locator<CurrentUser>().addUserDataToFirestore();
+          }
+        } else {
+          _handleError('username-taken');
+        }
+        setState(() {
+          isLoading = true;
+        });
+      } else {
+        _handleError('weak-password');
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,9 +215,7 @@ class SignUp extends StatelessWidget {
       create: (context) => SignUpController(context: context),
       builder: (context, child) {
         return GestureDetector(
-          onTap: () =>
-              prov.Provider.of<SignUpController>(context, listen: false)
-                  .hideKeyboard(),
+          onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
           child: Scaffold(
             floatingActionButton: downloadButtonIfWeb(),
             body: Center(
@@ -59,9 +226,13 @@ class SignUp extends StatelessWidget {
                   controller:
                       prov.Provider.of<SignUpController>(context, listen: false)
                           .pageController,
-                  children: const <Widget>[
-                    GetInfo(),
-                    GetPassword(),
+                  children: <Widget>[
+                    GetInfo(
+                      pageController: pageController,
+                    ),
+                    GetPassword(
+                      pageController: pageController,
+                    ),
                     Placeholder(), //FIXME for some reson this stops everything from breaking
                   ],
                 ),
@@ -75,7 +246,8 @@ class SignUp extends StatelessWidget {
 }
 
 class GetInfo extends StatelessWidget {
-  const GetInfo({super.key});
+  final PageController pageController;
+  const GetInfo({super.key, required this.pageController});
 
   @override
   Widget build(BuildContext context) {
@@ -89,7 +261,9 @@ class GetInfo extends StatelessWidget {
         child: ListView(
           keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           children: [
-            const _BackButton(),
+            _BackButton(
+              pageController: pageController,
+            ),
             SizedBox(
               height: height * 0.02,
             ),
@@ -201,9 +375,6 @@ class GetInfo extends StatelessWidget {
                   )
                 ],
               ),
-
-            // ElevatedButton(onPressed:()=> prov.Provider.of<SignUpController>(context, listen: false)
-            //       .isUsernameAvailable(), child: Text("check")),
             SizedBox(height: height * c.loginPadding),
             CustomInputFeild(
               label: AppLocalizations.of(context)!.email,
@@ -283,9 +454,6 @@ class GetInfo extends StatelessWidget {
                       children: [
                         Text(AppLocalizations.of(context)!.year),
                         CustomInputFeild(
-                          // validator: AutovalidateMode.always,
-                          // validatorFunction: prov.Provider.of<SignUpController>(context,
-                          //         listen: false).validateYear,
                           filter: r'[0-9]*',
                           showCounter: false,
                           maxLen: 4,
@@ -334,21 +502,6 @@ class GetInfo extends StatelessWidget {
             SizedBox(
               height: height * 0.08,
             ),
-            // CustomInputFeild(
-            //   focus: prov.Provider.of<SignUpController>(context, listen: false)
-            //       .dobFocus,
-            //   onEditingComplete: () =>
-            //       prov.Provider.of<SignUpController>(context, listen: false)
-            //           .keyboardGoToNextPage(),
-            //   label: AppLocalizations.of(context)!.dateOfBirth,
-            //   controller: prov.Provider.of<SignUpController>(context, listen: false)
-            //       .dobController,
-            //   textInputAction: TextInputAction.send,
-            //   inputType: TextInputType.datetime,
-            // ),
-            // SizedBox(
-            //   height: height * 0.1,
-            // ),
             SizedBox(
               width: width * 0.9,
               height: width * 0.15,
@@ -377,7 +530,8 @@ class GetInfo extends StatelessWidget {
 }
 
 class GetPassword extends StatelessWidget {
-  const GetPassword({super.key});
+  final PageController pageController;
+  const GetPassword({super.key, required this.pageController});
 
   @override
   Widget build(BuildContext context) {
@@ -390,7 +544,9 @@ class GetPassword extends StatelessWidget {
         child: ListView(
           keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           children: [
-            const _BackButton(),
+            _BackButton(
+              pageController: pageController,
+            ),
             SizedBox(
                 height: height * .1,
                 child: Align(
@@ -458,12 +614,12 @@ class GetPassword extends StatelessWidget {
               alignment: Alignment.centerLeft,
               child: prov.Consumer<SignUpController>(
                 builder: (context, signUpController, _) => Text(
-                  "${signUpController.passed[0]}${AppLocalizations.of(context)!.passwordLen}\n"
-                  "${signUpController.passed[1]}${AppLocalizations.of(context)!.passwordLower}\n"
-                  "${signUpController.passed[2]}${AppLocalizations.of(context)!.passwordUpper}\n"
-                  "${signUpController.passed[3]}${AppLocalizations.of(context)!.passwordNumber}\n"
-                  "${signUpController.passed[4]}${AppLocalizations.of(context)!.passwordSpecial}\n"
-                  "${signUpController.passed[5]}${AppLocalizations.of(context)!.passwordMatch}\n",
+                  '${signUpController.passed[0]}${AppLocalizations.of(context)!.passwordLen}\n'
+                  '${signUpController.passed[1]}${AppLocalizations.of(context)!.passwordLower}\n'
+                  '${signUpController.passed[2]}${AppLocalizations.of(context)!.passwordUpper}\n'
+                  '${signUpController.passed[3]}${AppLocalizations.of(context)!.passwordNumber}\n'
+                  '${signUpController.passed[4]}${AppLocalizations.of(context)!.passwordSpecial}\n'
+                  '${signUpController.passed[5]}${AppLocalizations.of(context)!.passwordMatch}\n',
                   style: const TextStyle(fontSize: 16),
                 ),
               ),

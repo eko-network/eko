@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:untitled_app/custom_widgets/download_button_if_web.dart';
 import 'package:untitled_app/custom_widgets/warning_dialog.dart';
+import 'package:untitled_app/interfaces/user.dart' as user;
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:untitled_app/providers/auth_provider.dart';
 import '../custom_widgets/login_text_feild.dart';
@@ -99,10 +100,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       if (handleError(await ref.read(authProvider.notifier).signIn(
               email: emailController.text.trim(),
               password: passwordController.text)) ==
-          0) {
-        // This probably doesn't work with how auth is. replacement for: locator<CurrentUser>().addFCM();
-        ref.read(authProvider.notifier).addFCM();
-      }
+          0) {}
       setState(() {
         isLoading = false;
       });
@@ -134,11 +132,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               child: Text(AppLocalizations.of(context)!.sendResetLink),
               onPressed: () async {
                 context.pop();
-                if (handleError(await ref
-                        .read(authProvider.notifier)
-                        .forgotPassword(
-                            countryCode: countryCode,
-                            email: emailController.text.trim())) ==
+                if (handleError(await user.forgotPassword(
+                        countryCode: countryCode,
+                        email: emailController.text.trim())) ==
                     0) {
                   if (context.mounted) {
                     showMyDialog(

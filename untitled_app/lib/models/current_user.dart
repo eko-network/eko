@@ -54,8 +54,6 @@ class CurrentUser extends AppUser {
           .collection('users')
           .where('blockedUsers', arrayContains: user)
           .get();
-      //blockedUsers.add(blockedUid);
-
       stateIsFollowing = false;
       return querySnapshot.docs.map((doc) => doc.id).toList();
     } catch (e) {
@@ -180,7 +178,6 @@ class CurrentUser extends AppUser {
       blockedBy = await getPeopleWhoBlockedMe();
       pollVotes =
           Map<String, int>.from(userData['profileData']['pollVotes'] ?? {});
-      // print(blockedBy);
       if (fcmTokens == null) {
         addFCM();
       } else if (await getActivityNotification()) {
@@ -603,19 +600,6 @@ class CurrentUser extends AppUser {
       return 'success';
     } catch (e) {
       return 'fail';
-    }
-  }
-
-  Future<bool> isUsernameAvailable(String username) async {
-    final querySnapshot = await FirebaseFirestore.instance
-        .collection('users')
-        .where('username', isEqualTo: username)
-        .get();
-
-    if (querySnapshot.docs.isEmpty) {
-      return true;
-    } else {
-      return false;
     }
   }
 
