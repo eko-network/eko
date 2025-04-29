@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:provider/provider.dart' as prov;
-import 'controllers/login_text_feild_controller.dart';
 import '../utilities/constants.dart' as c;
 
-class CustomInputFeild extends StatelessWidget {
+class CustomInputField extends StatefulWidget {
   final int? maxLen;
   final String? label;
   final TextEditingController controller;
@@ -23,7 +21,7 @@ class CustomInputFeild extends StatelessWidget {
 
   final void Function(String)? onChanged;
   final void Function()? onEditingComplete;
-  const CustomInputFeild(
+  const CustomInputField(
       {this.label,
       required this.controller,
       this.onChanged,
@@ -44,88 +42,81 @@ class CustomInputFeild extends StatelessWidget {
       super.key});
 
   @override
+  State<CustomInputField> createState() => _CustomInputField();
+}
+
+class _CustomInputField extends State<CustomInputField> {
+  @override
   Widget build(BuildContext context) {
     double feildWidth;
+    bool hidden = widget.password;
 
-    if (width == null) {
+    if (widget.width == null) {
       feildWidth = c.widthGetter(context) * 0.9;
     } else {
-      feildWidth = width!;
+      feildWidth = widget.width!;
     }
-    return prov.ChangeNotifierProvider(
-        create: (context) => LoginFieldController(password: password),
-        builder: (context, child) {
-          return Container(
-            alignment: Alignment.bottomCenter,
-            padding: padding
-                ? const EdgeInsets.only(top: 10, bottom: 10)
-                : const EdgeInsets.only(),
-            width: feildWidth,
-            height: height,
-            child: TextFormField(
-              maxLength: maxLen,
-              cursorColor: Theme.of(context).colorScheme.onSurface,
-              obscureText:
-                  prov.Provider.of<LoginFieldController>(context, listen: true)
-                      .hidden,
+    return Container(
+      alignment: Alignment.bottomCenter,
+      padding: widget.padding
+          ? const EdgeInsets.only(top: 10, bottom: 10)
+          : const EdgeInsets.only(),
+      width: feildWidth,
+      height: widget.height,
+      child: TextFormField(
+        maxLength: widget.maxLen,
+        cursorColor: Theme.of(context).colorScheme.onSurface,
+        obscureText: hidden,
 
-              enabled: enabled,
-              inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp(filter)),
-              ],
-              textInputAction: textInputAction,
-              autovalidateMode: validator,
-              validator: validatorFunction,
-              controller: controller,
-              focusNode: focus,
-              onChanged: onChanged,
-              onEditingComplete: onEditingComplete,
-              //autofocus: true,
-              keyboardType: inputType,
-              style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.normal,
-                  color: Theme.of(context).colorScheme.onSurface),
-              decoration: InputDecoration(
-                counterText: showCounter ? null : '',
-                labelText: label,
-                labelStyle: TextStyle(
-                  fontSize: 18,
-                  letterSpacing: 1,
-                  fontWeight: FontWeight.normal,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-                fillColor: Theme.of(context)
-                    .colorScheme
-                    .onSurface
-                    .withValues(alpha: 0.2),
-                filled: true,
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(
-                      color: Theme.of(context).colorScheme.outlineVariant),
-                  borderRadius: BorderRadius.circular(10.0),
-                ),
-                focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                    borderSide: BorderSide(
-                        color: Theme.of(context).colorScheme.onSurface)),
-                suffixIcon: password
-                    ? IconButton(
-                        icon: Icon(prov.Provider.of<LoginFieldController>(
-                                    context,
-                                    listen: true)
-                                .hidden
-                            ? Icons.visibility_off
-                            : Icons.visibility),
-                        onPressed: () => prov.Provider.of<LoginFieldController>(
-                                context,
-                                listen: false)
-                            .bottonPressed(),
-                      )
-                    : null,
-              ),
-            ),
-          );
-        });
+        enabled: widget.enabled,
+        inputFormatters: [
+          FilteringTextInputFormatter.allow(RegExp(widget.filter)),
+        ],
+        textInputAction: widget.textInputAction,
+        autovalidateMode: widget.validator,
+        validator: widget.validatorFunction,
+        controller: widget.controller,
+        focusNode: widget.focus,
+        onChanged: widget.onChanged,
+        onEditingComplete: widget.onEditingComplete,
+        //autofocus: true,
+        keyboardType: widget.inputType,
+        style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.normal,
+            color: Theme.of(context).colorScheme.onSurface),
+        decoration: InputDecoration(
+          counterText: widget.showCounter ? null : '',
+          labelText: widget.label,
+          labelStyle: TextStyle(
+            fontSize: 18,
+            letterSpacing: 1,
+            fontWeight: FontWeight.normal,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
+          fillColor:
+              Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
+          filled: true,
+          enabledBorder: OutlineInputBorder(
+            borderSide:
+                BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.0),
+              borderSide:
+                  BorderSide(color: Theme.of(context).colorScheme.onSurface)),
+          suffixIcon: widget.password
+              ? IconButton(
+                  icon: Icon(hidden ? Icons.visibility_off : Icons.visibility),
+                  onPressed: () {
+                    setState(() {
+                      hidden = !hidden;
+                    });
+                  })
+              : null,
+        ),
+      ),
+    );
   }
 }

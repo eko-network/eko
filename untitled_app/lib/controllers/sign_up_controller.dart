@@ -291,8 +291,9 @@ class SignUpController extends ChangeNotifier {
     _debounce =
         Timer(const Duration(milliseconds: c.searchPageDebounce), () async {
       if (s != '') {
-        availableUsername = await locator<CurrentUser>()
-            .isUsernameAvailable(usernameController.text.trim());
+        // TODO
+        // availableUsername = await locator<CurrentUser>()
+        //     .isUsernameAvailable(usernameController.text.trim());
 
         isChecking = false;
         notifyListeners();
@@ -314,15 +315,16 @@ class SignUpController extends ChangeNotifier {
         locator<CurrentUser>().username = usernameController.text.trim();
         locator<CurrentUser>().name = nameController.text.trim();
 
-        if (await locator<CurrentUser>()
-            .isUsernameAvailable(usernameController.text.trim())) {
-          if (_handleError(
-              await locator<CurrentUser>().signUp(passwordController.text))) {
-            locator<CurrentUser>().addUserDataToFirestore();
-          }
-        } else {
-          _handleError('username-taken');
-        }
+//TODO
+        // if (await locator<CurrentUser>()
+        //     .isUsernameAvailable(usernameController.text.trim())) {
+        //   if (_handleError(
+        //       await locator<CurrentUser>().signUp(passwordController.text))) {
+        //     locator<CurrentUser>().addUserDataToFirestore();
+        //   }
+        // } else {
+        //   _handleError('username-taken');
+        // }
 
         loggingIn = false;
         notifyListeners();
