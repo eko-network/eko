@@ -5,8 +5,8 @@ import '../models/group_handler.dart';
 import '../custom_widgets/time_stamp.dart';
 import '../utilities/constants.dart' as c;
 import '../utilities/locator.dart';
-import 'package:provider/provider.dart' as prov;
-import '../controllers/groups_page_controller.dart';
+// import 'package:provider/provider.dart' as prov;
+// import '../controllers/groups_page_controller.dart';
 
 Widget groupCardBuilder(dynamic group) {
   return GroupCard(
@@ -14,30 +14,47 @@ Widget groupCardBuilder(dynamic group) {
   );
 }
 
-class GroupCard extends StatelessWidget {
+class GroupCard extends StatefulWidget {
   final Group group;
   final void Function(Group)? onPressedSearched;
   const GroupCard({super.key, required this.group, this.onPressedSearched});
 
   @override
+  State<GroupCard> createState() => _GroupCardState();
+}
+
+class _GroupCardState extends State<GroupCard> {
+  late bool unseen;
+
+  @override
+  void initState() {
+    super.initState();
+    _updateUnseenStatus();
+  }
+
+  void _updateUnseenStatus() {
+    String currentUserId = locator<CurrentUser>().uid;
+    unseen = widget.group.notSeen.contains(currentUserId);
+  }
+
+  @override
   Widget build(BuildContext context) {
     final double width = c.widthGetter(context);
-    String currentUserId = locator<CurrentUser>().uid;
-    bool unseen = group.notSeen.contains(currentUserId);
 
     return InkWell(
         onTap: () async {
-          if (onPressedSearched == null) {
-            context.push('/groups/sub_group/${group.id}', extra: group).then(
-                (value) => unseen
-                    ? prov.Provider.of<GroupsPageController>(context,
-                            listen: false)
-                        .rebuild()
-                    : null);
-            await locator<CurrentUser>().setUnreadGroup(false);
+          if (widget.onPressedSearched == null) {
+            context.push('/groups/sub_group/${widget.group.id}',
+                extra: widget.group);
+            if (unseen) {
+              await locator<CurrentUser>().setUnreadGroup(false);
+              setState(() {
+                _updateUnseenStatus();
+              });
+            }
           } else {
             //if in compose page
-            onPressedSearched!(group);
+            widget.onPressedSearched!(widget.group);
           }
         },
         child: Column(
@@ -49,13 +66,13 @@ class GroupCard extends StatelessWidget {
                   SizedBox(
                     width: width * 0.05,
                   ),
-                  (group.icon != '')
+                  (widget.group.icon != '')
                       ? SizedBox(
                           width: width * 0.17,
                           height: width * 0.17,
                           child: FittedBox(
                               fit: BoxFit.contain,
-                              child: Text(group.icon,
+                              child: Text(widget.group.icon,
                                   style: TextStyle(fontSize: width * 0.15))),
                         )
                       : Container(
@@ -68,7 +85,7 @@ class GroupCard extends StatelessWidget {
                           child: FittedBox(
                             fit: BoxFit.contain,
                             child: Text(
-                              group.name[0],
+                              widget.group.name[0],
                               style: TextStyle(
                                   color: Theme.of(context).colorScheme.primary,
                                   fontSize: width * 0.15),
@@ -84,7 +101,7 @@ class GroupCard extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              group.name,
+                              widget.group.name,
                               style: TextStyle(
                                 fontSize: 17,
                                 fontWeight: unseen
@@ -93,7 +110,7 @@ class GroupCard extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              group.description,
+                              widget.group.description,
                               style: TextStyle(
                                   fontSize: 13,
                                   fontWeight: unseen
@@ -124,9 +141,9 @@ class GroupCard extends StatelessWidget {
                   SizedBox(
                     width: width * 0.02,
                   ),
-                  if (onPressedSearched == null)
+                  if (widget.onPressedSearched == null)
                     TimeStamp(
-                      time: group.lastActivity,
+                      time: widget.group.lastActivity,
                     ),
                   SizedBox(
                     width: width * 0.05,
