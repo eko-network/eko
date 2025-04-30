@@ -88,10 +88,9 @@ class EditGroupPageController extends ChangeNotifier {
     }
   }
 
-  Widget groupSearchPageBuilder(dynamic user) {
+  Widget groupSearchPageBuilder(dynamic uid) {
     return UserCard(
-      user: user,
-      initialBool: isUserSelected(user),
+      uid: uid,
       groupSearch: true,
       adder: addRemovePersonToList,
     );
@@ -132,7 +131,7 @@ class EditGroupPageController extends ChangeNotifier {
     return false;
   }
 
-  void addRemovePersonToList(AppUser user, bool add) {
+  void addRemovePersonToList(dynamic user, bool add) {
     if (add) {
       selectedPeople.add(user);
       addedMembers.add(user);
@@ -194,7 +193,7 @@ class EditGroupPageController extends ChangeNotifier {
     context.pop();
   }
 
-   void _popDialog() {
+  void _popDialog() {
     Navigator.of(context, rootNavigator: true).pop();
   }
 

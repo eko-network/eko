@@ -1,6 +1,8 @@
 import 'package:untitled_app/custom_widgets/post_card.dart';
 import 'package:untitled_app/models/post_handler.dart' show Post;
+
 Map<String, PostCard> postMap = {};
+
 class Cache {
   List<dynamic> items;
   bool end;
@@ -21,7 +23,7 @@ class FeedPostCache {
     postsList = List.generate(3, (index) => Cache(items: [], end: false));
   }
 
-  void clearGroupProfileCache(){
+  void clearGroupProfileCache() {
     groupsCache = Cache(end: false, items: []);
     profileCache = Cache(end: false, items: []);
   }
@@ -57,8 +59,8 @@ class FeedPostCache {
       });
     }
     profileCache.items.removeWhere((post) {
-        post as Post;
-        return post.postId == id;
-      });
+      post as Post;
+      return post.postId == id;
+    });
   }
 }

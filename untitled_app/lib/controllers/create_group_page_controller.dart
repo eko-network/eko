@@ -156,16 +156,15 @@ class CreateGroupPageController extends ChangeNotifier {
     return false;
   }
 
-  Widget groupSearchPageBuilder(dynamic user) {
+  Widget groupSearchPageBuilder(dynamic uid) {
     return UserCard(
-      user: user,
-      initialBool: isUserSelected(user),
+      uid: uid,
       groupSearch: true,
       adder: addRemovePersonToList,
     );
   }
 
-  void addRemovePersonToList(AppUser user, bool add) {
+  void addRemovePersonToList(dynamic user, bool add) {
     if (add) {
       selectedPeople.add(user);
       Timer(const Duration(milliseconds: 50), () {

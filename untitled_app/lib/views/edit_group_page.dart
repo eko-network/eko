@@ -174,9 +174,10 @@ class _GroupSettings extends StatelessWidget {
                 delegate: SliverChildBuilderDelegate(
                   (BuildContext context, int index) {
                     return UserCard(
-                      user: prov.Provider.of<EditGroupPageController>(context,
+                      uid: prov.Provider.of<EditGroupPageController>(context,
                               listen: true)
-                          .membersList[index],
+                          .membersList[index]
+                          .uid,
                     );
                   },
                   childCount: prov.Provider.of<EditGroupPageController>(context,

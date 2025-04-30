@@ -622,11 +622,12 @@ class _ComposePageState extends State<ComposePage> {
                                                               listen: false)
                                                           .bodyFocus);
                                             },
-                                            user: prov.Provider.of<
+                                            uid: prov.Provider.of<
                                                         ComposeController>(
                                                     context,
                                                     listen: true)
-                                                .hits[index]);
+                                                .hits[index]
+                                                .uid);
                                       },
                                     ),
                         )

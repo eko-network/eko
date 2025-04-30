@@ -298,11 +298,12 @@ class ViewPostPage extends StatelessWidget {
                                                                             false)
                                                                     .commentFeildFocus);
                                                       },
-                                                      user: prov.Provider.of<
+                                                      uid: prov.Provider.of<
                                                                   PostPageController>(
                                                               context,
                                                               listen: true)
-                                                          .hits[index],
+                                                          .hits[index]
+                                                          .uid,
                                                     );
                                                   },
                                                 ),
