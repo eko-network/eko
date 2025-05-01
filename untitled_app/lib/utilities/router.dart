@@ -324,14 +324,14 @@ final goRouter = GoRouter(
                     name: 'followers',
                     builder: (context, state) {
                       AppUser user = state.extra as AppUser;
-                      return Followers(user: user);
+                      return Followers(uid: user.uid);
                     }),
                 GoRoute(
                   path: 'following',
                   name: 'following',
                   builder: (context, state) {
                     AppUser user = state.extra as AppUser;
-                    return Following(user: user);
+                    return Following(uid: user.uid);
                   },
                 ),
               ],

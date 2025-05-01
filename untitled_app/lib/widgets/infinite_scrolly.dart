@@ -31,10 +31,9 @@ class _DefaultInitialLoader extends StatelessWidget {
 class InfiniteScrolly<K, V> extends StatefulWidget {
   /// Function that receives the current list of items and returns the next chunk. The getter
   ///		must treat the list it recives as read only. The data may get out of date, but that is ok.
-  final Future<List<MapEntry<K, V>>> Function(List<MapEntry<K, V>>) getter;
-
-  /// Number of items to expect getter to return in each fetch.
-  final int expectedChunkSize;
+  ///   Also must return bool to signifiy if this is the last chunk
+  final Future<(List<MapEntry<K, V>>, bool)> Function(List<MapEntry<K, V>>)
+      getter;
 
   /// Builder function that takes a key and returns a widget to display it.
   final Widget Function(K) widget;
@@ -60,7 +59,6 @@ class InfiniteScrolly<K, V> extends StatefulWidget {
   const InfiniteScrolly(
       {super.key,
       required this.getter,
-      required this.expectedChunkSize,
       required this.widget,
       this.appBar,
       this.header,
@@ -89,8 +87,8 @@ class _InfiniteScrollyState<K, V> extends State<InfiniteScrolly<K, V>> {
           if (objectPairs.isNotEmpty) {
             final returned = await widget.getter(objectPairs);
             setState(() {
-              isEnd = returned.length < widget.expectedChunkSize;
-              objectPairs.addAll(returned);
+              isEnd = returned.$2;
+              objectPairs.addAll(returned.$1);
             });
           }
           isLoading = false;
@@ -105,14 +103,19 @@ class _InfiniteScrollyState<K, V> extends State<InfiniteScrolly<K, V>> {
     }
     final returned = await widget.getter([]);
     setState(() {
-      isEnd = returned.length < widget.expectedChunkSize;
-      objectPairs = returned;
+      isEnd = returned.$2;
+      objectPairs = returned.$1;
     });
   }
 
   @override
   void initState() {
     scrollController.addListener(onScroll);
+    widget.getter([]).then((returned) => setState(() {
+          isEnd = returned.$2;
+          objectPairs = returned.$1;
+        }));
+
     super.initState();
   }
 
@@ -140,6 +143,14 @@ class _InfiniteScrollyState<K, V> extends State<InfiniteScrolly<K, V>> {
           SliverList.builder(
               itemCount: objectPairs.length + 2,
               itemBuilder: (BuildContext context, int index) {
+                // build header
+                if (index == 0) {
+                  return widget.header ?? SizedBox();
+                }
+                //normal case put cards
+                if (objectPairs.isNotEmpty && index < objectPairs.length + 1) {
+                  return widget.widget(objectPairs[index - 1].key);
+                }
                 //what to return if dataset is empty
                 if (isEmptySet) {
                   return widget.emptySetNotice ??
@@ -157,14 +168,6 @@ class _InfiniteScrollyState<K, V> extends State<InfiniteScrolly<K, V>> {
                 //end of feed
                 if (isEnd && objectPairs.isNotEmpty) {
                   return const SizedBox();
-                }
-                if (index == 0) {
-                  //build header
-                  return widget.header ?? const SizedBox();
-                }
-                //normal case put cards
-                if (objectPairs.isNotEmpty && index < objectPairs.length + 1) {
-                  return widget.widget(objectPairs[index - 1].key);
                 }
                 // new posts are loading
                 return widget.loadingWidget ??

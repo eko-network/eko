@@ -1,87 +1,85 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:go_router/go_router.dart';
+import 'package:untitled_app/providers/user_provider.dart';
+import 'package:untitled_app/widgets/infinite_scrolly.dart';
 import '../custom_widgets/searched_user_card.dart';
-import '../custom_widgets/pagination.dart';
-import 'package:untitled_app/models/users.dart';
-import 'package:untitled_app/custom_widgets/controllers/pagination_controller.dart';
 import '../utilities/constants.dart' as c;
 
-class Followers extends StatefulWidget {
-  final AppUser user;
-  const Followers({required this.user, super.key});
+class Followers extends ConsumerStatefulWidget {
+  final String uid;
+  const Followers({required this.uid, super.key});
   @override
-  State<Followers> createState() => _FollowersState();
+  ConsumerState<Followers> createState() => _FollowersState();
 }
 
-class _FollowersState extends State<Followers> {
-  Future<PaginationGetterReturn> userGetter(dynamic passedIndex) async {
-    Future<AppUser> getUser(int i) async {
-      AppUser user = AppUser(pageIndex: i);
-      await user.readUserData(widget.user.followers[i]);
-      return user;
+class _FollowersState extends ConsumerState<Followers> {
+  Future<(List<MapEntry<String, Never?>>, bool)> getter(
+      List<MapEntry<String, Never?>> data, List<String> fullFollowers) async {
+    // // value form constants
+    const chunkSize = c.usersOnSearch;
+    // // this is just to put queries in while they are waiting to finish
+    final List<Future<dynamic>> futures = [];
+    // // list of uids to render next
+    final List<MapEntry<String, Never?>> returnData = [];
+    final currentDataSet = data.map((item) => item.key).toSet();
+    var unfetchedFollowers =
+        fullFollowers.where((e) => !currentDataSet.contains(e)).toList();
+    final end = unfetchedFollowers.length < chunkSize
+        ? unfetchedFollowers.length
+        : chunkSize;
+    for (int i = 0; i < end; i++) {
+      final future = ref.read(userProvider(unfetchedFollowers[i]).future);
+      returnData.add(MapEntry(unfetchedFollowers[i], null));
+      futures.add(future);
     }
-
-    List<Future<AppUser>> returnList = [];
-    int startIndex = (passedIndex ?? -1) + 1;
-    final bool end =
-        (widget.user.followers.length < startIndex + c.usersOnSearch);
-
-    for (int i = startIndex;
-        i <
-            (end
-                ? (widget.user.followers.length)
-                : (startIndex + c.usersOnSearch));
-        i++) {
-      returnList.add(getUser(i));
-    }
-    return PaginationGetterReturn(
-        payload: await Future.wait(returnList), end: end);
+    await Future.wait(futures);
+    return (returnData, unfetchedFollowers.length < chunkSize);
   }
 
-  dynamic startAfterQuery(dynamic user) {
-    user as AppUser;
-    return user.pageIndex;
-  }
-
-  void onRefresh() async {
-    await widget.user.readUserData(widget.user.uid);
+  Future<void> onRefresh() async {
+    return await ref.refresh(userProvider(widget.uid));
   }
 
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.sizeOf(context).height;
 
-    return Scaffold(
-      appBar: AppBar(
-        surfaceTintColor: Colors.transparent,
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back_ios_rounded,
-            color: Theme.of(context).colorScheme.onSurface,
-            size: 20,
+    final asyncUser = ref.watch(userProvider(widget.uid));
+    return switch (asyncUser) {
+      AsyncData(:final value) => Scaffold(
+          appBar: AppBar(
+            surfaceTintColor: Colors.transparent,
+            leading: IconButton(
+              icon: Icon(
+                Icons.arrow_back_ios_rounded,
+                color: Theme.of(context).colorScheme.onSurface,
+                size: 20,
+              ),
+              onPressed: () => context.pop(),
+            ),
+            backgroundColor: Theme.of(context).colorScheme.surface,
+            title: Text(
+              AppLocalizations.of(context)!.followers,
+              style: TextStyle(
+                fontWeight: FontWeight.normal,
+                fontSize: 20,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+            ),
           ),
-          onPressed: () => context.pop('poped'),
+          body: Padding(
+              padding:
+                  EdgeInsets.symmetric(vertical: height * 0.01, horizontal: 6),
+              child: InfiniteScrolly<String, Never?>(
+                getter: (data) => getter(data, value.followers),
+                widget: (uid) => UserCard(uid: uid),
+                onRefresh: onRefresh,
+              )),
         ),
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        title: Text(
-          AppLocalizations.of(context)!.followers,
-          style: TextStyle(
-            fontWeight: FontWeight.normal,
-            fontSize: 20,
-            color: Theme.of(context).colorScheme.onSurface,
-          ),
-        ),
-      ),
-      body: Padding(
-        padding: EdgeInsets.symmetric(vertical: height * 0.01, horizontal: 6),
-        child: PaginationPage(
-          getter: userGetter,
-          card: searchPageBuilder,
-          startAfterQuery: startAfterQuery,
-          extraRefresh: onRefresh,
-        ),
-      ),
-    );
+      AsyncError(:final error) => Center(child: Text('Error: $error')),
+      _ => const Center(child: CircularProgressIndicator()),
+    };
   }
 }
