@@ -72,7 +72,9 @@ class EditProfileController extends ChangeNotifier {
   }
 
   void _pop() {
-    context.pop('poped');
+    if (context.mounted) {
+      context.pop();
+    }
   }
 
   void _popDialog() {

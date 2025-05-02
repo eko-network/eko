@@ -20,99 +20,87 @@ class ProfileHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 15, right: 15),
-          child: Align(
-            alignment: Alignment.topLeft,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Hero(
-                      tag: 'profileImage',
-                      child: IconButton(
-                        onPressed: () async {
-                          if (loggedIn) {
-                            locator<NavBarController>().disable();
-                            await context.pushNamed('profile_picture_detail',
-                                extra: user.profilePicture);
-                            locator<NavBarController>().enable();
-                          }
-                        },
-                        icon: ProfileAvatar(
-                            size: c.widthGetter(context) * 0.24,
-                            url: user.profilePicture),
-                      ),
-                    ),
-                    Flexible(
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 10),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                _ProfilePageTopNumberDisplay(
-                                  number: user.followers.length,
-                                  label:
-                                      AppLocalizations.of(context)!.followers,
-                                  onPressed: () {
-                                    if (loggedIn) {
-                                      context.push('/profile/followers',
-                                          extra: user);
-                                    }
-                                  },
-                                ),
-                                _ProfilePageTopNumberDisplay(
-                                  number: user.following.length,
-                                  label:
-                                      AppLocalizations.of(context)!.following,
-                                  onPressed: () {
-                                    if (loggedIn) {
-                                      context.push('/profile/following',
-                                          extra: user);
-                                    }
-                                  },
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 15),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Hero(
+                tag: 'profileImage',
+                child: IconButton(
+                  onPressed: () async {
+                    if (loggedIn) {
+                      locator<NavBarController>().disable();
+                      await context.pushNamed('profile_picture_detail',
+                          extra: user.profilePicture);
+                      locator<NavBarController>().enable();
+                    }
+                  },
+                  icon: ProfileAvatar(
+                      size: c.widthGetter(context) * 0.24,
+                      url: user.profilePicture),
                 ),
-                const SizedBox(height: 10),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      user.username != ''
-                          ? user.name
-                          : AppLocalizations.of(context)!.userNotFound,
-                      //user.name,
-                      style: TextStyle(
-                        fontSize: 16,
-                        letterSpacing: 1,
-                        fontWeight: FontWeight.normal,
-                        color: Theme.of(context).colorScheme.onSurface,
+              ),
+              Flexible(
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          _ProfilePageTopNumberDisplay(
+                            number: user.followers.length,
+                            label: AppLocalizations.of(context)!.followers,
+                            onPressed: () {
+                              if (loggedIn) {
+                                context.push('/profile/followers', extra: user);
+                              }
+                            },
+                          ),
+                          _ProfilePageTopNumberDisplay(
+                            number: user.following.length,
+                            label: AppLocalizations.of(context)!.following,
+                            onPressed: () {
+                              if (loggedIn) {
+                                context.push('/profile/following', extra: user);
+                              }
+                            },
+                          ),
+                        ],
                       ),
-                    ),
-                    Text(
-                      user.bio,
-                    )
-                  ],
+                    ],
+                  ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ),
-      ],
+          const SizedBox(height: 5),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                user.username != ''
+                    ? user.name
+                    : AppLocalizations.of(context)!.userNotFound,
+                //user.name,
+                style: TextStyle(
+                  fontSize: 16,
+                  letterSpacing: 1,
+                  fontWeight: FontWeight.normal,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+              ),
+              Text(
+                user.bio,
+              )
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

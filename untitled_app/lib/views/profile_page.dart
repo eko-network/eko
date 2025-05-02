@@ -49,7 +49,6 @@ class _Header extends ConsumerWidget {
     locator<NavBarController>().disable();
     await context.push('/profile/edit_profile');
     locator<NavBarController>().enable();
-    ref.invalidate(currentUserProvider);
   }
 
   void _settingsButtonPressed(BuildContext context) async {
@@ -74,7 +73,7 @@ class _Header extends ConsumerWidget {
         Column(
           children: [
             Padding(
-              padding: const EdgeInsets.only(left: 10),
+              padding: const EdgeInsets.only(left: 15, right: 15, top: 5),
               child: Row(
                 children: [
                   Text(
@@ -82,7 +81,7 @@ class _Header extends ConsumerWidget {
                     style: TextStyle(
                         color: Theme.of(context).colorScheme.onSurface,
                         fontWeight: FontWeight.bold,
-                        fontSize: 20),
+                        fontSize: 22),
                     overflow: TextOverflow.ellipsis,
                   ),
                   if (currentUser.user.isVerified)
@@ -96,24 +95,12 @@ class _Header extends ConsumerWidget {
                     ),
                   const Spacer(),
                   InkWell(
-                    onTap: () => _qrButtonPressed(context),
+                    onTap: () => _settingsButtonPressed(context),
                     child: Icon(
-                      Icons.qr_code,
+                      Icons.settings_outlined,
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      size: 22,
+                      size: 25,
                       weight: 10,
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: InkWell(
-                      onTap: () => _settingsButtonPressed(context),
-                      child: Icon(
-                        Icons.settings_outlined,
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        size: 22,
-                        weight: 10,
-                      ),
                     ),
                   ),
                 ],
@@ -125,26 +112,44 @@ class _Header extends ConsumerWidget {
           ],
         ),
         Padding(
-          padding: const EdgeInsets.symmetric(vertical: 20),
+          padding: const EdgeInsets.symmetric(vertical: 15),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              SizedBox(
-                width: width * 0.4,
-                height: width * 0.1,
-                child: TextButton(
-                  style: TextButton.styleFrom(
-                    side: BorderSide(
-                        width: 2,
-                        color: Theme.of(context).colorScheme.onSurface),
+              InkWell(
+                onTap: () => _editProfilePressed(context, ref),
+                child: Container(
+                  width: width * 0.45,
+                  height: width * 0.09,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.all(Radius.circular(10)),
+                    color: Theme.of(context).colorScheme.surfaceContainer,
                   ),
-                  onPressed: () => _editProfilePressed(context, ref),
                   child: Text(
                     AppLocalizations.of(context)!.editProfile,
                     style: TextStyle(
-                      fontSize: 16,
-                      letterSpacing: 1,
-                      fontWeight: FontWeight.normal,
+                      fontSize: 14,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(width: width * 0.02),
+              InkWell(
+                onTap: () => _qrButtonPressed(context),
+                child: Container(
+                  width: width * 0.45,
+                  height: width * 0.09,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.all(Radius.circular(10)),
+                    color: Theme.of(context).colorScheme.surfaceContainer,
+                  ),
+                  child: Text(
+                    AppLocalizations.of(context)!.shareProfile,
+                    style: TextStyle(
+                      fontSize: 14,
                       color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),

@@ -105,7 +105,6 @@ class PollWidgetState extends State<PollWidget> {
           ...widget.options.asMap().entries.map((entry) {
             final index = entry.key;
             final option = entry.value;
-            final isSelected = selectedOption == index;
             final voteCount = voteCounts[index] ?? 0;
             double percentage = totalVotes > 0 ? voteCount / totalVotes : 0;
 

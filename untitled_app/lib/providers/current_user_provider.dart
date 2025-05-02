@@ -75,6 +75,7 @@ class CurrentUser extends _$CurrentUser {
         firestore.collection('users').doc(otherUid).update({
           'profileData.followers': FieldValue.arrayUnion([uid])
         }),
+        // TODO: change this
         locator<PostsHandling>().addActivty(
             type: 'follow',
             content: 'Someone followed you',

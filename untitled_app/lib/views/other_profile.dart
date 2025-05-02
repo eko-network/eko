@@ -85,7 +85,6 @@ class OtherProfile extends ConsumerWidget {
         canPop: authState.uid != null,
         child: Scaffold(
           appBar: userAsync.when(
-            // TODO: come look at this, is it weird that loading and error have the same thing?
             data: (profileUser) => (isBlockedByMe || blocksMe)
                 ? AppBar(
                     backgroundColor: Theme.of(context).colorScheme.surface,
@@ -330,7 +329,6 @@ class _HeaderState extends ConsumerState<_Header> {
   @override
   Widget build(BuildContext context) {
     final width = c.widthGetter(context);
-    // TODO: what does .value do
     final user = ref.watch(userProvider(widget.uid)).value;
     final authState = ref.watch(authProvider);
 
