@@ -26,7 +26,7 @@ import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
 
 Widget profilePostCardBuilder(String id) {
-  return PostCard(id: id, isOnProfile: true, showGroup: true);
+  return PostCard(id: id, isOnProfile: true, showGroup: true, key: Key(id));
 }
 
 class _Count extends StatelessWidget {
@@ -663,10 +663,18 @@ class _PostCardState extends ConsumerState<PostCard> {
                   ),
                 );
               },
-              error: (_, __) => _Error(),
+              error: (object, stack) {
+                print(object);
+                print(stack);
+                return _Error();
+              },
               loading: () => _Loading());
         },
-        error: (_, __) => _Error(),
+        error: (object, stack) {
+          print(object);
+          print(stack);
+          return _Error();
+        },
         loading: () => _Loading());
   }
 }

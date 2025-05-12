@@ -117,7 +117,7 @@ class CurrentUser extends _$CurrentUser {
 
   LikeState getLikeState(String postId) {
     final liked = state.likedPosts.contains(postId);
-    final disliked = state.likedPosts.contains(postId);
+    final disliked = state.dislikedPosts.contains(postId);
     if (liked && disliked) {
       //TODO this case should not happen. Maybe write a function to correct db state?
       return LikeState.isLiked;

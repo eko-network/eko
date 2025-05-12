@@ -6,10 +6,12 @@ import 'package:untitled_app/utilities/cache_service.dart';
 
 part '../generated/providers/post_cache_provider.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 CacheService<PostModel> postCache(Ref ref) {
   return CacheService<PostModel>(
-    onInsert: (id) => ref.invalidate(postProvider(id)),
+    onInsert: (id) {
+      ref.invalidate(postProvider(id));
+    },
     keySelector: (post) => post.id,
     validTime: const Duration(minutes: 3),
   );

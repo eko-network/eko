@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:untitled_app/interfaces/post.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
 import 'package:untitled_app/providers/post_cache_provider.dart';
 import 'package:untitled_app/types/post.dart';
@@ -34,21 +35,13 @@ class Post extends _$Post {
     });
     // ********************************************* //
 
-    Future<int> countComments(String postId) {
-      return FirebaseFirestore.instance
-          .collection('posts')
-          .doc(postId)
-          .collection('comments')
-          .count()
-          .get()
-          .then((value) => value.count ?? 0, onError: (e) => 0);
-    }
-
     final cacheValue = ref.read(postCacheProvider).getItem(id);
+    print(id);
     if (cacheValue != null) {
+      print("good");
       return cacheValue;
     }
-
+    print("bad");
     final postsRef = FirebaseFirestore.instance.collection('posts');
     final data = await Future.wait([postsRef.doc(id).get(), countComments(id)]);
     final postData = data[0] as DocumentSnapshot<Map<String, dynamic>>;
@@ -93,10 +86,10 @@ class Post extends _$Post {
       state = AsyncData(prevState.copyWith(
           likeState: LikeState.isLiked, likes: prevState.likes + 1));
       await _addLikeUnsafe(prevState.id);
-      // ref.read(currentUserProvider.notifier).addIdToLiked(prevState.id);
+      ref.read(currentUserProvider.notifier).addIdToLiked(prevState.id);
     } catch (e) {
       state = AsyncData(prevState);
-      // ref.read(currentUserProvider.notifier).removeIdFromLiked(prevState.id);
+      ref.read(currentUserProvider.notifier).removeIdFromLiked(prevState.id);
     }
     _isLikeStateChanging = false;
   }
@@ -128,10 +121,10 @@ class Post extends _$Post {
       state = AsyncData(prevState.copyWith(
           likeState: LikeState.neutral, likes: prevState.likes - 1));
       await _removeLikeUnsafe(prevState.id);
-      // ref.read(currentUserProvider.notifier).addIdToLiked(prevState.id);
+      ref.read(currentUserProvider.notifier).addIdToLiked(prevState.id);
     } catch (e) {
       state = AsyncData(prevState);
-      // ref.read(currentUserProvider.notifier).removeIdFromLiked(prevState.id);
+      ref.read(currentUserProvider.notifier).removeIdFromLiked(prevState.id);
     }
     _isLikeStateChanging = false;
   }
