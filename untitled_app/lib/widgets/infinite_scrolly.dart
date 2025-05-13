@@ -99,13 +99,16 @@ class _InfiniteScrollyState<K, V> extends State<InfiniteScrolly<K, V>> {
 
   Future<void> onRefresh() async {
     if (widget.onRefresh != null) {
-      widget.onRefresh!();
+      //this can kill the widget so we must ckeck mounted
+      await widget.onRefresh!();
     }
-    final returned = await widget.getter([]);
-    setState(() {
-      isEnd = returned.$2;
-      objectPairs = returned.$1;
-    });
+    if (mounted) {
+      final returned = await widget.getter([]);
+      setState(() {
+        isEnd = returned.$2;
+        objectPairs = returned.$1;
+      });
+    }
   }
 
   @override

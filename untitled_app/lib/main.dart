@@ -10,6 +10,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:untitled_app/models/firebase_helper.dart';
 import 'package:untitled_app/models/notification_service.dart';
 import 'package:untitled_app/models/version_control.dart';
+import 'package:untitled_app/providers/post_pool_provider.dart';
+import 'package:untitled_app/providers/user_pool_provider.dart';
+import 'package:untitled_app/utilities/provider_debugger.dart';
 import 'utilities/themes/dark_theme_provider.dart';
 import 'utilities/themes/dark_theme_styles.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -81,15 +84,23 @@ Future<void> main() async {
     FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true)
   ]);
 
-  runApp(ProviderScope(child: const MyApp()));
+  if (kDebugMode) {
+    runApp(ProviderScope(observers: [
+      ProviderDebuggerObserver(),
+    ], child: const MyApp()));
+  } else {
+    ProviderScope(child: const MyApp());
+  }
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
   // This widget is the root of your application.
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(postPoolProvider);
+    ref.watch(userPoolProvider);
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,

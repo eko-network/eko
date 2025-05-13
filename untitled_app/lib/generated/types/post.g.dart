@@ -19,12 +19,14 @@ _PostModel _$PostModelFromJson(Map<String, dynamic> json) => _PostModel(
       dislikes: (json['dislikes'] as num).toInt(),
       commentCount: (json['commentCount'] as num).toInt(),
       createdAt: DateTime.parse(json['createdAt'] as String),
+      isPoll: json['isPoll'] as bool,
       pollOptions: (json['pollOptions'] as List<dynamic>?)
           ?.map((e) => e as String)
           .toList(),
       pollVoteCounts: (json['pollVoteCounts'] as Map<String, dynamic>?)?.map(
         (k, e) => MapEntry(k, (e as num).toInt()),
       ),
+      likeState: $enumDecode(_$LikeStateEnumMap, json['likeState']),
     );
 
 Map<String, dynamic> _$PostModelToJson(_PostModel instance) =>
@@ -40,6 +42,14 @@ Map<String, dynamic> _$PostModelToJson(_PostModel instance) =>
       'dislikes': instance.dislikes,
       'commentCount': instance.commentCount,
       'createdAt': instance.createdAt.toIso8601String(),
+      'isPoll': instance.isPoll,
       'pollOptions': instance.pollOptions,
       'pollVoteCounts': instance.pollVoteCounts,
+      'likeState': _$LikeStateEnumMap[instance.likeState]!,
     };
+
+const _$LikeStateEnumMap = {
+  LikeState.isLiked: 'isLiked',
+  LikeState.isDisliked: 'isDisliked',
+  LikeState.neutral: 'neutral',
+};

@@ -64,3 +64,16 @@ Future<String> forgotPassword(
     return (e.code);
   }
 }
+
+Future<String?> getUidFromUsername(String username) async {
+  final querySnapshot = await FirebaseFirestore.instance
+      .collection('users')
+      .where('username', isEqualTo: username)
+      .get();
+
+  if (querySnapshot.docs.isEmpty) {
+    return null;
+  } else {
+    return querySnapshot.docs.first.id;
+  }
+}

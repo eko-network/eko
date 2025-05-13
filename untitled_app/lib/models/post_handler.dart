@@ -2,6 +2,7 @@
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:untitled_app/interfaces/user.dart';
 import 'package:untitled_app/models/current_user.dart';
 import 'package:untitled_app/models/group_handler.dart';
 import 'package:untitled_app/utilities/locator.dart';
@@ -356,8 +357,7 @@ class PostsHandling {
 
     Future<void> notifiyTagedPeople(String chunk) async {
       if (chunk.startsWith('@')) {
-        String? taggedUid =
-            await locator<CurrentUser>().getUidFromUsername(chunk.substring(1));
+        String? taggedUid = await getUidFromUsername(chunk.substring(1));
         // get post - probably can optimize
         DocumentSnapshot post =
             await firestore.collection('posts').doc(postID).get();

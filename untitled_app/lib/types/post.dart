@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:untitled_app/utilities/enums.dart';
 part '../generated/types/post.freezed.dart';
 part '../generated/types/post.g.dart';
 
@@ -50,11 +51,13 @@ abstract class PostModel with _$PostModel {
     required int dislikes,
     required int commentCount,
     required DateTime createdAt,
+    required bool isPoll,
     List<String>? pollOptions,
     Map<String, int>? pollVoteCounts,
+    required LikeState likeState,
   }) = _PostModel;
 
-  factory PostModel.fromJson(Map<String, dynamic> json) {
+  factory PostModel.fromJson(Map<String, dynamic> json, LikeState likeState) {
     final time =
         DateTime.tryParse(json['time'] ?? '')?.toLocal() ?? DateTime.now();
     return PostModel(
@@ -63,6 +66,7 @@ abstract class PostModel with _$PostModel {
       id: json['id'] ?? '',
       // ***** //
       createdAt: time,
+      isPoll: json['isPoll'] ?? false,
       uid: json['author'] ?? '',
       likes: json['likes'] ?? 0,
       dislikes: json['dislikes'] ?? 0,
@@ -80,6 +84,7 @@ abstract class PostModel with _$PostModel {
       //broken
       title: _parseText(json['title']),
       body: _parseText(json['body']),
+      likeState: likeState,
     );
   }
 }

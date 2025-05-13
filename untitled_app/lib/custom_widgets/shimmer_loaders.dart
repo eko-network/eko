@@ -1,22 +1,20 @@
 import 'package:flutter/material.dart';
 import '../utilities/constants.dart' as c;
 
-
-
-LinearGradient getLinearGradient(BuildContext context){
+LinearGradient getLinearGradient(BuildContext context) {
   return LinearGradient(
-
-
-  colors: Theme.of(context).brightness == Brightness.dark ?c.darkModeGradient : c.lightModeGradient,
-  stops: const [
-    0.1,
-    0.3,
-    0.4,
-  ],
-  begin: const Alignment(-1.0, -0.3),
-  end: const Alignment(1.0, 0.3),
-  tileMode: TileMode.clamp,
-);
+    colors: Theme.of(context).brightness == Brightness.dark
+        ? c.darkModeGradient
+        : c.lightModeGradient,
+    stops: const [
+      0.1,
+      0.3,
+      0.4,
+    ],
+    begin: const Alignment(-1.0, -0.3),
+    end: const Alignment(1.0, 0.3),
+    tileMode: TileMode.clamp,
+  );
 }
 
 class FeedLoader extends StatelessWidget {
@@ -31,6 +29,19 @@ class FeedLoader extends StatelessWidget {
       height: height,
       child: const _FeedLoadingAnimation(),
     );
+  }
+}
+
+class PostLoader extends StatelessWidget {
+  const PostLoader({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final width = c.widthGetter(context);
+    return SizedBox(
+        width: width,
+        height: 100,
+        child: _ShimmerLoading(child: _PostCardListItem()));
   }
 }
 
@@ -139,7 +150,6 @@ class _PostCardListItem extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
       child: Row(
-        
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
@@ -222,26 +232,23 @@ class _UserCardListItem extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              
               Container(
                 width: width * 0.55,
-                height: width*0.043,
+                height: width * 0.043,
                 decoration: BoxDecoration(
                   color: Colors.black,
                   borderRadius: BorderRadius.circular(16),
                 ),
               ),
-              
               const SizedBox(height: 10),
               Container(
                 width: width * 0.7,
-                height: width*0.043,
+                height: width * 0.043,
                 decoration: BoxDecoration(
                   color: Colors.black,
                   borderRadius: BorderRadius.circular(16),
                 ),
               ),
-              
             ],
           )
         ],
@@ -251,8 +258,6 @@ class _UserCardListItem extends StatelessWidget {
 }
 
 //help
-
-
 
 class _Shimmer extends StatefulWidget {
   static _ShimmerState? of(BuildContext context) {

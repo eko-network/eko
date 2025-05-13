@@ -1,9 +1,9 @@
-class CacheService<T> {
+class PoolService<T> {
   final Map<String, _CacheEntry<T>> _map = {};
   final String Function(T) keySelector;
   final void Function(String) onInsert;
   final Duration? validTime;
-  CacheService(
+  PoolService(
       {required this.keySelector, required this.onInsert, this.validTime});
 
   void putAll(List<T> items) {

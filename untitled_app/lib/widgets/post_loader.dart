@@ -1,0 +1,91 @@
+import 'package:flutter/material.dart';
+import 'package:shimmer/shimmer.dart';
+import 'package:untitled_app/utilities/constants.dart' as c;
+
+class ShimmerPost extends StatelessWidget {
+  const ShimmerPost({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final width = c.widthGetter(context);
+    return Column(children: [
+      Padding(
+          padding: EdgeInsets.all(10),
+          child: Shimmer(
+            gradient: LinearGradient(
+              colors: Theme.of(context).brightness == Brightness.dark
+                  ? c.darkModeGradient
+                  : c.lightModeGradient,
+              stops: const [
+                0.1,
+                0.3,
+                0.4,
+              ],
+              begin: const Alignment(-1.0, -0.3),
+              end: const Alignment(1.0, 0.3),
+              tileMode: TileMode.clamp,
+            ),
+            enabled: true,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: width * 0.115,
+                  height: width * 0.115,
+                  decoration: const BoxDecoration(
+                    color: Colors.black,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                const SizedBox(width: 7),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 10),
+                    Container(
+                      width: width * 0.55,
+                      height: 24,
+                      decoration: BoxDecoration(
+                        color: Colors.black,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Container(
+                      width: width * 0.5,
+                      height: width * 0.4,
+                      decoration: BoxDecoration(
+                        color: Colors.black,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Container(
+                      width: width * 0.7,
+                      height: 24,
+                      decoration: BoxDecoration(
+                        color: Colors.black,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Container(
+                      width: width * 0.6,
+                      height: 24,
+                      decoration: BoxDecoration(
+                        color: Colors.black,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                  ],
+                )
+              ],
+            ),
+          )),
+      Divider(
+        color: Theme.of(context).colorScheme.outline,
+        height: c.dividerWidth,
+      ),
+    ]);
+  }
+}

@@ -1,25 +1,26 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of '../../providers/current_user_provider.dart';
+part of '../../providers/post_pool_provider.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$currentUserHash() => r'de7f086828c22e6b0ae6b549f393f8121ffca1bf';
+String _$postPoolHash() => r'35eebdddef5e558ab5b8d023914a10dc7e66d66b';
 
-/// See also [CurrentUser].
-@ProviderFor(CurrentUser)
-final currentUserProvider =
-    NotifierProvider<CurrentUser, CurrentUserModel>.internal(
-  CurrentUser.new,
-  name: r'currentUserProvider',
+/// See also [postPool].
+@ProviderFor(postPool)
+final postPoolProvider = Provider<PoolService<PostModel>>.internal(
+  postPool,
+  name: r'postPoolProvider',
   debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$currentUserHash,
+      const bool.fromEnvironment('dart.vm.product') ? null : _$postPoolHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$CurrentUser = Notifier<CurrentUserModel>;
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef PostPoolRef = ProviderRef<PoolService<PostModel>>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

@@ -4,7 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:untitled_app/providers/auth_provider.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
-import 'package:untitled_app/providers/user_cache_provider.dart';
+import 'package:untitled_app/providers/user_pool_provider.dart';
 import 'package:untitled_app/types/user.dart';
 // Necessary for code-generation to work
 part '../generated/providers/user_provider.g.dart';
@@ -36,7 +36,7 @@ class User extends _$User {
     if (ref.watch(authProvider).uid == uid) {
       return UserModel.fromCurrent(ref.watch(currentUserProvider)!);
     }
-    final cacheValue = ref.read(userCacheProvider).getItem(uid);
+    final cacheValue = ref.read(userPoolProvider).getItem(uid);
     if (cacheValue != null) {
       return cacheValue;
     }

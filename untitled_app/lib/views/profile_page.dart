@@ -1,43 +1,102 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:untitled_app/custom_widgets/shimmer_loaders.dart'
     show FeedLoader;
+import 'package:untitled_app/interfaces/post.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
-import 'package:untitled_app/models/feed_post_cache.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
+import 'package:untitled_app/providers/post_pool_provider.dart';
+import 'package:untitled_app/providers/post_provider.dart';
+import 'package:untitled_app/types/post.dart';
+import 'package:untitled_app/utilities/enums.dart';
 import 'package:untitled_app/utilities/locator.dart';
+import 'package:untitled_app/widgets/infinite_scrolly.dart';
 import '../controllers/bottom_nav_bar_controller.dart';
 import '../custom_widgets/profile_page_header.dart';
-import '../custom_widgets/pagination.dart';
-import '../custom_widgets/post_card.dart';
-import '../models/post_handler.dart';
 import '../utilities/constants.dart' as c;
+import '../widgets/post_card.dart';
 
 class ProfilePage extends ConsumerWidget {
   const ProfilePage({super.key});
 
+  Future<(List<MapEntry<String, String>>, bool)> getter(
+      List<MapEntry<String, String>> list, WidgetRef ref) async {
+    final uid = ref.read(currentUserProvider).user.uid;
+    final baseQuery = FirebaseFirestore.instance
+        .collection('posts')
+        .where('author', isEqualTo: uid)
+        .orderBy('time', descending: true)
+        .limit(c.postsOnRefresh);
+    final query =
+        list.isEmpty ? baseQuery : baseQuery.startAfter([list.last.value]);
+    final postList = await Future.wait(
+      await query.get().then(
+            (data) => data.docs.map(
+              (raw) async {
+                final json = raw.data();
+                json['id'] = raw.id;
+                json['commentCount'] =
+                    await countComments(raw.id); // commentCount;
+                final post = PostModel.fromJson(json, LikeState.neutral);
+                final likeState =
+                    ref.read(currentUserProvider.notifier).getLikeState(raw.id);
+                return MapEntry(post.copyWith(likeState: likeState),
+                    json['time'] as String);
+              },
+            ),
+          ),
+    );
+    final onlyPosts = postList.map((item) => item.key).toList();
+    ref.read(postPoolProvider).putAll(onlyPosts);
+    // start the providers going a frame early
+    for (final post in onlyPosts) {
+      ref.read(postProvider(post.id));
+    }
+    //     .map<Future<Post>>((raw) async {
+    //   return Post.fromRaw(raw, AppUser.fromCurrent(locator<CurrentUser>()),
+    //       await countComments(raw.postID),
+    //       group: (raw.tags.contains('public'))
+    //           ? null
+    //           : await GroupHandler().getGroupFromId(raw.tags.first),
+    //       hasCache: true);
+    // }).toList();
+    final retList =
+        postList.map((item) => MapEntry(item.key.id, item.value)).toList();
+    return (retList, retList.length < c.postsOnRefresh);
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     Future<void> onRefresh() async {
-      return await ref.refresh(currentUserProvider);
+      await ref.read(currentUserProvider.notifier).reload();
     }
 
     return PopScope(
       canPop: false,
       onPopInvoked: (didPop) => locator<NavBarController>().goBranch(0),
       child: Scaffold(
-        body: PaginationPage(
-          getter: (time) => locator<PostsHandling>().getProfilePosts(time),
-          card: profilePostCardBuilder,
-          startAfterQuery: (post) =>
-              locator<PostsHandling>().getTimeFromPost(post),
-          header: const _Header(),
-          initialLoadingWidget: const FeedLoader(),
-          externalData: locator<FeedPostCache>().profileCache,
-          extraRefresh: onRefresh,
-        ),
-      ),
+          body: InfiniteScrolly<String, String>(
+        getter: (data) async {
+          return await getter(data, ref);
+        },
+        widget: profilePostCardBuilder,
+        header: const _Header(),
+        onRefresh: onRefresh,
+        initialLoadingWidget: FeedLoader(),
+      )
+          // PaginationPage(
+          //       getter: (time) => locator<PostsHandling>().getProfilePosts(time),
+          //       card: (post) => profilePostCardBuilder(post.postId),
+          //       startAfterQuery: (post) =>
+          //           locator<PostsHandling>().getTimeFromPost(post),
+          //       header: const _Header(),
+          //       initialLoadingWidget: const FeedLoader(),
+          //       externalData: locator<FeedPostCache>().profileCache,
+          //       extraRefresh: onRefresh,
+          //     ),
+          ),
     );
   }
 }
