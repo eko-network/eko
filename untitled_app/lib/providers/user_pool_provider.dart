@@ -4,7 +4,7 @@ import 'package:untitled_app/providers/user_provider.dart';
 import 'package:untitled_app/types/user.dart';
 import 'package:untitled_app/utilities/cache_service.dart';
 
-part '../generated/providers/user_cache_provider.g.dart';
+part '../generated/providers/user_pool_provider.g.dart';
 
 @Riverpod(keepAlive: true)
 PoolService<UserModel> userPool(Ref ref) {

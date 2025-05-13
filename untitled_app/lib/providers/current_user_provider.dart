@@ -39,7 +39,7 @@ class CurrentUser extends _$CurrentUser {
     state = state.copyWith(dislikedPosts: dislikes);
   }
 
-  void removeIdfromDisliked(String id) {
+  void removeIdFromDisliked(String id) {
     final dislikes = [...state.likedPosts];
     dislikes.remove(id);
     state = state.copyWith(dislikedPosts: dislikes);

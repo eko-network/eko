@@ -153,10 +153,10 @@ class Post extends _$Post {
       state = AsyncData(prevState.copyWith(
           likeState: LikeState.isDisliked, dislikes: prevState.dislikes + 1));
       await _addDislikeUnsafe(prevState.id);
-      // ref.read(currentUserProvider.notifier).addIdToLiked(prevState.id);
+      ref.read(currentUserProvider.notifier).addIdToDisliked(prevState.id);
     } catch (e) {
       state = AsyncData(prevState);
-      // ref.read(currentUserProvider.notifier).removeIdFromLiked(prevState.id);
+      ref.read(currentUserProvider.notifier).removeIdFromDisliked(prevState.id);
     }
     _isLikeStateChanging = false;
   }
@@ -188,10 +188,10 @@ class Post extends _$Post {
       state = AsyncData(prevState.copyWith(
           likeState: LikeState.neutral, dislikes: prevState.dislikes - 1));
       await _removeDisikeUnsafe(prevState.id);
-      // ref.read(currentUserProvider.notifier).addIdToLiked(prevState.id);
+      ref.read(currentUserProvider.notifier).addIdToDisliked(prevState.id);
     } catch (e) {
       state = AsyncData(prevState);
-      // ref.read(currentUserProvider.notifier).removeIdFromLiked(prevState.id);
+      ref.read(currentUserProvider.notifier).removeIdFromDisliked(prevState.id);
     }
     _isLikeStateChanging = false;
   }
