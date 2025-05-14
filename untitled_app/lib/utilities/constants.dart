@@ -59,7 +59,7 @@ ColorScheme darkThemeColors(context) {
     errorContainer: Color(0xFF93000A),
     onError: Color(0xFF690005),
     onErrorContainer: Color(0xFFFFDAD6),
-    surface: Color.fromARGB(255, 18, 18, 18),
+    surface: Color.fromARGB(255, 0, 0, 0),
     onSurface: Color.fromARGB(255, 229, 229, 229),
     surfaceContainer: Color(0xFF25292E),
     surfaceContainerHighest: Color(0xFF46464F),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:untitled_app/custom_widgets/shimmer_loaders.dart'
     show FeedLoader;
 import 'package:untitled_app/models/feed_post_cache.dart';
@@ -76,12 +77,10 @@ class FeedPage extends StatelessWidget {
             ),
           ],
           title: SizedBox(
-            width: width * 0.2,
-            child: Image.asset(
-                (Theme.of(context).brightness == Brightness.light)
-                    ? 'images/eko_logo_light.png'
-                    : 'images/eko_logo.png'),
-          ),
+              width: width * 0.2,
+              child: (Theme.of(context).brightness == Brightness.light)
+                  ? Image.asset('images/eko_logo_light.png')
+                  : SvgPicture.asset('images/eko_logo.svg')),
         );
         //end app bar
 

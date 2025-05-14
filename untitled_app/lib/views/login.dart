@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:untitled_app/custom_widgets/download_button_if_web.dart';
 import 'package:untitled_app/custom_widgets/warning_dialog.dart';
@@ -188,13 +189,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 height: height * .055,
               ),
               SizedBox(
-                height: height * .25,
-                width: width * 0.7,
-                child: Image.asset(
-                    (Theme.of(context).brightness == Brightness.light)
-                        ? 'images/eko_logo_light.png'
-                        : 'images/eko_logo.png'),
-              ),
+                  height: height * .25,
+                  width: width * 0.7,
+                  child: (Theme.of(context).brightness == Brightness.light)
+                      ? Image.asset('images/eko_logo_light.png')
+                      : SvgPicture.asset('images/eko_logo.svg')),
               SizedBox(height: height * .05),
               CustomInputField(
                 focus: emailFocus,
