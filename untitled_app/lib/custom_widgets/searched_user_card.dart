@@ -84,33 +84,15 @@ class _UserCardState extends ConsumerState<UserCard> {
     controller.unblockUser(user.uid);
   }
 
-  Future<void> onFollowPressed(UserModel user) async {
-    //final currentUser = locator<CurrentUser>();
-    //final uid = user.uid;
-    //if (uid != currentUser.uid && !isFollowing) {
-    //  isFollowing = true;
-    //
-    //  final isCurrentlyFollowing = following;
-    //
-    //  if (isCurrentlyFollowing) {
-    //    setState(() {});
-    //    if (!(await currentUser.removeFollower(uid))) {
-    //      setState(() {});
-    //    } else {
-    //      ref.refresh(userProvider(widget.uid));
-    //    }
-    //  } else {
-    //    setState(() {});
-    //    if (!(await currentUser.addFollower(uid))) {
-    //      setState(() {});
-    //    } else {
-    //      ref.refresh(userProvider(widget.uid));
-    //    }
-    //  }
-    //
-    //  isFollowing = false;
-    //  setState(() {});
-    //}
+  Future<void> onFollowPressed(WidgetRef ref, UserModel user) async {
+    final isFollowing =
+        ref.watch(currentUserProvider).user.following.contains(user.uid);
+
+    if (isFollowing) {
+      await ref.read(currentUserProvider.notifier).removeFollower(user.uid);
+    } else {
+      await ref.read(currentUserProvider.notifier).addFollower(user.uid);
+    }
   }
 
   void onAddPressed(UserModel user) {
@@ -225,7 +207,7 @@ class _UserCardState extends ConsumerState<UserCard> {
                   )
                 else
                   InkWell(
-                    onTap: () => onFollowPressed(user),
+                    onTap: () => onFollowPressed(ref, user),
                     child: Container(
                       width: width * 0.25,
                       height: width * 0.08,
