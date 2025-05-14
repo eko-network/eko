@@ -89,8 +89,12 @@ class CurrentUser extends _$CurrentUser {
     state = CurrentUserModel.fromJson(mainData);
   }
 
-  Future<bool> addFollower(String otherUid) async {
+  Future<void> addFollower(String otherUid) async {
     try {
+      final updatedFollowing = [...state.user.following, otherUid];
+      state = state.copyWith(
+          user: state.user.copyWith(following: updatedFollowing));
+
       final firestore = FirebaseFirestore.instance;
       final uid = ref.read(authProvider).uid!;
       await Future.wait([
@@ -107,12 +111,27 @@ class CurrentUser extends _$CurrentUser {
             path: uid,
             user: otherUid)
       ]);
+    } catch (e) {}
+  }
 
-      state.user.following.add(otherUid);
-      return true;
-    } catch (e) {
-      return false;
-    }
+  Future<void> removeFollower(String otherUid) async {
+    try {
+      final updatedFollowing =
+          state.user.following.where((id) => id != otherUid).toList();
+      state = state.copyWith(
+          user: state.user.copyWith(following: updatedFollowing));
+
+      final firestore = FirebaseFirestore.instance;
+      final uid = ref.read(authProvider).uid!;
+      await Future.wait([
+        firestore.collection('users').doc(uid).update({
+          'profileData.following': FieldValue.arrayRemove([otherUid])
+        }),
+        firestore.collection('users').doc(otherUid).update({
+          'profileData.followers': FieldValue.arrayRemove([uid])
+        })
+      ]);
+    } catch (e) {}
   }
 
   LikeState getLikeState(String postId) {
@@ -129,25 +148,5 @@ class CurrentUser extends _$CurrentUser {
       return LikeState.isDisliked;
     }
     return LikeState.neutral;
-  }
-
-  Future<bool> removeFollower(String otherUid) async {
-    try {
-      final firestore = FirebaseFirestore.instance;
-      final uid = ref.read(authProvider).uid!;
-      await Future.wait([
-        firestore.collection('users').doc(uid).update({
-          'profileData.following': FieldValue.arrayRemove([otherUid])
-        }),
-        firestore.collection('users').doc(otherUid).update({
-          'profileData.followers': FieldValue.arrayRemove([uid])
-        })
-      ]);
-
-      state.user.following.remove(otherUid);
-      return true;
-    } catch (e) {
-      return false;
-    }
   }
 }

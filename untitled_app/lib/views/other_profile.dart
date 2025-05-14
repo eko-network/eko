@@ -6,7 +6,9 @@ import 'package:untitled_app/custom_widgets/warning_dialog.dart';
 import 'package:untitled_app/interfaces/post.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
 import 'package:untitled_app/providers/user_provider.dart';
+import 'package:untitled_app/types/current_user.dart';
 import 'package:untitled_app/types/post.dart';
+import 'package:untitled_app/types/user.dart';
 import 'package:untitled_app/utilities/enums.dart';
 import 'package:untitled_app/widgets/infinite_scrolly.dart';
 import 'package:untitled_app/widgets/loading_spinner.dart';
@@ -186,7 +188,7 @@ class OtherProfile extends ConsumerWidget {
                 initialLoadingWidget: PostLoader(
                   length: 3,
                 ),
-                header: _Header(uid: uid),
+                header: _Header(user: profileUser),
                 appBar: SliverAppBar(
                   floating: true,
                   pinned: false,
@@ -307,126 +309,53 @@ class OtherProfile extends ConsumerWidget {
   }
 }
 
-class _Header extends ConsumerStatefulWidget {
-  final String uid;
-  const _Header({required this.uid});
+class _Header extends ConsumerWidget {
+  final UserModel user;
+  const _Header({required this.user});
 
-  @override
-  ConsumerState<_Header> createState() => _HeaderState();
-}
-
-class _HeaderState extends ConsumerState<_Header> {
-  bool _isFollowing = false;
-  bool _isFollowingInProgress = false;
-
-  @override
-  void initState() {
-    super.initState();
+  Future<void> _onFollowPressed(WidgetRef ref) async {
+    final currentUserNotifier = ref.read(currentUserProvider.notifier);
     final currentUser = ref.read(currentUserProvider);
-    _isFollowing = currentUser.user.following.contains(widget.uid);
-  }
+    final isFollowing = currentUser.user.following.contains(user.uid);
 
-  Future<void> _onFollowPressed() async {
-    // final auth = ref.read(authProvider);
-
-    // Check if user is logged in
-    // if (auth.uid == null) {
-    //   _showLogInDialog();
-    //   return;
-    // }
-
-    // Prevent multiple follow/unfollow operations at once
-    if (!_isFollowingInProgress) {
-      setState(() {
-        _isFollowingInProgress = true;
-      });
-
-      try {
-        final success = _isFollowing
-            ? await _unfollowUser(widget.uid)
-            : await _followUser(widget.uid);
-
-        if (success) {
-          setState(() {
-            _isFollowing = !_isFollowing;
-          });
-
-          ref.invalidate(userProvider(widget.uid));
-        }
-      } finally {
-        setState(() {
-          _isFollowingInProgress = false;
-        });
-      }
+    if (isFollowing) {
+      await currentUserNotifier.removeFollower(user.uid);
+    } else {
+      await currentUserNotifier.addFollower(user.uid);
     }
-  }
 
-  Future<bool> _followUser(String uid) async {
-    try {
-      final currentUser = ref.read(currentUserProvider.notifier);
-      await currentUser.addFollower(uid);
-      return true;
-    } catch (e) {
-      return false;
-    }
-  }
-
-  Future<bool> _unfollowUser(String uid) async {
-    try {
-      final currentUser = ref.read(currentUserProvider.notifier);
-      await currentUser.removeFollower(uid);
-      return true;
-    } catch (e) {
-      return false;
-    }
-  }
-
-  void _showLogInDialog() {
-    showMyDialog(
-      AppLocalizations.of(context)!.logIntoApp,
-      AppLocalizations.of(context)!.logInRequired,
-      [
-        AppLocalizations.of(context)!.goBack,
-        AppLocalizations.of(context)!.signIn
-      ],
-      [
-        () => Navigator.of(context, rootNavigator: true).pop(),
-        () => context.go('/')
-      ],
-      context,
-      dismissable: true,
-    );
+    ref.invalidate(userProvider(user.uid));
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final width = c.widthGetter(context);
-    final user = ref.watch(userProvider(widget.uid)).value;
-    // final authState = ref.watch(authProvider);
+    final currentUser = ref.watch(currentUserProvider);
+    final isFollowing = currentUser.user.following.contains(user.uid);
 
     return Column(
       children: [
         ProfileHeader(
-          user: user!,
+          user: user,
           loggedIn: true, //authState.uid != null,
         ),
         Padding(
             padding: const EdgeInsets.symmetric(vertical: 15),
             child: Center(
               child: InkWell(
-                onTap: () => _onFollowPressed(),
+                onTap: () => _onFollowPressed(ref),
                 child: Container(
                   width: width * 0.45,
                   height: width * 0.09,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
                     borderRadius: const BorderRadius.all(Radius.circular(10)),
-                    color: _isFollowing
+                    color: isFollowing
                         ? Theme.of(context).colorScheme.surfaceContainer
                         : Theme.of(context).colorScheme.primaryContainer,
                   ),
                   child: Text(
-                    _isFollowing
+                    isFollowing
                         ? AppLocalizations.of(context)!.following
                         : AppLocalizations.of(context)!.follow,
                     style: TextStyle(

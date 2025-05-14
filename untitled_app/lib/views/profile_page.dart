@@ -7,6 +7,7 @@ import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
 import 'package:untitled_app/providers/post_pool_provider.dart';
 import 'package:untitled_app/providers/post_provider.dart';
+import 'package:untitled_app/types/current_user.dart';
 import 'package:untitled_app/types/post.dart';
 import 'package:untitled_app/utilities/enums.dart';
 import 'package:untitled_app/utilities/locator.dart';
@@ -79,7 +80,7 @@ class ProfilePage extends ConsumerWidget {
             return await getter(data, ref);
           },
           widget: profilePostCardBuilder,
-          header: const _Header(),
+          header: _Header(currentUser: ref.watch(currentUserProvider)),
           onRefresh: onRefresh,
           initialLoadingWidget: PostLoader(
             length: 3,
@@ -90,10 +91,11 @@ class ProfilePage extends ConsumerWidget {
   }
 }
 
-class _Header extends ConsumerWidget {
-  const _Header();
+class _Header extends StatelessWidget {
+  final CurrentUserModel currentUser;
+  const _Header({required this.currentUser});
 
-  void _editProfilePressed(BuildContext context, WidgetRef ref) async {
+  void _editProfilePressed(BuildContext context) async {
     locator<NavBarController>().disable();
     await context.push('/profile/edit_profile');
     locator<NavBarController>().enable();
@@ -112,9 +114,8 @@ class _Header extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final width = c.widthGetter(context);
-    final currentUser = ref.watch(currentUserProvider);
 
     return Column(
       children: [
@@ -165,7 +166,7 @@ class _Header extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               InkWell(
-                onTap: () => _editProfilePressed(context, ref),
+                onTap: () => _editProfilePressed(context),
                 child: Container(
                   width: width * 0.45,
                   height: width * 0.09,
