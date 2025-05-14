@@ -7,7 +7,7 @@ class ProviderDebuggerObserver extends ProviderObserver {
     Object? value,
     ProviderContainer container,
   ) {
-    print('Provider $provider was initialized with $value');
+    print('Provider $provider was initialized');
   }
 
   @override
@@ -25,7 +25,7 @@ class ProviderDebuggerObserver extends ProviderObserver {
     Object? newValue,
     ProviderContainer container,
   ) {
-    print('Provider $provider updated from $previousValue to $newValue');
+    print('Provider $provider updated');
   }
 
   @override

@@ -13,7 +13,7 @@ part '../generated/providers/user_provider.g.dart';
 class User extends _$User {
   Timer? _disposeTimer;
   @override
-  Future<UserModel> build(String uid) async {
+  FutureOr<UserModel> build(String uid) {
     // *** This block is for lifecycle management *** //
     // Keep provider alive
     final link = ref.keepAlive();
@@ -40,9 +40,18 @@ class User extends _$User {
     if (cacheValue != null) {
       return cacheValue;
     }
+    return _fetchUserModel(uid);
+  }
 
+  Future<UserModel> _fetchUserModel(String uid) async {
     final userRef = FirebaseFirestore.instance.collection('users');
     final data = await userRef.doc(uid).get();
     return UserModel.fromJson(data.data());
+  }
+
+  void updateFollowers(List<String> newFollowers) {
+    state.whenData((user) {
+      state = AsyncData(user.copyWith(followers: newFollowers));
+    });
   }
 }

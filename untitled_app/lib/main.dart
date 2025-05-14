@@ -23,20 +23,10 @@ import 'package:flutter_web_plugins/url_strategy.dart';
 import '../models/shared_pref_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/current_user.dart';
-import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:untitled_app/firebase_options.dart';
 // import 'package:untitled_app/utilities/firebase_options.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-
-Future<void> _setupAppCheck() async {
-  await FirebaseAppCheck.instance.activate(
-    webProvider: ReCaptchaV3Provider(dotenv.env['RE_CAPTCHA']!),
-    androidProvider:
-        kReleaseMode ? AndroidProvider.playIntegrity : AndroidProvider.debug,
-    appleProvider: kReleaseMode ? AppleProvider.appAttest : AppleProvider.debug,
-  );
-}
 
 Future<void> _checkFirstInstall() async {
   if ((await getBool('NOT_FIRST_INSTALL')) == null) {
@@ -69,13 +59,8 @@ Future<void> main() async {
   FirebaseDatabase.instance
       .setPersistenceEnabled(false); // FIXME doesnt seem to work :(
 
-  //setup appcheck and non-protected services
-  await Future.wait([
-    _setupAppCheck(),
-  ]);
-  // //
   setupLocator();
-  // //protected/dependent services
+  //protected/dependent services
   await Future.wait([
     _checkFirstInstall(),
     _setUpOtherNotification(),

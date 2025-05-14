@@ -15,7 +15,7 @@ class Post extends _$Post {
   Timer? _disposeTimer;
   bool _isLikeStateChanging = false;
   @override
-  Future<PostModel> build(String id) async {
+  FutureOr<PostModel> build(String id) async {
     // *** This block is for lifecycle management *** //
     // Keep provider alive
     final link = ref.keepAlive();
@@ -39,6 +39,11 @@ class Post extends _$Post {
     if (cacheValue != null) {
       return cacheValue;
     }
+
+    return _fetchPostModel(id);
+  }
+
+  Future<PostModel> _fetchPostModel(String id) async {
     final postsRef = FirebaseFirestore.instance.collection('posts');
     final data = await Future.wait([postsRef.doc(id).get(), countComments(id)]);
     final postData = data[0] as DocumentSnapshot<Map<String, dynamic>>;
@@ -80,13 +85,32 @@ class Post extends _$Post {
     }
     _isLikeStateChanging = true;
     try {
-      state = AsyncData(prevState.copyWith(
-          likeState: LikeState.isLiked, likes: prevState.likes + 1));
-      await _addLikeUnsafe(prevState.id);
+      //queue a database opperation to add a like
+      final List<Future<dynamic>> futures = [_addLikeUnsafe(prevState.id)];
+
+      //check if also need to remove a dislike
+      if (prevState.likeState == LikeState.isDisliked) {
+        state = AsyncData(prevState.copyWith(
+            likeState: LikeState.isLiked,
+            likes: prevState.likes + 1,
+            dislikes: prevState.dislikes - 1));
+        ref
+            .read(currentUserProvider.notifier)
+            .removeIdFromDisliked(prevState.id);
+        futures.add(_removeDisikeUnsafe(prevState.id));
+      } else {
+        state = AsyncData(prevState.copyWith(
+            likeState: LikeState.isLiked, likes: prevState.likes + 1));
+      }
       ref.read(currentUserProvider.notifier).addIdToLiked(prevState.id);
+
+      await Future.wait(futures);
     } catch (e) {
       state = AsyncData(prevState);
       ref.read(currentUserProvider.notifier).removeIdFromLiked(prevState.id);
+      if (prevState.likeState == LikeState.isDisliked) {
+        ref.read(currentUserProvider.notifier).addIdToDisliked(prevState.id);
+      }
     }
     _isLikeStateChanging = false;
   }
@@ -117,8 +141,8 @@ class Post extends _$Post {
     try {
       state = AsyncData(prevState.copyWith(
           likeState: LikeState.neutral, likes: prevState.likes - 1));
-      await _removeLikeUnsafe(prevState.id);
       ref.read(currentUserProvider.notifier).addIdToLiked(prevState.id);
+      await _removeLikeUnsafe(prevState.id);
     } catch (e) {
       state = AsyncData(prevState);
       ref.read(currentUserProvider.notifier).removeIdFromLiked(prevState.id);
@@ -150,13 +174,26 @@ class Post extends _$Post {
     }
     _isLikeStateChanging = true;
     try {
-      state = AsyncData(prevState.copyWith(
-          likeState: LikeState.isDisliked, dislikes: prevState.dislikes + 1));
-      await _addDislikeUnsafe(prevState.id);
+      final List<Future<dynamic>> futures = [_addDislikeUnsafe(prevState.id)];
+      if (prevState.likeState == LikeState.isLiked) {
+        state = AsyncData(prevState.copyWith(
+            likeState: LikeState.isDisliked,
+            likes: prevState.likes - 1,
+            dislikes: prevState.dislikes + 1));
+        ref.read(currentUserProvider.notifier).removeIdFromLiked(prevState.id);
+        futures.add(_removeLikeUnsafe(prevState.id));
+      } else {
+        state = AsyncData(prevState.copyWith(
+            likeState: LikeState.isDisliked, dislikes: prevState.dislikes + 1));
+      }
       ref.read(currentUserProvider.notifier).addIdToDisliked(prevState.id);
+      await Future.wait(futures);
     } catch (e) {
       state = AsyncData(prevState);
       ref.read(currentUserProvider.notifier).removeIdFromDisliked(prevState.id);
+      if (prevState.likeState == LikeState.isLiked) {
+        ref.read(currentUserProvider.notifier).addIdToLiked(prevState.id);
+      }
     }
     _isLikeStateChanging = false;
   }
@@ -187,8 +224,8 @@ class Post extends _$Post {
     try {
       state = AsyncData(prevState.copyWith(
           likeState: LikeState.neutral, dislikes: prevState.dislikes - 1));
-      await _removeDisikeUnsafe(prevState.id);
       ref.read(currentUserProvider.notifier).addIdToDisliked(prevState.id);
+      await _removeDisikeUnsafe(prevState.id);
     } catch (e) {
       state = AsyncData(prevState);
       ref.read(currentUserProvider.notifier).removeIdFromDisliked(prevState.id);

@@ -1,33 +1,74 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:untitled_app/custom_widgets/warning_dialog.dart';
-import 'package:untitled_app/models/feed_post_cache.dart';
-import 'package:untitled_app/models/post_handler.dart';
-import 'package:untitled_app/providers/auth_provider.dart';
+import 'package:untitled_app/interfaces/post.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
 import 'package:untitled_app/providers/user_provider.dart';
-import 'package:untitled_app/utilities/locator.dart';
+import 'package:untitled_app/types/current_user.dart';
+import 'package:untitled_app/types/post.dart';
+import 'package:untitled_app/types/user.dart';
+import 'package:untitled_app/utilities/enums.dart';
+import 'package:untitled_app/widgets/infinite_scrolly.dart';
 import 'package:untitled_app/widgets/loading_spinner.dart';
-import 'package:untitled_app/custom_widgets/shimmer_loaders.dart'
-    show FeedLoader;
 import 'package:untitled_app/custom_widgets/profile_page_header.dart';
-import '../custom_widgets/pagination.dart';
+import 'package:untitled_app/widgets/post_loader.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
-import '../custom_widgets/post_card.dart';
+import '../providers/post_pool_provider.dart';
 import '../utilities/constants.dart' as c;
+import '../widgets/post_card.dart';
 
 class OtherProfile extends ConsumerWidget {
   final String uid;
   const OtherProfile({super.key, required this.uid});
 
+  Future<(List<MapEntry<String, String>>, bool)> getter(
+      List<MapEntry<String, String>> list, WidgetRef ref) async {
+    final baseQuery = FirebaseFirestore.instance
+        .collection('posts')
+        .where('author', isEqualTo: uid)
+        .orderBy('time', descending: true)
+        .limit(c.postsOnRefresh);
+    final query =
+        list.isEmpty ? baseQuery : baseQuery.startAfter([list.last.value]);
+    final postList = await Future.wait(
+      await query.get().then(
+            (data) => data.docs.map(
+              (raw) async {
+                final json = raw.data();
+                json['id'] = raw.id;
+                json['commentCount'] =
+                    await countComments(raw.id); // commentCount;
+                final post = PostModel.fromJson(json, LikeState.neutral);
+                final likeState =
+                    ref.read(currentUserProvider.notifier).getLikeState(raw.id);
+                return MapEntry(post.copyWith(likeState: likeState),
+                    json['time'] as String);
+              },
+            ),
+          ),
+    );
+    final onlyPosts = postList.map((item) => item.key).toList();
+    ref.read(postPoolProvider).putAll(onlyPosts);
+    //     .map<Future<Post>>((raw) async {
+    //   return Post.fromRaw(raw, AppUser.fromCurrent(locator<CurrentUser>()),
+    //       await countComments(raw.postID),
+    //       group: (raw.tags.contains('public'))
+    //           ? null
+    //           : await GroupHandler().getGroupFromId(raw.tags.first),
+    //       hasCache: true);
+    // }).toList();
+    final retList =
+        postList.map((item) => MapEntry(item.key.id, item.value)).toList();
+    return (retList, retList.length < c.postsOnRefresh);
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final width = c.widthGetter(context);
     final userAsync = ref.watch(userProvider(uid));
-    final authState = ref.watch(authProvider);
     final currentUser = ref.watch(currentUserProvider);
-    final Cache loadedPostData = Cache(items: [], end: false);
 
     // Check if we're viewing our own profile
     if (currentUser.user.uid == uid) {
@@ -82,7 +123,7 @@ class OtherProfile extends ConsumerWidget {
     }
 
     return PopScope(
-        canPop: authState.uid != null,
+        canPop: true,
         child: Scaffold(
           appBar: userAsync.when(
             data: (profileUser) => (isBlockedByMe || blocksMe)
@@ -138,52 +179,92 @@ class OtherProfile extends ConsumerWidget {
                   ),
                 );
               }
-              return PaginationPage(
-                appbar: SliverAppBar(
+              return InfiniteScrolly<String, String>(
+                getter: (data) async {
+                  return await getter(data, ref);
+                },
+                widget: otherProfilePostCardBuilder,
+                onRefresh: onRefresh,
+                initialLoadingWidget: PostLoader(
+                  length: 3,
+                ),
+                header: _Header(user: profileUser),
+                appBar: SliverAppBar(
                   floating: true,
                   pinned: false,
                   scrolledUnderElevation: 0.0,
                   centerTitle: false,
-                  leadingWidth: ref.read(authProvider).uid == null ? 100 : null,
-                  leading: ref.read(authProvider).uid != null
-                      ? IconButton(
-                          icon: Icon(
-                            Icons.arrow_back_ios_rounded,
-                            color: Theme.of(context).colorScheme.onSurface,
-                            size: 20,
-                          ),
-                          onPressed: () => context.pop('popped'))
-                      : TextButton(
-                          onPressed: () {
-                            context.go('/');
-                          },
-                          child: Text(AppLocalizations.of(context)!.signIn)),
+                  leadingWidth:
+                      null, //ref.read(authProvider).uid == null ? 100 : null,
+                  leading: IconButton(
+                      icon: Icon(
+                        Icons.arrow_back_ios_rounded,
+                        color: Theme.of(context).colorScheme.onSurface,
+                        size: 20,
+                      ),
+                      onPressed: () => context.pop('popped')),
+
+                  // ref.read(authProvider).uid != null
+                  //              ? IconButton(
+                  //                  icon: Icon(
+                  //                    Icons.arrow_back_ios_rounded,
+                  //                    color: Theme.of(context).colorScheme.onSurface,
+                  //                    size: 20,
+                  //                  ),
+                  //                  onPressed: () => context.pop('popped'))
+                  //              : TextButton(
+                  //                  onPressed: () {
+                  //                    context.go('/');
+                  //                  },
+                  //                  child: Text(AppLocalizations.of(context)!.signIn)),
                   backgroundColor: Theme.of(context).colorScheme.surface,
-                  title: ref.read(authProvider).uid != null
-                      ? Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              '@${profileUser.username}',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20,
-                                color: Theme.of(context).colorScheme.onSurface,
-                              ),
-                            ),
-                            if (profileUser.isVerified)
-                              Padding(
-                                padding: const EdgeInsets.only(left: 6),
-                                child: Icon(
-                                  Icons.verified_rounded,
-                                  size: c.verifiedIconSize,
-                                  color:
-                                      Theme.of(context).colorScheme.surfaceTint,
-                                ),
-                              ),
-                          ],
-                        )
-                      : null,
+                  title: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        '@${profileUser.username}',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                      ),
+                      if (profileUser.isVerified)
+                        Padding(
+                          padding: const EdgeInsets.only(left: 6),
+                          child: Icon(
+                            Icons.verified_rounded,
+                            size: c.verifiedIconSize,
+                            color: Theme.of(context).colorScheme.surfaceTint,
+                          ),
+                        ),
+                    ],
+                  ),
+                  // ref.read(authProvider).uid != null
+                  //              ? Row(
+                  //                  mainAxisAlignment: MainAxisAlignment.center,
+                  //                  children: [
+                  //                    Text(
+                  //                      '@${profileUser.username}',
+                  //                      style: TextStyle(
+                  //                        fontWeight: FontWeight.bold,
+                  //                        fontSize: 20,
+                  //                        color: Theme.of(context).colorScheme.onSurface,
+                  //                      ),
+                  //                    ),
+                  //                    if (profileUser.isVerified)
+                  //                      Padding(
+                  //                        padding: const EdgeInsets.only(left: 6),
+                  //                        child: Icon(
+                  //                          Icons.verified_rounded,
+                  //                          size: c.verifiedIconSize,
+                  //                          color:
+                  //                              Theme.of(context).colorScheme.surfaceTint,
+                  //                        ),
+                  //                      ),
+                  //                  ],
+                  //                )
+                  //              : null,
                   actions: [
                     Padding(
                       padding: EdgeInsets.only(left: 16, right: 16),
@@ -215,17 +296,10 @@ class OtherProfile extends ConsumerWidget {
                     ),
                   ),
                 ),
-                getter: (time) =>
-                    locator<PostsHandling>().getSubProfilePosts(time, uid),
-                card: otherProfilePostCardBuilder,
-                startAfterQuery: (post) =>
-                    locator<PostsHandling>().getTimeFromPost(post),
-                header: _Header(uid: uid),
-                externalData: loadedPostData,
-                extraRefresh: onRefresh,
-                initialLoadingWidget: const FeedLoader(),
               );
             },
+            // getter: (time) =>
+            //     locator<PostsHandling>().getSubProfilePosts(time, uid),
             loading: () => const Center(child: LoadingSpinner()),
             error: (error, stack) => Center(
               child: Text('Error loading user profile: $error'),
@@ -235,126 +309,50 @@ class OtherProfile extends ConsumerWidget {
   }
 }
 
-class _Header extends ConsumerStatefulWidget {
-  final String uid;
-  const _Header({required this.uid});
+class _Header extends ConsumerWidget {
+  final UserModel user;
+  const _Header({required this.user});
 
-  @override
-  ConsumerState<_Header> createState() => _HeaderState();
-}
+  Future<void> _onFollowPressed(WidgetRef ref) async {
+    final isFollowing =
+        ref.watch(currentUserProvider).user.following.contains(user.uid);
 
-class _HeaderState extends ConsumerState<_Header> {
-  bool _isFollowing = false;
-  bool _isFollowingInProgress = false;
-
-  @override
-  void initState() {
-    super.initState();
-    final currentUser = ref.read(currentUserProvider);
-    _isFollowing = currentUser.user.following.contains(widget.uid);
-  }
-
-  Future<void> _onFollowPressed() async {
-    final auth = ref.read(authProvider);
-
-    // Check if user is logged in
-    if (auth.uid == null) {
-      _showLogInDialog();
-      return;
+    if (isFollowing) {
+      await ref.read(currentUserProvider.notifier).removeFollower(user.uid);
+    } else {
+      await ref.read(currentUserProvider.notifier).addFollower(user.uid);
     }
-
-    // Prevent multiple follow/unfollow operations at once
-    if (!_isFollowingInProgress) {
-      setState(() {
-        _isFollowingInProgress = true;
-      });
-
-      try {
-        final success = _isFollowing
-            ? await _unfollowUser(widget.uid)
-            : await _followUser(widget.uid);
-
-        if (success) {
-          setState(() {
-            _isFollowing = !_isFollowing;
-          });
-
-          ref.invalidate(userProvider(widget.uid));
-        }
-      } finally {
-        setState(() {
-          _isFollowingInProgress = false;
-        });
-      }
-    }
-  }
-
-  Future<bool> _followUser(String uid) async {
-    try {
-      final currentUser = ref.read(currentUserProvider.notifier);
-      await currentUser.addFollower(uid);
-      return true;
-    } catch (e) {
-      return false;
-    }
-  }
-
-  Future<bool> _unfollowUser(String uid) async {
-    try {
-      final currentUser = ref.read(currentUserProvider.notifier);
-      await currentUser.removeFollower(uid);
-      return true;
-    } catch (e) {
-      return false;
-    }
-  }
-
-  void _showLogInDialog() {
-    showMyDialog(
-      AppLocalizations.of(context)!.logIntoApp,
-      AppLocalizations.of(context)!.logInRequired,
-      [
-        AppLocalizations.of(context)!.goBack,
-        AppLocalizations.of(context)!.signIn
-      ],
-      [
-        () => Navigator.of(context, rootNavigator: true).pop(),
-        () => context.go('/')
-      ],
-      context,
-      dismissable: true,
-    );
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final width = c.widthGetter(context);
-    final user = ref.watch(userProvider(widget.uid)).value;
-    final authState = ref.watch(authProvider);
+    final currentUser = ref.watch(currentUserProvider);
+    final isFollowing = currentUser.user.following.contains(user.uid);
 
     return Column(
       children: [
         ProfileHeader(
-          user: user!,
-          loggedIn: authState.uid != null,
+          user: user,
+          loggedIn: true, //authState.uid != null,
         ),
         Padding(
             padding: const EdgeInsets.symmetric(vertical: 15),
             child: Center(
               child: InkWell(
-                onTap: () => _onFollowPressed(),
+                onTap: () => _onFollowPressed(ref),
                 child: Container(
                   width: width * 0.45,
                   height: width * 0.09,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
                     borderRadius: const BorderRadius.all(Radius.circular(10)),
-                    color: _isFollowing
+                    color: isFollowing
                         ? Theme.of(context).colorScheme.surfaceContainer
                         : Theme.of(context).colorScheme.primaryContainer,
                   ),
                   child: Text(
-                    _isFollowing
+                    isFollowing
                         ? AppLocalizations.of(context)!.following
                         : AppLocalizations.of(context)!.follow,
                     style: TextStyle(
