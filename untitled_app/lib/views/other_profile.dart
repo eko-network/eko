@@ -314,14 +314,13 @@ class _Header extends ConsumerWidget {
   const _Header({required this.user});
 
   Future<void> _onFollowPressed(WidgetRef ref) async {
-    final currentUserNotifier = ref.read(currentUserProvider.notifier);
-    final currentUser = ref.read(currentUserProvider);
-    final isFollowing = currentUser.user.following.contains(user.uid);
+    final isFollowing =
+        ref.watch(currentUserProvider).user.following.contains(user.uid);
 
     if (isFollowing) {
-      await currentUserNotifier.removeFollower(user.uid);
+      await ref.read(currentUserProvider.notifier).removeFollower(user.uid);
     } else {
-      await currentUserNotifier.addFollower(user.uid);
+      await ref.read(currentUserProvider.notifier).addFollower(user.uid);
     }
   }
 
