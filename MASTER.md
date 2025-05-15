@@ -19,3 +19,4 @@ TODO:
 1. EKode
 1. EkoAI
 1. Ekoin Crypto + In app rewards + microtransactions (ekredit and ekdebt)
+1. Fediverse
