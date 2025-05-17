@@ -39,17 +39,17 @@ class Group extends _$Group {
       throw Exception('Failed to load');
     }
 
-    return GroupModel.fromJson(postData, data.id);
+    return GroupModel.fromFirestore(postData, data.id);
   }
 
-  Future<String> createGroup(Group group) async {
+  Future<String> createGroup(GroupModel group) async {
     final firestore = FirebaseFirestore.instance;
-    // final snapshot = await firestore.collection('groups').add(group.toMap());
-    // return snapshot.id;
-    return "";
+    final snapshot = await firestore.collection('groups').add(group.toJson());
+    return snapshot.id;
   }
 
-  Future<void> updateGroupMembers(Group group, List<String> members) async {
+  Future<void> updateGroupMembers(
+      GroupModel group, List<String> members) async {
     final firestore = FirebaseFirestore.instance;
 
     // Get the first document (there should be only one)
@@ -62,37 +62,37 @@ class Group extends _$Group {
     //print('Group members updated successfully.');
   }
 
-  Future<GroupModel> getGroupFromId(String id) async {
+  Future<GroupModel?> getGroupFromId(String id) async {
     final data =
         await FirebaseFirestore.instance.collection('groups').doc(id).get();
     final postData = data.data();
     if (postData == null) {
-      throw Exception('Failed to load');
+      return null;
     }
-    return GroupModel.fromJson(postData, data.id);
+    return GroupModel.fromFirestore(postData, data.id);
   }
 
-  //Future<PaginationGetterReturn> getGroups(dynamic time) async {
-  //  final user = FirebaseAuth.instance.currentUser!.uid;
-  //  final query = FirebaseFirestore.instance
-  //      .collection('groups')
-  //      .where('members', arrayContains: user)
-  //      .orderBy('lastActivity', descending: true);
-  //  //.where("author", isEqualTo: user)
-  //
-  //  late QuerySnapshot<Map<String, dynamic>> snapshot;
-  //  if (time == null) {
-  //    //initial data
-  //    snapshot = await query.limit(c.postsOnRefresh).get();
-  //  } else {
-  //    snapshot = await query.startAfter([time]).limit(c.postsOnRefresh).get();
-  //  }
-  //  final postList = snapshot.docs.map<Group>((doc) {
-  //    var data = doc.data();
-  //
-  //    return GroupModel.fromJson(data, doc.id);
-  //  }).toList();
-  //  return PaginationGetterReturn(
-  //      end: (postList.length < c.postsOnRefresh), payload: postList);
-  //}
+  Future<PaginationGetterReturn> getGroups(dynamic time) async {
+    final user = FirebaseAuth.instance.currentUser!.uid;
+    final query = FirebaseFirestore.instance
+        .collection('groups')
+        .where('members', arrayContains: user)
+        .orderBy('lastActivity', descending: true);
+    //.where("author", isEqualTo: user)
+
+    late QuerySnapshot<Map<String, dynamic>> snapshot;
+    if (time == null) {
+      //initial data
+      snapshot = await query.limit(c.postsOnRefresh).get();
+    } else {
+      snapshot = await query.startAfter([time]).limit(c.postsOnRefresh).get();
+    }
+    final postList = snapshot.docs.map<GroupModel>((doc) {
+      var data = doc.data();
+
+      return GroupModel.fromFirestore(data, doc.id);
+    }).toList();
+    return PaginationGetterReturn(
+        end: (postList.length < c.postsOnRefresh), payload: postList);
+  }
 }

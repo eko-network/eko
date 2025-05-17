@@ -7,7 +7,7 @@ part of '../../types/group.dart';
 // **************************************************************************
 
 _GroupModel _$GroupModelFromJson(Map<String, dynamic> json) => _GroupModel(
-      id: json['id'] as String,
+      id: json['id'] as String? ?? '',
       name: json['name'] as String,
       description: json['description'] as String,
       lastActivity: json['lastActivity'] as String,

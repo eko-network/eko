@@ -31,6 +31,9 @@ mixin _$GroupModel implements DiagnosticableTreeMixin {
   $GroupModelCopyWith<GroupModel> get copyWith =>
       _$GroupModelCopyWithImpl<GroupModel>(this as GroupModel, _$identity);
 
+  /// Serializes this GroupModel to a JSON map.
+  Map<String, dynamic> toJson();
+
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     properties
@@ -63,6 +66,7 @@ mixin _$GroupModel implements DiagnosticableTreeMixin {
             const DeepCollectionEquality().equals(other.notSeen, notSeen));
   }
 
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
       runtimeType,
@@ -161,7 +165,7 @@ class _$GroupModelCopyWithImpl<$Res> implements $GroupModelCopyWith<$Res> {
 @JsonSerializable(explicitToJson: true)
 class _GroupModel with DiagnosticableTreeMixin implements GroupModel {
   const _GroupModel(
-      {required this.id,
+      {this.id = '',
       required this.name,
       required this.description,
       required this.lastActivity,
@@ -171,8 +175,11 @@ class _GroupModel with DiagnosticableTreeMixin implements GroupModel {
       required final List<String> notSeen})
       : _members = members,
         _notSeen = notSeen;
+  factory _GroupModel.fromJson(Map<String, dynamic> json) =>
+      _$GroupModelFromJson(json);
 
   @override
+  @JsonKey()
   final String id;
   @override
   final String name;
@@ -209,6 +216,13 @@ class _GroupModel with DiagnosticableTreeMixin implements GroupModel {
       __$GroupModelCopyWithImpl<_GroupModel>(this, _$identity);
 
   @override
+  Map<String, dynamic> toJson() {
+    return _$GroupModelToJson(
+      this,
+    );
+  }
+
+  @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     properties
       ..add(DiagnosticsProperty('type', 'GroupModel'))
@@ -240,6 +254,7 @@ class _GroupModel with DiagnosticableTreeMixin implements GroupModel {
             const DeepCollectionEquality().equals(other._notSeen, _notSeen));
   }
 
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
       runtimeType,

@@ -1,22 +1,16 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:untitled_app/custom_widgets/warning_dialog.dart';
-import 'package:untitled_app/interfaces/post.dart';
 import 'package:untitled_app/interfaces/post_queries.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
 import 'package:untitled_app/providers/user_provider.dart';
-import 'package:untitled_app/types/current_user.dart';
-import 'package:untitled_app/types/post.dart';
 import 'package:untitled_app/types/user.dart';
-import 'package:untitled_app/utilities/enums.dart';
 import 'package:untitled_app/widgets/infinite_scrolly.dart';
 import 'package:untitled_app/widgets/loading_spinner.dart';
 import 'package:untitled_app/custom_widgets/profile_page_header.dart';
 import 'package:untitled_app/widgets/post_loader.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
-import '../providers/post_pool_provider.dart';
 import '../utilities/constants.dart' as c;
 import '../widgets/post_card.dart';
 
