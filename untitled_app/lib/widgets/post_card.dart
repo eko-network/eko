@@ -67,7 +67,7 @@ class PostCard extends ConsumerStatefulWidget {
 class _Error extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return const Text('Error');
+    return Text(AppLocalizations.of(context)!.postNotFound);
   }
 }
 
@@ -81,11 +81,6 @@ class _Loading extends StatelessWidget {
 class _PostCardState extends ConsumerState<PostCard> {
   bool sharing = false;
   bool isSelf = false;
-
-  @override
-  void initState() {
-    super.initState();
-  }
 
   // void _init() {
   //   // liked = locator<CurrentUser>().checkIsLiked(post.postId);
