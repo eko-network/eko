@@ -1,30 +1,20 @@
 import 'dart:async';
-
-import 'package:extended_image/extended_image.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:untitled_app/controllers/view_post_page_controller.dart';
 import 'package:untitled_app/custom_widgets/count_down_timer.dart';
 import 'package:untitled_app/custom_widgets/gif_widget.dart';
 import 'package:untitled_app/custom_widgets/time_stamp.dart';
 import 'package:untitled_app/custom_widgets/warning_dialog.dart';
-import 'package:untitled_app/models/current_user.dart';
+import 'package:untitled_app/providers/comment_provider.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
-import 'package:untitled_app/providers/post_provider.dart';
-import 'package:untitled_app/providers/user_provider.dart';
-import 'package:untitled_app/types/post.dart';
-import 'package:untitled_app/utilities/locator.dart';
+import 'package:untitled_app/types/comment.dart';
 import 'package:untitled_app/widgets/comment_like_buttons.dart';
-import 'package:untitled_app/widgets/like_buttons.dart';
 import 'package:untitled_app/widgets/profile_picture.dart';
 import 'package:untitled_app/widgets/user_tag.dart';
 import '../localization/generated/app_localizations.dart';
 import '../utilities/constants.dart' as c;
-import '../custom_widgets/profile_avatar.dart';
-import 'package:like_button/like_button.dart';
 import 'package:flutter/cupertino.dart';
 
 Widget commentCardBuilder(String id) {
@@ -69,7 +59,7 @@ class _CommentCardState extends ConsumerState<CommentCard> {
         duration: const Duration(milliseconds: 80), curve: Curves.linear);
   }
 
-  void onScrollEnd(WidgetRef ref, PostModel comment) async {
+  void onScrollEnd(WidgetRef ref, CommentModel comment) async {
     Timer(
       const Duration(milliseconds: 1),
       () {
@@ -108,7 +98,7 @@ class _CommentCardState extends ConsumerState<CommentCard> {
     //     .removeComment(post.postId);
   }
 
-  void deletePressed(PostModel comment) {
+  void deletePressed(CommentModel comment) {
     scrollToStart();
     if (DateTime.parse(comment.createdAt)
         .toLocal()
@@ -139,7 +129,7 @@ class _CommentCardState extends ConsumerState<CommentCard> {
   @override
   Widget build(BuildContext context) {
     final width = c.widthGetter(context);
-    final asyncComment = ref.watch(postProvider(widget.id));
+    final asyncComment = ref.watch(commentProvider(widget.id));
     final currentUser = ref.watch(currentUserProvider);
 
     return asyncComment.when(
@@ -213,10 +203,11 @@ class _CommentCardState extends ConsumerState<CommentCard> {
 }
 
 class _Card extends ConsumerWidget {
-  final PostModel comment;
+  final CommentModel comment;
   const _Card({required this.comment});
 
-  avatarPressed(BuildContext context, WidgetRef ref, PostModel comment) async {
+  avatarPressed(
+      BuildContext context, WidgetRef ref, CommentModel comment) async {
     if (comment.uid == ref.watch(currentUserProvider).user.uid) {
       await context.push('/feed/sub_profile/${comment.uid}');
     } else {
@@ -335,7 +326,7 @@ class _Card extends ConsumerWidget {
                 ),
                 Column(children: [
                   TimeStamp(time: comment.createdAt),
-                  CommentLikeButtons(post: comment),
+                  CommentLikeButtons(comment: comment),
                 ])
               ],
             ),

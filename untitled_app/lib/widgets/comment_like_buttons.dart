@@ -3,9 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:like_button/like_button.dart';
+import 'package:untitled_app/providers/comment_provider.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
-import 'package:untitled_app/providers/post_provider.dart';
-import 'package:untitled_app/types/post.dart';
+import 'package:untitled_app/types/comment.dart';
 import '../utilities/constants.dart' as c;
 
 class Count extends StatelessWidget {
@@ -39,8 +39,8 @@ class Count extends StatelessWidget {
 }
 
 class CommentLikeButtons extends ConsumerWidget {
-  final PostModel post;
-  const CommentLikeButtons({super.key, required this.post});
+  final CommentModel comment;
+  const CommentLikeButtons({super.key, required this.comment});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -49,7 +49,7 @@ class CommentLikeButtons extends ConsumerWidget {
       Row(
         children: [
           LikeButton(
-            isLiked: user.likedPosts.contains(post.id),
+            isLiked: user.likedPosts.contains(comment.id),
             likeBuilder: (isLiked) {
               return SvgPicture.string(
                 '''
@@ -65,7 +65,7 @@ class CommentLikeButtons extends ConsumerWidget {
               );
             },
             onTap: (isLiked) async {
-              ref.read(postProvider(post.id).notifier).likePostToggle();
+              ref.read(commentProvider(comment.id).notifier).likePostToggle();
               return !isLiked;
             },
             likeCountAnimationType: LikeCountAnimationType.none,
@@ -81,9 +81,9 @@ class CommentLikeButtons extends ConsumerWidget {
             ),
           ),
           Count(
-            count: post.likes,
+            count: comment.likes,
             onTap: () {
-              context.push('/feed/post/${post.id}/likes', extra: post.id);
+              context.push('/feed/post/${comment.id}/likes', extra: comment.id);
             },
           ),
         ],
@@ -91,7 +91,7 @@ class CommentLikeButtons extends ConsumerWidget {
       Row(
         children: [
           LikeButton(
-            isLiked: user.dislikedPosts.contains(post.id), //dislike
+            isLiked: user.dislikedPosts.contains(comment.id), //dislike
             likeBuilder: (isDisliked) {
               return SvgPicture.string(
                 '''
@@ -107,7 +107,9 @@ class CommentLikeButtons extends ConsumerWidget {
               );
             },
             onTap: (isDisliked) async {
-              ref.read(postProvider(post.id).notifier).dislikePostToggle();
+              ref
+                  .read(commentProvider(comment.id).notifier)
+                  .dislikePostToggle();
               return !isDisliked;
             },
             likeCountAnimationType: LikeCountAnimationType.none,
@@ -123,9 +125,10 @@ class CommentLikeButtons extends ConsumerWidget {
             ),
           ),
           Count(
-            count: post.dislikes,
+            count: comment.dislikes,
             onTap: () {
-              context.push('/feed/post/${post.id}/dislikes', extra: post.id);
+              context.push('/feed/post/${comment.id}/dislikes',
+                  extra: comment.id);
             },
           )
         ],

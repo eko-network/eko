@@ -1,19 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-// import 'package:provider/provider.dart' as prov;
 import 'package:untitled_app/custom_widgets/count_down_timer.dart';
 import 'package:untitled_app/interfaces/post_queries.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
 import 'package:untitled_app/providers/post_provider.dart';
-import 'package:untitled_app/widgets/divider.dart';
-
 import 'package:untitled_app/widgets/loading_spinner.dart';
-
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:untitled_app/widgets/post_card.dart';
-
-// import '../controllers/view_post_page_controller.dart';
 import '../utilities/constants.dart' as c;
 import '../widgets/comment_card.dart';
 import '../widgets/infinite_scrolly.dart';
@@ -336,20 +330,6 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
                   child: IndexedStack(
                     index: isAtSymbolTyped ? 1 : 0,
                     children: [
-                      // PaginationPage(
-                      //     externalData: prov.Provider.of<PostPageController>(
-                      //             context,
-                      //             listen: true)
-                      //         .data,
-                      //     getter: prov.Provider.of<PostPageController>(context,
-                      //             listen: false)
-                      //         .getCommentsFromPost,
-                      //     card: commentCardBuilder,
-                      //     header: const _Header(),
-                      //     startAfterQuery: prov.Provider.of<PostPageController>(
-                      //             context,
-                      //             listen: false)
-                      //         .getTimeFromPost),
                       InfiniteScrolly<String, String>(
                         getter: (data) async {
                           return await commentsGetter(data, ref, widget.id);
