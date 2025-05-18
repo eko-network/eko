@@ -65,7 +65,7 @@ class CommentLikeButtons extends ConsumerWidget {
               );
             },
             onTap: (isLiked) async {
-              ref.read(commentProvider(comment.id).notifier).likePostToggle();
+              ref.read(commentProvider(comment.id).notifier).likeCommentToggle();
               return !isLiked;
             },
             likeCountAnimationType: LikeCountAnimationType.none,
@@ -109,7 +109,7 @@ class CommentLikeButtons extends ConsumerWidget {
             onTap: (isDisliked) async {
               ref
                   .read(commentProvider(comment.id).notifier)
-                  .dislikePostToggle();
+                  .dislikeCommentToggle();
               return !isDisliked;
             },
             likeCountAnimationType: LikeCountAnimationType.none,
