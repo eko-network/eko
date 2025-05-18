@@ -288,7 +288,7 @@ class _PostCardState extends ConsumerState<PostCard> {
                                 uid: post.uid,
                               )),
                               if (!widget.isPreview)
-                                TimeStamp(time: post.createdAt),
+                                TimeStamp(time: post.getDateTime()),
                             ],
                           ),
                           const SizedBox(height: 6.0),

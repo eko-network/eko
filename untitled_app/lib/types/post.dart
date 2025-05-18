@@ -51,21 +51,19 @@ abstract class PostModel with _$PostModel {
     required int likes,
     required int dislikes,
     required int commentCount,
-    required DateTime createdAt,
+    required String createdAt,
     required bool isPoll,
     List<String>? pollOptions,
     Map<String, int>? pollVoteCounts,
   }) = _PostModel;
 
   factory PostModel.fromJson(Map<String, dynamic> json) {
-    final time =
-        DateTime.tryParse(json['time'] ?? '')?.toLocal() ?? DateTime.now();
     return PostModel(
       //MANUALLY ADD THESE TO THE MAP FOR NOW.//
       commentCount: json['commentCount'] ?? 0,
       id: json['id'] ?? '',
       // ***** //
-      createdAt: time,
+      createdAt: json['time'],
       isPoll: json['isPoll'] ?? false,
       uid: json['author'] ?? '',
       likes: json['likes'] ?? 0,
@@ -85,6 +83,10 @@ abstract class PostModel with _$PostModel {
       title: _parseText(json['title']),
       body: _parseText(json['body']),
     );
+  }
+
+  DateTime getDateTime() {
+    return DateTime.tryParse(createdAt) ?? DateTime.now();
   }
 
   static Future<PostModel> fromFireStoreDoc(

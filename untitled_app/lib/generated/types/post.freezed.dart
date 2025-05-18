@@ -25,7 +25,7 @@ mixin _$PostModel {
   int get likes;
   int get dislikes;
   int get commentCount;
-  DateTime get createdAt;
+  String get createdAt;
   bool get isPoll;
   List<String>? get pollOptions;
   Map<String, int>? get pollVoteCounts;
@@ -104,7 +104,7 @@ abstract mixin class $PostModelCopyWith<$Res> {
       int likes,
       int dislikes,
       int commentCount,
-      DateTime createdAt,
+      String createdAt,
       bool isPoll,
       List<String>? pollOptions,
       Map<String, int>? pollVoteCounts});
@@ -181,7 +181,7 @@ class _$PostModelCopyWithImpl<$Res> implements $PostModelCopyWith<$Res> {
       createdAt: null == createdAt
           ? _self.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
+              as String,
       isPoll: null == isPoll
           ? _self.isPoll
           : isPoll // ignore: cast_nullable_to_non_nullable
@@ -266,7 +266,7 @@ class _PostModel implements PostModel {
   @override
   final int commentCount;
   @override
-  final DateTime createdAt;
+  final String createdAt;
   @override
   final bool isPoll;
   final List<String>? _pollOptions;
@@ -367,7 +367,7 @@ abstract mixin class _$PostModelCopyWith<$Res>
       int likes,
       int dislikes,
       int commentCount,
-      DateTime createdAt,
+      String createdAt,
       bool isPoll,
       List<String>? pollOptions,
       Map<String, int>? pollVoteCounts});
@@ -444,7 +444,7 @@ class __$PostModelCopyWithImpl<$Res> implements _$PostModelCopyWith<$Res> {
       createdAt: null == createdAt
           ? _self.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
+              as String,
       isPoll: null == isPoll
           ? _self.isPoll
           : isPoll // ignore: cast_nullable_to_non_nullable

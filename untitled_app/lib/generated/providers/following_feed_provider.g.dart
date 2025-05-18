@@ -6,7 +6,7 @@ part of '../../providers/following_feed_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$followingFeedHash() => r'f80e38b9882504c203d3afab90185b3d0afe504a';
+String _$followingFeedHash() => r'92106423a4a36ef752861eb7ab14fca220270ced';
 
 /// See also [FollowingFeed].
 @ProviderFor(FollowingFeed)

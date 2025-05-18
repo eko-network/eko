@@ -69,27 +69,27 @@ class Group extends _$Group {
     return GroupModel.fromFirestore(postData, data.id);
   }
 
-  Future<PaginationGetterReturn> getGroups(dynamic time) async {
-    final user = FirebaseAuth.instance.currentUser!.uid;
-    final query = FirebaseFirestore.instance
-        .collection('groups')
-        .where('members', arrayContains: user)
-        .orderBy('lastActivity', descending: true);
-    //.where("author", isEqualTo: user)
+  // Future<PaginationGetterReturn> getGroups(dynamic time) async {
+  //   final user = FirebaseAuth.instance.currentUser!.uid;
+  //   final query = FirebaseFirestore.instance
+  //       .collection('groups')
+  //       .where('members', arrayContains: user)
+  //       .orderBy('lastActivity', descending: true);
+  //   //.where("author", isEqualTo: user)
 
-    late QuerySnapshot<Map<String, dynamic>> snapshot;
-    if (time == null) {
-      //initial data
-      snapshot = await query.limit(c.postsOnRefresh).get();
-    } else {
-      snapshot = await query.startAfter([time]).limit(c.postsOnRefresh).get();
-    }
-    final postList = snapshot.docs.map<GroupModel>((doc) {
-      var data = doc.data();
+  //   late QuerySnapshot<Map<String, dynamic>> snapshot;
+  //   if (time == null) {
+  //     //initial data
+  //     snapshot = await query.limit(c.postsOnRefresh).get();
+  //   } else {
+  //     snapshot = await query.startAfter([time]).limit(c.postsOnRefresh).get();
+  //   }
+  //   final postList = snapshot.docs.map<GroupModel>((doc) {
+  //     var data = doc.data();
 
-      return GroupModel.fromFirestore(data, doc.id);
-    }).toList();
-    return PaginationGetterReturn(
-        end: (postList.length < c.postsOnRefresh), payload: postList);
-  }
+  //     return GroupModel.fromFirestore(data, doc.id);
+  //   }).toList();
+  //   return PaginationGetterReturn(
+  //       end: (postList.length < c.postsOnRefresh), payload: postList);
+  // }
 }

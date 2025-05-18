@@ -10,11 +10,10 @@ part '../generated/providers/following_feed_provider.g.dart';
 class _Chunk {
   final List<String> uids;
   PostModel newestUnshownPost;
-  String time;
-  _Chunk(
-      {required this.uids,
-      required this.newestUnshownPost,
-      required this.time});
+  _Chunk({
+    required this.uids,
+    required this.newestUnshownPost,
+  });
 }
 
 @riverpod
@@ -46,10 +45,10 @@ class FollowingFeed extends _$FollowingFeed {
         if (initResults[i].isNotEmpty) {
           asyncChunks.add(() async {
             return _Chunk(
-                uids: slicedFollowing[i],
-                newestUnshownPost:
-                    await PostModel.fromFireStoreDoc(initResults[i].first),
-                time: initResults[i].first.data()['time']);
+              uids: slicedFollowing[i],
+              newestUnshownPost:
+                  await PostModel.fromFireStoreDoc(initResults[i].first),
+            );
           }());
         }
       }
@@ -58,19 +57,20 @@ class FollowingFeed extends _$FollowingFeed {
         return;
       }
       _feedChunks.addAll(await Future.wait(asyncChunks));
-      _feedChunks.sort((a, b) => b.time.compareTo(a.time));
+      _feedChunks.sort((a, b) => b.newestUnshownPost.createdAt
+          .compareTo(a.newestUnshownPost.createdAt));
       gottenPosts.add(_feedChunks.first.newestUnshownPost);
     }
     while (gottenPosts.length < c.postsOnRefresh) {
       final snapshot = await baseQuery
           .where('author', whereIn: _feedChunks.first.uids)
-          .startAfter([_feedChunks.first.time]).get();
+          .startAfter([_feedChunks.first.newestUnshownPost.createdAt]).get();
       if (snapshot.docs.isNotEmpty) {
         _feedChunks.first.newestUnshownPost =
             await PostModel.fromFireStoreDoc(snapshot.docs.first);
-        _feedChunks.first.time = snapshot.docs.first.data()['time'];
         _feedChunks.sort(
-          (a, b) => b.time.compareTo(a.time),
+          (a, b) => b.newestUnshownPost.createdAt
+              .compareTo(a.newestUnshownPost.createdAt),
         );
         gottenPosts.add(_feedChunks.first.newestUnshownPost);
       } else {
@@ -86,6 +86,7 @@ class FollowingFeed extends _$FollowingFeed {
   }
 
   Future<void> refresh() async {
+    _feedChunks.clear();
     state = ([], false);
     await getter();
   }

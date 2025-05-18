@@ -5,15 +5,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
 import 'package:untitled_app/types/post.dart';
 
-Future<List<MapEntry<PostModel, String>>> getPosts(
+Future<List<PostModel>> getPosts(
   Query<Map<String, dynamic>> query,
 ) async {
   final postList = await Future.wait(
     await query.get().then(
           (data) => data.docs.map(
             (doc) async {
-              return MapEntry(
-                  await PostModel.fromFireStoreDoc(doc), doc.data()['time'] as String);
+              return await PostModel.fromFireStoreDoc(doc);
             },
           ),
         ),
@@ -33,10 +32,9 @@ Future<(List<MapEntry<String, String>>, bool)> profilePageGetter(
       list.isEmpty ? baseQuery : baseQuery.startAfter([list.last.value]);
 
   final postList = await getPosts(query);
-  final onlyPosts = postList.map((item) => item.key).toList();
-  ref.read(postPoolProvider).putAll(onlyPosts);
+  ref.read(postPoolProvider).putAll(postList);
   final retList =
-      postList.map((item) => MapEntry(item.key.id, item.value)).toList();
+      postList.map((item) => MapEntry(item.id, item.createdAt)).toList();
   return (retList, retList.length < c.postsOnRefresh);
 }
 
@@ -51,43 +49,9 @@ Future<(List<MapEntry<String, String>>, bool)> otherProfilePageGetter(
   final query =
       list.isEmpty ? baseQuery : baseQuery.startAfter([list.last.value]);
   final postList = await getPosts(query);
-  final onlyPosts = postList.map((item) => item.key).toList();
-  ref.read(postPoolProvider).putAll(onlyPosts);
+  ref.read(postPoolProvider).putAll(postList);
   final retList =
-      postList.map((item) => MapEntry(item.key.id, item.value)).toList();
-  return (retList, retList.length < c.postsOnRefresh);
-}
-
-Future<(List<MapEntry<String, String>>, bool)> newPageGetter(
-    List<MapEntry<String, String>> list, WidgetRef ref) async {
-  final baseQuery = FirebaseFirestore.instance
-      .collection('posts')
-      .where('tags', arrayContains: 'public')
-      .orderBy('time', descending: true)
-      .limit(c.postsOnRefresh);
-  final query =
-      list.isEmpty ? baseQuery : baseQuery.startAfter([list.last.value]);
-  final postList = await getPosts(query);
-  final onlyPosts = postList.map((item) => item.key).toList();
-  ref.read(postPoolProvider).putAll(onlyPosts);
-  final retList =
-      postList.map((item) => MapEntry(item.key.id, item.value)).toList();
-  return (retList, retList.length < c.postsOnRefresh);
-}
-
-Future<(List<MapEntry<String, String>>, bool)> followingGetter(
-    List<MapEntry<String, String>> list, WidgetRef ref) async {
-  final baseQuery = FirebaseFirestore.instance
-      .collection('posts')
-      .orderBy('time', descending: true)
-      .limit(c.postsOnRefresh);
-  final query =
-      list.isEmpty ? baseQuery : baseQuery.startAfter([list.last.value]);
-  final postList = await getPosts(query);
-  final onlyPosts = postList.map((item) => item.key).toList();
-  ref.read(postPoolProvider).putAll(onlyPosts);
-  final retList =
-      postList.map((item) => MapEntry(item.key.id, item.value)).toList();
+      postList.map((item) => MapEntry(item.id, item.createdAt)).toList();
   return (retList, retList.length < c.postsOnRefresh);
 }
 
@@ -101,9 +65,8 @@ Future<(List<MapEntry<String, int>>, bool)> popGetter(
   final query =
       list.isEmpty ? baseQuery : baseQuery.startAfter([list.last.value]);
   final postList = await getPosts(query);
-  final onlyPosts = postList.map((item) => item.key).toList();
-  ref.read(postPoolProvider).putAll(onlyPosts);
+  ref.read(postPoolProvider).putAll(postList);
   final retList =
-      postList.map((item) => MapEntry(item.key.id, item.key.likes)).toList();
+      postList.map((item) => MapEntry(item.id, item.likes)).toList();
   return (retList, retList.length < c.postsOnRefresh);
 }
