@@ -10,8 +10,7 @@ import '../models/current_user.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import '../custom_widgets/warning_dialog.dart';
 import 'package:untitled_app/custom_widgets/controllers/pagination_controller.dart'
-    show PaginationGetterReturn;
-import 'package:untitled_app/models/feed_post_cache.dart';
+    show Cache, PaginationGetterReturn;
 import '../custom_widgets/searched_user_card.dart';
 
 class CreateGroupPageController extends ChangeNotifier {
@@ -207,7 +206,6 @@ class CreateGroupPageController extends ChangeNotifier {
         notSeen: [],
       );
       newGroup.id = await GroupHandler().createGroup(newGroup);
-      locator<FeedPostCache>().groupsCache.items.insert(0, newGroup);
       creatingGroup = false;
       context.pop();
     }

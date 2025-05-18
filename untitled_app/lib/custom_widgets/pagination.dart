@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart' as prov;
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'controllers/pagination_controller.dart';
-import 'package:untitled_app/models/feed_post_cache.dart' show Cache;
 import 'package:untitled_app/widgets/loading_spinner.dart';
 
 class _DefaultInitialLoader extends StatelessWidget {

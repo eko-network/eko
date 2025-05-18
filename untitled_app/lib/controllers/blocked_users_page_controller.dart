@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:untitled_app/custom_widgets/controllers/pagination_controller.dart';
 import 'package:untitled_app/models/current_user.dart';
-import 'package:untitled_app/models/feed_post_cache.dart';
 import 'package:untitled_app/models/users.dart';
 import 'package:untitled_app/utilities/locator.dart';
 import '../utilities/constants.dart' as c;

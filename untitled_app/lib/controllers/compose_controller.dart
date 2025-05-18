@@ -14,7 +14,6 @@ import '../models/post_handler.dart';
 import 'bottom_nav_bar_controller.dart';
 import '../custom_widgets/post_card.dart';
 import 'package:go_router/go_router.dart';
-import 'package:untitled_app/models/feed_post_cache.dart';
 import '../models/users.dart' show AppUser;
 import '../models/group_handler.dart';
 import '../custom_widgets/controllers/pagination_controller.dart'
@@ -450,25 +449,25 @@ class ComposeController extends ChangeNotifier {
                   final postID =
                       await locator<PostsHandling>().createPost(post);
                   if (tags.contains('public')) {
-                    locator<FeedPostCache>().addPost(
-                      0,
-                      Post(
-                        tags: tags,
-                        gifSource: post['gifSource'],
-                        gifURL: post['gifUrl'],
-                        postId: postID,
-                        time: DateTime.now().toUtc().toIso8601String(),
-                        image: post['image'],
-                        title: Post.parseText(post['title']),
-                        author: AppUser.fromCurrent(locator<CurrentUser>()),
-                        body: Post.parseText(post['body']),
-                        likes: 0,
-                        dislikes: 0,
-                        isPoll: post['isPoll'] ?? false,
-                        pollOptions: post['pollOptions'],
-                        pollVoteCounts: post['pollVoteCounts'],
-                      ),
-                    );
+                    // locator<FeedPostCache>().addPost(
+                    //   0,
+                    //   Post(
+                    //     tags: tags,
+                    //     gifSource: post['gifSource'],
+                    //     gifURL: post['gifUrl'],
+                    //     postId: postID,
+                    //     time: DateTime.now().toUtc().toIso8601String(),
+                    //     image: post['image'],
+                    //     title: Post.parseText(post['title']),
+                    //     author: AppUser.fromCurrent(locator<CurrentUser>()),
+                    //     body: Post.parseText(post['body']),
+                    //     likes: 0,
+                    //     dislikes: 0,
+                    //     isPoll: post['isPoll'] ?? false,
+                    //     pollOptions: post['pollOptions'],
+                    //     pollVoteCounts: post['pollVoteCounts'],
+                    //   ),
+                    // );
 
                     _goToPage();
                   } else {

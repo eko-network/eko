@@ -5,7 +5,6 @@ import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:untitled_app/models/post_handler.dart';
 import 'package:untitled_app/utilities/locator.dart';
 import '../custom_widgets/controllers/pagination_controller.dart';
-import '../models/feed_post_cache.dart';
 import '../utilities/constants.dart' as c;
 import '../models/users.dart';
 import 'dart:async';
@@ -211,10 +210,6 @@ class EditGroupPageController extends ChangeNotifier {
     } else {
       locator<PostsHandling>().deleteData('groups/${group.id}');
     }
-    locator<FeedPostCache>().groupsCache.items.removeWhere((element) {
-      element as Group;
-      return element.id == group.id;
-    });
     context.go('/groups', extra: true);
   }
 

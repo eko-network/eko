@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 // import 'package:provider/provider.dart' as prov;
 import 'package:untitled_app/localization/generated/app_localizations.dart';
-import 'package:untitled_app/models/feed_post_cache.dart';
 import 'package:untitled_app/models/group_handler.dart';
 import 'package:untitled_app/utilities/locator.dart';
 // import '../controllers/groups_page_controller.dart';
@@ -56,7 +55,6 @@ class _GroupsPageState extends State<GroupsPage> {
       onPopInvoked: (didPop) => onWillPop(),
       child: Scaffold(
         body: PaginationPage(
-          externalData: locator<FeedPostCache>().groupsCache,
           getter: getGroups,
           card: groupCardBuilder,
           startAfterQuery: getTimeFromGroup,

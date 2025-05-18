@@ -63,12 +63,12 @@ dependencies:
   shimmer: ^3.0.0
   collection: ^1.17.1
   shared_preferences: ^2.2.0
+  eraser: ^3.0.0
   firebase_messaging: ^15.2.5
   extended_image: ^8.2.0
   loading_indicator: ^3.1.1
   permission_handler: ^11.0.1
   cloud_functions: ^5.3.4
-  flutter_local_notifications: ^19.2.0
   emoji_picker_flutter: ^4.3.0
   flutter_hooks: ^0.21.2
   universal_html: ^2.2.4

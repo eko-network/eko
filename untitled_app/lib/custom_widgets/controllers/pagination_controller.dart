@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 
-import 'package:untitled_app/models/feed_post_cache.dart';
-
+class Cache {
+  List<dynamic> items;
+  bool end;
+  Cache({required this.items, required this.end});
+}
 class PaginationGetterReturn {
   final bool end;
   final List<dynamic> payload;

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:untitled_app/custom_widgets/safe_area.dart';
+import 'package:untitled_app/models/notification_helper.dart';
 import 'package:untitled_app/types/user.dart';
 import 'package:untitled_app/views/blocked_users_page.dart';
 import 'package:untitled_app/views/download_page.dart';
@@ -119,9 +120,12 @@ final goRouter = GoRouter(
         ]),
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) {
-        return RequireAuth(
+        return NotificationHandler(
+          child: RequireAuth(
             child:
-                ScaffoldWithNestedNavigation(navigationShell: navigationShell));
+                ScaffoldWithNestedNavigation(navigationShell: navigationShell),
+          ),
+        );
       },
       branches: [
         StatefulShellBranch(

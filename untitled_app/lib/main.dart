@@ -6,8 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:provider/provider.dart' as prov;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:untitled_app/models/firebase_helper.dart';
-import 'package:untitled_app/models/notification_service.dart';
+import 'package:untitled_app/models/notification_helper.dart';
 import 'package:untitled_app/models/version_control.dart';
 import 'package:untitled_app/providers/post_pool_provider.dart';
 import 'package:untitled_app/providers/user_pool_provider.dart';
@@ -39,10 +38,6 @@ Future<void> _checkFirstInstall() async {
   }
 }
 
-Future<void> _setUpOtherNotification() async {
-  if (!kIsWeb) await NotificationService.initializeNotification();
-}
-
 Future<void> _buildVersion() async {
   if (!kIsWeb) await locator<Version>().init();
 }
@@ -50,7 +45,6 @@ Future<void> _buildVersion() async {
 Future<void> main() async {
   usePathUrlStrategy();
   WidgetsFlutterBinding.ensureInitialized();
-
   //init
   await dotenv.load();
   await Firebase.initializeApp(
@@ -60,7 +54,6 @@ Future<void> main() async {
   //protected/dependent services
   await Future.wait([
     _checkFirstInstall(),
-    _setUpOtherNotification(),
     _buildVersion(),
     LogoService.init(),
     FirebaseHelper.setupNotifications(),

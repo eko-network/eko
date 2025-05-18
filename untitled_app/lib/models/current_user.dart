@@ -7,7 +7,6 @@ import 'package:flutter/foundation.dart';
 
 import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
-import 'package:untitled_app/models/feed_post_cache.dart';
 import 'package:untitled_app/models/shared_pref_model.dart';
 import 'package:untitled_app/utilities/locator.dart';
 import '../models/users.dart';
@@ -744,8 +743,6 @@ class CurrentUser extends AppUser {
 
   void clearVariables() {
     locator<PostsHandling>().feedChunks.clear();
-    locator<FeedPostCache>().clearFeedCache();
-    locator<FeedPostCache>().clearGroupProfileCache();
     uid = '';
 
     name = '';

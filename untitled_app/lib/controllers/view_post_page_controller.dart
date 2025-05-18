@@ -14,8 +14,7 @@ import 'package:untitled_app/localization/generated/app_localizations.dart';
 import '../models/post_handler.dart';
 import 'package:go_router/go_router.dart';
 import '../custom_widgets/controllers/pagination_controller.dart'
-    show PaginationGetterReturn;
-import '../models/feed_post_cache.dart';
+    show Cache, PaginationGetterReturn;
 import 'bottom_nav_bar_controller.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
@@ -158,12 +157,9 @@ class PostPageController extends ChangeNotifier {
   }
 
   void reduceComments() {
-    postMap[post!.postId]!.post.commentCount--;
   }
 
   void _deletePostFromDialog() {
-    _pop();
-    locator<FeedPostCache>().removePostFromAllCaches(post!.postId);
     _pop();
     // TODO: 
     // postMap[post!.postId]!.visible = false; 
@@ -428,7 +424,6 @@ class PostPageController extends ChangeNotifier {
       gif = null;
       //notifyListeners();
     }
-    postMap[post!.postId]!.post.commentCount++;
     notifyListeners();
   }
 
