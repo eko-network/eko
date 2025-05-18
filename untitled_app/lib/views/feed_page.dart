@@ -141,12 +141,8 @@ class _FeedPageState extends State<FeedPage> with TickerProviderStateMixin {
   }
 
   void tabListener() {
-    print("rtes");
-    if (tabController.indexIsChanging && appBarOffset != 0.0) {
-      setState(() {
-        appBarOffset = 0.0;
-      });
-    }
+    lastOffset = getCurrentScrollController().offset;
+    revealDelta = 0.0;
   }
 
   void scrollListener() {
@@ -181,6 +177,7 @@ class _FeedPageState extends State<FeedPage> with TickerProviderStateMixin {
     newScrollController.addListener(scrollListener);
     popScrollController.addListener(scrollListener);
     tabController = TabController(length: 3, vsync: this);
+    tabController.addListener(tabListener);
   }
 
   @override
@@ -188,6 +185,7 @@ class _FeedPageState extends State<FeedPage> with TickerProviderStateMixin {
     followingScrollController.removeListener(scrollListener);
     newScrollController.removeListener(scrollListener);
     popScrollController.removeListener(scrollListener);
+    tabController.removeListener(tabListener);
     followingScrollController.dispose();
     newScrollController.dispose();
     popScrollController.dispose();
@@ -213,10 +211,21 @@ class _FeedPageState extends State<FeedPage> with TickerProviderStateMixin {
                   });
                 }
               } else if (notification is ScrollUpdateNotification) {
-                if (appBarOffset != 0.0 && tabController.offset % 1 != 0.0) {
-                  setState(() {
-                    appBarOffset = 0.0;
-                  });
+                if (appBarOffset == 0.0) {
+                  return false;
+                }
+                final modulatedOffset = tabController.offset % 1;
+                if (modulatedOffset != 0) {
+                  revealDelta = 0.0;
+                  if (tabController.offset.sign == -1.0) {
+                    setState(() {
+                      appBarOffset = modulatedOffset * -appBarHeight;
+                    });
+                  } else {
+                    setState(() {
+                      appBarOffset = (1 - modulatedOffset) * -appBarHeight;
+                    });
+                  }
                 }
               }
               return false;
