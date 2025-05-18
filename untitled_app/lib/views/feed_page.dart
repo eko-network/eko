@@ -140,6 +140,15 @@ class _FeedPageState extends State<FeedPage> with TickerProviderStateMixin {
     }
   }
 
+  void tabListener() {
+    print("rtes");
+    if (tabController.indexIsChanging && appBarOffset != 0.0) {
+      setState(() {
+        appBarOffset = 0.0;
+      });
+    }
+  }
+
   void scrollListener() {
     final currentOffset = getCurrentScrollController().offset;
     final delta = currentOffset - lastOffset;
@@ -176,13 +185,13 @@ class _FeedPageState extends State<FeedPage> with TickerProviderStateMixin {
 
   @override
   void dispose() {
-    tabController.dispose();
     followingScrollController.removeListener(scrollListener);
     newScrollController.removeListener(scrollListener);
     popScrollController.removeListener(scrollListener);
     followingScrollController.dispose();
     newScrollController.dispose();
     popScrollController.dispose();
+    tabController.dispose();
     super.dispose();
   }
 
@@ -203,17 +212,24 @@ class _FeedPageState extends State<FeedPage> with TickerProviderStateMixin {
                     appBarOffset = 0.0;
                   });
                 }
+              } else if (notification is ScrollUpdateNotification) {
+                if (appBarOffset != 0.0 && tabController.offset % 1 != 0.0) {
+                  setState(() {
+                    appBarOffset = 0.0;
+                  });
+                }
               }
               return false;
             },
-            child: TabBarView(
+            child: GestureDetector(
+                child: TabBarView(
               controller: tabController,
               children: [
                 _FollowingTab(controller: followingScrollController),
                 _NewTab(controller: newScrollController),
                 _PopTab(controller: popScrollController),
               ],
-            )),
+            ))),
         AnimatedPositioned(
             duration: Duration(milliseconds: 100),
             curve: Curves.easeOut,
@@ -230,12 +246,22 @@ class _FeedPageState extends State<FeedPage> with TickerProviderStateMixin {
   }
 }
 
-class _FollowingTab extends ConsumerWidget {
+class _FollowingTab extends ConsumerStatefulWidget {
   final ScrollController controller;
   const _FollowingTab({required this.controller});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_FollowingTab> createState() => __FollowingTabState();
+}
+
+class __FollowingTabState extends ConsumerState<_FollowingTab>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
     final provider = ref.watch(followingFeedProvider);
     return InfiniteScrollyShell<String>(
       isEnd: provider.$2,
@@ -249,17 +275,27 @@ class _FollowingTab extends ConsumerWidget {
         length: 3,
       ),
       widget: postCardBuilder,
-      controller: controller,
+      controller: widget.controller,
     );
   }
 }
 
-class _NewTab extends ConsumerWidget {
+class _NewTab extends ConsumerStatefulWidget {
   final ScrollController controller;
   const _NewTab({required this.controller});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_NewTab> createState() => __NewTabState();
+}
+
+class __NewTabState extends ConsumerState<_NewTab>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
     final provider = ref.watch(newFeedProvider);
     return InfiniteScrollyShell<String>(
       isEnd: provider.$2,
@@ -273,17 +309,27 @@ class _NewTab extends ConsumerWidget {
         length: 3,
       ),
       widget: postCardBuilder,
-      controller: controller,
+      controller: widget.controller,
     );
   }
 }
 
-class _PopTab extends ConsumerWidget {
+class _PopTab extends ConsumerStatefulWidget {
   final ScrollController controller;
   const _PopTab({required this.controller});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_PopTab> createState() => __PopTabState();
+}
+
+class __PopTabState extends ConsumerState<_PopTab>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
     return InfiniteScrolly<String, int>(
       header: SizedBox(
         height: appBarHeight,
@@ -295,7 +341,7 @@ class _PopTab extends ConsumerWidget {
         length: 3,
       ),
       widget: postCardBuilder,
-      controller: controller,
+      controller: widget.controller,
     );
   }
 }

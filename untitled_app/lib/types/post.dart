@@ -39,6 +39,8 @@ List<String>? _parseText(String? text) {
 
 @freezed
 abstract class PostModel with _$PostModel {
+  const PostModel._();
+
   @JsonSerializable(explicitToJson: true)
   const factory PostModel({
     required String uid,

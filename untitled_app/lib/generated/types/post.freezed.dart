@@ -201,7 +201,7 @@ class _$PostModelCopyWithImpl<$Res> implements $PostModelCopyWith<$Res> {
 /// @nodoc
 
 @JsonSerializable(explicitToJson: true)
-class _PostModel implements PostModel {
+class _PostModel extends PostModel {
   const _PostModel(
       {required this.uid,
       required this.id,
@@ -221,7 +221,8 @@ class _PostModel implements PostModel {
         _body = body,
         _tags = tags,
         _pollOptions = pollOptions,
-        _pollVoteCounts = pollVoteCounts;
+        _pollVoteCounts = pollVoteCounts,
+        super._();
 
   @override
   final String uid;

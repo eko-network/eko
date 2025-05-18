@@ -21,19 +21,19 @@ class NewFeed extends _$NewFeed {
         .limit(c.postsOnRefresh);
     final query =
         state.$1.isEmpty ? baseQuery : baseQuery.startAfter([_timestamps.last]);
-    final postList = await getPosts(
-        query);
+    final postList = await getPosts(query);
 
-    ref.read(postPoolProvider).putAll(postList.map((item) => item.key));
+    ref.read(postPoolProvider).putAll(postList);
     final newList = [...state.$1];
-    for (final postMap in postList) {
-      newList.add(postMap.key.id);
-      _timestamps.add(postMap.value);
+    for (final post in postList) {
+      newList.add(post.id);
+      _timestamps.add(post.createdAt);
     }
     state = (newList, postList.length < c.postsOnRefresh);
   }
 
   Future<void> refresh() async {
+    _timestamps.clear();
     state = ([], false);
     await getter();
   }

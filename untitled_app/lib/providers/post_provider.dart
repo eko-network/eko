@@ -124,7 +124,7 @@ class Post extends _$Post {
       ref.read(currentUserProvider.notifier).removeIdFromLiked(prevState.id);
       state = AsyncData(prevState.copyWith(likes: prevState.likes - 1));
       try {
-        await _addLikeToDb(prevState.id);
+        await _removeLikeFromDb(prevState.id);
       } catch (_) {
         ref.read(currentUserProvider.notifier).addIdToLiked(prevState.id);
         state = AsyncData(prevState);
@@ -134,15 +134,16 @@ class Post extends _$Post {
       bool wasDisliked = false;
       final List<Future<void>> ops = [_addLikeToDb(prevState.id)];
       ref.read(currentUserProvider.notifier).addIdToLiked(prevState.id);
-      state = AsyncData(prevState.copyWith(likes: prevState.likes + 1));
       if (ref.read(currentUserProvider).dislikedPosts.contains(prevState.id)) {
         wasDisliked = true;
         ref
             .read(currentUserProvider.notifier)
             .removeIdFromDisliked(prevState.id);
-        state = AsyncData(prevState.copyWith(dislikes: prevState.dislikes - 1));
-
+        state = AsyncData(prevState.copyWith(
+            dislikes: prevState.dislikes - 1, likes: prevState.likes + 1));
         ops.add(_removeDisikeFromDb(prevState.id));
+      } else {
+        state = AsyncData(prevState.copyWith(likes: prevState.likes + 1));
       }
       try {
         await Future.wait(ops);
@@ -165,7 +166,7 @@ class Post extends _$Post {
       ref.read(currentUserProvider.notifier).removeIdFromDisliked(prevState.id);
       state = AsyncData(prevState.copyWith(dislikes: prevState.dislikes - 1));
       try {
-        await _addDislikeToDb(prevState.id);
+        await _removeDisikeFromDb(prevState.id);
       } catch (_) {
         ref.read(currentUserProvider.notifier).addIdToDisliked(prevState.id);
         state = AsyncData(prevState);
@@ -174,12 +175,14 @@ class Post extends _$Post {
       bool wasLiked = false;
       final List<Future<void>> ops = [_addDislikeToDb(prevState.id)];
       ref.read(currentUserProvider.notifier).addIdToDisliked(prevState.id);
-      state = AsyncData(prevState.copyWith(dislikes: prevState.dislikes + 1));
       if (ref.read(currentUserProvider).likedPosts.contains(prevState.id)) {
         wasLiked = true;
         ref.read(currentUserProvider.notifier).removeIdFromLiked(prevState.id);
-        state = AsyncData(prevState.copyWith(likes: prevState.likes - 1));
+        state = AsyncData(prevState.copyWith(
+            likes: prevState.likes - 1, dislikes: prevState.dislikes + 1));
         ops.add(_removeLikeFromDb(prevState.id));
+      } else {
+        state = AsyncData(prevState.copyWith(dislikes: prevState.dislikes + 1));
       }
       try {
         await Future.wait(ops);
