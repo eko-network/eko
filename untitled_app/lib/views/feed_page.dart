@@ -148,7 +148,9 @@ class _FeedPageState extends State<FeedPage> with TickerProviderStateMixin {
   void scrollListener() {
     final currentOffset = getCurrentScrollController().offset;
     final delta = currentOffset - lastOffset;
-
+    if (currentOffset < 0) {
+      return;
+    }
     if (delta < 0) {
       if (revealDelta < targetRevealDelta && currentOffset > appBarHeight) {
         revealDelta -= delta;

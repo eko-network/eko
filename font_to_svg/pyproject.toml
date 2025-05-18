@@ -1,0 +1,10 @@
+[project]
+name = "font-to-svg"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "firebase-admin>=6.8.0",
+    "ziafont>=0.10",
+]

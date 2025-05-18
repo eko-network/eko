@@ -10,6 +10,7 @@ import 'package:untitled_app/models/notification_helper.dart';
 import 'package:untitled_app/models/version_control.dart';
 import 'package:untitled_app/providers/post_pool_provider.dart';
 import 'package:untitled_app/providers/user_pool_provider.dart';
+import 'package:untitled_app/utilities/logo_service.dart';
 import 'package:untitled_app/utilities/provider_debugger.dart';
 import 'utilities/themes/dark_theme_provider.dart';
 import 'utilities/themes/dark_theme_styles.dart';
@@ -54,6 +55,7 @@ Future<void> main() async {
   await Future.wait([
     _checkFirstInstall(),
     _buildVersion(),
+    LogoService.init(),
     NotificationHelper.setupNotifications(),
     FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true)
   ]);
