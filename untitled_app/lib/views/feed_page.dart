@@ -244,7 +244,7 @@ class _FollowingTab extends ConsumerWidget {
         height: appBarHeight,
       ),
       getter: ref.read(followingFeedProvider.notifier).getter,
-      onRefresh: ref.read(newFeedProvider.notifier).refresh,
+      onRefresh: ref.read(followingFeedProvider.notifier).refresh,
       initialLoadingWidget: PostLoader(
         length: 3,
       ),

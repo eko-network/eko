@@ -8,6 +8,7 @@ import 'package:untitled_app/custom_widgets/error_snack_bar.dart';
 import 'package:untitled_app/custom_widgets/gif_widget.dart';
 import 'package:untitled_app/custom_widgets/image_widget.dart';
 import 'package:untitled_app/custom_widgets/poll_widget.dart';
+import 'package:untitled_app/providers/current_user_provider.dart';
 // import 'package:untitled_app/interfaces/user.dart';
 // import 'package:untitled_app/providers/current_user_provider.dart';
 import 'package:untitled_app/providers/post_provider.dart';
@@ -246,11 +247,14 @@ class _PostCardState extends ConsumerState<PostCard> {
                     // Display the profile picture as a CircleAvatar
                     ProfilePicture(
                       onPressed: () {
-                        // if (isLoggedIn()) {
-                        //   (!widget.isPreview && !widget.isOnProfile)
-                        //       ? avatarPressed(post.uid)
-                        //       : null;
-                        // }
+                        if (!widget.isPreview && !widget.isOnProfile) {
+                          if (post.uid !=
+                              ref.read(currentUserProvider).user.uid) {
+                            context.push('/feed/sub_profile/${post.uid}');
+                          } else {
+                            context.go('/profile');
+                          }
+                        }
                       },
                       uid: post.uid,
                       size: width * 0.115,
@@ -266,14 +270,21 @@ class _PostCardState extends ConsumerState<PostCard> {
                             children: [
                               Expanded(
                                   child: UserTag(
-                                // onPressed: () {
-                                //   if (isLoggedIn()) {
-                                //     (!widget.isPreview &&
-                                //             !widget.isOnProfile)
-                                //         ? avatarPressed(post.uid)
-                                //         : null;
-                                //   }
-                                // },
+                                onPressed: () {
+                                  if (!widget.isPreview &&
+                                      !widget.isOnProfile) {
+                                    if (post.uid !=
+                                        ref
+                                            .read(currentUserProvider)
+                                            .user
+                                            .uid) {
+                                      context.push(
+                                          '/feed/sub_profile/${post.uid}');
+                                    } else {
+                                      context.go('/profile');
+                                    }
+                                  }
+                                },
                                 uid: post.uid,
                               )),
                               if (!widget.isPreview)
