@@ -355,7 +355,7 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
                           return await commentsGetter(data, ref, widget.id);
                         },
                         widget: commentCardBuilder,
-                        header: _Header(id: widget.id),
+                        header: PostCard(id: widget.id),
                         onRefresh: onRefresh,
                         // initialLoadingWidget: PostLoader(
                         //   length: 3,
@@ -486,22 +486,6 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
           child: LoadingSpinner(),
         );
       },
-    );
-  }
-}
-
-class _Header extends StatelessWidget {
-  final String id;
-  const _Header({required this.id});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        PostCard(
-          id: id,
-        ),
-      ],
     );
   }
 }

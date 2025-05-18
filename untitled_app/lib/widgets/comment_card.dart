@@ -17,6 +17,7 @@ import 'package:untitled_app/providers/post_provider.dart';
 import 'package:untitled_app/providers/user_provider.dart';
 import 'package:untitled_app/types/post.dart';
 import 'package:untitled_app/utilities/locator.dart';
+import 'package:untitled_app/widgets/comment_like_buttons.dart';
 import 'package:untitled_app/widgets/like_buttons.dart';
 import 'package:untitled_app/widgets/profile_picture.dart';
 import 'package:untitled_app/widgets/user_tag.dart';
@@ -240,7 +241,6 @@ class _Card extends ConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Display the profile picture as a CircleAvatar
                 ProfilePicture(
                   onPressed: () {
                     if (comment.uid != ref.read(currentUserProvider).user.uid) {
@@ -333,10 +333,9 @@ class _Card extends ConsumerWidget {
                     ],
                   ),
                 ),
-
                 Column(children: [
                   TimeStamp(time: comment.createdAt),
-                  LikeButtons(post: comment),
+                  CommentLikeButtons(post: comment),
                 ])
               ],
             ),
