@@ -9,12 +9,12 @@ import 'package:untitled_app/providers/post_provider.dart';
 import 'package:untitled_app/widgets/divider.dart';
 
 import 'package:untitled_app/widgets/loading_spinner.dart';
-import 'package:untitled_app/widgets/post_card.dart';
 
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 
 // import '../controllers/view_post_page_controller.dart';
 import '../utilities/constants.dart' as c;
+import '../widgets/comment_card.dart';
 import '../widgets/infinite_scrolly.dart';
 
 class ViewPostPage extends ConsumerStatefulWidget {
@@ -353,7 +353,7 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
                         getter: (data) async {
                           return await commentsGetter(data, ref, widget.id);
                         },
-                        widget: profilePostCardBuilder,
+                        widget: commentCardBuilder,
                         header: _Header(id: widget.id),
                         onRefresh: onRefresh,
                         // initialLoadingWidget: PostLoader(
@@ -497,11 +497,9 @@ class _Header extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        PostCard(
+        CommentCard(
           id: id,
-          isPostPage: true,
         ),
-        StyledDivider(),
       ],
     );
   }
