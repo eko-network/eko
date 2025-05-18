@@ -6,14 +6,13 @@ import 'package:untitled_app/interfaces/post.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
 import 'package:untitled_app/providers/post_pool_provider.dart';
 import 'package:untitled_app/types/post.dart';
-import 'package:untitled_app/utilities/enums.dart';
 // Necessary for code-generation to work
 part '../generated/providers/post_provider.g.dart';
 
 @riverpod
 class Post extends _$Post {
   Timer? _disposeTimer;
-  bool _isLikeStateChanging = false;
+  bool _isLiking = false;
   @override
   FutureOr<PostModel> build(String id) async {
     // *** This block is for lifecycle management *** //
@@ -57,15 +56,14 @@ class Post extends _$Post {
     json['id'] = id;
     json['commentCount'] = commentCount;
 
-    return PostModel.fromJson(
-        json, ref.read(currentUserProvider.notifier).getLikeState(id));
+    return PostModel.fromJson(json);
   }
 
-  Future<void> _addLikeUnsafe(String id) async {
+  Future<void> _addLikeToDb(String id) async {
     final firestore = FirebaseFirestore.instance;
-    final user = ref.read(currentUserProvider).user.uid;
+    final uid = ref.read(currentUserProvider).user.uid;
     await Future.wait([
-      firestore.collection('users').doc(user).update({
+      firestore.collection('users').doc(uid).update({
         'profileData.likedPosts': FieldValue.arrayUnion([id])
       }),
       firestore
@@ -75,51 +73,11 @@ class Post extends _$Post {
     ]);
   }
 
-  Future<void> addLike() async {
-    if (_isLikeStateChanging) {
-      return;
-    }
-    final prevState = await future;
-    if (prevState.likeState == LikeState.isLiked) {
-      return;
-    }
-    _isLikeStateChanging = true;
-    try {
-      //queue a database opperation to add a like
-      final List<Future<dynamic>> futures = [_addLikeUnsafe(prevState.id)];
-
-      //check if also need to remove a dislike
-      if (prevState.likeState == LikeState.isDisliked) {
-        state = AsyncData(prevState.copyWith(
-            likeState: LikeState.isLiked,
-            likes: prevState.likes + 1,
-            dislikes: prevState.dislikes - 1));
-        ref
-            .read(currentUserProvider.notifier)
-            .removeIdFromDisliked(prevState.id);
-        futures.add(_removeDisikeUnsafe(prevState.id));
-      } else {
-        state = AsyncData(prevState.copyWith(
-            likeState: LikeState.isLiked, likes: prevState.likes + 1));
-      }
-      ref.read(currentUserProvider.notifier).addIdToLiked(prevState.id);
-
-      await Future.wait(futures);
-    } catch (e) {
-      state = AsyncData(prevState);
-      ref.read(currentUserProvider.notifier).removeIdFromLiked(prevState.id);
-      if (prevState.likeState == LikeState.isDisliked) {
-        ref.read(currentUserProvider.notifier).addIdToDisliked(prevState.id);
-      }
-    }
-    _isLikeStateChanging = false;
-  }
-
-  Future<void> _removeLikeUnsafe(String id) async {
+  Future<void> _removeLikeFromDb(String id) async {
     final firestore = FirebaseFirestore.instance;
-    final user = ref.read(currentUserProvider).user.uid;
+    final uid = ref.read(currentUserProvider).user.uid;
     await Future.wait([
-      firestore.collection('users').doc(user).update({
+      firestore.collection('users').doc(uid).update({
         'profileData.likedPosts': FieldValue.arrayRemove([id])
       }),
       firestore
@@ -129,32 +87,11 @@ class Post extends _$Post {
     ]);
   }
 
-  Future<void> removeLike() async {
-    if (_isLikeStateChanging) {
-      return;
-    }
-    final prevState = await future;
-    if (prevState.likeState != LikeState.isLiked) {
-      return;
-    }
-    _isLikeStateChanging = true;
-    try {
-      state = AsyncData(prevState.copyWith(
-          likeState: LikeState.neutral, likes: prevState.likes - 1));
-      ref.read(currentUserProvider.notifier).addIdToLiked(prevState.id);
-      await _removeLikeUnsafe(prevState.id);
-    } catch (e) {
-      state = AsyncData(prevState);
-      ref.read(currentUserProvider.notifier).removeIdFromLiked(prevState.id);
-    }
-    _isLikeStateChanging = false;
-  }
-
-  Future<void> _addDislikeUnsafe(String id) async {
+  Future<void> _addDislikeToDb(String id) async {
     final firestore = FirebaseFirestore.instance;
-    final user = ref.read(currentUserProvider).user.uid;
+    final uid = ref.read(currentUserProvider).user.uid;
     await Future.wait([
-      firestore.collection('users').doc(user).update({
+      firestore.collection('users').doc(uid).update({
         'profileData.dislikedPosts': FieldValue.arrayUnion([id])
       }),
       firestore
@@ -164,45 +101,11 @@ class Post extends _$Post {
     ]);
   }
 
-  Future<void> addDislike() async {
-    if (_isLikeStateChanging) {
-      return;
-    }
-    final prevState = await future;
-    if (prevState.likeState == LikeState.isDisliked) {
-      return;
-    }
-    _isLikeStateChanging = true;
-    try {
-      final List<Future<dynamic>> futures = [_addDislikeUnsafe(prevState.id)];
-      if (prevState.likeState == LikeState.isLiked) {
-        state = AsyncData(prevState.copyWith(
-            likeState: LikeState.isDisliked,
-            likes: prevState.likes - 1,
-            dislikes: prevState.dislikes + 1));
-        ref.read(currentUserProvider.notifier).removeIdFromLiked(prevState.id);
-        futures.add(_removeLikeUnsafe(prevState.id));
-      } else {
-        state = AsyncData(prevState.copyWith(
-            likeState: LikeState.isDisliked, dislikes: prevState.dislikes + 1));
-      }
-      ref.read(currentUserProvider.notifier).addIdToDisliked(prevState.id);
-      await Future.wait(futures);
-    } catch (e) {
-      state = AsyncData(prevState);
-      ref.read(currentUserProvider.notifier).removeIdFromDisliked(prevState.id);
-      if (prevState.likeState == LikeState.isLiked) {
-        ref.read(currentUserProvider.notifier).addIdToLiked(prevState.id);
-      }
-    }
-    _isLikeStateChanging = false;
-  }
-
-  Future<void> _removeDisikeUnsafe(String id) async {
+  Future<void> _removeDisikeFromDb(String id) async {
     final firestore = FirebaseFirestore.instance;
-    final user = ref.read(currentUserProvider).user.uid;
+    final uid = ref.read(currentUserProvider).user.uid;
     await Future.wait([
-      firestore.collection('users').doc(user).update({
+      firestore.collection('users').doc(uid).update({
         'profileData.dislikedPosts': FieldValue.arrayRemove([id])
       }),
       firestore
@@ -212,24 +115,84 @@ class Post extends _$Post {
     ]);
   }
 
-  Future<void> removeDislike() async {
-    if (_isLikeStateChanging) {
-      return;
-    }
+  Future<void> likePostToggle() async {
     final prevState = await future;
-    if (prevState.likeState != LikeState.isDisliked) {
-      return;
+    if (_isLiking) return;
+    _isLiking = true;
+    // liked -> not liked
+    if (ref.read(currentUserProvider).likedPosts.contains(prevState.id)) {
+      ref.read(currentUserProvider.notifier).removeIdFromLiked(prevState.id);
+      state = AsyncData(prevState.copyWith(likes: prevState.likes - 1));
+      try {
+        await _addLikeToDb(prevState.id);
+      } catch (_) {
+        ref.read(currentUserProvider.notifier).addIdToLiked(prevState.id);
+        state = AsyncData(prevState);
+      }
+      // not liked -> liked
+    } else {
+      bool wasDisliked = false;
+      final List<Future<void>> ops = [_addLikeToDb(prevState.id)];
+      ref.read(currentUserProvider.notifier).addIdToLiked(prevState.id);
+      state = AsyncData(prevState.copyWith(likes: prevState.likes + 1));
+      if (ref.read(currentUserProvider).dislikedPosts.contains(prevState.id)) {
+        wasDisliked = true;
+        ref
+            .read(currentUserProvider.notifier)
+            .removeIdFromDisliked(prevState.id);
+        state = AsyncData(prevState.copyWith(dislikes: prevState.dislikes - 1));
+
+        ops.add(_removeDisikeFromDb(prevState.id));
+      }
+      try {
+        await Future.wait(ops);
+      } catch (_) {
+        ref.read(currentUserProvider.notifier).removeIdFromLiked(prevState.id);
+        if (wasDisliked) {
+          ref.read(currentUserProvider.notifier).addIdToDisliked(prevState.id);
+        }
+        state = AsyncData(prevState);
+      }
     }
-    _isLikeStateChanging = true;
-    try {
-      state = AsyncData(prevState.copyWith(
-          likeState: LikeState.neutral, dislikes: prevState.dislikes - 1));
-      ref.read(currentUserProvider.notifier).addIdToDisliked(prevState.id);
-      await _removeDisikeUnsafe(prevState.id);
-    } catch (e) {
-      state = AsyncData(prevState);
+    _isLiking = false;
+  }
+
+  Future<void> dislikePostToggle() async {
+    final prevState = await future;
+    if (_isLiking) return;
+    _isLiking = true;
+    if (ref.read(currentUserProvider).dislikedPosts.contains(prevState.id)) {
       ref.read(currentUserProvider.notifier).removeIdFromDisliked(prevState.id);
+      state = AsyncData(prevState.copyWith(dislikes: prevState.dislikes - 1));
+      try {
+        await _addDislikeToDb(prevState.id);
+      } catch (_) {
+        ref.read(currentUserProvider.notifier).addIdToDisliked(prevState.id);
+        state = AsyncData(prevState);
+      }
+    } else {
+      bool wasLiked = false;
+      final List<Future<void>> ops = [_addDislikeToDb(prevState.id)];
+      ref.read(currentUserProvider.notifier).addIdToDisliked(prevState.id);
+      state = AsyncData(prevState.copyWith(dislikes: prevState.dislikes + 1));
+      if (ref.read(currentUserProvider).likedPosts.contains(prevState.id)) {
+        wasLiked = true;
+        ref.read(currentUserProvider.notifier).removeIdFromLiked(prevState.id);
+        state = AsyncData(prevState.copyWith(likes: prevState.likes - 1));
+        ops.add(_removeLikeFromDb(prevState.id));
+      }
+      try {
+        await Future.wait(ops);
+      } catch (_) {
+        ref
+            .read(currentUserProvider.notifier)
+            .removeIdFromDisliked(prevState.id);
+        if (wasLiked) {
+          ref.read(currentUserProvider.notifier).addIdToLiked(prevState.id);
+        }
+        state = AsyncData(prevState);
+      }
     }
-    _isLikeStateChanging = false;
+    _isLiking = false;
   }
 }

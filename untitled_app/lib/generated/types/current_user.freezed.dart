@@ -16,10 +16,10 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$CurrentUserModel {
   UserModel get user;
-  List<String> get likedPosts;
-  List<String> get dislikedPosts;
-  List<String> get blockedUsers;
-  List<String> get blockedBy;
+  Set<String> get likedPosts;
+  Set<String> get dislikedPosts;
+  Set<String> get blockedUsers;
+  Set<String> get blockedBy;
   Map<String, int> get pollVotes;
 
   /// Create a copy of CurrentUserModel
@@ -70,10 +70,10 @@ abstract mixin class $CurrentUserModelCopyWith<$Res> {
   @useResult
   $Res call(
       {UserModel user,
-      List<String> likedPosts,
-      List<String> dislikedPosts,
-      List<String> blockedUsers,
-      List<String> blockedBy,
+      Set<String> likedPosts,
+      Set<String> dislikedPosts,
+      Set<String> blockedUsers,
+      Set<String> blockedBy,
       Map<String, int> pollVotes});
 
   $UserModelCopyWith<$Res> get user;
@@ -107,19 +107,19 @@ class _$CurrentUserModelCopyWithImpl<$Res>
       likedPosts: null == likedPosts
           ? _self.likedPosts
           : likedPosts // ignore: cast_nullable_to_non_nullable
-              as List<String>,
+              as Set<String>,
       dislikedPosts: null == dislikedPosts
           ? _self.dislikedPosts
           : dislikedPosts // ignore: cast_nullable_to_non_nullable
-              as List<String>,
+              as Set<String>,
       blockedUsers: null == blockedUsers
           ? _self.blockedUsers
           : blockedUsers // ignore: cast_nullable_to_non_nullable
-              as List<String>,
+              as Set<String>,
       blockedBy: null == blockedBy
           ? _self.blockedBy
           : blockedBy // ignore: cast_nullable_to_non_nullable
-              as List<String>,
+              as Set<String>,
       pollVotes: null == pollVotes
           ? _self.pollVotes
           : pollVotes // ignore: cast_nullable_to_non_nullable
@@ -143,10 +143,10 @@ class _$CurrentUserModelCopyWithImpl<$Res>
 class _CurrentUserModel implements CurrentUserModel {
   const _CurrentUserModel(
       {required this.user,
-      required final List<String> likedPosts,
-      required final List<String> dislikedPosts,
-      required final List<String> blockedUsers,
-      required final List<String> blockedBy,
+      required final Set<String> likedPosts,
+      required final Set<String> dislikedPosts,
+      required final Set<String> blockedUsers,
+      required final Set<String> blockedBy,
       required final Map<String, int> pollVotes})
       : _likedPosts = likedPosts,
         _dislikedPosts = dislikedPosts,
@@ -156,36 +156,36 @@ class _CurrentUserModel implements CurrentUserModel {
 
   @override
   final UserModel user;
-  final List<String> _likedPosts;
+  final Set<String> _likedPosts;
   @override
-  List<String> get likedPosts {
-    if (_likedPosts is EqualUnmodifiableListView) return _likedPosts;
+  Set<String> get likedPosts {
+    if (_likedPosts is EqualUnmodifiableSetView) return _likedPosts;
     // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_likedPosts);
+    return EqualUnmodifiableSetView(_likedPosts);
   }
 
-  final List<String> _dislikedPosts;
+  final Set<String> _dislikedPosts;
   @override
-  List<String> get dislikedPosts {
-    if (_dislikedPosts is EqualUnmodifiableListView) return _dislikedPosts;
+  Set<String> get dislikedPosts {
+    if (_dislikedPosts is EqualUnmodifiableSetView) return _dislikedPosts;
     // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_dislikedPosts);
+    return EqualUnmodifiableSetView(_dislikedPosts);
   }
 
-  final List<String> _blockedUsers;
+  final Set<String> _blockedUsers;
   @override
-  List<String> get blockedUsers {
-    if (_blockedUsers is EqualUnmodifiableListView) return _blockedUsers;
+  Set<String> get blockedUsers {
+    if (_blockedUsers is EqualUnmodifiableSetView) return _blockedUsers;
     // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_blockedUsers);
+    return EqualUnmodifiableSetView(_blockedUsers);
   }
 
-  final List<String> _blockedBy;
+  final Set<String> _blockedBy;
   @override
-  List<String> get blockedBy {
-    if (_blockedBy is EqualUnmodifiableListView) return _blockedBy;
+  Set<String> get blockedBy {
+    if (_blockedBy is EqualUnmodifiableSetView) return _blockedBy;
     // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_blockedBy);
+    return EqualUnmodifiableSetView(_blockedBy);
   }
 
   final Map<String, int> _pollVotes;
@@ -248,10 +248,10 @@ abstract mixin class _$CurrentUserModelCopyWith<$Res>
   @useResult
   $Res call(
       {UserModel user,
-      List<String> likedPosts,
-      List<String> dislikedPosts,
-      List<String> blockedUsers,
-      List<String> blockedBy,
+      Set<String> likedPosts,
+      Set<String> dislikedPosts,
+      Set<String> blockedUsers,
+      Set<String> blockedBy,
       Map<String, int> pollVotes});
 
   @override
@@ -286,19 +286,19 @@ class __$CurrentUserModelCopyWithImpl<$Res>
       likedPosts: null == likedPosts
           ? _self._likedPosts
           : likedPosts // ignore: cast_nullable_to_non_nullable
-              as List<String>,
+              as Set<String>,
       dislikedPosts: null == dislikedPosts
           ? _self._dislikedPosts
           : dislikedPosts // ignore: cast_nullable_to_non_nullable
-              as List<String>,
+              as Set<String>,
       blockedUsers: null == blockedUsers
           ? _self._blockedUsers
           : blockedUsers // ignore: cast_nullable_to_non_nullable
-              as List<String>,
+              as Set<String>,
       blockedBy: null == blockedBy
           ? _self._blockedBy
           : blockedBy // ignore: cast_nullable_to_non_nullable
-              as List<String>,
+              as Set<String>,
       pollVotes: null == pollVotes
           ? _self._pollVotes
           : pollVotes // ignore: cast_nullable_to_non_nullable

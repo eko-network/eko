@@ -29,7 +29,6 @@ mixin _$PostModel {
   bool get isPoll;
   List<String>? get pollOptions;
   Map<String, int>? get pollVoteCounts;
-  LikeState get likeState;
 
   /// Create a copy of PostModel
   /// with the given fields replaced by the non-null parameter values.
@@ -62,9 +61,7 @@ mixin _$PostModel {
             const DeepCollectionEquality()
                 .equals(other.pollOptions, pollOptions) &&
             const DeepCollectionEquality()
-                .equals(other.pollVoteCounts, pollVoteCounts) &&
-            (identical(other.likeState, likeState) ||
-                other.likeState == likeState));
+                .equals(other.pollVoteCounts, pollVoteCounts));
   }
 
   @override
@@ -83,12 +80,11 @@ mixin _$PostModel {
       createdAt,
       isPoll,
       const DeepCollectionEquality().hash(pollOptions),
-      const DeepCollectionEquality().hash(pollVoteCounts),
-      likeState);
+      const DeepCollectionEquality().hash(pollVoteCounts));
 
   @override
   String toString() {
-    return 'PostModel(uid: $uid, id: $id, gifUrl: $gifUrl, imageString: $imageString, title: $title, body: $body, tags: $tags, likes: $likes, dislikes: $dislikes, commentCount: $commentCount, createdAt: $createdAt, isPoll: $isPoll, pollOptions: $pollOptions, pollVoteCounts: $pollVoteCounts, likeState: $likeState)';
+    return 'PostModel(uid: $uid, id: $id, gifUrl: $gifUrl, imageString: $imageString, title: $title, body: $body, tags: $tags, likes: $likes, dislikes: $dislikes, commentCount: $commentCount, createdAt: $createdAt, isPoll: $isPoll, pollOptions: $pollOptions, pollVoteCounts: $pollVoteCounts)';
   }
 }
 
@@ -111,8 +107,7 @@ abstract mixin class $PostModelCopyWith<$Res> {
       DateTime createdAt,
       bool isPoll,
       List<String>? pollOptions,
-      Map<String, int>? pollVoteCounts,
-      LikeState likeState});
+      Map<String, int>? pollVoteCounts});
 }
 
 /// @nodoc
@@ -141,7 +136,6 @@ class _$PostModelCopyWithImpl<$Res> implements $PostModelCopyWith<$Res> {
     Object? isPoll = null,
     Object? pollOptions = freezed,
     Object? pollVoteCounts = freezed,
-    Object? likeState = null,
   }) {
     return _then(_self.copyWith(
       uid: null == uid
@@ -200,10 +194,6 @@ class _$PostModelCopyWithImpl<$Res> implements $PostModelCopyWith<$Res> {
           ? _self.pollVoteCounts
           : pollVoteCounts // ignore: cast_nullable_to_non_nullable
               as Map<String, int>?,
-      likeState: null == likeState
-          ? _self.likeState
-          : likeState // ignore: cast_nullable_to_non_nullable
-              as LikeState,
     ));
   }
 }
@@ -226,8 +216,7 @@ class _PostModel implements PostModel {
       required this.createdAt,
       required this.isPoll,
       final List<String>? pollOptions,
-      final Map<String, int>? pollVoteCounts,
-      required this.likeState})
+      final Map<String, int>? pollVoteCounts})
       : _title = title,
         _body = body,
         _tags = tags,
@@ -300,9 +289,6 @@ class _PostModel implements PostModel {
     return EqualUnmodifiableMapView(value);
   }
 
-  @override
-  final LikeState likeState;
-
   /// Create a copy of PostModel
   /// with the given fields replaced by the non-null parameter values.
   @override
@@ -335,9 +321,7 @@ class _PostModel implements PostModel {
             const DeepCollectionEquality()
                 .equals(other._pollOptions, _pollOptions) &&
             const DeepCollectionEquality()
-                .equals(other._pollVoteCounts, _pollVoteCounts) &&
-            (identical(other.likeState, likeState) ||
-                other.likeState == likeState));
+                .equals(other._pollVoteCounts, _pollVoteCounts));
   }
 
   @override
@@ -356,12 +340,11 @@ class _PostModel implements PostModel {
       createdAt,
       isPoll,
       const DeepCollectionEquality().hash(_pollOptions),
-      const DeepCollectionEquality().hash(_pollVoteCounts),
-      likeState);
+      const DeepCollectionEquality().hash(_pollVoteCounts));
 
   @override
   String toString() {
-    return 'PostModel(uid: $uid, id: $id, gifUrl: $gifUrl, imageString: $imageString, title: $title, body: $body, tags: $tags, likes: $likes, dislikes: $dislikes, commentCount: $commentCount, createdAt: $createdAt, isPoll: $isPoll, pollOptions: $pollOptions, pollVoteCounts: $pollVoteCounts, likeState: $likeState)';
+    return 'PostModel(uid: $uid, id: $id, gifUrl: $gifUrl, imageString: $imageString, title: $title, body: $body, tags: $tags, likes: $likes, dislikes: $dislikes, commentCount: $commentCount, createdAt: $createdAt, isPoll: $isPoll, pollOptions: $pollOptions, pollVoteCounts: $pollVoteCounts)';
   }
 }
 
@@ -387,8 +370,7 @@ abstract mixin class _$PostModelCopyWith<$Res>
       DateTime createdAt,
       bool isPoll,
       List<String>? pollOptions,
-      Map<String, int>? pollVoteCounts,
-      LikeState likeState});
+      Map<String, int>? pollVoteCounts});
 }
 
 /// @nodoc
@@ -417,7 +399,6 @@ class __$PostModelCopyWithImpl<$Res> implements _$PostModelCopyWith<$Res> {
     Object? isPoll = null,
     Object? pollOptions = freezed,
     Object? pollVoteCounts = freezed,
-    Object? likeState = null,
   }) {
     return _then(_PostModel(
       uid: null == uid
@@ -476,10 +457,6 @@ class __$PostModelCopyWithImpl<$Res> implements _$PostModelCopyWith<$Res> {
           ? _self._pollVoteCounts
           : pollVoteCounts // ignore: cast_nullable_to_non_nullable
               as Map<String, int>?,
-      likeState: null == likeState
-          ? _self.likeState
-          : likeState // ignore: cast_nullable_to_non_nullable
-              as LikeState,
     ));
   }
 }

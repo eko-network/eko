@@ -1,5 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:untitled_app/utilities/enums.dart';
+import 'package:untitled_app/interfaces/post.dart';
 part '../generated/types/post.freezed.dart';
 part '../generated/types/post.g.dart';
 
@@ -54,10 +55,9 @@ abstract class PostModel with _$PostModel {
     required bool isPoll,
     List<String>? pollOptions,
     Map<String, int>? pollVoteCounts,
-    required LikeState likeState,
   }) = _PostModel;
 
-  factory PostModel.fromJson(Map<String, dynamic> json, LikeState likeState) {
+  factory PostModel.fromJson(Map<String, dynamic> json) {
     final time =
         DateTime.tryParse(json['time'] ?? '')?.toLocal() ?? DateTime.now();
     return PostModel(
@@ -84,7 +84,14 @@ abstract class PostModel with _$PostModel {
       //broken
       title: _parseText(json['title']),
       body: _parseText(json['body']),
-      likeState: likeState,
     );
+  }
+
+  static Future<PostModel> fromFireStoreDoc(
+      QueryDocumentSnapshot<Map<String, dynamic>> doc) async {
+    final json = doc.data();
+    json['id'] = doc.id;
+    json['commentCount'] = await countComments(doc.id);
+    return PostModel.fromJson(json);
   }
 }

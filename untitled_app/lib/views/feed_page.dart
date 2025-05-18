@@ -1,21 +1,13 @@
-import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:untitled_app/interfaces/post_queries.dart';
+import 'package:untitled_app/providers/following_feed_provider.dart';
+import 'package:untitled_app/providers/new_feed_provider.dart';
 
 import 'package:untitled_app/widgets/icons.dart';
 import 'package:untitled_app/widgets/infinite_scrolly.dart';
 import 'package:untitled_app/widgets/post_card.dart';
-// import 'package:untitled_app/custom_widgets/shimmer_loaders.dart'
-//     show FeedLoader;
-// import 'package:untitled_app/models/feed_post_cache.dart';
-// import 'package:untitled_app/utilities/locator.dart';
-// import '../custom_widgets/pagination.dart';
-// import '../controllers/feed_controller.dart';
-// import 'package:provider/provider.dart' as prov;
-// import '../custom_widgets/post_card.dart';
-import '../utilities/constants.dart' as c;
+import 'package:untitled_app/widgets/post_loader.dart';
 
 const appBarHeight = 80.0;
 
@@ -217,23 +209,9 @@ class _FeedPageState extends State<FeedPage> with TickerProviderStateMixin {
             child: TabBarView(
               controller: tabController,
               children: [
-                ListView.builder(
-                  controller: followingScrollController,
-                  padding: EdgeInsets.only(top: appBarHeight),
-                  itemCount: 50,
-                  itemBuilder: (context, index) => ListTile(
-                    title: Text('Item $index'),
-                  ),
-                ),
+                _FollowingTab(controller: followingScrollController),
                 _NewTab(controller: newScrollController),
-                ListView.builder(
-                  controller: popScrollController,
-                  padding: EdgeInsets.only(top: appBarHeight),
-                  itemCount: 50,
-                  itemBuilder: (context, index) => ListTile(
-                    title: Text('Item $index'),
-                  ),
-                ),
+                _PopTab(controller: popScrollController),
               ],
             )),
         AnimatedPositioned(
@@ -252,19 +230,70 @@ class _FeedPageState extends State<FeedPage> with TickerProviderStateMixin {
   }
 }
 
+class _FollowingTab extends ConsumerWidget {
+  final ScrollController controller;
+  const _FollowingTab({required this.controller});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final provider = ref.watch(followingFeedProvider);
+    return InfiniteScrollyShell<String>(
+      isEnd: provider.$2,
+      list: provider.$1,
+      header: SizedBox(
+        height: appBarHeight,
+      ),
+      getter: ref.read(followingFeedProvider.notifier).getter,
+      onRefresh: ref.read(newFeedProvider.notifier).refresh,
+      initialLoadingWidget: PostLoader(
+        length: 3,
+      ),
+      widget: postCardBuilder,
+      controller: controller,
+    );
+  }
+}
+
 class _NewTab extends ConsumerWidget {
   final ScrollController controller;
   const _NewTab({required this.controller});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return InfiniteScrolly<String, String>(
+    final provider = ref.watch(newFeedProvider);
+    return InfiniteScrollyShell<String>(
+      isEnd: provider.$2,
+      list: provider.$1,
+      header: SizedBox(
+        height: appBarHeight,
+      ),
+      getter: ref.read(newFeedProvider.notifier).getter,
+      onRefresh: ref.read(newFeedProvider.notifier).refresh,
+      initialLoadingWidget: PostLoader(
+        length: 3,
+      ),
+      widget: postCardBuilder,
+      controller: controller,
+    );
+  }
+}
+
+class _PopTab extends ConsumerWidget {
+  final ScrollController controller;
+  const _PopTab({required this.controller});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return InfiniteScrolly<String, int>(
       header: SizedBox(
         height: appBarHeight,
       ),
       getter: (data) async {
-        return await newPageGetter(data, ref);
+        return await popGetter(data, ref);
       },
+      initialLoadingWidget: PostLoader(
+        length: 3,
+      ),
       widget: postCardBuilder,
       controller: controller,
     );

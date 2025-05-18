@@ -1,11 +1,8 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:untitled_app/custom_widgets/controllers/pagination_controller.dart';
 import 'package:untitled_app/types/group.dart';
-import '../utilities/constants.dart' as c;
 // Necessary for code-generation to work
 part '../generated/providers/group_provider.g.dart';
 
@@ -46,7 +43,7 @@ class Group extends _$Group {
     final firestore = FirebaseFirestore.instance;
     // final snapshot = await firestore.collection('groups').add(group.toMap());
     // return snapshot.id;
-    return "";
+    return '';
   }
 
   Future<void> updateGroupMembers(Group group, List<String> members) async {

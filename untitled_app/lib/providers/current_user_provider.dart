@@ -4,7 +4,6 @@ import 'package:untitled_app/models/post_handler.dart';
 import 'package:untitled_app/providers/auth_provider.dart';
 import 'package:untitled_app/providers/user_provider.dart';
 import 'package:untitled_app/types/current_user.dart';
-import 'package:untitled_app/utilities/enums.dart';
 import 'package:untitled_app/utilities/locator.dart';
 // Necessary for code-generation to work
 part '../generated/providers/current_user_provider.g.dart';
@@ -23,25 +22,25 @@ class CurrentUser extends _$CurrentUser {
   }
 
   void addIdToLiked(String id) {
-    final likes = [...state.likedPosts];
+    final likes = Set<String>.from(state.likedPosts);
     likes.add(id);
     state = state.copyWith(likedPosts: likes);
   }
 
   void removeIdFromLiked(String id) {
-    final likes = [...state.likedPosts];
+    final likes = Set<String>.from(state.likedPosts);
     likes.remove(id);
     state = state.copyWith(likedPosts: likes);
   }
 
   void addIdToDisliked(String id) {
-    final dislikes = [...state.likedPosts];
+    final dislikes = Set<String>.from(state.dislikedPosts);
     dislikes.add(id);
     state = state.copyWith(dislikedPosts: dislikes);
   }
 
   void removeIdFromDisliked(String id) {
-    final dislikes = [...state.likedPosts];
+    final dislikes = Set<String>.from(state.dislikedPosts);
     dislikes.remove(id);
     state = state.copyWith(dislikedPosts: dislikes);
   }
@@ -181,21 +180,5 @@ class CurrentUser extends _$CurrentUser {
         }
       });
     }
-  }
-
-  LikeState getLikeState(String postId) {
-    final liked = state.likedPosts.contains(postId);
-    final disliked = state.dislikedPosts.contains(postId);
-    if (liked && disliked) {
-      //TODO this case should not happen. Maybe write a function to correct db state?
-      return LikeState.isLiked;
-    }
-    if (liked) {
-      return LikeState.isLiked;
-    }
-    if (disliked) {
-      return LikeState.isDisliked;
-    }
-    return LikeState.neutral;
   }
 }
