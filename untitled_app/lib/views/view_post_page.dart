@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:giphy_get/giphy_get.dart';
 import 'package:go_router/go_router.dart';
 import 'package:untitled_app/custom_widgets/count_down_timer.dart';
+import 'package:untitled_app/custom_widgets/error_snack_bar.dart';
 import 'package:untitled_app/interfaces/post_queries.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
 import 'package:untitled_app/providers/post_provider.dart';
@@ -24,88 +26,79 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
   bool isAtSymbolTyped = false;
   FocusNode commentFieldFocus = FocusNode();
   final TextEditingController commentField = TextEditingController();
+  GiphyGif? gif;
+  final reportFocus = FocusNode();
+  final reportController = TextEditingController();
 
   void reportPressed() {
-    // showDialog(
-    //   context: context,
-    //   builder: (BuildContext context) {
-    //     final height = MediaQuery.sizeOf(context).height;
-    //     return AlertDialog(
-    //       backgroundColor: Theme.of(context).colorScheme.outlineVariant,
-    //       title: Text(
-    //         AppLocalizations.of(context)!.reportDetails,
-    //         style: const TextStyle(fontSize: 18),
-    //       ),
-    //       content: SingleChildScrollView(
-    //         child: ConstrainedBox(
-    //           constraints: BoxConstraints(maxHeight: height * 0.5),
-    //           child: TextField(
-    //             textCapitalization: TextCapitalization.sentences,
-    //             focusNode: reportFocus,
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        final height = MediaQuery.sizeOf(context).height;
+        return AlertDialog(
+          backgroundColor: Theme.of(context).colorScheme.outlineVariant,
+          title: Text(
+            AppLocalizations.of(context)!.reportDetails,
+            style: const TextStyle(fontSize: 18),
+          ),
+          content: SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(maxHeight: height * 0.5),
+              child: TextField(
+                textCapitalization: TextCapitalization.sentences,
+                focusNode: reportFocus,
+                controller: reportController,
+                maxLines: null,
+                maxLength: 300,
+                cursorColor: Theme.of(context).colorScheme.onSurface,
+                keyboardType: TextInputType.multiline,
+                style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.normal,
+                    color: Theme.of(context).colorScheme.onSurface),
+                decoration: InputDecoration(
+                  contentPadding: EdgeInsets.all(height * 0.01),
+                  hintText: AppLocalizations.of(context)!.addText,
+                  hintStyle: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.normal,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant),
+                ),
+              ),
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text(AppLocalizations.of(context)!.cancel),
+              onPressed: () {
+                _popDialog();
+              },
+            ),
+            TextButton(
+              child: Text(AppLocalizations.of(context)!.send),
+              onPressed: () async {
+                final message = reportController.text.trim();
+                if (message != '') {
+                  reportController.text = '';
+                  await ref
+                      .read(postProvider(widget.id).notifier)
+                      .addReport(widget.id, message);
+                  _popDialog();
+                } else {
+                  showSnackBar(
+                      context: context,
+                      text: AppLocalizations.of(context)!.commentRequired);
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
-    //             // onChanged: (s) {
-    //             //   prov.Provider.of<ComposeController>(context, listen: false)
-    //             //       .updateCountsBody(s);
-    //             //   prov.Provider.of<ComposeController>(context, listen: false)
-    //             //       .checkAtSymbol(s);
-    //             // },
-    //             controller: reportController,
-
-    //             maxLines: null,
-    //             maxLength: 300,
-    //             cursorColor: Theme.of(context).colorScheme.onSurface,
-    //             keyboardType: TextInputType.multiline,
-    //             style: TextStyle(
-    //                 fontSize: 18,
-    //                 fontWeight: FontWeight.normal,
-    //                 color: Theme.of(context).colorScheme.onSurface),
-    //             decoration: InputDecoration(
-    //               contentPadding: EdgeInsets.all(height * 0.01),
-    //               hintText: AppLocalizations.of(context)!.addText,
-    //               hintStyle: TextStyle(
-    //                   fontSize: 18,
-    //                   fontWeight: FontWeight.normal,
-    //                   color: Theme.of(context).colorScheme.onSurfaceVariant),
-    //               //border: InputBorder.none,
-    //             ),
-    //           ),
-    //         ),
-
-    //         //  CustomInputField(
-    //         //   focus: reportFocus,
-    //         //   label: AppLocalizations.of(context)!.comments,
-    //         //   controller: reportController,
-    //         //   inputType: TextInputType.multiline,
-    //         // ),
-    //       ),
-    //       actions: <Widget>[
-    //         TextButton(
-    //           child: Text(AppLocalizations.of(context)!.cancel),
-    //           onPressed: () {
-    //             _popDialog();
-    //           },
-    //         ),
-    //         TextButton(
-    //           child: Text(AppLocalizations.of(context)!.send),
-    //           onPressed: () async {
-    //             final message = reportController.text.trim();
-    //             if (message != '') {
-    //               reportController.text = '';
-    //               await locator<PostsHandling>()
-    //                   .addReport(post: post!, message: message);
-    //               _popDialog();
-    //             } else {
-    //               showSnackBar(
-    //                   context: context,
-    //                   text: AppLocalizations.of(context)!.commentRequired);
-    //             }
-    //             //resetPassword(countryCode);
-    //           },
-    //         ),
-    //       ],
-    //     );
-    //   },
-    // );
+  void _popDialog() {
+    Navigator.of(context, rootNavigator: true).pop();
   }
 
   void deletePressed() {
@@ -181,21 +174,19 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
 
   Future<void> postCommentPressed() async {
     // if (gif == null) {
-    //   commentFeild.text = commentFeild.text.trim();
-    //   updateCount(commentFeild.text);
-
-    //   if (chars > c.maxCommentChars) {
+    //   commentField.text = commentField.text.trim();
+    //   if (commentField.text.length > c.maxCommentChars) {
     //     showSnackBar(
     //         text: AppLocalizations.of(context)!.tooManyChar, context: context);
-    //   } else if (commentFeild.text == '') {
-    //     commentFeildFocus.requestFocus();
+    //   } else if (commentField.text == '') {
+    //     commentFieldFocus.requestFocus();
     //     showSnackBar(
     //         text: AppLocalizations.of(context)!.emptyFieldError,
     //         context: context);
     //   } else {
-    //     String comment = commentFeild.text;
-    //     commentFeild.text = '';
-    //     hideKeyboard();
+    //     String comment = commentField.text;
+    //     commentField.text = '';
+    //     FocusManager.instance.primaryFocus?.unfocus();
     //     final returnedId = await locator<PostsHandling>().createComment(
     //         {'body': comment}, post!.postId, post!.author.uid, post!.postId);
 
@@ -234,20 +225,9 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
     //       commentCount: 0,
     //       dislikes: 0);
     //   data.items.add(newComment);
-    //   // if (post!.hasCache) {
-    //   //   locator<FeedPostCache>().updateComments(post!.postId, 1);
-    //   //   if (builtFromID) {
-    //   //     post!.commentCount++;
-    //   //   }
-    //   // } else {
-    //   //postMap[post!.postId]!.post.commentCount++;
-    //   //post!.commentCount++;
-    //   // }
     //   gif = null;
-    //   //notifyListeners();
     // }
     // postMap[post!.postId]!.post.commentCount++;
-    // notifyListeners();
   }
 
   @override
@@ -257,7 +237,7 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
     final asyncPost = ref.watch(postProvider(widget.id));
 
     Future<void> onRefresh() async {
-      // await ref.read(currentUserProvider.notifier).reload();
+      await ref.read(currentUserProvider.notifier).reload();
     }
 
     return asyncPost.when(
@@ -315,13 +295,6 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
-                // IconButton(
-                //   onPressed: () {
-
-                //   },
-                //   icon: const Icon(Icons.more_vert),
-                //   color: Theme.of(context).colorScheme.onBackground,
-                // )
               ],
             ),
             body: Column(
@@ -384,7 +357,7 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
                       //                                       PostPageController>(
                       //                                   context,
                       //                                   listen: false)
-                      //                               .commentFeild,
+                      //                               .commentField,
                       //                           prov.Provider.of<
                       //                                       PostPageController>(
                       //                                   context,

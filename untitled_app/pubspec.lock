@@ -913,7 +913,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "69d6f579356773e8eab5d5844b7b5ebe2d37880b"
+      resolved-ref: ca0af4d9801a5c90ac9e61514023af10ec8626f1
       url: "https://github.com/ericbreh/image_to_ascii.git"
     source: git
     version: "0.0.1"

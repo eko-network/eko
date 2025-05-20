@@ -198,4 +198,20 @@ class Post extends _$Post {
     }
     _isLiking = false;
   }
+
+  Future<void> addReport(String id, String message) async {
+    final firestore = FirebaseFirestore.instance;
+    final uid = ref.read(currentUserProvider).user.uid;
+    final post = await ref.read(postProvider(id).future);
+
+    final report = {
+      'sender': uid,
+      'postId': id,
+      'postAuthor': post.uid,
+      'message': message,
+      'time': DateTime.now().toUtc().toIso8601String()
+    };
+
+    await firestore.collection('reports').add(report);
+  }
 }
