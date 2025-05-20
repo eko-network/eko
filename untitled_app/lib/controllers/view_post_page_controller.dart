@@ -160,8 +160,6 @@ class PostPageController extends ChangeNotifier {
 
   void _deletePostFromDialog() {
     _pop();
-    // TODO: 
-    // postMap[post!.postId]!.visible = false; 
     locator<PostsHandling>().deleteData('posts/${post!.postId}');
   }
 
