@@ -44,7 +44,6 @@ class _FollowingState extends ConsumerState<Following> {
 
   @override
   Widget build(BuildContext context) {
-    final height = MediaQuery.sizeOf(context).height;
     final asyncUser = ref.watch(userProvider(widget.uid));
 
     return switch (asyncUser) {

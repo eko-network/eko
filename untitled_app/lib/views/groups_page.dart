@@ -3,7 +3,6 @@ import 'package:go_router/go_router.dart';
 // import 'package:provider/provider.dart' as prov;
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:untitled_app/models/group_handler.dart';
-import 'package:untitled_app/utilities/locator.dart';
 // import '../controllers/groups_page_controller.dart';
 import '../custom_widgets/controllers/pagination_controller.dart';
 import '../custom_widgets/pagination.dart';

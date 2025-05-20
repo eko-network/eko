@@ -52,6 +52,7 @@ class _SearchAppBarState extends State<SearchAppBar> {
             prov.Provider.of<AppBarProvider>(context, listen: false).queryText);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(Duration(milliseconds: 100), _focus.requestFocus);
       // Establish the debouncer
       final _debouncer = Debouncer(
         delay: Duration(

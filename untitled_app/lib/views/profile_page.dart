@@ -5,7 +5,6 @@ import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
 import 'package:untitled_app/providers/nav_bar_provider.dart';
 import 'package:untitled_app/types/current_user.dart';
-import 'package:untitled_app/utilities/locator.dart';
 import 'package:untitled_app/widgets/divider.dart';
 import 'package:untitled_app/widgets/infinite_scrolly.dart';
 import 'package:untitled_app/widgets/post_loader.dart';
@@ -43,24 +42,6 @@ class _Header extends ConsumerWidget {
   final CurrentUserModel currentUser;
   const _Header({required this.currentUser});
 
-  // void _editProfilePressed(BuildContext context) async {
-  //   locator<NavBarController>().disable();
-  //   await context.push('/profile/edit_profile');
-  //   locator<NavBarController>().enable();
-  // }
-
-  // void _settingsButtonPressed(BuildContext context) async {
-  //   locator<NavBarController>().disable();
-  //   await context.push('/profile/user_settings');
-  //   locator<NavBarController>().enable();
-  // }
-
-  // void _qrButtonPressed(BuildContext context) async {
-  //   locator<NavBarController>().disable();
-  //   await context.push('/profile/share_profile');
-  //   locator<NavBarController>().enable();
-  // }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final width = c.widthGetter(context);
@@ -91,8 +72,10 @@ class _Header extends ConsumerWidget {
                     ),
                   const Spacer(),
                   InkWell(
-                    onTap: () {ref.read(navBarProvider.notifier).disable();
-                    context.push('/profile/user_settings').then((_)=>ref.read(navBarProvider.notifier).enable());
+                    onTap: () {
+                      ref.read(navBarProvider.notifier).disable();
+                      context.push('/profile/user_settings').then(
+                          (_) => ref.read(navBarProvider.notifier).enable());
                     },
                     child: Icon(
                       Icons.settings_outlined,

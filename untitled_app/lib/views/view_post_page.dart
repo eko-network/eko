@@ -6,7 +6,6 @@ import 'package:untitled_app/custom_widgets/count_down_timer.dart';
 import 'package:untitled_app/interfaces/post_queries.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
 import 'package:untitled_app/providers/post_provider.dart';
-import 'package:untitled_app/widgets/divider.dart';
 
 import 'package:untitled_app/widgets/loading_spinner.dart';
 

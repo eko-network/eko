@@ -20,39 +20,41 @@ class ProfilePicture extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final asyncUser = ref.watch(userProvider(uid));
-    return IconButton(
-      onPressed: onPressed,
-      padding: padding,
-      icon: SizedBox(
-        width: size,
-        height: size,
-        child: ClipOval(
-          child: asyncUser.when(
-            data: (user) {
-              return kIsWeb
-                  ? Image.network(
-                      user.profilePicture,
-                      fit: BoxFit.fill,
-                      loadingBuilder: (context, child, loadingProgress) {
-                        if (loadingProgress == null) {
-                          return child;
-                        }
-                        return const LoadingProfileImage();
-                      },
-                    )
-                  : CachedNetworkImage(
-                      fit: BoxFit.fill,
-                      imageUrl: user.profilePicture,
-                      placeholder: (context, url) =>
-                          const LoadingProfileImage(),
-                      errorWidget: (context, url, error) =>
-                          const LoadingProfileImage(),
-                    );
-            },
-            error: (_, __) {
-              return const Text('Error');
-            },
-            loading: () => LoadingProfileImage(),
+    return GestureDetector(
+      onTap: onPressed,
+      child: Padding(
+        padding: padding ?? const EdgeInsets.all(0),
+        child: SizedBox(
+          width: size,
+          height: size,
+          child: ClipOval(
+            child: asyncUser.when(
+              data: (user) {
+                return kIsWeb
+                    ? Image.network(
+                        user.profilePicture,
+                        fit: BoxFit.fill,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) {
+                            return child;
+                          }
+                          return const LoadingProfileImage();
+                        },
+                      )
+                    : CachedNetworkImage(
+                        fit: BoxFit.fill,
+                        imageUrl: user.profilePicture,
+                        placeholder: (context, url) =>
+                            const LoadingProfileImage(),
+                        errorWidget: (context, url, error) =>
+                            const LoadingProfileImage(),
+                      );
+              },
+              error: (_, __) {
+                return const Text('Error');
+              },
+              loading: () => LoadingProfileImage(),
+            ),
           ),
         ),
       ),

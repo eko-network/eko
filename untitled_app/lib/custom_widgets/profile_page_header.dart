@@ -4,7 +4,6 @@ import 'package:intl/intl.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:untitled_app/types/user.dart';
 import '../custom_widgets/profile_avatar.dart';
-import '../utilities/locator.dart';
 import '../utilities/constants.dart' as c;
 
 class ProfileHeader extends StatelessWidget {

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:untitled_app/custom_widgets/controllers/pagination_controller.dart'
     show PaginationGetterReturn;
-import 'package:untitled_app/utilities/locator.dart';
 import '../models/search_model.dart';
 import 'dart:async';
 import '../utilities/constants.dart' as c;

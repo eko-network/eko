@@ -1,29 +1,21 @@
 import 'dart:async';
 
-import 'package:extended_image/extended_image.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:untitled_app/controllers/view_post_page_controller.dart';
 import 'package:untitled_app/custom_widgets/count_down_timer.dart';
 import 'package:untitled_app/custom_widgets/gif_widget.dart';
 import 'package:untitled_app/custom_widgets/time_stamp.dart';
 import 'package:untitled_app/custom_widgets/warning_dialog.dart';
-import 'package:untitled_app/models/current_user.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
 import 'package:untitled_app/providers/post_provider.dart';
-import 'package:untitled_app/providers/user_provider.dart';
 import 'package:untitled_app/types/post.dart';
-import 'package:untitled_app/utilities/locator.dart';
 import 'package:untitled_app/widgets/like_buttons.dart';
 import 'package:untitled_app/widgets/profile_picture.dart';
 import 'package:untitled_app/widgets/user_tag.dart';
 import '../localization/generated/app_localizations.dart';
 import '../utilities/constants.dart' as c;
-import '../custom_widgets/profile_avatar.dart';
-import 'package:like_button/like_button.dart';
 import 'package:flutter/cupertino.dart';
 
 Widget commentCardBuilder(String id) {

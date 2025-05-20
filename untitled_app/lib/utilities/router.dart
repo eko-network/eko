@@ -18,7 +18,6 @@ import 'package:untitled_app/views/search_page.dart';
 import 'package:untitled_app/views/profile_page.dart';
 import 'package:untitled_app/views/edit_profile.dart';
 import 'package:untitled_app/views/navigation_bar.dart';
-import 'package:untitled_app/models/post_handler.dart';
 import 'package:untitled_app/views/other_profile.dart';
 import 'package:untitled_app/views/view_post_page.dart';
 import 'package:untitled_app/views/profile_picture_detail.dart';

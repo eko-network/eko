@@ -133,8 +133,6 @@ class ComposeController extends ChangeNotifier {
     isPoll = false;
     pollOptions = ['', ''];
     newLines = 0;
-    bodyChars = 0;
-    titleChars = 0;
     showCount0 = false;
     showCount1 = false;
     titleController.text = '';
