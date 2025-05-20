@@ -84,6 +84,7 @@ dependencies:
     # path: ../../image_to_ascii
     git:
       url: https://github.com/ericbreh/image_to_ascii.git
+  image: ^3.3.0
 
 dev_dependencies:
   # flutter_test:

@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:extended_image/extended_image.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:image/image.dart' as img;
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:untitled_app/models/current_user.dart';
 import '../models/search_model.dart';
@@ -293,7 +294,10 @@ class ComposeController extends ChangeNotifier {
 
     if (imageLocal != null) {
       File imageFile = File(imageLocal.path);
-      String ascii = convertImageToAscii(imageFile.path);
+      final bytes = await imageFile.readAsBytes();
+      final img.Image? decodedImage = img.decodeImage(bytes);
+      if (decodedImage == null) throw Exception('Image decode failed');
+      final ascii = ImageToAscii().convertImageToAscii(decodedImage);
       // String? ascii = await uploadImage(File(imageFile.path));
       image = ascii;
       gif = null;
