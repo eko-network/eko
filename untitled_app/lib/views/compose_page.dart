@@ -1,16 +1,17 @@
 import 'dart:io';
-import 'dart:nativewrappers/_internal/vm/lib/ffi_patch.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:giphy_get/giphy_get.dart';
+import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
 import 'package:image_to_ascii/image_to_ascii.dart';
 import 'package:untitled_app/custom_widgets/error_snack_bar.dart';
 import 'package:untitled_app/custom_widgets/image_widget.dart';
+import 'package:untitled_app/interfaces/post.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
 // import 'package:untitled_app/models/current_user.dart';
@@ -18,6 +19,7 @@ import 'package:untitled_app/providers/nav_bar_provider.dart';
 import 'package:untitled_app/types/post.dart';
 import 'package:untitled_app/widgets/infinite_scrolly.dart';
 import 'package:untitled_app/widgets/poll_creator.dart';
+import 'package:untitled_app/widgets/post_card.dart';
 import 'package:untitled_app/widgets/profile_picture.dart';
 import '../custom_widgets/searched_user_card.dart';
 import '../utilities/constants.dart' as c;
@@ -167,6 +169,10 @@ class _ComposePageState extends ConsumerState<ComposePage> {
   Future<void> _postPressed() async {
     final title = titleController.text.trim();
     final body = bodyController.text.trim();
+    final List<String> tags = [
+      'public'
+      // (groupEndPoint != null) ? groupEndPoint!.id : 'public'
+    ];
     if (title == '' && body == '' && gif == null && image == null && !isPoll) {
       titleFocus.requestFocus();
       showSnackBar(
@@ -206,95 +212,46 @@ class _ComposePageState extends ConsumerState<ComposePage> {
     final post = PostModel(
       uid: ref.watch(currentUserProvider).user.uid,
       id: '',
-      tags: [],
+      tags: tags,
       likes: 0,
       dislikes: 0,
       commentCount: 0,
       createdAt: DateTime.now().toUtc().toIso8601String(),
       isPoll: isPoll,
-      pollOptions: pollOptions,
+      pollOptions: isPoll ? pollOptions : null,
       imageString: image,
       gifUrl: gif?.images?.fixedWidth.url,
+      title: parseTextToTags(title),
+      body: parseTextToTags(body),
     );
-    // showDialog(
-    //   context: context,
-    //   builder: (BuildContext context) {
-    //     return AlertDialog(
-    //       backgroundColor: Theme.of(context).colorScheme.outlineVariant,
-    //       title: Text(AppLocalizations.of(context)!.confirmation),
-    //       content: SingleChildScrollView(
-    //         child: PostCard(
-    //             post: Post(
-    //                 tags: tags,
-    //                 gifSource: post['gifSource'],
-    //                 gifURL: post['gifUrl'],
-    //                 postId: 'postId',
-    //                 time: '', //DateTime.now().toUtc().toIso8601String(),
-    //                 title: Post.parseText(post['title']),
-    //                 author: AppUser.fromCurrent(locator<CurrentUser>()),
-    //                 body: Post.parseText(post['body']),
-    //                 image: post['image'],
-    //                 likes: 0,
-    //                 dislikes: 0,
-    //                 isPoll: post['isPoll'] ?? false,
-    //                 pollOptions: post['pollOptions'],
-    //                 pollVoteCounts: post['pollVoteCounts']),
-    //             isPreview: true),
-    //       ),
-    //       actions: <Widget>[
-    //         TextButton(
-    //           child: Text(AppLocalizations.of(context)!.cancel),
-    //           onPressed: () {
-    //             context.pop();
-    //           },
-    //         ),
-    //         TextButton(
-    //           child: Text(AppLocalizations.of(context)!.post),
-    //           onPressed: () async {
-    //             titleController.text = '';
-    //             bodyController.text = '';
-    //             gif = null;
-    //             image = null;
-    //             isPoll = false;
-    //             pollOptions = ['', ''];
-    //             context.pop();
-    //
-    //             final postID =
-    //                 await locator<PostsHandling>().createPost(post);
-    //             if (tags.contains('public')) {
-    //               // locator<FeedPostCache>().addPost(
-    //               //   0,
-    //               //   Post(
-    //               //     tags: tags,
-    //               //     gifSource: post['gifSource'],
-    //               //     gifURL: post['gifUrl'],
-    //               //     postId: postID,
-    //               //     time: DateTime.now().toUtc().toIso8601String(),
-    //               //     image: post['image'],
-    //               //     title: Post.parseText(post['title']),
-    //               //     author: AppUser.fromCurrent(locator<CurrentUser>()),
-    //               //     body: Post.parseText(post['body']),
-    //               //     likes: 0,
-    //               //     dislikes: 0,
-    //               //     isPoll: post['isPoll'] ?? false,
-    //               //     pollOptions: post['pollOptions'],
-    //               //     pollVoteCounts: post['pollVoteCounts'],
-    //               //   ),
-    //               // );
-    //
-    //               _goToPage();
-    //             } else {
-    //               _goToPage(group: groupEndPoint);
-    //               //refine cases later for more complicated tag system
-    //             }
-    //
-    //             notifyListeners();
-    //           },
-    //         ),
-    //       ],
-    //     );
-    //   },
-    // );
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Theme.of(context).colorScheme.outlineVariant,
+          title: Text(AppLocalizations.of(context)!.confirmation),
+          content: SingleChildScrollView(
+            child: PostCardFromPost(post: post, isPreview: true),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text(AppLocalizations.of(context)!.cancel),
+              onPressed: () {
+                context.pop();
+              },
+            ),
+            TextButton(
+              child: Text(AppLocalizations.of(context)!.post),
+              onPressed: () async {
+                await uploadPost(post);
+                // _clear();
+                context.pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -367,7 +324,10 @@ class _ComposePageState extends ConsumerState<ComposePage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               TextButton(
-                onPressed: () => _clear(),
+                onPressed: () {
+                  FocusManager.instance.primaryFocus?.unfocus();
+                  _clear();
+                },
                 style: TextButton.styleFrom(
                     backgroundColor: Theme.of(context).colorScheme.surface),
                 child: Text(
@@ -378,7 +338,7 @@ class _ComposePageState extends ConsumerState<ComposePage> {
                 ),
               ),
               TextButton(
-                onPressed: () {},
+                onPressed: () => _postPressed(),
                 style: TextButton.styleFrom(
                   backgroundColor:
                       Theme.of(context).colorScheme.primaryContainer,

@@ -10,8 +10,9 @@ import '../utilities/constants.dart' as c;
 
 class Count extends StatelessWidget {
   final int count;
-  final VoidCallback onTap;
-  const Count({super.key, 
+  final void Function()? onTap;
+  const Count({
+    super.key,
     required this.count,
     required this.onTap,
   });
@@ -39,7 +40,8 @@ class Count extends StatelessWidget {
 
 class LikeButtons extends ConsumerWidget {
   final PostModel post;
-  const LikeButtons({super.key, required this.post});
+  final bool disabled;
+  const LikeButtons({super.key, required this.post, this.disabled = false});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -65,8 +67,11 @@ class LikeButtons extends ConsumerWidget {
               );
             },
             onTap: (isLiked) async {
-              ref.read(postProvider(post.id).notifier).likePostToggle();
-              return !isLiked;
+              if (!disabled) {
+                ref.read(postProvider(post.id).notifier).likePostToggle();
+                return !isLiked;
+              }
+              return isLiked;
             },
             likeCountAnimationType: LikeCountAnimationType.none,
             likeCountPadding: null,
@@ -82,9 +87,11 @@ class LikeButtons extends ConsumerWidget {
           ),
           Count(
             count: post.likes,
-            onTap: () {
-              context.push('/feed/post/${post.id}/likes', extra: post.id);
-            },
+            onTap: disabled
+                ? null
+                : () {
+                    context.push('/feed/post/${post.id}/likes', extra: post.id);
+                  },
           ),
           LikeButton(
             isLiked: user.dislikedPosts.contains(post.id), //dislike
@@ -103,8 +110,11 @@ class LikeButtons extends ConsumerWidget {
               );
             },
             onTap: (isDisliked) async {
-              ref.read(postProvider(post.id).notifier).dislikePostToggle();
-              return !isDisliked;
+              if (!disabled) {
+                ref.read(postProvider(post.id).notifier).dislikePostToggle();
+                return !isDisliked;
+              }
+              return isDisliked;
             },
             likeCountAnimationType: LikeCountAnimationType.none,
             likeCountPadding: null,
@@ -120,9 +130,12 @@ class LikeButtons extends ConsumerWidget {
           ),
           Count(
             count: post.dislikes,
-            onTap: () {
-              context.push('/feed/post/${post.id}/dislikes', extra: post.id);
-            },
+            onTap: disabled
+                ? null
+                : () {
+                    context.push('/feed/post/${post.id}/dislikes',
+                        extra: post.id);
+                  },
           )
         ]);
   }

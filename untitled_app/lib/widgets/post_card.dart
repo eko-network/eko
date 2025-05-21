@@ -416,7 +416,10 @@ class PostCardFromPost extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   SizedBox(width: width * 0.115 + 8),
-                  LikeButtons(post: post),
+                  LikeButtons(
+                    post: post,
+                    disabled: isPreview,
+                  ),
                   SizedBox(
                     width: 5,
                   ),
@@ -467,10 +470,11 @@ class PostCardFromPost extends ConsumerWidget {
                 ],
               ),
             ),
-            SizedBox(
-              height: 8,
-            ),
-            SizedBox(width: width, child: StyledDivider())
+
+            if (!isPreview)
+              Padding(
+                  padding: EdgeInsets.only(top: 8),
+                  child: SizedBox(width: width, child: StyledDivider()))
           ],
         ),
       ),

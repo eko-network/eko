@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:provider/provider.dart' as prov;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:untitled_app/interfaces/post.dart';
 import 'package:untitled_app/models/notification_helper.dart';
 import 'package:untitled_app/models/version_control.dart';
 import 'package:untitled_app/providers/post_pool_provider.dart';

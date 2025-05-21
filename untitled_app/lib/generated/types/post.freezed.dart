@@ -14,17 +14,22 @@ part of '../../types/post.dart';
 T _$identity<T>(T value) => value;
 
 /// @nodoc
-mixin _$PostModel {
+mixin _$PostModel implements DiagnosticableTreeMixin {
+  @JsonKey(name: 'author')
   String get uid;
   String get id;
   String? get gifUrl;
+  @JsonKey(name: 'image')
   String? get imageString;
-  List<String>? get title;
-  List<String>? get body;
+  @JsonKey(fromJson: parseTextToTags, toJson: _joinList)
+  List<String> get title;
+  @JsonKey(fromJson: parseTextToTags, toJson: _joinList)
+  List<String> get body;
   List<String> get tags;
   int get likes;
   int get dislikes;
   int get commentCount;
+  @JsonKey(name: 'time')
   String get createdAt;
   bool get isPoll;
   List<String>? get pollOptions;
@@ -36,6 +41,29 @@ mixin _$PostModel {
   @pragma('vm:prefer-inline')
   $PostModelCopyWith<PostModel> get copyWith =>
       _$PostModelCopyWithImpl<PostModel>(this as PostModel, _$identity);
+
+  /// Serializes this PostModel to a JSON map.
+  Map<String, dynamic> toJson();
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    properties
+      ..add(DiagnosticsProperty('type', 'PostModel'))
+      ..add(DiagnosticsProperty('uid', uid))
+      ..add(DiagnosticsProperty('id', id))
+      ..add(DiagnosticsProperty('gifUrl', gifUrl))
+      ..add(DiagnosticsProperty('imageString', imageString))
+      ..add(DiagnosticsProperty('title', title))
+      ..add(DiagnosticsProperty('body', body))
+      ..add(DiagnosticsProperty('tags', tags))
+      ..add(DiagnosticsProperty('likes', likes))
+      ..add(DiagnosticsProperty('dislikes', dislikes))
+      ..add(DiagnosticsProperty('commentCount', commentCount))
+      ..add(DiagnosticsProperty('createdAt', createdAt))
+      ..add(DiagnosticsProperty('isPoll', isPoll))
+      ..add(DiagnosticsProperty('pollOptions', pollOptions))
+      ..add(DiagnosticsProperty('pollVoteCounts', pollVoteCounts));
+  }
 
   @override
   bool operator ==(Object other) {
@@ -64,6 +92,7 @@ mixin _$PostModel {
                 .equals(other.pollVoteCounts, pollVoteCounts));
   }
 
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
       runtimeType,
@@ -83,7 +112,7 @@ mixin _$PostModel {
       const DeepCollectionEquality().hash(pollVoteCounts));
 
   @override
-  String toString() {
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
     return 'PostModel(uid: $uid, id: $id, gifUrl: $gifUrl, imageString: $imageString, title: $title, body: $body, tags: $tags, likes: $likes, dislikes: $dislikes, commentCount: $commentCount, createdAt: $createdAt, isPoll: $isPoll, pollOptions: $pollOptions, pollVoteCounts: $pollVoteCounts)';
   }
 }
@@ -94,17 +123,17 @@ abstract mixin class $PostModelCopyWith<$Res> {
       _$PostModelCopyWithImpl;
   @useResult
   $Res call(
-      {String uid,
+      {@JsonKey(name: 'author') String uid,
       String id,
       String? gifUrl,
-      String? imageString,
-      List<String>? title,
-      List<String>? body,
+      @JsonKey(name: 'image') String? imageString,
+      @JsonKey(fromJson: parseTextToTags, toJson: _joinList) List<String> title,
+      @JsonKey(fromJson: parseTextToTags, toJson: _joinList) List<String> body,
       List<String> tags,
       int likes,
       int dislikes,
       int commentCount,
-      String createdAt,
+      @JsonKey(name: 'time') String createdAt,
       bool isPoll,
       List<String>? pollOptions,
       Map<String, int>? pollVoteCounts});
@@ -126,8 +155,8 @@ class _$PostModelCopyWithImpl<$Res> implements $PostModelCopyWith<$Res> {
     Object? id = null,
     Object? gifUrl = freezed,
     Object? imageString = freezed,
-    Object? title = freezed,
-    Object? body = freezed,
+    Object? title = null,
+    Object? body = null,
     Object? tags = null,
     Object? likes = null,
     Object? dislikes = null,
@@ -154,14 +183,14 @@ class _$PostModelCopyWithImpl<$Res> implements $PostModelCopyWith<$Res> {
           ? _self.imageString
           : imageString // ignore: cast_nullable_to_non_nullable
               as String?,
-      title: freezed == title
+      title: null == title
           ? _self.title
           : title // ignore: cast_nullable_to_non_nullable
-              as List<String>?,
-      body: freezed == body
+              as List<String>,
+      body: null == body
           ? _self.body
           : body // ignore: cast_nullable_to_non_nullable
-              as List<String>?,
+              as List<String>,
       tags: null == tags
           ? _self.tags
           : tags // ignore: cast_nullable_to_non_nullable
@@ -199,22 +228,23 @@ class _$PostModelCopyWithImpl<$Res> implements $PostModelCopyWith<$Res> {
 }
 
 /// @nodoc
-
-@JsonSerializable(explicitToJson: true)
-class _PostModel extends PostModel {
+@JsonSerializable()
+class _PostModel extends PostModel with DiagnosticableTreeMixin {
   const _PostModel(
-      {required this.uid,
+      {@JsonKey(name: 'author') required this.uid,
       required this.id,
       this.gifUrl,
-      this.imageString,
-      final List<String>? title,
-      final List<String>? body,
-      required final List<String> tags,
-      required this.likes,
-      required this.dislikes,
-      required this.commentCount,
-      required this.createdAt,
-      required this.isPoll,
+      @JsonKey(name: 'image') this.imageString,
+      @JsonKey(fromJson: parseTextToTags, toJson: _joinList)
+      final List<String> title = const <String>[],
+      @JsonKey(fromJson: parseTextToTags, toJson: _joinList)
+      final List<String> body = const <String>[],
+      final List<String> tags = const ['public'],
+      this.likes = 0,
+      this.dislikes = 0,
+      this.commentCount = 0,
+      @JsonKey(name: 'time') required this.createdAt,
+      this.isPoll = false,
       final List<String>? pollOptions,
       final Map<String, int>? pollVoteCounts})
       : _title = title,
@@ -223,37 +253,40 @@ class _PostModel extends PostModel {
         _pollOptions = pollOptions,
         _pollVoteCounts = pollVoteCounts,
         super._();
+  factory _PostModel.fromJson(Map<String, dynamic> json) =>
+      _$PostModelFromJson(json);
 
   @override
+  @JsonKey(name: 'author')
   final String uid;
   @override
   final String id;
   @override
   final String? gifUrl;
   @override
+  @JsonKey(name: 'image')
   final String? imageString;
-  final List<String>? _title;
+  final List<String> _title;
   @override
-  List<String>? get title {
-    final value = _title;
-    if (value == null) return null;
+  @JsonKey(fromJson: parseTextToTags, toJson: _joinList)
+  List<String> get title {
     if (_title is EqualUnmodifiableListView) return _title;
     // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(value);
+    return EqualUnmodifiableListView(_title);
   }
 
-  final List<String>? _body;
+  final List<String> _body;
   @override
-  List<String>? get body {
-    final value = _body;
-    if (value == null) return null;
+  @JsonKey(fromJson: parseTextToTags, toJson: _joinList)
+  List<String> get body {
     if (_body is EqualUnmodifiableListView) return _body;
     // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(value);
+    return EqualUnmodifiableListView(_body);
   }
 
   final List<String> _tags;
   @override
+  @JsonKey()
   List<String> get tags {
     if (_tags is EqualUnmodifiableListView) return _tags;
     // ignore: implicit_dynamic_type
@@ -261,14 +294,19 @@ class _PostModel extends PostModel {
   }
 
   @override
+  @JsonKey()
   final int likes;
   @override
+  @JsonKey()
   final int dislikes;
   @override
+  @JsonKey()
   final int commentCount;
   @override
+  @JsonKey(name: 'time')
   final String createdAt;
   @override
+  @JsonKey()
   final bool isPoll;
   final List<String>? _pollOptions;
   @override
@@ -299,6 +337,33 @@ class _PostModel extends PostModel {
       __$PostModelCopyWithImpl<_PostModel>(this, _$identity);
 
   @override
+  Map<String, dynamic> toJson() {
+    return _$PostModelToJson(
+      this,
+    );
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    properties
+      ..add(DiagnosticsProperty('type', 'PostModel'))
+      ..add(DiagnosticsProperty('uid', uid))
+      ..add(DiagnosticsProperty('id', id))
+      ..add(DiagnosticsProperty('gifUrl', gifUrl))
+      ..add(DiagnosticsProperty('imageString', imageString))
+      ..add(DiagnosticsProperty('title', title))
+      ..add(DiagnosticsProperty('body', body))
+      ..add(DiagnosticsProperty('tags', tags))
+      ..add(DiagnosticsProperty('likes', likes))
+      ..add(DiagnosticsProperty('dislikes', dislikes))
+      ..add(DiagnosticsProperty('commentCount', commentCount))
+      ..add(DiagnosticsProperty('createdAt', createdAt))
+      ..add(DiagnosticsProperty('isPoll', isPoll))
+      ..add(DiagnosticsProperty('pollOptions', pollOptions))
+      ..add(DiagnosticsProperty('pollVoteCounts', pollVoteCounts));
+  }
+
+  @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
@@ -325,6 +390,7 @@ class _PostModel extends PostModel {
                 .equals(other._pollVoteCounts, _pollVoteCounts));
   }
 
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
       runtimeType,
@@ -344,7 +410,7 @@ class _PostModel extends PostModel {
       const DeepCollectionEquality().hash(_pollVoteCounts));
 
   @override
-  String toString() {
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
     return 'PostModel(uid: $uid, id: $id, gifUrl: $gifUrl, imageString: $imageString, title: $title, body: $body, tags: $tags, likes: $likes, dislikes: $dislikes, commentCount: $commentCount, createdAt: $createdAt, isPoll: $isPoll, pollOptions: $pollOptions, pollVoteCounts: $pollVoteCounts)';
   }
 }
@@ -358,17 +424,17 @@ abstract mixin class _$PostModelCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {String uid,
+      {@JsonKey(name: 'author') String uid,
       String id,
       String? gifUrl,
-      String? imageString,
-      List<String>? title,
-      List<String>? body,
+      @JsonKey(name: 'image') String? imageString,
+      @JsonKey(fromJson: parseTextToTags, toJson: _joinList) List<String> title,
+      @JsonKey(fromJson: parseTextToTags, toJson: _joinList) List<String> body,
       List<String> tags,
       int likes,
       int dislikes,
       int commentCount,
-      String createdAt,
+      @JsonKey(name: 'time') String createdAt,
       bool isPoll,
       List<String>? pollOptions,
       Map<String, int>? pollVoteCounts});
@@ -390,8 +456,8 @@ class __$PostModelCopyWithImpl<$Res> implements _$PostModelCopyWith<$Res> {
     Object? id = null,
     Object? gifUrl = freezed,
     Object? imageString = freezed,
-    Object? title = freezed,
-    Object? body = freezed,
+    Object? title = null,
+    Object? body = null,
     Object? tags = null,
     Object? likes = null,
     Object? dislikes = null,
@@ -418,14 +484,14 @@ class __$PostModelCopyWithImpl<$Res> implements _$PostModelCopyWith<$Res> {
           ? _self.imageString
           : imageString // ignore: cast_nullable_to_non_nullable
               as String?,
-      title: freezed == title
+      title: null == title
           ? _self._title
           : title // ignore: cast_nullable_to_non_nullable
-              as List<String>?,
-      body: freezed == body
+              as List<String>,
+      body: null == body
           ? _self._body
           : body // ignore: cast_nullable_to_non_nullable
-              as List<String>?,
+              as List<String>,
       tags: null == tags
           ? _self._tags
           : tags // ignore: cast_nullable_to_non_nullable
