@@ -9,6 +9,7 @@ import 'package:untitled_app/custom_widgets/warning_dialog.dart';
 import 'package:untitled_app/interfaces/post.dart';
 import 'package:untitled_app/interfaces/post_queries.dart';
 import 'package:untitled_app/interfaces/report.dart';
+import 'package:untitled_app/providers/comment_pool_provider.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
 import 'package:untitled_app/providers/nav_bar_provider.dart';
 import 'package:untitled_app/providers/post_provider.dart';
@@ -181,39 +182,46 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
   }
 
   Future<void> postCommentPressed() async {
+    CommentModel? comment;
+
     if (gif == null) {
       commentField.text = commentField.text.trim();
       if (commentField.text.length > c.maxCommentChars) {
         showSnackBar(
             text: AppLocalizations.of(context)!.tooManyChar, context: context);
+        return;
       } else if (commentField.text == '') {
         commentFieldFocus.requestFocus();
         showSnackBar(
             text: AppLocalizations.of(context)!.emptyFieldError,
             context: context);
+        return;
       } else {
         String body = commentField.text;
         commentField.text = '';
         FocusManager.instance.primaryFocus?.unfocus();
-        final comment = CommentModel(
+        comment = CommentModel(
           uid: ref.watch(currentUserProvider).user.uid,
           id: '',
           postId: widget.id,
           createdAt: DateTime.now().toUtc().toIso8601String(),
           body: parseTextToTags(body),
         );
-        await uploadComment(comment, ref);
       }
     } else {
-      final comment = CommentModel(
+      comment = CommentModel(
         uid: ref.watch(currentUserProvider).user.uid,
         id: '',
         postId: widget.id,
         createdAt: DateTime.now().toUtc().toIso8601String(),
         gifUrl: gif!.images!.fixedWidth.url,
       );
-      await uploadComment(comment, ref);
+      gif = null;
     }
+
+    final id = await uploadComment(comment, ref);
+    final completeComment = comment.copyWith(id: id);
+    ref.read(commentPoolProvider).putAll([completeComment]);
   }
 
   @override
