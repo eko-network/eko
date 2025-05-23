@@ -251,10 +251,9 @@ final goRouter = GoRouter(
               path: '/compose',
               name: 'compose',
               pageBuilder: (context, state) {
-                final Group? group = state.extra as Group?;
-                //if (args != null) print(args[0]);
+                final String? id = state.uri.queryParameters['id'];
                 return NoTransitionPage(
-                  child: ComposePage(groupId: group?.id),
+                  child: ComposePage(groupId: id),
                 );
               },
             ),

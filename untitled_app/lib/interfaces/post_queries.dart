@@ -73,6 +73,22 @@ Future<(List<MapEntry<String, int>>, bool)> popGetter(
   return (retList, retList.length < c.postsOnRefresh);
 }
 
+Future<(List<MapEntry<String, String>>, bool)> getGroupPosts(
+    List<MapEntry<String, String>> list, WidgetRef ref, String groupId) async {
+  final baseQuery = FirebaseFirestore.instance
+      .collection('posts')
+      .where('tags', arrayContains: groupId)
+      .orderBy('time', descending: true)
+      .limit(c.postsOnRefresh);
+  final query =
+      list.isEmpty ? baseQuery : baseQuery.startAfter([list.last.value]);
+  final postList = await getPosts(query);
+  ref.read(postPoolProvider).putAll(postList);
+  final retList =
+      postList.map((item) => MapEntry(item.id, item.createdAt)).toList();
+  return (retList, retList.length < c.postsOnRefresh);
+}
+
 Future<List<CommentModel>> getComments(
     Query<Map<String, dynamic>> query) async {
   final commentList = await Future.wait(

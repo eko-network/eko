@@ -163,6 +163,7 @@ class _ComposePageState extends ConsumerState<ComposePage> {
       bodyNewLines = 0;
       bodyController.clear();
       titleController.clear();
+      audiance = null;
     });
   }
 
@@ -245,7 +246,8 @@ class _ComposePageState extends ConsumerState<ComposePage> {
       builder: (BuildContext context) {
         return AlertDialog(
           backgroundColor: Theme.of(context).colorScheme.outlineVariant,
-          title: Text(AppLocalizations.of(context)!.confirmation),
+          title: Text(
+              'Post to ${audiance == null ? AppLocalizations.of(context)!.public : ref.watch(groupProvider(audiance!)).when(data: (group) => group.name, loading: () => '--', error: (_, __) => '--')}?'),
           content: SingleChildScrollView(
             child: PostCardFromPost(post: post, isPreview: true),
           ),
@@ -771,10 +773,7 @@ class _GroupListHeader extends StatelessWidget {
         ),
         InkWell(
           onTap: () {
-            // groupEndPoint = null;
-            // audience = AppLocalizations.of(context)!.public;
-            // context.pop();
-            // notifyListeners();
+            onPopularPressed();
           },
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 12),
