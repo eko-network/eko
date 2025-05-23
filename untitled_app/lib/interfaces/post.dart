@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:untitled_app/providers/comment_pool_provider.dart';
+import 'package:untitled_app/providers/post_provider.dart';
 import 'package:untitled_app/types/comment.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:untitled_app/interfaces/activity.dart';
 import 'package:untitled_app/interfaces/user.dart';
@@ -124,18 +125,68 @@ Future<String> uploadPost(PostModel post, WidgetRef ref) async {
   return postId;
 }
 
-Future<String> uploadComment(CommentModel comment) async {
+Future<String> uploadComment(CommentModel comment, WidgetRef ref) async {
   final firestore = FirebaseFirestore.instance;
   final json = comment.toJson();
+  final post = await ref.read(postProvider(comment.postId).future);
 
   //don't put these in firebase
   json.remove('id');
   json.remove('postId');
+
+  // upload
   final commentId = await firestore
       .collection('posts')
       .doc(comment.postId)
       .collection('comments')
       .add(json)
       .then((documentSnapshot) => documentSnapshot.id);
+
+  // ref.read(commentPoolProvider).putAll([comment]);
+
+  final activity = ActivityModel(
+      id: '',
+      createdAt: comment.createdAt,
+      type: 'comment',
+      content: json['body'] ?? 'Click to see gif',
+      path: comment.postId,
+      sourceUid: comment.uid);
+
+  uploadActivity(activity, post.uid);
+
+  // get users tagged in the comment
+  final List<Future<String?>> idFutures = [];
+  for (int i = 1; i < comment.body.length; i += 2) {
+    idFutures.add(getUidFromUsername(comment.body[i].substring(1)));
+  }
+
+  // activity content
+  final String content = json['body'];
+
+  final taggedUsers = await Future.wait(idFutures);
+
+  // make sure not to notify yourself
+  final Set<String> sentActivites = {ref.watch(currentUserProvider).user.uid};
+  final List<Future<void>> activityFutures = [];
+
+  for (final user in taggedUsers) {
+    if (user == null) {
+      continue;
+    }
+    if (sentActivites.contains(user)) {
+      continue;
+    }
+    sentActivites.add(user);
+
+    final activity = ActivityModel(
+        id: '',
+        createdAt: comment.createdAt,
+        type: 'tag',
+        content: content,
+        path: comment.postId,
+        sourceUid: comment.uid);
+    activityFutures.add(uploadActivity(activity, user));
+  }
+
   return commentId;
 }

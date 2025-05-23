@@ -202,10 +202,7 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
           createdAt: DateTime.now().toUtc().toIso8601String(),
           body: parseTextToTags(body),
         );
-        await uploadComment(comment);
-        // data.items.add(Post.fromRaw(
-        //     newComment, AppUser.fromCurrent(locator<CurrentUser>()), 0,
-        //     rootPostId: post!.postId));
+        await uploadComment(comment, ref);
       }
     } else {
       final comment = CommentModel(
@@ -215,11 +212,8 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
         createdAt: DateTime.now().toUtc().toIso8601String(),
         gifUrl: gif!.images!.fixedWidth.url,
       );
-      await uploadComment(comment);
-      // data.items.add(newComment);
-      // gif = null;
+      await uploadComment(comment, ref);
     }
-    // postMap[post!.postId]!.post.commentCount++;
   }
 
   @override
