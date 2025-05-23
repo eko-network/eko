@@ -85,6 +85,14 @@ class FollowingFeed extends _$FollowingFeed {
     state = ([...state.$1, ...gottenPosts.map((item) => item.id)], false);
   }
 
+  void insertAtIndex(int index, PostModel post) {
+    if (_feedChunks.isNotEmpty) {
+      final newList = [...state.$1];
+      newList.insert(index, post.id);
+      state = (newList, state.$2);
+    }
+  }
+
   Future<void> refresh() async {
     _feedChunks.clear();
     state = ([], false);

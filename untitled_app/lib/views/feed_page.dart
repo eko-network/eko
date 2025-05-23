@@ -46,20 +46,43 @@ class _RoundedPainter extends BoxPainter {
 
 class _Tab extends StatelessWidget {
   final String label;
-  const _Tab({required this.label});
+  final bool selected;
+  final ScrollController controller;
+  const _Tab(
+      {required this.label, required this.selected, required this.controller});
 
   @override
   Widget build(BuildContext context) {
+    if (selected) {
+      return GestureDetector(
+        onTap: () {
+          if (!controller.hasClients) {
+            return;
+          }
+          controller.animateTo(0,
+              duration: Duration(milliseconds: 300), curve: ElasticInCurve());
+        },
+        child: Padding(
+          padding: EdgeInsetsDirectional.only(top: 0, bottom: 10),
+          child: Text(label),
+        ),
+      );
+    }
     return Padding(
-        padding: EdgeInsetsDirectional.only(top: 0, bottom: 10),
-        child: Text(label));
+      padding: EdgeInsetsDirectional.only(top: 0, bottom: 10),
+      child: Text(label),
+    );
   }
 }
 
 class _AppBar extends StatelessWidget {
   final double height;
   final TabController tabController;
-  const _AppBar({required this.height, required this.tabController});
+  final List<ScrollController> scrollControllers;
+  const _AppBar(
+      {required this.height,
+      required this.tabController,
+      required this.scrollControllers});
   @override
   Widget build(BuildContext context) {
     return DecoratedBox(
@@ -87,10 +110,22 @@ class _AppBar extends StatelessWidget {
             ),
             TabBar(
               controller: tabController,
-              tabs: const [
-                _Tab(label: 'Following'),
-                _Tab(label: 'New'),
-                _Tab(label: 'Popular'),
+              tabs: [
+                _Tab(
+                  label: 'Following',
+                  selected: tabController.index == 0,
+                  controller: scrollControllers[0],
+                ),
+                _Tab(
+                  label: 'New',
+                  selected: tabController.index == 1,
+                  controller: scrollControllers[1],
+                ),
+                _Tab(
+                  label: 'Popular',
+                  selected: tabController.index == 2,
+                  controller: scrollControllers[2],
+                ),
               ],
               indicator: RoundedTabIndicator(
                 color: Theme.of(context).colorScheme.primary,
@@ -141,7 +176,11 @@ class _FeedPageState extends State<FeedPage> with TickerProviderStateMixin {
   }
 
   void tabListener() {
-    lastOffset = getCurrentScrollController().offset;
+    final controller = getCurrentScrollController();
+    if (!controller.hasClients) {
+      return;
+    }
+    lastOffset = controller.offset;
     revealDelta = 0.0;
   }
 
@@ -251,6 +290,11 @@ class _FeedPageState extends State<FeedPage> with TickerProviderStateMixin {
             child: _AppBar(
               height: appBarHeight,
               tabController: tabController,
+              scrollControllers: [
+                followingScrollController,
+                newScrollController,
+                popScrollController
+              ],
             )),
       ],
     );

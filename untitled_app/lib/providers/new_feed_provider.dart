@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:untitled_app/interfaces/post_queries.dart';
 import 'package:untitled_app/providers/post_pool_provider.dart';
+import 'package:untitled_app/types/post.dart';
 import '../utilities/constants.dart' as c;
 part '../generated/providers/new_feed_provider.g.dart';
 
@@ -36,5 +37,12 @@ class NewFeed extends _$NewFeed {
     _timestamps.clear();
     state = ([], false);
     await getter();
+  }
+
+  void insertAtIndex(int index, PostModel post) {
+    final newList = [...state.$1];
+    newList.insert(index, post.id);
+    _timestamps.add(post.createdAt);
+    state = (newList, state.$2);
   }
 }

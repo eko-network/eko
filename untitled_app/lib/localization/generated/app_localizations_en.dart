@@ -51,7 +51,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get usernameTakenTitle => 'This Username has been taken.';
 
   @override
-  String get usernameTakenBody => 'Please go back and choose a different username.';
+  String get usernameTakenBody =>
+      'Please go back and choose a different username.';
 
   @override
   String get invalidEmailTittle => 'Invalid Email Formating';
@@ -63,7 +64,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get userNotFoundTitle => 'Can\'t Find Account';
 
   @override
-  String get userNotFoundBody => 'We can\'t find an account with that email. Try another email, or sign up.';
+  String get userNotFoundBody =>
+      'We can\'t find an account with that email. Try another email, or sign up.';
 
   @override
   String get wrongPasswordTittle => 'Incorrect Password';
@@ -75,7 +77,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get userDisabledTittle => 'Account Disabled';
 
   @override
-  String get userDisabledBody => 'Your account has been disabled. Please contact us at conetechnologiesdev@gmail.com.';
+  String get userDisabledBody =>
+      'Your account has been disabled. Please contact us at conetechnologiesdev@gmail.com.';
 
   @override
   String get weakPasswordTitle => 'Weak Password';
@@ -87,25 +90,29 @@ class AppLocalizationsEn extends AppLocalizations {
   String get defaultErrorTittle => 'Something Went Wrong';
 
   @override
-  String get defaultErrorBody => 'Please try again later or reach out to conetechnologiesdev@gmail.com.';
+  String get defaultErrorBody =>
+      'Please try again later or reach out to conetechnologiesdev@gmail.com.';
 
   @override
   String get emailAlreadyInUseTitle => 'Email Already In-Use';
 
   @override
-  String get emailAlreadyInUseBody => 'An account with that email already exists';
+  String get emailAlreadyInUseBody =>
+      'An account with that email already exists';
 
   @override
   String get forgotPasswordTittle => 'You\'ve Got Mail!';
 
   @override
-  String get forgotPasswordBody => 'Check your email for a password reset link.';
+  String get forgotPasswordBody =>
+      'Check your email for a password reset link.';
 
   @override
   String get exitCreateAccountTitle => 'Return to welcome page?';
 
   @override
-  String get exitCreateAccountBody => 'Are you sure you want to go back? your information will be deleted.';
+  String get exitCreateAccountBody =>
+      'Are you sure you want to go back? your information will be deleted.';
 
   @override
   String get exitEditProfileTitle => 'Are you sure you want to exit?';
@@ -285,10 +292,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get createAPassword => 'Create a Password';
 
   @override
-  String get deleteAcountTitle => 'Are you sure you want to delete your account?';
+  String get deleteAcountTitle =>
+      'Are you sure you want to delete your account?';
 
   @override
-  String get deleteAcountBody => 'All account data will be deleted. This action cannot be undone. Press \"Go Back\" to cancel';
+  String get deleteAcountBody =>
+      'All account data will be deleted. This action cannot be undone. Press \"Go Back\" to cancel';
 
   @override
   String get delete => 'Delete';
@@ -366,7 +375,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get userNotFound => 'User Not Found';
 
   @override
-  String get usernameReqs => 'Usernames must be between 3 and 24 characters. Usernames can only contain lowercase letters, numbers, and underscores.';
+  String get usernameReqs =>
+      'Usernames must be between 3 and 24 characters. Usernames can only contain lowercase letters, numbers, and underscores.';
 
   @override
   String get followText => 'started following you';
@@ -375,7 +385,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get taggedText => 'tagged you:';
 
   @override
-  String get badAuthState => 'Request is invalid or has expired. Please try again.';
+  String get badAuthState =>
+      'Request is invalid or has expired. Please try again.';
 
   @override
   String get resetPasswordPromt => 'Reset password for:';
@@ -411,7 +422,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get updateRequiredTitle => 'Update Required';
 
   @override
-  String get updateRequiredBody => 'Please download the latest update to continue.';
+  String get updateRequiredBody =>
+      'Please download the latest update to continue.';
 
   @override
   String get updateAvailable => 'Update Available';
@@ -426,10 +438,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get groupNotFound => 'Group Not Found';
 
   @override
-  String get leaveGroupWarningTitle => 'Are you sure you want to leave the group?';
+  String get leaveGroupWarningTitle =>
+      'Are you sure you want to leave the group?';
 
   @override
-  String get leaveGroupWarningBody => 'A group member will need to re-add you should you want to join again.';
+  String get leaveGroupWarningBody =>
+      'A group member will need to re-add you should you want to join again.';
 
   @override
   String get share => 'Share';
@@ -444,7 +458,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get shareProfile => 'Share Profile';
 
   @override
-  String get deleteAcountReAuthWarning => 'Please enter your password to confirm you wish to delete your account. This Action cannot be undone. Upon clicking the button below, your account will be deleted.';
+  String get deleteAcountReAuthWarning =>
+      'Please enter your password to confirm you wish to delete your account. This Action cannot be undone. Upon clicking the button below, your account will be deleted.';
 
   @override
   String get logIntoApp => 'Login required';
@@ -459,7 +474,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get send => 'Send';
 
   @override
-  String get reportDetails => 'Please provide information on why you are reporting this post.';
+  String get reportDetails =>
+      'Please provide information on why you are reporting this post.';
 
   @override
   String get commentRequired => 'Comment Required';
@@ -468,7 +484,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tooEarlyDeleteTitle => 'Please Wait';
 
   @override
-  String get tooEarlyDeleteBody => 'Posts/comments may only be deleted 48 hours after they are posted.';
+  String get tooEarlyDeleteBody =>
+      'Posts/comments may only be deleted 48 hours after they are posted.';
 
   @override
   String get deletePostWarningTitle => 'Delete Post';
@@ -477,10 +494,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deleteCommentWarningTitle => 'Delete Comment';
 
   @override
-  String get deletePostWarningBody => 'Are you sure you wish to proceed? This action cannot be undone.';
+  String get deletePostWarningBody =>
+      'Are you sure you wish to proceed? This action cannot be undone.';
 
   @override
-  String get invalidSession => 'This Eko account is being used on another device. Press below to continue on this device.';
+  String get invalidSession =>
+      'This Eko account is being used on another device. Press below to continue on this device.';
 
   @override
   String get birthday => 'Birthday';
@@ -522,7 +541,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get blockTitle => 'Block User';
 
   @override
-  String get blockBody => 'This will hide content the user posts and prevent them from viewing your profile.';
+  String get blockBody =>
+      'This will hide content the user posts and prevent them from viewing your profile.';
 
   @override
   String get blockedAccounts => 'Blocked Accounts';
@@ -531,8 +551,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get newActivityNotifications => 'New Activity Notifications';
 
   @override
-  String get blockedByUserMessage => 'You do not currently have permission to view this content.';
+  String get blockedByUserMessage =>
+      'You do not currently have permission to view this content.';
 
   @override
-  String get birthdayExplanation => 'We use this to ensure you are old enough to use the app.';
+  String get birthdayExplanation =>
+      'We use this to ensure you are old enough to use the app.';
 }

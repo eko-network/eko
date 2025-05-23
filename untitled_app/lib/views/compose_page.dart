@@ -14,10 +14,13 @@ import 'package:untitled_app/custom_widgets/image_widget.dart';
 import 'package:untitled_app/interfaces/post.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
+import 'package:untitled_app/providers/following_feed_provider.dart';
 import 'package:untitled_app/providers/group_list_provider.dart';
 import 'package:untitled_app/providers/group_provider.dart';
 // import 'package:untitled_app/models/current_user.dart';
 import 'package:untitled_app/providers/nav_bar_provider.dart';
+import 'package:untitled_app/providers/new_feed_provider.dart';
+import 'package:untitled_app/providers/post_pool_provider.dart';
 import 'package:untitled_app/types/post.dart';
 import 'package:untitled_app/widgets/infinite_scrolly.dart';
 import 'package:untitled_app/widgets/poll_creator.dart';
@@ -47,6 +50,7 @@ class _ComposePageState extends ConsumerState<ComposePage> {
   final bodyFocus = FocusNode();
   final titleFocus = FocusNode();
   int bodyNewLines = 0;
+  bool isPosting = false;
 
   void _setState() {
     setState(() {});
@@ -159,6 +163,7 @@ class _ComposePageState extends ConsumerState<ComposePage> {
       bodyNewLines = 0;
       bodyController.clear();
       titleController.clear();
+      audiance = null;
     });
   }
 
@@ -210,6 +215,15 @@ class _ComposePageState extends ConsumerState<ComposePage> {
           text: AppLocalizations.of(context)!.tooManyChar, context: context);
       return;
     }
+
+    if (isPosting) {
+      return;
+    }
+
+    setState(() {
+      isPosting = true;
+    });
+
     final post = PostModel(
       uid: ref.watch(currentUserProvider).user.uid,
       id: '',
@@ -227,11 +241,13 @@ class _ComposePageState extends ConsumerState<ComposePage> {
     );
 
     showDialog(
+      barrierDismissible: !isPosting,
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           backgroundColor: Theme.of(context).colorScheme.outlineVariant,
-          title: Text(AppLocalizations.of(context)!.confirmation),
+          title: Text(
+              'Post to ${audiance == null ? AppLocalizations.of(context)!.public : ref.watch(groupProvider(audiance!)).when(data: (group) => group.name, loading: () => '--', error: (_, __) => '--')}?'),
           content: SingleChildScrollView(
             child: PostCardFromPost(post: post, isPreview: true),
           ),
@@ -239,18 +255,36 @@ class _ComposePageState extends ConsumerState<ComposePage> {
             TextButton(
               child: Text(AppLocalizations.of(context)!.cancel),
               onPressed: () {
-                context.pop();
+                if (!isPosting) {
+                  context.pop();
+                }
               },
             ),
             TextButton(
               child: Text(AppLocalizations.of(context)!.post),
               onPressed: () async {
-                _clear();
-                await uploadPost(post, ref);
-                if (context.mounted) {
-                  context.pop();
-                  if (post.tags.contains('public')) {
-                    context.go('/feed');
+                final postToUpload = post.copyWith(
+                    createdAt: DateTime.now().toUtc().toIso8601String());
+                final id = await uploadPost(postToUpload, ref);
+                if (context.mounted) context.pop();
+                if (id != null) {
+                  _clear();
+                  if (context.mounted) {
+                    if (post.tags.contains('public')) {
+                      final completePost = postToUpload.copyWith(
+                        id: id,
+                      );
+                      ref
+                          .read(newFeedProvider.notifier)
+                          .insertAtIndex(0, completePost);
+                      ref
+                          .read(followingFeedProvider.notifier)
+                          .insertAtIndex(0, completePost);
+                      ref.read(postPoolProvider).putAll([completePost]);
+                      context.go('/feed');
+                    } else {
+                      context.go('/groups/sub_group/${post.tags.first}');
+                    }
                   }
                 }
               },
@@ -259,6 +293,10 @@ class _ComposePageState extends ConsumerState<ComposePage> {
         );
       },
     ).then((_) => FocusManager.instance.primaryFocus?.unfocus());
+
+    setState(() {
+      isPosting = false;
+    });
   }
 
   @override
@@ -735,10 +773,7 @@ class _GroupListHeader extends StatelessWidget {
         ),
         InkWell(
           onTap: () {
-            // groupEndPoint = null;
-            // audience = AppLocalizations.of(context)!.public;
-            // context.pop();
-            // notifyListeners();
+            onPopularPressed();
           },
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 12),

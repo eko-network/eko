@@ -8,8 +8,7 @@ import '../custom_widgets/group_card.dart';
 import '../utilities/constants.dart' as c;
 
 class GroupsPage extends ConsumerStatefulWidget {
-  final bool reload;
-  const GroupsPage({super.key, this.reload = false});
+  const GroupsPage({super.key});
 
   @override
   ConsumerState<GroupsPage> createState() => _GroupsPageState();

@@ -9,14 +9,12 @@ import '../models/post_handler.dart';
 import 'package:go_router/go_router.dart';
 
 class SubGroupController extends ChangeNotifier {
-  final Group? passedGroup;
   Group? group;
   final String id;
   final BuildContext context;
   bool groupNotFound = false;
   bool notInGroup = false;
   SubGroupController({
-    required this.passedGroup,
     required this.context,
     required this.id,
   }) {
@@ -28,29 +26,21 @@ class SubGroupController extends ChangeNotifier {
   // }
 
   Future<void> _init() async {
-    if (passedGroup != null) {
-      group = passedGroup!;
-    } else {
-      group ??= await GroupHandler()
-          .getGroupFromId(id); //FIXME might break if opening deleted group
-      // builtFromID = true;
-      // post!.hasCache = true;
-    }
+    group ??= await GroupHandler()
+        .getGroupFromId(id); //FIXME might break if opening deleted group
+    // builtFromID = true;
+    // post!.hasCache = true;
 
-    if (passedGroup != null) {
-      group = passedGroup!;
-    } else {
-      if (group == null) {
-        final readGroup = await GroupHandler().getGroupFromId(id);
-        if (readGroup != null) {
-          if (readGroup.members.contains(locator<CurrentUser>().getUID())) {
-            group = readGroup;
-          } else {
-            notInGroup = true;
-          }
+    if (group == null) {
+      final readGroup = await GroupHandler().getGroupFromId(id);
+      if (readGroup != null) {
+        if (readGroup.members.contains(locator<CurrentUser>().getUID())) {
+          group = readGroup;
         } else {
-          groupNotFound = true;
+          notInGroup = true;
         }
+      } else {
+        groupNotFound = true;
       }
     }
     notifyListeners();

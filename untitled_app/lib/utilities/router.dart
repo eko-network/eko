@@ -199,17 +199,8 @@ final goRouter = GoRouter(
               path: '/groups',
               name: 'groups',
               pageBuilder: (context, state) {
-                //return const NoTransitionPage(child: GroupsPage());
-                bool? reload;
-                if (state.extra is bool) {
-                  reload = state.extra as bool?;
-                }
                 return NoTransitionPage(
-                  child: reload == null
-                      ? const GroupsPage()
-                      : GroupsPage(
-                          reload: reload,
-                        ),
+                  child: GroupsPage(),
                 );
               },
               routes: [
@@ -218,7 +209,7 @@ final goRouter = GoRouter(
                     name: 'sub_group',
                     builder: (context, state) {
                       String id = state.pathParameters['id']!;
-                      return SubGroupPage(group: null, id: id);
+                      return SubGroupPage(id: id);
                     },
                     routes: [
                       GoRoute(
@@ -260,10 +251,9 @@ final goRouter = GoRouter(
               path: '/compose',
               name: 'compose',
               pageBuilder: (context, state) {
-                final Group? group = state.extra as Group?;
-                //if (args != null) print(args[0]);
+                final String? id = state.uri.queryParameters['id'];
                 return NoTransitionPage(
-                  child: ComposePage(groupId: group?.id),
+                  child: ComposePage(groupId: id),
                 );
               },
             ),
