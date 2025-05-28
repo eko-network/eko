@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -25,7 +23,7 @@ import 'package:untitled_app/widgets/infinite_scrolly.dart';
 import 'package:untitled_app/widgets/poll_creator.dart';
 import 'package:untitled_app/widgets/post_card.dart';
 import 'package:untitled_app/widgets/profile_picture.dart';
-import '../custom_widgets/searched_user_card.dart';
+// import '../custom_widgets/searched_user_card.dart';
 import '../utilities/constants.dart' as c;
 import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 
@@ -118,20 +116,15 @@ class _ComposePageState extends ConsumerState<ComposePage> {
   }
 
   Future<void> _addImagePressed() async {
-    final ImagePicker picker = ImagePicker();
-    final XFile? imageLocal =
-        await picker.pickImage(source: ImageSource.gallery);
-    if (imageLocal == null) return;
+    final asciiArt = await context.push('/compose/camera');
 
-    setState(() => _isLoadingImage = true);
-
-    final ascii = await ImageToAscii().convertImageToAscii(imageLocal.path);
-    setState(() {
-      image = ascii;
-      gif = null;
-      isPoll = false;
-      _isLoadingImage = false;
-    });
+    if (asciiArt != null && asciiArt is String) {
+      setState(() {
+        image = asciiArt;
+        gif = null;
+        isPoll = false;
+      });
+    }
   }
 
   void _addPollPressed() {
@@ -257,24 +250,22 @@ class _ComposePageState extends ConsumerState<ComposePage> {
                     createdAt: DateTime.now().toUtc().toIso8601String());
                 final id = await uploadPost(postToUpload, ref);
                 if (context.mounted) context.pop();
-                if (id != null) {
-                  _clear();
-                  if (context.mounted) {
-                    if (post.tags.contains('public')) {
-                      final completePost = postToUpload.copyWith(
-                        id: id,
-                      );
-                      ref
-                          .read(newFeedProvider.notifier)
-                          .insertAtIndex(0, completePost);
-                      ref
-                          .read(followingFeedProvider.notifier)
-                          .insertAtIndex(0, completePost);
-                      ref.read(postPoolProvider).putAll([completePost]);
-                      context.go('/feed');
-                    } else {
-                      context.go('/groups/sub_group/${post.tags.first}');
-                    }
+                _clear();
+                if (context.mounted) {
+                  if (post.tags.contains('public')) {
+                    final completePost = postToUpload.copyWith(
+                      id: id,
+                    );
+                    ref
+                        .read(newFeedProvider.notifier)
+                        .insertAtIndex(0, completePost);
+                    ref
+                        .read(followingFeedProvider.notifier)
+                        .insertAtIndex(0, completePost);
+                    ref.read(postPoolProvider).putAll([completePost]);
+                    context.go('/feed');
+                  } else {
+                    context.go('/groups/sub_group/${post.tags.first}');
                   }
                 }
               },
@@ -297,7 +288,6 @@ class _ComposePageState extends ConsumerState<ComposePage> {
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
-        //
         floatingActionButtonLocation: ExpandableFab.location,
         floatingActionButton: Visibility(
           visible: !bodyFocus.hasPrimaryFocus,

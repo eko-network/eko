@@ -256,6 +256,8 @@
 
 
     "blockedByUserMessage":"You do not currently have permission to view this content.",
-    "birthdayExplanation":"We use this to ensure you are old enough to use the app."
+    "birthdayExplanation":"We use this to ensure you are old enough to use the app.",
+    "noImageSelected":"No image selected",
+    "changeImage":"Change Image",
+    "pickImage":"Pick Image"
 }
-

@@ -6,6 +6,7 @@ import 'package:untitled_app/types/user.dart';
 import 'package:untitled_app/views/blocked_users_page.dart';
 import 'package:untitled_app/views/download_page.dart';
 import 'package:untitled_app/views/edit_group_page.dart';
+import 'package:untitled_app/views/camera_page.dart';
 import 'package:untitled_app/views/invalid_session_page.dart';
 import 'package:untitled_app/views/login.dart';
 import 'package:untitled_app/views/re_auth_page.dart';
@@ -256,6 +257,13 @@ final goRouter = GoRouter(
                   child: ComposePage(groupId: id),
                 );
               },
+              routes: [
+                GoRoute(
+                  path: 'camera',
+                  name: 'camera',
+                  builder: (context, state) => const CameraPage(),
+                ),
+              ],
             ),
           ],
         ),
