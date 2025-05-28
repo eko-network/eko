@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -54,6 +56,38 @@ class ProfilePicture extends ConsumerWidget {
                 return const Text('Error');
               },
               loading: () => LoadingProfileImage(),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class ProfilePictureFromFile extends StatelessWidget {
+  final void Function()? onPressed;
+  final EdgeInsets? padding;
+  final double size;
+  final File file;
+  const ProfilePictureFromFile(
+      {this.onPressed,
+      this.padding,
+      required this.size,
+      required this.file,
+      super.key});
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onPressed,
+      child: Padding(
+        padding: padding ?? const EdgeInsets.all(0),
+        child: SizedBox(
+          width: size,
+          height: size,
+          child: ClipOval(
+            child: Image.file(
+              file,
+              fit: BoxFit.fill,
             ),
           ),
         ),

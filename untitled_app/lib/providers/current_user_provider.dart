@@ -1,5 +1,9 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:untitled_app/interfaces/user.dart';
 import 'package:untitled_app/models/post_handler.dart';
 import 'package:untitled_app/providers/auth_provider.dart';
 import 'package:untitled_app/providers/user_provider.dart';
@@ -23,12 +27,32 @@ class CurrentUser extends _$CurrentUser {
     return CurrentUserModel.loading();
   }
 
-  Future<void> editProfile({String? name, String? bio}) async {
+  Future<void> editProfile(
+      {String? name,
+      String? bio,
+      String? username,
+      File? profilePicture}) async {
     final prev = state.user;
     state = state.copyWith(
         user:
             state.user.copyWith(name: name ?? prev.name, bio: bio ?? prev.bio));
+
     try {
+      String? pic;
+      if (profilePicture != null) {
+        pic = await _uploadProfilePicture(profilePicture);
+        if (pic != null) {
+          state =
+              state.copyWith(user: state.user.copyWith(profilePicture: pic));
+        }
+      }
+      String? validUsername;
+      if (username != null) {
+        if (await isUsernameAvailable(username) && isUsernameValid(username)) {
+          validUsername = username;
+        }
+      }
+
       final Map<String, dynamic> json = {};
       if (name != null) {
         json['name'] = name;
@@ -36,12 +60,40 @@ class CurrentUser extends _$CurrentUser {
       if (bio != null) {
         json['profileData.bio'] = bio;
       }
+      if (pic != null) {
+        json['profileData.profilePicture'] = pic;
+      }
+      if (validUsername != null) {
+        json['username'] = username;
+      }
       await FirebaseFirestore.instance
           .collection('users')
           .doc(state.user.uid)
           .update(json);
-    } catch (e) {
+      if (validUsername != null) {
+        state =
+            state.copyWith(user: state.user.copyWith(username: validUsername));
+      }
+    } catch (_) {
       state = state.copyWith(user: prev);
+    }
+  }
+
+  Future<String?> _uploadProfilePicture(File img) async {
+    final uid = state.user.uid;
+    try {
+      await FirebaseStorage.instance
+          .ref()
+          .child('profile_pictures/$uid/profile.jpg')
+          .putFile(img);
+      final ref = FirebaseStorage.instance
+          .ref()
+          .child('profile_pictures/$uid/profile.jpg');
+
+      final pic = await ref.getDownloadURL();
+      return pic;
+    } catch (_) {
+      return null;
     }
   }
 
