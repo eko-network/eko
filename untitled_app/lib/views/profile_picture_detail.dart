@@ -1,40 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart' as prov;
-import '../controllers/profile_picture_detail_controller.dart';
-import '../custom_widgets/profile_avatar.dart';
+import 'package:go_router/go_router.dart';
+import 'package:untitled_app/widgets/profile_picture.dart';
 import '../utilities/constants.dart' as c;
 
 class ProfilePictureDetail extends StatelessWidget {
-  final String imageURL;
+  final String uid;
 
-  const ProfilePictureDetail({super.key, required this.imageURL});
+  const ProfilePictureDetail({super.key, required this.uid});
 
   @override
   Widget build(BuildContext context) {
     final width = c.widthGetter(context);
-    return prov.ChangeNotifierProvider(
-        create: (context) => ProfilePictureDetailController(context: context),
-        builder: (context, child) {
-          return InkWell(
-            onTap: () => prov.Provider.of<ProfilePictureDetailController>(
-                    context,
-                    listen: false)
-                .backgroundPressed(),
-            child: Container(
-              alignment: Alignment.center,
-              width: double.infinity,
-              height: double.infinity,
-              decoration:
-                  BoxDecoration(color: Theme.of(context).colorScheme.shadow),
-              child: Hero(
-                tag: 'profileImage',
-                child: IconButton(
-                  onPressed: () {},
-                  icon: ProfileAvatar(url: imageURL, size: width * 0.6),
-                ),
-              ),
-            ),
-          );
-        });
+    return Scaffold(
+      body: GestureDetector(
+        onTap: () => context.pop(),
+        child: Container(
+            alignment: Alignment.center,
+            width: double.infinity,
+            height: double.infinity,
+            decoration:
+                BoxDecoration(color: Theme.of(context).colorScheme.shadow),
+            child: ProfilePicture(uid: uid, size: width * 0.75)),
+      ),
+    );
   }
 }

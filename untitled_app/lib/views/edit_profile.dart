@@ -202,7 +202,10 @@ class _EditProfileState extends ConsumerState<EditProfile> {
       canPop: false,
       onPopInvokedWithResult: (didPop, Object? result) {
         if (didPop) return;
-        if (!_shouldShowSave(user)) context.pop();
+        if (!_shouldShowSave(user)) {
+          context.pop();
+          return;
+        }
         _showWarning();
       },
       child: GestureDetector(
@@ -212,7 +215,7 @@ class _EditProfileState extends ConsumerState<EditProfile> {
             leading: IconButton(
               icon: Icon(Icons.arrow_back_ios_rounded,
                   color: Theme.of(context).colorScheme.onSurface),
-              onPressed: () => context.pop(),
+              onPressed: () => Navigator.of(context).maybePop(),
             ),
             automaticallyImplyLeading: false,
             title: Text(

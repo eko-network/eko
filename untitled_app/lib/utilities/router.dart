@@ -59,11 +59,10 @@ final goRouter = GoRouter(
   redirectLimit: 15,
   routes: [
     GoRoute(
-      path: '/profile_picture_detail',
+      path: '/profile_picture_detail/:id',
       name: 'profile_picture_detail',
       builder: (context, state) {
-        String url = state.extra as String;
-        return ProfilePictureDetail(imageURL: url);
+        return ProfilePictureDetail(uid: state.pathParameters['id']!);
       },
     ),
     GoRoute(
