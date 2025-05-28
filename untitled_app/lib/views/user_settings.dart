@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
+import 'package:untitled_app/providers/theme_provider.dart';
 
 //import '../utilities/constants.dart' as c;
 import '../controllers/settings_controller.dart';
@@ -8,11 +10,11 @@ import 'package:go_router/go_router.dart';
 
 //import 'package:cloud_firestore/cloud_firestore.dart';
 
-class UserSettings extends StatelessWidget {
+class UserSettings extends ConsumerWidget {
   const UserSettings({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return prov.ChangeNotifierProvider(
       create: (context) => SettingsController(context: context),
       builder: (context, child) {
@@ -38,11 +40,9 @@ class UserSettings extends StatelessWidget {
               SwitchListTile(
                 title: Text(AppLocalizations.of(context)!.darkMode),
                 value:
-                    prov.Provider.of<SettingsController>(context, listen: false)
-                        .getThemeValue(),
+                    ref.watch(colorThemeProvider).brightness == Brightness.dark,
                 onChanged: (value) {
-                  prov.Provider.of<SettingsController>(context, listen: false)
-                      .changeValue(value);
+                  ref.read(colorThemeProvider.notifier).changeTheme(value);
                 },
                 activeColor: Theme.of(context).colorScheme.primary,
               ),

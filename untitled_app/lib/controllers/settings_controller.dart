@@ -1,10 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart' as prov;
 import 'package:untitled_app/models/current_user.dart';
 import 'package:untitled_app/models/shared_pref_model.dart';
 import 'package:untitled_app/utilities/locator.dart';
-import '../utilities/themes/dark_theme_provider.dart';
 import 'package:go_router/go_router.dart';
 import '../custom_widgets/warning_dialog.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
@@ -21,17 +19,6 @@ class SettingsController extends ChangeNotifier {
   init() async {
     activityNotification = await getActivityNotification();
     notifyListeners();
-  }
-
-  bool getThemeValue() {
-    return prov.Provider.of<DarkThemeProvider>(context, listen: false)
-        .darkTheme;
-  }
-
-  changeValue(value) {
-    final themeChange =
-        prov.Provider.of<DarkThemeProvider>(context, listen: false);
-    themeChange.darkTheme = value;
   }
 
   void _popDialog() {

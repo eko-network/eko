@@ -9,8 +9,7 @@ import 'package:untitled_app/providers/auth_provider.dart';
 import 'package:untitled_app/providers/user_provider.dart';
 import 'package:untitled_app/types/current_user.dart';
 import 'package:untitled_app/utilities/locator.dart';
-import 'package:untitled_app/views/followers.dart';
-import 'package:untitled_app/views/following.dart';
+
 // Necessary for code-generation to work
 part '../generated/providers/current_user_provider.g.dart';
 

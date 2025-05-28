@@ -1,8 +1,8 @@
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:untitled_app/utilities/shared_pref_service.dart';
 
-Future<bool> getActivityNotification() async {
+bool getActivityNotification() {
   const activityNotification = 'ACTIVITY_NOTIFICATION';
-  SharedPreferences prefs = await SharedPreferences.getInstance();
+  final prefs = PrefsService.instance;
   final bool? value = prefs.getBool(activityNotification);
   if (value == null) {
     prefs.setBool(activityNotification, true);
@@ -11,17 +11,18 @@ Future<bool> getActivityNotification() async {
   return value;
 }
 
-void setActivityNotification(bool value) async {
+void setActivityNotification(bool value) {
   const activityNotification = 'ACTIVITY_NOTIFICATION';
-  SharedPreferences prefs = await SharedPreferences.getInstance();
+  final prefs = PrefsService.instance;
   prefs.setBool(activityNotification, value);
 }
 
-Future<bool?> getBool(String name)async{
-  SharedPreferences prefs = await SharedPreferences.getInstance();
+bool? getBool(String name) {
+  final prefs = PrefsService.instance;
   return prefs.getBool(name);
 }
-void setBool(String name, bool bool)async{
-  SharedPreferences prefs = await SharedPreferences.getInstance();
+
+void setBool(String name, bool bool) {
+  final prefs = PrefsService.instance;
   prefs.setBool(name, bool);
 }

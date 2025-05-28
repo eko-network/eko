@@ -58,7 +58,7 @@ dependencies:
   go_router: ^15.1.2
   shimmer: ^3.0.0
   collection: ^1.17.1
-  shared_preferences: ^2.2.0
+  shared_preferences: ^2.5.3
   eraser: ^3.0.0
   firebase_messaging: ^15.2.5
   extended_image: ^8.2.0

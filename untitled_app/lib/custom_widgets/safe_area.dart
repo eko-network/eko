@@ -1,20 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart' as prov;
-import 'package:untitled_app/utilities/themes/dark_theme_provider.dart';
-import 'package:untitled_app/utilities/constants.dart' as c;
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:untitled_app/providers/theme_provider.dart';
 
-class AppSafeArea extends StatelessWidget {
+class AppSafeArea extends ConsumerWidget {
   const AppSafeArea({super.key, required this.child});
   final Widget child;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return DecoratedBox(
-      decoration: BoxDecoration(
-          color: prov.Provider.of<DarkThemeProvider>(context, listen: true)
-                  .darkTheme
-              ? c.darkThemeColors(context).surface
-              : c.lightThemeColors(context).surface),
+      decoration: BoxDecoration(color: ref.watch(colorThemeProvider).surface),
       child: SafeArea(
         child: child,
       ),
