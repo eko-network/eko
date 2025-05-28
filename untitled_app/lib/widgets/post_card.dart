@@ -369,12 +369,14 @@ class PostCardFromPost extends ConsumerWidget {
                           ),
                         if (post.gifUrl != null) GifWidget(url: post.gifUrl!),
                         if (post.imageString != null)
-                          ImageWidget(text: post.imageString!),
+                          Padding(
+                              padding: const EdgeInsets.only(right: 50),
+                              child: ImageWidget(text: post.imageString!)),
                         if (post.gifUrl != null ||
                             post.imageString != null ||
                             post.isPoll)
                           const SizedBox(height: 6.0),
-                        if (post.body?.isNotEmpty ?? false)
+                        if (post.body.isNotEmpty)
                           RichText(
                             text: TextSpan(
                               style: TextStyle(
@@ -382,7 +384,7 @@ class PostCardFromPost extends ConsumerWidget {
                                     .style
                                     .fontFamily,
                               ),
-                              children: post.body!.map((chunk) {
+                              children: post.body.map((chunk) {
                                 if (chunk.startsWith('@')) {
                                   // This is a username, create a hyperlink
                                   return TextSpan(

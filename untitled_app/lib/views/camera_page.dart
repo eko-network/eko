@@ -16,6 +16,23 @@ class _CameraPageState extends State<CameraPage> {
   XFile? selectedImage;
   String? asciiImage;
   bool isLoading = false;
+  bool isDarkMode = true;
+
+  Future<void> _convertImageToAscii() async {
+    if (selectedImage == null) return;
+
+    setState(() {
+      isLoading = true;
+    });
+
+    final ascii = await ImageToAscii()
+        .convertImageToAscii(selectedImage!.path, darkMode: isDarkMode);
+
+    setState(() {
+      asciiImage = ascii;
+      isLoading = false;
+    });
+  }
 
   Future<void> _pickImage() async {
     final ImagePicker picker = ImagePicker();
@@ -26,17 +43,16 @@ class _CameraPageState extends State<CameraPage> {
 
     setState(() {
       selectedImage = imageLocal;
-      isLoading = true;
     });
 
-    // Convert to ASCII
-    //FIXME update ascii_to_image first
-    final ascii = await ImageToAscii().convertImageToAscii(imageLocal.path);
+    await _convertImageToAscii();
+  }
 
+  void _toggleDarkMode() {
     setState(() {
-      asciiImage = ascii;
-      isLoading = false;
+      isDarkMode = !isDarkMode;
     });
+    _convertImageToAscii();
   }
 
   @override
@@ -54,69 +70,163 @@ class _CameraPageState extends State<CameraPage> {
           icon: Icon(Icons.arrow_back_ios_rounded),
           onPressed: () => context.pop(),
         ),
-        actions: [
-          if (asciiImage != null)
-            TextButton(
-              onPressed: () {
-                context.pop(asciiImage);
-              },
-              style: TextButton.styleFrom(
-                backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-              ),
-              child: Text(
-                AppLocalizations.of(context)!.done,
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-              ),
-            ),
-        ],
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (isLoading)
-              const CircularProgressIndicator()
-            else if (asciiImage != null)
-              ImageWidget(text: asciiImage!)
-            else
-              Text(
-                AppLocalizations.of(context)!.noImageSelected,
-                style: TextStyle(
-                  fontSize: 18,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-              ),
-            if (asciiImage != null)
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      body: Column(
+        children: [
+          // Main content area (image or placeholder)
+          Expanded(
+            child: isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : asciiImage != null
+                    ? Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: ImageWidget(text: asciiImage!),
+                      )
+                    : Center(
+                        child: Text(
+                          AppLocalizations.of(context)!.noImageSelected,
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                        ),
+                      ),
+          ),
+
+          // Bottom toolbar
+          Container(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // if (asciiImage != null) ...[
+                //   Row(
+                //     mainAxisAlignment: MainAxisAlignment.center,
+                //     children: [
+                //       InkWell(
+                //         onTap: _toggleDarkMode,
+                //         borderRadius: BorderRadius.circular(12),
+                //         child: Container(
+                //           padding: const EdgeInsets.symmetric(
+                //               horizontal: 20, vertical: 12),
+                //           decoration: BoxDecoration(
+                //             color: isDarkMode
+                //                 ? Theme.of(context).colorScheme.primaryContainer
+                //                 : Theme.of(context)
+                //                     .colorScheme
+                //                     .surfaceContainer,
+                //             borderRadius: BorderRadius.circular(12),
+                //           ),
+                //           child: Icon(
+                //             Icons.dark_mode,
+                //             size: 20,
+                //             color: isDarkMode
+                //                 ? Theme.of(context)
+                //                     .colorScheme
+                //                     .onPrimaryContainer
+                //                 : Theme.of(context).colorScheme.onSurface,
+                //           ),
+                //         ),
+                //       ),
+                //       const SizedBox(width: 6),
+                //       _buildToggleButton(
+                //         isSelected: isDarkMode,
+                //         onPressed: _toggleDarkMode,
+                //         icon: Icons.dark_mode,
+                //       ),
+                //       const SizedBox(width: 6),
+                //       _buildToggleButton(
+                //         isSelected: isDarkMode,
+                //         onPressed: _toggleDarkMode,
+                //         icon: Icons.dark_mode,
+                //       ),
+                //       const SizedBox(width: 6),
+                //       _buildToggleButton(
+                //         isSelected: isDarkMode,
+                //         onPressed: _toggleDarkMode,
+                //         icon: Icons.dark_mode,
+                //       ),
+                //       const SizedBox(width: 6),
+                //       _buildToggleButton(
+                //         isSelected: isDarkMode,
+                //         onPressed: _toggleDarkMode,
+                //         icon: Icons.dark_mode,
+                //       ),
+                //     ],
+                //   ),
+                //   const SizedBox(height: 20),
+                // ],
+
+                // Button row
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    ElevatedButton(
-                      onPressed: _pickImage,
-                      child: Text(AppLocalizations.of(context)!.changeImage),
-                    ),
-                    // You can add more editing controls here in the future
+                    IconButton(
+                        onPressed: _pickImage,
+                        icon: Icon(
+                          Icons.perm_media,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        )),
+                    if (asciiImage != null) ...[
+                      IconButton(
+                          onPressed: _toggleDarkMode,
+                          icon: Icon(
+                            (isDarkMode) ? Icons.dark_mode : Icons.light_mode,
+                            color: Theme.of(context).colorScheme.onSurface,
+                          )),
+                      InkWell(
+                        onTap: () {
+                          context.pop(asciiImage);
+                        },
+                        borderRadius: BorderRadius.circular(12),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 12),
+                          decoration: BoxDecoration(
+                            color:
+                                Theme.of(context).colorScheme.primaryContainer,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(Icons.arrow_forward,
+                              size: 20,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onPrimaryContainer),
+                        ),
+                      ),
+                    ]
                   ],
                 ),
-              )
-            else
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: ElevatedButton(
-                  onPressed: _pickImage,
-                  child: Text(AppLocalizations.of(context)!.pickImage),
-                ),
-              ),
-          ],
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildToggleButton({
+    required bool isSelected,
+    required VoidCallback onPressed,
+    required IconData icon,
+  }) {
+    return InkWell(
+      onTap: onPressed,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? Theme.of(context).colorScheme.primaryContainer
+              : Theme.of(context).colorScheme.surfaceContainer,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Icon(
+          icon,
+          size: 20,
+          color: isSelected
+              ? Theme.of(context).colorScheme.onPrimaryContainer
+              : Theme.of(context).colorScheme.onSurface,
         ),
       ),
     );

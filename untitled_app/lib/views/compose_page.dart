@@ -116,7 +116,9 @@ class _ComposePageState extends ConsumerState<ComposePage> {
   }
 
   Future<void> _addImagePressed() async {
+    ref.read(navBarProvider.notifier).disable();
     final asciiArt = await context.push('/compose/camera');
+    ref.read(navBarProvider.notifier).enable();
 
     if (asciiArt != null && asciiArt is String) {
       setState(() {

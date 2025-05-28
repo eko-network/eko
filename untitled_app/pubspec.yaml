@@ -84,7 +84,7 @@ dependencies:
     # path: ../../image_to_ascii
     git:
       url: https://github.com/ericbreh/image_to_ascii.git
-      ref: a3a2d92
+      ref: 9fd7d35789167cb8ef6828325ae212744ef10b2b
   image: ^3.3.0
 
 dev_dependencies:
