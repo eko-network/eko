@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:giphy_get/giphy_get.dart';
 import 'package:go_router/go_router.dart';
@@ -15,9 +14,9 @@ import 'package:untitled_app/interfaces/post.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
 import 'package:untitled_app/providers/following_feed_provider.dart';
+import 'package:untitled_app/providers/gif_provider.dart';
 import 'package:untitled_app/providers/group_list_provider.dart';
 import 'package:untitled_app/providers/group_provider.dart';
-// import 'package:untitled_app/models/current_user.dart';
 import 'package:untitled_app/providers/nav_bar_provider.dart';
 import 'package:untitled_app/providers/new_feed_provider.dart';
 import 'package:untitled_app/providers/post_pool_provider.dart';
@@ -26,7 +25,6 @@ import 'package:untitled_app/widgets/infinite_scrolly.dart';
 import 'package:untitled_app/widgets/poll_creator.dart';
 import 'package:untitled_app/widgets/post_card.dart';
 import 'package:untitled_app/widgets/profile_picture.dart';
-import '../custom_widgets/searched_user_card.dart';
 import '../utilities/constants.dart' as c;
 import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 
@@ -41,7 +39,8 @@ class _ComposePageState extends ConsumerState<ComposePage> {
   final _key = GlobalKey<ExpandableFabState>();
   bool _isLoadingImage = false;
   String? audiance;
-  GiphyGif? gif;
+  // GiphyGif? gif;
+  String? gif;
   String? image;
   bool isPoll = false;
   List<String> pollOptions = ['', ''];
@@ -96,26 +95,8 @@ class _ComposePageState extends ConsumerState<ComposePage> {
     });
   }
 
-  Future<void> _addGifPressed() async {
-    ref.read(navBarProvider.notifier).disable();
-    GiphyGif? newGif = await GiphyGet.getGif(
-      context: context,
-      apiKey: dotenv.env['GIPHY_API_KEY']!,
-      lang: GiphyLanguage.english,
-      tabColor: Colors.teal,
-      debounceTimeInMilliseconds: 350,
-    );
-    //only update gif a gif was selected
-    if (newGif != null) {
-      setState(() {
-        gif = newGif;
-        gif = newGif;
-        image = null;
-        isPoll = false;
-      });
-    }
-
-    ref.read(navBarProvider.notifier).enable();
+  void _addGifPressed() async {
+    await context.pushNamed('gif');
   }
 
   Future<void> _addImagePressed() async {
@@ -135,8 +116,8 @@ class _ComposePageState extends ConsumerState<ComposePage> {
       // String? ascii = await uploadImage(File(imageFile.path));
       setState(() {
         image = ascii;
-        gif = null;
         isPoll = false;
+        ref.read(selectedGifProvider.notifier).clear();
       });
     }
     setState(() {
@@ -148,7 +129,7 @@ class _ComposePageState extends ConsumerState<ComposePage> {
     ref.read(navBarProvider.notifier).disable();
     setState(() {
       isPoll = true;
-      gif = null;
+      ref.read(selectedGifProvider.notifier).clear();
       image = null;
     });
     ref.read(navBarProvider.notifier).enable();
@@ -158,7 +139,7 @@ class _ComposePageState extends ConsumerState<ComposePage> {
     setState(() {
       isPoll = false;
       pollOptions = ['', ''];
-      gif = null;
+      ref.read(selectedGifProvider.notifier).clear();
       image = null;
       bodyNewLines = 0;
       bodyController.clear();
@@ -169,7 +150,7 @@ class _ComposePageState extends ConsumerState<ComposePage> {
   void _removeMedia() {
     setState(() {
       isPoll = false;
-      gif = null;
+      ref.read(selectedGifProvider.notifier).clear();
       image = null;
     });
   }
@@ -234,7 +215,7 @@ class _ComposePageState extends ConsumerState<ComposePage> {
       isPoll: isPoll,
       pollOptions: isPoll ? pollOptions : null,
       imageString: image,
-      gifUrl: gif?.images?.fixedWidth.url,
+      gifUrl: gif,
       title: parseTextToTags(title),
       body: parseTextToTags(body),
     );
@@ -301,11 +282,11 @@ class _ComposePageState extends ConsumerState<ComposePage> {
   Widget build(BuildContext context) {
     final width = c.widthGetter(context);
     final height = MediaQuery.sizeOf(context).height;
+    gif = ref.watch(selectedGifProvider);
 
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
-        //
         floatingActionButtonLocation: ExpandableFab.location,
         floatingActionButton: Visibility(
           visible: !bodyFocus.hasPrimaryFocus,
@@ -519,7 +500,8 @@ class _ComposePageState extends ConsumerState<ComposePage> {
                                       : image != null
                                           ? ImageWidget(text: image!)
                                           : Image.network(
-                                              gif!.images!.fixedWidth.url,
+                                              // gif!.images!.fixedWidth.url,
+                                              gif ?? '',
                                               loadingBuilder:
                                                   (BuildContext context,
                                                       Widget child,
@@ -609,120 +591,6 @@ class _ComposePageState extends ConsumerState<ComposePage> {
                 ],
               ),
             ),
-            // Padding(
-            //   padding: EdgeInsets.symmetric(horizontal: width * 0.04),
-            //   child: Column(
-            //     children: [
-            //       TextField(
-            //         focusNode: prov.Provider.of<ComposeController>(context,
-            //                 listen: false)
-            //             .searchFocus,
-            //         controller: prov.Provider.of<ComposeController>(context,
-            //                 listen: false)
-            //             .searchController,
-            //         onChanged: (s) {
-            //           prov.Provider.of<ComposeController>(context,
-            //                   listen: false)
-            //               .checkAtSymbol(s);
-            //         },
-            //         textCapitalization: TextCapitalization.sentences,
-            //         maxLines: null,
-            //         cursorColor: Theme.of(context).colorScheme.onSurface,
-            //         keyboardType: TextInputType.text,
-            //         style: TextStyle(
-            //             fontSize: 20,
-            //             fontWeight: FontWeight.normal,
-            //             color: Theme.of(context).colorScheme.onSurface),
-            //         decoration: InputDecoration(
-            //           contentPadding: EdgeInsets.all(height * 0.01),
-            //           hintText: AppLocalizations.of(context)!.addText,
-            //           hintStyle: TextStyle(
-            //               fontSize: 20,
-            //               fontWeight: FontWeight.normal,
-            //               color: Theme.of(context)
-            //                   .colorScheme
-            //                   .onSurfaceVariant),
-            //           border: InputBorder.none,
-            //         ),
-            //       ),
-            //       Expanded(
-            //         child: prov.Provider.of<ComposeController>(context,
-            //                     listen: true)
-            //                 .isLoading
-            //             ? const Center(
-            //                 child: CircularProgressIndicator(),
-            //               )
-            //             : prov.Provider.of<ComposeController>(context,
-            //                         listen: true)
-            //                     .hits
-            //                     .isEmpty
-            //                 ? Center(
-            //                     child: Text(
-            //                       AppLocalizations.of(context)!
-            //                           .noResultsFound,
-            //                       style: TextStyle(
-            //                           fontSize: 18,
-            //                           color: Theme.of(context)
-            //                               .colorScheme
-            //                               .onSurface),
-            //                     ),
-            //                   )
-            //                 : ListView.builder(
-            //                     shrinkWrap: true,
-            //                     itemCount:
-            //                         prov.Provider.of<ComposeController>(
-            //                                 context,
-            //                                 listen: true)
-            //                             .hits
-            //                             .length,
-            //                     itemBuilder:
-            //                         (BuildContext context, int index) {
-            //                       return UserCard(
-            //                           tagSearch: true,
-            //                           onCardTap: (username) {
-            //                             prov.Provider.of<ComposeController>(
-            //                                     context,
-            //                                     listen: false)
-            //                                 .updateTextField(
-            //                                     username,
-            //                                     prov.Provider.of<
-            //                                                 ComposeController>(
-            //                                             context,
-            //                                             listen: false)
-            //                                         .titleController,
-            //                                     prov.Provider.of<
-            //                                                 ComposeController>(
-            //                                             context,
-            //                                             listen: false)
-            //                                         .titleFocus);
-            //                             prov.Provider.of<ComposeController>(
-            //                                     context,
-            //                                     listen: false)
-            //                                 .updateTextField(
-            //                                     username,
-            //                                     prov.Provider.of<
-            //                                                 ComposeController>(
-            //                                             context,
-            //                                             listen: false)
-            //                                         .bodyController,
-            //                                     prov.Provider.of<
-            //                                                 ComposeController>(
-            //                                             context,
-            //                                             listen: false)
-            //                                         .bodyFocus);
-            //                           },
-            //                           uid: prov.Provider.of<
-            //                                       ComposeController>(
-            //                                   context,
-            //                                   listen: true)
-            //                               .hits[index]
-            //                               .uid);
-            //                     },
-            //                   ),
-            //       )
-            //     ],
-            //   ),
-            // )
           ],
         ),
       ),

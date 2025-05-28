@@ -35,6 +35,7 @@ import 'package:untitled_app/views/auth_action_interface.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:untitled_app/views/view_likes_page.dart';
 import 'package:untitled_app/views/update_required_page.dart';
+import 'package:untitled_app/widgets/gifs.dart';
 import 'package:untitled_app/widgets/require_auth.dart';
 import 'package:untitled_app/widgets/require_no_auth.dart';
 
@@ -248,16 +249,42 @@ final goRouter = GoRouter(
           navigatorKey: _shellNavigatorComposeKey,
           routes: [
             GoRoute(
-              path: '/compose',
-              name: 'compose',
-              pageBuilder: (context, state) {
-                final Group? group = state.extra as Group?;
-                //if (args != null) print(args[0]);
-                return NoTransitionPage(
-                  child: ComposePage(groupId: group?.id),
-                );
-              },
-            ),
+                path: '/compose',
+                name: 'compose',
+                pageBuilder: (context, state) {
+                  final Group? group = state.extra as Group?;
+                  //if (args != null) print(args[0]);
+                  return NoTransitionPage(
+                    child: ComposePage(groupId: group?.id),
+                  );
+                },
+                routes: [
+                  GoRoute(
+                    path: '/gif',
+                    name: 'gif',
+                    pageBuilder: (context, state) {
+                      return CustomTransitionPage(
+                        key: state.pageKey,
+                        child: GifSearchSection(),
+                        transitionsBuilder:
+                            (context, animation, secondaryAnimation, child) {
+                          const begin = Offset(0.0, 1.0);
+                          const end = Offset.zero;
+                          const curve = Curves.easeOut;
+
+                          final tween = Tween(begin: begin, end: end)
+                              .chain(CurveTween(curve: curve));
+                          final offsetAnimation = animation.drive(tween);
+
+                          return SlideTransition(
+                            position: offsetAnimation,
+                            child: child,
+                          );
+                        },
+                      );
+                    },
+                  ),
+                ]),
           ],
         ),
         StatefulShellBranch(
