@@ -50,7 +50,7 @@ dependencies:
   package_info_plus: ^8.3.0
   share_plus: ^10.1.4
   image_picker: ^1.1.2
-  image_cropper: ^9.0.0
+  image_cropper: ^9.1.0
   firebase_storage: ^12.4.5
   provider: ^6.0.5
   cached_network_image: ^3.2.3
@@ -84,6 +84,7 @@ dependencies:
     # path: ../../image_to_ascii
     git:
       url: https://github.com/ericbreh/image_to_ascii.git
+      ref: a3a2d92
   image: ^3.3.0
   flutter_staggered_grid_view: ^0.7.0
 

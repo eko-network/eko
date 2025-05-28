@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:untitled_app/models/shared_pref_model.dart';
+import '../utilities/constants.dart' as c;
 
 Future<bool> isUsernameAvailable(String username) async {
   final querySnapshot = await FirebaseFirestore.instance
@@ -15,6 +16,10 @@ Future<bool> isUsernameAvailable(String username) async {
   } else {
     return false;
   }
+}
+
+bool isUsernameValid(String username) {
+  return username.trim().contains(RegExp(c.userNameReqs));
 }
 
 // I copied this. Didn't change anything

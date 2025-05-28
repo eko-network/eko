@@ -9,6 +9,7 @@ import 'package:untitled_app/custom_widgets/time_stamp.dart';
 import 'package:untitled_app/custom_widgets/warning_dialog.dart';
 import 'package:untitled_app/providers/comment_provider.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
+import 'package:untitled_app/providers/user_provider.dart';
 import 'package:untitled_app/types/comment.dart';
 import 'package:untitled_app/widgets/comment_like_buttons.dart';
 import 'package:untitled_app/widgets/profile_picture.dart';
@@ -17,13 +18,11 @@ import '../localization/generated/app_localizations.dart';
 import '../utilities/constants.dart' as c;
 import 'package:flutter/cupertino.dart';
 
-Widget commentCardBuilder(String id) {
-  return CommentCard(id: id);
-}
-
 class CommentCard extends ConsumerStatefulWidget {
   final String id;
-  const CommentCard({super.key, required this.id});
+  final Function(String username) onReply;
+
+  const CommentCard({super.key, required this.id, required this.onReply});
   @override
   ConsumerState<CommentCard> createState() => _CommentCardState();
 }
@@ -74,8 +73,8 @@ class _CommentCardState extends ConsumerState<CommentCard> {
         } else {
           if (scrollPercentage >= 0.9) {
             scrollToStart();
-            // TODO: reply to comment
-            // replyPressed(ref.watch(userProvider(comment.uid)).value!.username);
+            widget
+                .onReply(ref.watch(userProvider(comment.uid)).value!.username);
           } else {
             scrollToStart();
           }
@@ -159,7 +158,8 @@ class _CommentCardState extends ConsumerState<CommentCard> {
                             decoration: BoxDecoration(
                                 color: Theme.of(context).colorScheme.surface),
                             width: width,
-                            child: _Card(comment: comment))),
+                            child: _Card(
+                                comment: comment, onReply: widget.onReply))),
                     SizedBox(
                       width: width * 0.2,
                       //color: Colors.red,
@@ -204,7 +204,9 @@ class _CommentCardState extends ConsumerState<CommentCard> {
 
 class _Card extends ConsumerWidget {
   final CommentModel comment;
-  const _Card({required this.comment});
+  final Function(String username) onReply;
+
+  const _Card({required this.comment, required this.onReply});
 
   avatarPressed(
       BuildContext context, WidgetRef ref, CommentModel comment) async {
@@ -267,45 +269,47 @@ class _Card extends ConsumerWidget {
                         ],
                       ),
                       const SizedBox(height: 8.0),
-                      if (comment.body != null)
-                        RichText(
-                          text: TextSpan(
-                            style: TextStyle(
-                              fontFamily:
-                                  DefaultTextStyle.of(context).style.fontFamily,
-                            ),
-                            children: comment.body!.map((chunk) {
-                              if (chunk.startsWith('@')) {
-                                // This is a username, create a hyperlink
-                                return TextSpan(
-                                    text: chunk,
-                                    style: TextStyle(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .surfaceTint),
-                                    recognizer: TapGestureRecognizer()
-                                    // ..onTap = () => tagPressed(chunk.substring(1)),
-                                    );
-                              } else {
-                                // This is a normal text, create a TextSpan
-                                return TextSpan(
+                      RichText(
+                        text: TextSpan(
+                          style: TextStyle(
+                            fontFamily:
+                                DefaultTextStyle.of(context).style.fontFamily,
+                          ),
+                          children: comment.body.map((chunk) {
+                            if (chunk.startsWith('@')) {
+                              // This is a username, create a hyperlink
+                              return TextSpan(
                                   text: chunk,
                                   style: TextStyle(
-                                    fontSize: 14,
-                                    color:
-                                        Theme.of(context).colorScheme.onSurface,
-                                  ),
-                                );
-                              }
-                            }).toList(),
-                          ),
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .surfaceTint),
+                                  recognizer: TapGestureRecognizer()
+                                  // ..onTap = () => tagPressed(chunk.substring(1)),
+                                  );
+                            } else {
+                              // This is a normal text, create a TextSpan
+                              return TextSpan(
+                                text: chunk,
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
+                                ),
+                              );
+                            }
+                          }).toList(),
                         ),
+                      ),
                       if (comment.gifUrl != null)
                         GifWidget(url: comment.gifUrl!),
                       const SizedBox(height: 4.0),
                       TextButton(
                         onPressed: () {
-                          // replyPressed(comment.uid);
+                          onReply(ref
+                              .watch(userProvider(comment.uid))
+                              .value!
+                              .username);
                         },
                         style: TextButton.styleFrom(
                           padding: EdgeInsets.zero,

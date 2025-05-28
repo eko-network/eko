@@ -8,6 +8,7 @@ import 'package:untitled_app/custom_widgets/gif_widget.dart';
 import 'package:untitled_app/custom_widgets/image_widget.dart';
 import 'package:untitled_app/custom_widgets/poll_widget.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
+import 'package:untitled_app/providers/group_provider.dart';
 // import 'package:untitled_app/interfaces/user.dart';
 // import 'package:untitled_app/providers/current_user_provider.dart';
 import 'package:untitled_app/providers/post_provider.dart';
@@ -38,6 +39,68 @@ Widget postCardBuilder(String id) {
   return PostCard(
     id: id,
   );
+}
+
+class GroupBadge extends ConsumerWidget {
+  final String groupId;
+  const GroupBadge({super.key, required this.groupId});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final width = c.widthGetter(context);
+    final asyncGroup = ref.watch(groupProvider(groupId));
+    return Padding(
+      padding: EdgeInsets.only(left: width * 0.115 + 20),
+      child: InkWell(
+        onTap: () {
+          final group = asyncGroup.valueOrNull;
+          if (group == null) {
+            return;
+          }
+          if (group.members.contains(ref.watch(currentUserProvider).user.uid)) {
+            context.push('/groups/sub_group/${group.id}', extra: group);
+          } else {
+            showMyDialog(AppLocalizations.of(context)!.notInGroup, '',
+                [AppLocalizations.of(context)!.ok], [context.pop], context,
+                dismissable: true);
+          }
+        },
+        child: Container(
+          padding: const EdgeInsets.only(left: 6, right: 6),
+          decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primaryContainer,
+              borderRadius: BorderRadius.circular(10)),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.group,
+                color: Theme.of(context).colorScheme.onPrimaryContainer,
+              ),
+              const SizedBox(width: 2),
+              asyncGroup.when(
+                data: (group) => Text(
+                  group.name,
+                  style: TextStyle(
+                      color: Theme.of(context).colorScheme.onPrimaryContainer),
+                ),
+                error: (_, __) => Text(
+                  'Error',
+                  style: TextStyle(
+                      color: Theme.of(context).colorScheme.onPrimaryContainer),
+                ),
+                loading: () => Text(
+                  'loading...',
+                  style: TextStyle(
+                      color: Theme.of(context).colorScheme.onPrimaryContainer),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class PostCard extends ConsumerStatefulWidget {
@@ -80,25 +143,6 @@ class _Loading extends StatelessWidget {
 class _PostCardState extends ConsumerState<PostCard> {
   bool sharing = false;
   bool isSelf = false;
-
-  // void _init() {
-  //   // liked = locator<CurrentUser>().checkIsLiked(post.postId);
-  //   // disliked = locator<CurrentUser>().checkIsDisliked(post.postId);
-  //   // isSelf = post.author.uid == locator<CurrentUser>().getUID();
-  // }
-
-  void groupBannerPressed() {
-    // final group = post.group;
-    // if (group != null) {
-    //   if (group.members.contains(locator<CurrentUser>().getUID())) {
-    //     context.push('/groups/sub_group/${group.id}', extra: group);
-    //   } else {
-    //     showMyDialog(AppLocalizations.of(context)!.notInGroup, '',
-    //         [AppLocalizations.of(context)!.ok], [_popDialog], context,
-    //         dismissable: true);
-    //   }
-    // }
-  }
 
   bool isBlockedByMe() {
     return false;
@@ -195,6 +239,7 @@ class PostCardFromPost extends ConsumerWidget {
   final bool isLoggedIn;
   final bool isPostPage;
   final bool isOnProfile;
+  final bool showGroup;
   final void Function(String)? sharePressed;
 
   const PostCardFromPost(
@@ -203,6 +248,7 @@ class PostCardFromPost extends ConsumerWidget {
       this.isPreview = false,
       this.isPostPage = false,
       this.isLoggedIn = true,
+      this.showGroup = false,
       super.key,
       required this.post});
 
@@ -220,41 +266,8 @@ class PostCardFromPost extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // if (widget.showGroup && post.group != null)
-            //   Padding(
-            //     padding: EdgeInsets.only(left: width * 0.115 + 20),
-            //     child: InkWell(
-            //       onTap: () => groupBannerPressed(),
-            //       child: Container(
-            //         padding:
-            //             const EdgeInsets.only(left: 6, right: 6),
-            //         decoration: BoxDecoration(
-            //             color: Theme.of(context)
-            //                 .colorScheme
-            //                 .primaryContainer,
-            //             borderRadius: BorderRadius.circular(10)),
-            //         child: Row(
-            //           mainAxisSize: MainAxisSize.min,
-            //           children: [
-            //             Icon(
-            //               Icons.group,
-            //               color: Theme.of(context)
-            //                   .colorScheme
-            //                   .onPrimaryContainer,
-            //             ),
-            //             const SizedBox(width: 2),
-            //             Text(
-            //               post.group!.name,
-            //               style: TextStyle(
-            //                   color: Theme.of(context)
-            //                       .colorScheme
-            //                       .onPrimaryContainer),
-            //             ),
-            //           ],
-            //         ),
-            //       ),
-            //     ),
-            //   ),
+            if (showGroup && post.tags.first != 'public')
+              GroupBadge(groupId: post.tags.first),
             Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: c.postPaddingHoriz,
@@ -470,7 +483,6 @@ class PostCardFromPost extends ConsumerWidget {
                 ],
               ),
             ),
-
             if (!isPreview)
               Padding(
                   padding: EdgeInsets.only(top: 8),

@@ -534,5 +534,15 @@ class AppLocalizationsEs extends AppLocalizations {
   String get blockedByUserMessage => 'You do not currently have permission to view this content.';
 
   @override
-  String get birthdayExplanation => 'We use this to ensure you are old enough to use the app.';
+  String get birthdayExplanation =>
+      'We use this to ensure you are old enough to use the app.';
+
+  @override
+  String get noImageSelected => 'No image selected';
+
+  @override
+  String get changeImage => 'Change Image';
+
+  @override
+  String get pickImage => 'Pick Image';
 }

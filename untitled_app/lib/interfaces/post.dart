@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:untitled_app/providers/post_provider.dart';
 import 'package:untitled_app/types/comment.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -48,98 +49,144 @@ List<String> parseTextToTags(String? text) {
   return chunks;
 }
 
-Future<String?> uploadPost(PostModel post, WidgetRef ref) async {
-  try {
-    final firestore = FirebaseFirestore.instance;
-    // update time (the server should probably do this itself)
-    final fixedPost =
-        post.copyWith(createdAt: DateTime.now().toUtc().toIso8601String());
-    final json = fixedPost.toJson();
+Future<String> uploadPost(PostModel post, WidgetRef ref) async {
+  final firestore = FirebaseFirestore.instance;
+  // update time (the server should probably do this itself)
+  final fixedPost =
+      post.copyWith(createdAt: DateTime.now().toUtc().toIso8601String());
+  final json = fixedPost.toJson();
 
-    //don't put these in firebase
-    json.remove('commentCount');
-    json.remove('id');
+  //don't put these in firebase
+  json.remove('commentCount');
+  json.remove('id');
 
-    // upload
-    final postId = await firestore
-        .collection('posts')
-        .add(json)
-        .then((documentSnapshot) => documentSnapshot.id);
+  // upload
+  final postId = await firestore
+      .collection('posts')
+      .add(json)
+      .then((documentSnapshot) => documentSnapshot.id);
 
-    // get users tagged in the post
-    final List<Future<String?>> idFutures = [];
-    for (int i = 1; i < post.title.length; i += 2) {
-      idFutures.add(getUidFromUsername(post.title[i].substring(1)));
-    }
-    for (int i = 1; i < post.body.length; i += 2) {
-      idFutures.add(getUidFromUsername(post.body[i].substring(1)));
-    }
-
-    // activity content
-    late final String content;
-    if (json['title'] != null) {
-      content = json['title'];
-    } else if (json['body'] != null) {
-      content = json['body'];
-    } else {
-      content = "${json['author']} tagged you in a post";
-    }
-
-    final taggedUsers = await Future.wait(idFutures);
-    // make sure not to notify yourself
-    final Set<String> sentActivites = {ref.watch(currentUserProvider).user.uid};
-    final List<Future<void>> activityFutures = [];
-
-    late final Set<String>? members;
-    if (post.tags.contains('public')) {
-      members = null;
-    } else {
-      final group = await ref.read(groupProvider(post.tags.first).future);
-      members = Set<String>.from(group.members);
-    }
-
-    for (final user in taggedUsers) {
-      if (user == null) {
-        continue;
-      }
-      if (sentActivites.contains(user)) {
-        continue;
-      }
-      sentActivites.add(user);
-
-      if (members != null && !members.contains(user)) {
-        // This is a group post and the tagged user is not it the group.
-        continue;
-      }
-
-      final activity = ActivityModel(
-          id: '',
-          createdAt: post.createdAt,
-          type: 'tag',
-          content: content,
-          path: postId,
-          sourceUid: post.uid);
-      activityFutures.add(uploadActivity(activity, user));
-    }
-
-    return postId;
-  } catch (_) {
-    return null;
+  // get users tagged in the post
+  final List<Future<String?>> idFutures = [];
+  for (int i = 1; i < post.title.length; i += 2) {
+    idFutures.add(getUidFromUsername(post.title[i].substring(1)));
   }
+  for (int i = 1; i < post.body.length; i += 2) {
+    idFutures.add(getUidFromUsername(post.body[i].substring(1)));
+  }
+
+  // activity content
+  late final String content;
+  if (json['title'] != null) {
+    content = json['title'];
+  } else if (json['body'] != null) {
+    content = json['body'];
+  } else {
+    content = "${json['author']} tagged you in a post";
+  }
+
+  final taggedUsers = await Future.wait(idFutures);
+  // make sure not to notify yourself
+  final Set<String> sentActivites = {ref.watch(currentUserProvider).user.uid};
+  final List<Future<void>> activityFutures = [];
+
+  late final Set<String>? members;
+  if (post.tags.contains('public')) {
+    members = null;
+  } else {
+    final group = await ref.read(groupProvider(post.tags.first).future);
+    members = Set<String>.from(group.members);
+  }
+
+  for (final user in taggedUsers) {
+    if (user == null) {
+      continue;
+    }
+    if (sentActivites.contains(user)) {
+      continue;
+    }
+    sentActivites.add(user);
+
+    if (members != null && !members.contains(user)) {
+      // This is a group post and the tagged user is not it the group.
+      continue;
+    }
+
+    final activity = ActivityModel(
+        id: '',
+        createdAt: post.createdAt,
+        type: 'tag',
+        content: content,
+        path: postId,
+        sourceUid: post.uid);
+    activityFutures.add(uploadActivity(activity, user));
+  }
+
+  return postId;
 }
 
-Future<String> uploadComment(CommentModel comment) async {
+Future<String> uploadComment(CommentModel comment, WidgetRef ref) async {
   final firestore = FirebaseFirestore.instance;
   final json = comment.toJson();
+  final post = await ref.read(postProvider(comment.postId).future);
 
   //don't put these in firebase
   json.remove('id');
   json.remove('postId');
+
+  // upload
   final commentId = await firestore
       .collection('posts')
       .doc(comment.postId)
       .collection('comments')
       .add(json)
       .then((documentSnapshot) => documentSnapshot.id);
+
+  if (ref.watch(currentUserProvider).user.uid != post.uid) {
+    final activity = ActivityModel(
+        id: '',
+        createdAt: comment.createdAt,
+        type: 'comment',
+        content: json['body'] ?? 'Click to see gif',
+        path: comment.postId,
+        sourceUid: comment.uid);
+
+    uploadActivity(activity, post.uid);
+  }
+
+  // get users tagged in the comment
+  final List<Future<String?>> idFutures = [];
+  for (int i = 1; i < comment.body.length; i += 2) {
+    idFutures.add(getUidFromUsername(comment.body[i].substring(1)));
+  }
+
+  // activity content
+  final String content = json['body'];
+
+  final taggedUsers = await Future.wait(idFutures);
+
+  // make sure not to notify yourself
+  final Set<String> sentActivites = {ref.watch(currentUserProvider).user.uid};
+  final List<Future<void>> activityFutures = [];
+
+  for (final user in taggedUsers) {
+    if (user == null) {
+      continue;
+    }
+    if (sentActivites.contains(user)) {
+      continue;
+    }
+    sentActivites.add(user);
+
+    final activity = ActivityModel(
+        id: '',
+        createdAt: comment.createdAt,
+        type: 'tag',
+        content: content,
+        path: comment.postId,
+        sourceUid: comment.uid);
+    activityFutures.add(uploadActivity(activity, user));
+  }
+
   return commentId;
 }

@@ -1150,6 +1150,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'We use this to ensure you are old enough to use the app.'**
   String get birthdayExplanation;
+
+  /// No description provided for @noImageSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'No image selected'**
+  String get noImageSelected;
+
+  /// No description provided for @changeImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Change Image'**
+  String get changeImage;
+
+  /// No description provided for @pickImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick Image'**
+  String get pickImage;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

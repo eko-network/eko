@@ -25,21 +25,16 @@ class ProfileHeader extends StatelessWidget {
         children: [
           Row(
             children: [
-              Hero(
-                tag: 'profileImage',
-                child: IconButton(
-                  onPressed: () async {
-                    if (loggedIn) {
-                      // locator<NavBarController>().disable();
-                      await context.pushNamed('profile_picture_detail',
-                          extra: user.profilePicture);
-                      // locator<NavBarController>().enable();
-                    }
-                  },
-                  icon: ProfileAvatar(
-                      size: c.widthGetter(context) * 0.24,
-                      url: user.profilePicture),
-                ),
+              IconButton(
+                onPressed: () async {
+                  if (loggedIn) {
+                    await context.pushNamed('profile_picture_detail',
+                        pathParameters: {'id': user.uid});
+                  }
+                },
+                icon: ProfileAvatar(
+                    size: c.widthGetter(context) * 0.24,
+                    url: user.profilePicture),
               ),
               Flexible(
                 child: Padding(

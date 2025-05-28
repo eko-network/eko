@@ -6,6 +6,7 @@ In Progress:
 1. UI & Rivapod
 
 TODO:
+1. Eko-googlelens-verse
 1. SQL
 1. Audio Messages
 1. Online indicator & Eko DMs

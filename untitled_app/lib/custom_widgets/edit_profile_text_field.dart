@@ -84,8 +84,7 @@ class ProfileInputFeild extends StatelessWidget {
             fontWeight: FontWeight.normal,
             color: Theme.of(context).colorScheme.onSurface,
           ),
-          fillColor:
-              Theme.of(context).colorScheme.onSurface.withOpacity(0.2),
+          fillColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.2),
           filled: true,
           enabledBorder: OutlineInputBorder(
             // borderSide:
@@ -94,8 +93,8 @@ class ProfileInputFeild extends StatelessWidget {
           ),
           focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10.0),
-              borderSide: BorderSide(
-                  color: Theme.of(context).colorScheme.onSurface)),
+              borderSide:
+                  BorderSide(color: Theme.of(context).colorScheme.onSurface)),
         ),
       ),
     );

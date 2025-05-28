@@ -1,10 +1,7 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:giphy_get/giphy_get.dart';
 import 'package:go_router/go_router.dart';
-import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
 import 'package:image_to_ascii/image_to_ascii.dart';
 import 'package:untitled_app/custom_widgets/error_snack_bar.dart';
@@ -100,29 +97,16 @@ class _ComposePageState extends ConsumerState<ComposePage> {
   }
 
   Future<void> _addImagePressed() async {
-    setState(() {
-      _isLoadingImage = true;
-    });
-    final ImagePicker picker = ImagePicker();
-    final XFile? imageLocal =
-        await picker.pickImage(source: ImageSource.gallery);
+    final asciiArt = await context.push('/compose/camera');
 
-    if (imageLocal != null) {
-      File imageFile = File(imageLocal.path);
-      final bytes = await imageFile.readAsBytes();
-      final img.Image? decodedImage = img.decodeImage(bytes);
-      if (decodedImage == null) throw Exception('Image decode failed');
-      final ascii = ImageToAscii().convertImageToAscii(decodedImage);
-      // String? ascii = await uploadImage(File(imageFile.path));
+    if (asciiArt != null && asciiArt is String) {
       setState(() {
-        image = ascii;
+        image = asciiArt;
+        gif = null;
         isPoll = false;
         ref.read(selectedGifProvider.notifier).clear();
       });
     }
-    setState(() {
-      _isLoadingImage = false;
-    });
   }
 
   void _addPollPressed() {
@@ -144,6 +128,7 @@ class _ComposePageState extends ConsumerState<ComposePage> {
       bodyNewLines = 0;
       bodyController.clear();
       titleController.clear();
+      audiance = null;
     });
   }
 
@@ -226,7 +211,8 @@ class _ComposePageState extends ConsumerState<ComposePage> {
       builder: (BuildContext context) {
         return AlertDialog(
           backgroundColor: Theme.of(context).colorScheme.outlineVariant,
-          title: Text(AppLocalizations.of(context)!.confirmation),
+          title: Text(
+              'Post to ${audiance == null ? AppLocalizations.of(context)!.public : ref.watch(groupProvider(audiance!)).when(data: (group) => group.name, loading: () => '--', error: (_, __) => '--')}?'),
           content: SingleChildScrollView(
             child: PostCardFromPost(post: post, isPreview: true),
           ),
@@ -246,24 +232,22 @@ class _ComposePageState extends ConsumerState<ComposePage> {
                     createdAt: DateTime.now().toUtc().toIso8601String());
                 final id = await uploadPost(postToUpload, ref);
                 if (context.mounted) context.pop();
-                if (id != null) {
-                  _clear();
-                  if (context.mounted) {
-                    if (post.tags.contains('public')) {
-                      final completePost = postToUpload.copyWith(
-                        id: id,
-                      );
-                      ref
-                          .read(newFeedProvider.notifier)
-                          .insertAtIndex(0, completePost);
-                      ref
-                          .read(followingFeedProvider.notifier)
-                          .insertAtIndex(0, completePost);
-                      ref.read(postPoolProvider).putAll([completePost]);
-                      context.go('/feed');
-                    } else {
-                      context.go('/groups/sub_group/${post.tags.first}');
-                    }
+                _clear();
+                if (context.mounted) {
+                  if (post.tags.contains('public')) {
+                    final completePost = postToUpload.copyWith(
+                      id: id,
+                    );
+                    ref
+                        .read(newFeedProvider.notifier)
+                        .insertAtIndex(0, completePost);
+                    ref
+                        .read(followingFeedProvider.notifier)
+                        .insertAtIndex(0, completePost);
+                    ref.read(postPoolProvider).putAll([completePost]);
+                    context.go('/feed');
+                  } else {
+                    context.go('/groups/sub_group/${post.tags.first}');
                   }
                 }
               },
@@ -639,10 +623,7 @@ class _GroupListHeader extends StatelessWidget {
         ),
         InkWell(
           onTap: () {
-            // groupEndPoint = null;
-            // audience = AppLocalizations.of(context)!.public;
-            // context.pop();
-            // notifyListeners();
+            onPopularPressed();
           },
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 12),
