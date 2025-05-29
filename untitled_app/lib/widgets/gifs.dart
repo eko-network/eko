@@ -5,6 +5,15 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
+// todo add to models
+class GifData {
+  final String url;
+  final int width;
+  final int height;
+
+  GifData({required this.url, required this.width, required this.height});
+}
+
 class GifSearchSection extends StatefulWidget {
   const GifSearchSection({super.key});
 
@@ -18,7 +27,7 @@ class _GifSearchSectionState extends State<GifSearchSection> {
   final ScrollController _scrollController = ScrollController();
 
   List<String> _suggestions = [];
-  List<String> _gifUrls = [];
+  List<GifData> _gifData = [];
   String _nextPos = '';
   String _error = '';
   String _currentQuery = '';
@@ -78,7 +87,7 @@ class _GifSearchSectionState extends State<GifSearchSection> {
     if (!append) {
       setState(() {
         _error = '';
-        _gifUrls = [];
+        _gifData = [];
         _nextPos = '';
         _currentQuery = query;
       });
@@ -88,7 +97,6 @@ class _GifSearchSectionState extends State<GifSearchSection> {
     final params = {
       'key': dotenv.env['TENOR_API_KEY'],
       'limit': '20',
-      'media_filter': 'gif',
       if (query.isNotEmpty) 'q': query,
       if (_nextPos.isNotEmpty) 'pos': _nextPos,
     };
@@ -104,9 +112,23 @@ class _GifSearchSectionState extends State<GifSearchSection> {
         setState(() {
           _nextPos = json['next'] ?? '';
           final newGifs = results
-              .map((r) => r['media_formats']['gif']['url'] as String)
+              .map((r) {
+                // todo christian store the full quality in firebase
+                final mediaFormats = r['media_formats'];
+                Map<String, dynamic>? chosenFormat =
+                    mediaFormats['tinygif'] ?? mediaFormats['gif'];
+                if (chosenFormat == null) return null;
+
+                final url = chosenFormat['url'];
+                final dims = chosenFormat['dims'];
+
+                if (url == null || dims == null || dims.length < 2) return null;
+
+                return GifData(url: url, width: dims[0], height: dims[1]);
+              })
+              .whereType<GifData>()
               .toList();
-          _gifUrls = append ? [..._gifUrls, ...newGifs] : newGifs;
+          _gifData = append ? [..._gifData, ...newGifs] : newGifs;
         });
       } else {
         setState(() => _error = 'Failed to load gifs');
@@ -195,39 +217,43 @@ class _GifSearchSectionState extends State<GifSearchSection> {
               crossAxisCount: 2,
               mainAxisSpacing: 12,
               crossAxisSpacing: 12,
-              itemCount: _gifUrls.length,
+              itemCount: _gifData.length,
               itemBuilder: (context, index) => GestureDetector(
                 onTap: () {
-                  context.pop(_gifUrls[index]);
+                  context.pop(_gifData[index].url);
                 },
                 child: Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Image.network(
-                      _gifUrls[index],
-                      fit: BoxFit.cover,
-                      loadingBuilder: (context, child, loadingProgress) {
-                        if (loadingProgress == null) return child;
-                        return Container(
-                          height: 200,
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            color: Colors.grey[200],
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: CircularProgressIndicator(
-                            value: loadingProgress.expectedTotalBytes != null
-                                ? loadingProgress.cumulativeBytesLoaded /
-                                    loadingProgress.expectedTotalBytes!
-                                : null,
-                          ),
-                        );
-                      },
-                    ),
-                  ),
+                      borderRadius: BorderRadius.circular(12),
+                      child: AspectRatio(
+                        aspectRatio:
+                            _gifData[index].width / _gifData[index].height,
+                        child: Image.network(
+                          _gifData[index].url,
+                          fit: BoxFit.cover,
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return Container(
+                              height: 200,
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[200],
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: CircularProgressIndicator(
+                                value: loadingProgress.expectedTotalBytes !=
+                                        null
+                                    ? loadingProgress.cumulativeBytesLoaded /
+                                        loadingProgress.expectedTotalBytes!
+                                    : null,
+                              ),
+                            );
+                          },
+                        ),
+                      )),
                 ),
               ),
             ),
