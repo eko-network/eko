@@ -1,71 +1,127 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:untitled_app/providers/gif_provider.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-class GifAutocompleteWidget extends ConsumerWidget {
-  final TextEditingController controller;
-  final FocusNode focusNode;
-
-  const GifAutocompleteWidget({
-    super.key,
-    required this.controller,
-    required this.focusNode,
-  });
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final suggestions = ref.watch(autocompleteSuggestionsProvider);
-
-    return Expanded(
-        child: ListView.builder(
-      itemCount: suggestions.length,
-      itemBuilder: (context, index) {
-        final suggestion = suggestions[index];
-        return ListTile(
-          title: Text(suggestion),
-          onTap: () {
-            controller.text = suggestion;
-            controller.selection = TextSelection.fromPosition(
-              TextPosition(offset: suggestion.length),
-            );
-            ref.read(searchQueryProvider.notifier).setQuery(suggestion.trim());
-            ref.read(autocompleteSuggestionsProvider.notifier).clear();
-            focusNode.unfocus();
-          },
-        );
-      },
-    ));
-  }
-}
-
-class GifSearchSection extends ConsumerStatefulWidget {
+class GifSearchSection extends StatefulWidget {
   const GifSearchSection({super.key});
+
   @override
-  ConsumerState<GifSearchSection> createState() => _GifSearchSectionState();
+  State<GifSearchSection> createState() => _GifSearchSectionState();
 }
 
-class _GifSearchSectionState extends ConsumerState<GifSearchSection> {
+class _GifSearchSectionState extends State<GifSearchSection> {
   final TextEditingController _controller = TextEditingController();
   final FocusNode _focusNode = FocusNode();
+  final ScrollController _scrollController = ScrollController();
+
+  List<String> _suggestions = [];
+  List<String> _gifUrls = [];
+  String _nextPos = '';
+  String _error = '';
+  String _currentQuery = '';
+  bool _isLoadingMore = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+    _fetchGifs('');
+  }
 
   @override
   void dispose() {
     _controller.dispose();
     _focusNode.dispose();
+    _scrollController.dispose();
     super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
+      if (!_isLoadingMore && _nextPos.isNotEmpty) {
+        _fetchGifs(_currentQuery, append: true);
+      }
+    }
+  }
+
+  Future<void> _fetchSuggestions(String query) async {
+    if (query.isEmpty) {
+      setState(() => _suggestions = []);
+      return;
+    }
+
+    final uri = Uri.https('tenor.googleapis.com', '/v2/autocomplete', {
+      'q': query,
+      'key': dotenv.env['TENOR_API_KEY'],
+    });
+
+    try {
+      final response = await http.get(uri);
+      if (response.statusCode == 200) {
+        final json = jsonDecode(response.body);
+        setState(() {
+          _suggestions = List<String>.from(json['results']);
+        });
+      } else {
+        setState(() => _suggestions = []);
+      }
+    } catch (_) {
+      setState(() => _suggestions = []);
+    }
+  }
+
+  Future<void> _fetchGifs(String query, {bool append = false}) async {
+    if (!append) {
+      setState(() {
+        _error = '';
+        _gifUrls = [];
+        _nextPos = '';
+        _currentQuery = query;
+      });
+    }
+
+    final path = query.isEmpty ? '/v2/featured' : '/v2/search';
+    final params = {
+      'key': dotenv.env['TENOR_API_KEY'],
+      'limit': '20',
+      'media_filter': 'gif',
+      if (query.isNotEmpty) 'q': query,
+      if (_nextPos.isNotEmpty) 'pos': _nextPos,
+    };
+
+    final uri = Uri.https('tenor.googleapis.com', path, params);
+
+    try {
+      setState(() => _isLoadingMore = true);
+      final response = await http.get(uri);
+      if (response.statusCode == 200) {
+        final json = jsonDecode(response.body);
+        final results = json['results'] as List;
+        setState(() {
+          _nextPos = json['next'] ?? '';
+          final newGifs = results
+              .map((r) => r['media_formats']['gif']['url'] as String)
+              .toList();
+          _gifUrls = append ? [..._gifUrls, ...newGifs] : newGifs;
+        });
+      } else {
+        setState(() => _error = 'Failed to load gifs');
+      }
+    } catch (_) {
+      setState(() => _error = 'Failed to load gifs');
+    } finally {
+      setState(() => _isLoadingMore = false);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final autocompletes = ref.watch(autocompleteSuggestionsProvider);
-    final gifsAsync = ref.watch(gifUrlsProvider);
-
     return Scaffold(
-        body: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
+      body: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(
           children: [
             Expanded(
@@ -74,16 +130,10 @@ class _GifSearchSectionState extends ConsumerState<GifSearchSection> {
                 child: TextField(
                   controller: _controller,
                   focusNode: _focusNode,
-                  onChanged: (value) {
-                    ref
-                        .read(autocompleteSuggestionsProvider.notifier)
-                        .fetch(value.trim());
-                  },
+                  onChanged: _fetchSuggestions,
                   onSubmitted: (value) {
-                    ref
-                        .read(searchQueryProvider.notifier)
-                        .setQuery(value.trim());
-                    ref.read(autocompleteSuggestionsProvider.notifier).clear();
+                    _fetchGifs(value.trim());
+                    setState(() => _suggestions = []);
                   },
                   textAlignVertical: TextAlignVertical.center,
                   decoration: InputDecoration(
@@ -92,17 +142,12 @@ class _GifSearchSectionState extends ConsumerState<GifSearchSection> {
                     fillColor: Theme.of(context).colorScheme.outlineVariant,
                     hintText: 'Search for gifs',
                     prefixIcon: Icon(Icons.search),
-                    focusedBorder: InputBorder.none,
-                    enabledBorder: InputBorder.none,
-                    errorBorder: InputBorder.none,
-                    disabledBorder: InputBorder.none,
+                    border: InputBorder.none,
                   ),
                 ),
               ),
             ),
-            SizedBox(
-              width: 8,
-            ),
+            const SizedBox(width: 8),
             Container(
               height: 45,
               width: 45,
@@ -111,130 +156,83 @@ class _GifSearchSectionState extends ConsumerState<GifSearchSection> {
                 borderRadius: BorderRadius.circular(10),
               ),
               child: IconButton(
-                onPressed: () {
-                  context.pop();
-                },
+                onPressed: () => Navigator.pop(context),
                 icon: Icon(Icons.close),
                 color: Theme.of(context).colorScheme.onPrimary,
               ),
             ),
           ],
         ),
-        SizedBox(
-          height: 9,
-        ),
-        autocompletes.isNotEmpty
-            ? GifAutocompleteWidget(
-                controller: _controller,
-                focusNode: _focusNode,
-              )
-            : GifResultsList(
-                gifsAsync: gifsAsync,
-              )
-      ],
-    ));
-  }
-}
-
-class GifResultsList extends ConsumerWidget {
-  final AsyncValue<List<String>> gifsAsync;
-  const GifResultsList({super.key, required this.gifsAsync});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final autoCompleteSuggestions = ref.watch(autocompleteSuggestionsProvider);
-
-    if (autoCompleteSuggestions.isNotEmpty) {
-      return const SizedBox.shrink();
-    }
-
-    return gifsAsync.when(
-      data: (gifs) => gifs.isEmpty
-          ? Container(
-              margin: const EdgeInsets.only(top: 16),
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surface,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Center(
-                child: Text(
-                  'No GIFs found.',
-                  style:
-                      TextStyle(color: Theme.of(context).colorScheme.onSurface),
-                ),
-              ),
-            )
-          : Expanded(
-              child: MasonryGridView.count(
-                padding: const EdgeInsets.only(bottom: 16),
-                crossAxisCount: 2,
-                mainAxisSpacing: 12,
-                crossAxisSpacing: 12,
-                itemCount: gifs.length,
-                itemBuilder: (context, index) => GestureDetector(
+        const SizedBox(height: 9),
+        if (_suggestions.isNotEmpty)
+          Expanded(
+            child: ListView.builder(
+              itemCount: _suggestions.length,
+              itemBuilder: (context, index) {
+                final suggestion = _suggestions[index];
+                return ListTile(
+                  title: Text(suggestion),
                   onTap: () {
-                    ref.read(selectedGifProvider.notifier).setGif(gifs[index]);
-                    context.pop();
+                    _controller.text = suggestion;
+                    _controller.selection = TextSelection.fromPosition(
+                      TextPosition(offset: suggestion.length),
+                    );
+                    setState(() => _suggestions = []);
+                    _focusNode.unfocus();
+                    _fetchGifs(suggestion.trim());
                   },
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 4,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: Image.network(
-                        gifs[index],
-                        fit: BoxFit.cover,
-                        loadingBuilder: (context, child, loadingProgress) {
-                          if (loadingProgress == null) return child;
-                          return Container(
-                            height: 200,
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              color: Colors.grey[200],
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: CircularProgressIndicator(
-                              value: loadingProgress.expectedTotalBytes != null
-                                  ? loadingProgress.cumulativeBytesLoaded /
-                                      loadingProgress.expectedTotalBytes!
-                                  : null,
-                            ),
-                          );
-                        },
-                        errorBuilder: (context, error, stackTrace) => Container(
+                );
+              },
+            ),
+          )
+        else if (_error.isNotEmpty)
+          Center(child: Text(_error))
+        else
+          Expanded(
+            child: MasonryGridView.count(
+              controller: _scrollController,
+              padding: const EdgeInsets.only(bottom: 16),
+              crossAxisCount: 2,
+              mainAxisSpacing: 12,
+              crossAxisSpacing: 12,
+              itemCount: _gifUrls.length,
+              itemBuilder: (context, index) => GestureDetector(
+                onTap: () {
+                  context.pop(_gifUrls[index]);
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.network(
+                      _gifUrls[index],
+                      fit: BoxFit.cover,
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return Container(
                           height: 200,
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
                             color: Colors.grey[200],
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          child: const Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.error, color: Colors.grey),
-                              SizedBox(height: 8),
-                              Text('Failed to load GIF',
-                                  style: TextStyle(color: Colors.grey)),
-                            ],
+                          child: CircularProgressIndicator(
+                            value: loadingProgress.expectedTotalBytes != null
+                                ? loadingProgress.cumulativeBytesLoaded /
+                                    loadingProgress.expectedTotalBytes!
+                                : null,
                           ),
-                        ),
-                      ),
+                        );
+                      },
                     ),
                   ),
                 ),
               ),
             ),
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (err, _) => Center(child: Text('Error loading GIFs: $err')),
+          )
+      ]),
     );
   }
 }

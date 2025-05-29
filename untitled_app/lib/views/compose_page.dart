@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:giphy_get/giphy_get.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image_to_ascii/image_to_ascii.dart';
@@ -11,7 +10,6 @@ import 'package:untitled_app/interfaces/post.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
 import 'package:untitled_app/providers/following_feed_provider.dart';
-import 'package:untitled_app/providers/gif_provider.dart';
 import 'package:untitled_app/providers/group_list_provider.dart';
 import 'package:untitled_app/providers/group_provider.dart';
 import 'package:untitled_app/providers/nav_bar_provider.dart';
@@ -36,7 +34,6 @@ class _ComposePageState extends ConsumerState<ComposePage> {
   final _key = GlobalKey<ExpandableFabState>();
   bool _isLoadingImage = false;
   String? audiance;
-  // GiphyGif? gif;
   String? gif;
   String? image;
   bool isPoll = false;
@@ -93,7 +90,12 @@ class _ComposePageState extends ConsumerState<ComposePage> {
   }
 
   void _addGifPressed() async {
-    await context.pushNamed('gif');
+    String? url = await context.pushNamed('gif');
+    if (url != null) {
+      setState(() {
+        gif = url;
+      });
+    }
   }
 
   Future<void> _addImagePressed() async {
@@ -104,7 +106,6 @@ class _ComposePageState extends ConsumerState<ComposePage> {
         image = asciiArt;
         gif = null;
         isPoll = false;
-        ref.read(selectedGifProvider.notifier).clear();
       });
     }
   }
@@ -113,7 +114,7 @@ class _ComposePageState extends ConsumerState<ComposePage> {
     ref.read(navBarProvider.notifier).disable();
     setState(() {
       isPoll = true;
-      ref.read(selectedGifProvider.notifier).clear();
+      gif = null;
       image = null;
     });
     ref.read(navBarProvider.notifier).enable();
@@ -123,7 +124,7 @@ class _ComposePageState extends ConsumerState<ComposePage> {
     setState(() {
       isPoll = false;
       pollOptions = ['', ''];
-      ref.read(selectedGifProvider.notifier).clear();
+      gif = null;
       image = null;
       bodyNewLines = 0;
       bodyController.clear();
@@ -135,7 +136,7 @@ class _ComposePageState extends ConsumerState<ComposePage> {
   void _removeMedia() {
     setState(() {
       isPoll = false;
-      ref.read(selectedGifProvider.notifier).clear();
+      gif = null;
       image = null;
     });
   }
@@ -266,7 +267,6 @@ class _ComposePageState extends ConsumerState<ComposePage> {
   Widget build(BuildContext context) {
     final width = c.widthGetter(context);
     final height = MediaQuery.sizeOf(context).height;
-    gif = ref.watch(selectedGifProvider);
 
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
