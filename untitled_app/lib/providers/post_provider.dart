@@ -4,7 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:untitled_app/interfaces/post.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
-import 'package:untitled_app/providers/post_pool_provider.dart';
+import 'package:untitled_app/providers/pool_providers.dart';
 import 'package:untitled_app/types/post.dart';
 // Necessary for code-generation to work
 part '../generated/providers/post_provider.g.dart';

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:untitled_app/interfaces/post_queries.dart';
 import 'package:untitled_app/providers/following_feed_provider.dart';
 import 'package:untitled_app/providers/new_feed_provider.dart';
+import 'package:untitled_app/utilities/shared_pref_service.dart';
 
 import 'package:untitled_app/widgets/icons.dart';
 import 'package:untitled_app/widgets/infinite_scrolly.dart';
@@ -10,6 +12,7 @@ import 'package:untitled_app/widgets/post_card.dart';
 import 'package:untitled_app/widgets/post_loader.dart';
 
 const appBarHeight = 80.0;
+const tabStorageKey = 'LAST_FEED_PAGE_INDEX';
 
 class RoundedTabIndicator extends Decoration {
   final BoxPainter _painter;
@@ -103,7 +106,10 @@ class _AppBar extends StatelessWidget {
                   ),
                   Align(
                     alignment: Alignment(0.95, 0.05),
-                    child: Bell(),
+                    child: InkWell(
+                      onTap: () => context.pushNamed('recent'),
+                      child: Bell(),
+                    ),
                   )
                 ],
               ),
@@ -176,6 +182,7 @@ class _FeedPageState extends State<FeedPage> with TickerProviderStateMixin {
   }
 
   void tabListener() {
+    PrefsService.instance.setInt(tabStorageKey, tabController.index);
     final controller = getCurrentScrollController();
     if (!controller.hasClients) {
       return;
@@ -213,11 +220,16 @@ class _FeedPageState extends State<FeedPage> with TickerProviderStateMixin {
 
   @override
   void initState() {
+    const numTabs = 3;
     super.initState();
     followingScrollController.addListener(scrollListener);
     newScrollController.addListener(scrollListener);
     popScrollController.addListener(scrollListener);
-    tabController = TabController(length: 3, vsync: this);
+    tabController = TabController(
+        length: numTabs,
+        vsync: this,
+        initialIndex: (PrefsService.instance.getInt(tabStorageKey) ?? 0)
+            .clamp(0, numTabs));
     tabController.addListener(tabListener);
   }
 

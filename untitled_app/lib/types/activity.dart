@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:untitled_app/interfaces/post.dart';
 part '../generated/types/activity.freezed.dart';
 part '../generated/types/activity.g.dart';
 
@@ -9,7 +8,7 @@ part '../generated/types/activity.g.dart';
 abstract class ActivityModel with _$ActivityModel {
   const ActivityModel._();
   const factory ActivityModel({
-    @Default('') String sourceUid,
+    @Default(null) String? sourceUid,
     required String id,
     @JsonKey(name: 'time') required String createdAt,
     @Default(<String>[]) List<String> tags,
@@ -25,11 +24,10 @@ abstract class ActivityModel with _$ActivityModel {
     return DateTime.tryParse(createdAt) ?? DateTime.now();
   }
 
-  // static Future<PostModel> fromFireStoreDoc(
-  //     QueryDocumentSnapshot<Map<String, dynamic>> doc) async {
-  //   final json = doc.data();
-  //   json['id'] = doc.id;
-  //   json['commentCount'] = await countComments(doc.id);
-  //   return PostModel.fromJson(json);
-  // }
+  static ActivityModel fromFirestoreDoc(
+      DocumentSnapshot<Map<String, dynamic>> doc) {
+    final json = doc.data()!;
+    json['id'] = doc.id;
+    return ActivityModel.fromJson(json);
+  }
 }
