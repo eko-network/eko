@@ -14,7 +14,7 @@ import 'package:untitled_app/providers/group_list_provider.dart';
 import 'package:untitled_app/providers/group_provider.dart';
 import 'package:untitled_app/providers/nav_bar_provider.dart';
 import 'package:untitled_app/providers/new_feed_provider.dart';
-import 'package:untitled_app/providers/post_pool_provider.dart';
+import 'package:untitled_app/providers/pool_providers.dart';
 import 'package:untitled_app/types/post.dart';
 import 'package:untitled_app/widgets/infinite_scrolly.dart';
 import 'package:untitled_app/widgets/poll_creator.dart';

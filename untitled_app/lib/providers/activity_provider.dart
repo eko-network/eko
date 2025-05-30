@@ -2,18 +2,16 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:untitled_app/providers/auth_provider.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
 import 'package:untitled_app/providers/pool_providers.dart';
-import 'package:untitled_app/types/user.dart';
-// Necessary for code-generation to work
-part '../generated/providers/user_provider.g.dart';
+import 'package:untitled_app/types/activity.dart';
+part '../generated/providers/activity_provider.g.dart';
 
 @riverpod
-class User extends _$User {
+class Activity extends _$Activity {
   Timer? _disposeTimer;
   @override
-  FutureOr<UserModel> build(String uid) {
+  FutureOr<ActivityModel> build(String id) async {
     // *** This block is for lifecycle management *** //
     // Keep provider alive
     final link = ref.keepAlive();
@@ -32,26 +30,26 @@ class User extends _$User {
       _disposeTimer?.cancel();
     });
     // ********************************************* //
-
-    if (ref.watch(authProvider).uid == uid) {
-      return UserModel.fromCurrent(ref.watch(currentUserProvider)!);
-    }
-    final cacheValue = ref.read(userPoolProvider).getItem(uid);
+    // await Future.delayed(Duration(seconds: 100));
+    final cacheValue = ref.read(activityPoolProvider).getItem(id);
     if (cacheValue != null) {
       return cacheValue;
     }
-    return _fetchUserModel(uid);
+
+    return _fetchActivityModel(id);
   }
 
-  Future<UserModel> _fetchUserModel(String uid) async {
-    final userRef = FirebaseFirestore.instance.collection('users');
-    final data = await userRef.doc(uid).get();
-    return UserModel.fromJson(data.data());
-  }
+  Future<ActivityModel> _fetchActivityModel(String id) async {
+    final actData = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(ref.watch(currentUserProvider).user.uid)
+        .collection('newActivity')
+        .doc(id)
+        .get();
+    if (actData.data() == null) {
+      throw Exception('Failed to load');
+    }
 
-  void updateFollowers(List<String> newFollowers) {
-    state.whenData((user) {
-      state = AsyncData(user.copyWith(followers: newFollowers));
-    });
+    return ActivityModel.fromFirestoreDoc(actData);
   }
 }

@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:untitled_app/providers/comment_pool_provider.dart';
-import 'package:untitled_app/providers/post_pool_provider.dart';
+import 'package:untitled_app/providers/pool_providers.dart';
 import 'package:untitled_app/types/comment.dart';
 import '../utilities/constants.dart' as c;
 import 'package:flutter_riverpod/flutter_riverpod.dart';

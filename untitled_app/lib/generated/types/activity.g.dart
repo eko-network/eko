@@ -8,7 +8,7 @@ part of '../../types/activity.dart';
 
 _ActivityModel _$ActivityModelFromJson(Map<String, dynamic> json) =>
     _ActivityModel(
-      sourceUid: json['sourceUid'] as String? ?? '',
+      sourceUid: json['sourceUid'] as String? ?? null,
       id: json['id'] as String,
       createdAt: json['time'] as String,
       tags:

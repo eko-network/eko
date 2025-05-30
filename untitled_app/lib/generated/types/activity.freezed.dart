@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 
 /// @nodoc
 mixin _$ActivityModel implements DiagnosticableTreeMixin {
-  String get sourceUid;
+  String? get sourceUid;
   String get id;
   @JsonKey(name: 'time')
   String get createdAt;
@@ -82,7 +82,7 @@ abstract mixin class $ActivityModelCopyWith<$Res> {
       _$ActivityModelCopyWithImpl;
   @useResult
   $Res call(
-      {String sourceUid,
+      {String? sourceUid,
       String id,
       @JsonKey(name: 'time') String createdAt,
       List<String> tags,
@@ -104,7 +104,7 @@ class _$ActivityModelCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? sourceUid = null,
+    Object? sourceUid = freezed,
     Object? id = null,
     Object? createdAt = null,
     Object? tags = null,
@@ -113,10 +113,10 @@ class _$ActivityModelCopyWithImpl<$Res>
     Object? path = null,
   }) {
     return _then(_self.copyWith(
-      sourceUid: null == sourceUid
+      sourceUid: freezed == sourceUid
           ? _self.sourceUid
           : sourceUid // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       id: null == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
@@ -149,7 +149,7 @@ class _$ActivityModelCopyWithImpl<$Res>
 @JsonSerializable()
 class _ActivityModel extends ActivityModel with DiagnosticableTreeMixin {
   const _ActivityModel(
-      {this.sourceUid = '',
+      {this.sourceUid = null,
       required this.id,
       @JsonKey(name: 'time') required this.createdAt,
       final List<String> tags = const <String>[],
@@ -163,7 +163,7 @@ class _ActivityModel extends ActivityModel with DiagnosticableTreeMixin {
 
   @override
   @JsonKey()
-  final String sourceUid;
+  final String? sourceUid;
   @override
   final String id;
   @override
@@ -252,7 +252,7 @@ abstract mixin class _$ActivityModelCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {String sourceUid,
+      {String? sourceUid,
       String id,
       @JsonKey(name: 'time') String createdAt,
       List<String> tags,
@@ -274,7 +274,7 @@ class __$ActivityModelCopyWithImpl<$Res>
   @override
   @pragma('vm:prefer-inline')
   $Res call({
-    Object? sourceUid = null,
+    Object? sourceUid = freezed,
     Object? id = null,
     Object? createdAt = null,
     Object? tags = null,
@@ -283,10 +283,10 @@ class __$ActivityModelCopyWithImpl<$Res>
     Object? path = null,
   }) {
     return _then(_ActivityModel(
-      sourceUid: null == sourceUid
+      sourceUid: freezed == sourceUid
           ? _self.sourceUid
           : sourceUid // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       id: null == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable

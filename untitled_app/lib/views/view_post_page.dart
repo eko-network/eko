@@ -8,9 +8,9 @@ import 'package:untitled_app/custom_widgets/warning_dialog.dart';
 import 'package:untitled_app/interfaces/post.dart';
 import 'package:untitled_app/interfaces/post_queries.dart';
 import 'package:untitled_app/interfaces/report.dart';
-import 'package:untitled_app/providers/comment_pool_provider.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
 import 'package:untitled_app/providers/nav_bar_provider.dart';
+import 'package:untitled_app/providers/pool_providers.dart';
 import 'package:untitled_app/providers/post_provider.dart';
 import 'package:untitled_app/types/comment.dart';
 

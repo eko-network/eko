@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:untitled_app/interfaces/post_queries.dart';
-import 'package:untitled_app/providers/post_pool_provider.dart';
+import 'package:untitled_app/providers/pool_providers.dart';
 import 'package:untitled_app/types/post.dart';
 import '../utilities/constants.dart' as c;
 part '../generated/providers/new_feed_provider.g.dart';

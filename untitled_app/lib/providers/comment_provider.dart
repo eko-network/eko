@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
-import 'package:untitled_app/providers/comment_pool_provider.dart';
+import 'package:untitled_app/providers/pool_providers.dart';
 import 'package:untitled_app/types/comment.dart';
 // Necessary for code-generation to work
 part '../generated/providers/comment_provider.g.dart';
