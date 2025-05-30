@@ -234,6 +234,7 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
 
     Future<void> onRefresh() async {
       await ref.read(currentUserProvider.notifier).reload();
+      ref.invalidate(postProvider(widget.id));
     }
 
     return asyncPost.when(
