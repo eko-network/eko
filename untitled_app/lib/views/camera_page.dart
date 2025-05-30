@@ -99,65 +99,6 @@ class _CameraPageState extends State<CameraPage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // if (asciiImage != null) ...[
-                //   Row(
-                //     mainAxisAlignment: MainAxisAlignment.center,
-                //     children: [
-                //       InkWell(
-                //         onTap: _toggleDarkMode,
-                //         borderRadius: BorderRadius.circular(12),
-                //         child: Container(
-                //           padding: const EdgeInsets.symmetric(
-                //               horizontal: 20, vertical: 12),
-                //           decoration: BoxDecoration(
-                //             color: isDarkMode
-                //                 ? Theme.of(context).colorScheme.primaryContainer
-                //                 : Theme.of(context)
-                //                     .colorScheme
-                //                     .surfaceContainer,
-                //             borderRadius: BorderRadius.circular(12),
-                //           ),
-                //           child: Icon(
-                //             Icons.dark_mode,
-                //             size: 20,
-                //             color: isDarkMode
-                //                 ? Theme.of(context)
-                //                     .colorScheme
-                //                     .onPrimaryContainer
-                //                 : Theme.of(context).colorScheme.onSurface,
-                //           ),
-                //         ),
-                //       ),
-                //       const SizedBox(width: 6),
-                //       _buildToggleButton(
-                //         isSelected: isDarkMode,
-                //         onPressed: _toggleDarkMode,
-                //         icon: Icons.dark_mode,
-                //       ),
-                //       const SizedBox(width: 6),
-                //       _buildToggleButton(
-                //         isSelected: isDarkMode,
-                //         onPressed: _toggleDarkMode,
-                //         icon: Icons.dark_mode,
-                //       ),
-                //       const SizedBox(width: 6),
-                //       _buildToggleButton(
-                //         isSelected: isDarkMode,
-                //         onPressed: _toggleDarkMode,
-                //         icon: Icons.dark_mode,
-                //       ),
-                //       const SizedBox(width: 6),
-                //       _buildToggleButton(
-                //         isSelected: isDarkMode,
-                //         onPressed: _toggleDarkMode,
-                //         icon: Icons.dark_mode,
-                //       ),
-                //     ],
-                //   ),
-                //   const SizedBox(height: 20),
-                // ],
-
-                // Button row
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -201,33 +142,6 @@ class _CameraPageState extends State<CameraPage> {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildToggleButton({
-    required bool isSelected,
-    required VoidCallback onPressed,
-    required IconData icon,
-  }) {
-    return InkWell(
-      onTap: onPressed,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? Theme.of(context).colorScheme.primaryContainer
-              : Theme.of(context).colorScheme.surfaceContainer,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Icon(
-          icon,
-          size: 20,
-          color: isSelected
-              ? Theme.of(context).colorScheme.onPrimaryContainer
-              : Theme.of(context).colorScheme.onSurface,
-        ),
       ),
     );
   }
