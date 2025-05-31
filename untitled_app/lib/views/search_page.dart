@@ -8,7 +8,6 @@ import 'package:untitled_app/custom_widgets/shimmer_loaders.dart'
     show SearchLoader;
 import 'package:untitled_app/interfaces/search.dart';
 import 'package:untitled_app/widgets/infinite_scrolly.dart';
-import '../controllers/search_page_controller.dart';
 import '../custom_widgets/searched_user_card.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import '../utilities/constants.dart' as c;
@@ -123,10 +122,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
   Widget build(BuildContext context) {
     final height = MediaQuery.sizeOf(context).height;
 
-    return prov.ChangeNotifierProvider(
-      create: (context) => SearchPageController(context: context),
-      builder: (context, child) {
-        return GestureDetector(
+    return GestureDetector(
           onPanDown: (details) => FocusManager.instance.primaryFocus?.unfocus(),
           onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
           child: Scaffold(
@@ -164,7 +160,6 @@ class _SearchPageState extends ConsumerState<SearchPage> {
             ),
           ),
         );
-      },
-    );
+
   }
 }
