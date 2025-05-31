@@ -218,7 +218,7 @@ class _InfiniteScrollyShell<T> extends State<InfiniteScrollyShell<T>> {
     return RefreshIndicator(
       onRefresh: widget.onRefresh ?? () async {},
       child: CustomScrollView(
-        shrinkWrap: true,
+        // shrinkWrap: true,
         keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
         physics: isEmptySet
             ? const NeverScrollableScrollPhysics()

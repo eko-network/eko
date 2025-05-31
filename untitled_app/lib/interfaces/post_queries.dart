@@ -101,21 +101,3 @@ Future<List<CommentModel>> getComments(
   );
   return commentList;
 }
-
-Future<(List<MapEntry<String, String>>, bool)> commentsGetter(
-    List<MapEntry<String, String>> list, WidgetRef ref, String postId) async {
-  final baseQuery = FirebaseFirestore.instance
-      .collection('posts')
-      .doc(postId)
-      .collection('comments')
-      .orderBy('time', descending: false)
-      .limit(c.postsOnRefresh);
-  final query =
-      list.isEmpty ? baseQuery : baseQuery.startAfter([list.last.value]);
-
-  final commentList = await getComments(query);
-  ref.read(commentPoolProvider).putAll(commentList);
-  final retList =
-      commentList.map((item) => MapEntry(item.id, item.createdAt)).toList();
-  return (retList, retList.length < c.postsOnRefresh);
-}

@@ -8,6 +8,7 @@ import 'package:untitled_app/custom_widgets/warning_dialog.dart';
 import 'package:untitled_app/interfaces/post.dart';
 import 'package:untitled_app/interfaces/post_queries.dart';
 import 'package:untitled_app/interfaces/report.dart';
+import 'package:untitled_app/providers/comment_list_provider.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
 import 'package:untitled_app/providers/nav_bar_provider.dart';
 import 'package:untitled_app/providers/pool_providers.dart';
@@ -36,6 +37,13 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
   String? gif;
   final reportFocus = FocusNode();
   final reportController = TextEditingController();
+  final ScrollController commentsScrollController = ScrollController();
+
+  @override
+  void dispose() {
+    commentsScrollController.dispose();
+    super.dispose();
+  }
 
   void _popDialog() {
     Navigator.of(context, rootNavigator: true).pop();
@@ -211,7 +219,27 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
 
     final id = await uploadComment(comment, ref);
     final completeComment = comment.copyWith(id: id);
+
+    // Add comment to the comment list
+    ref
+        .read(commentListProvider(widget.id).notifier)
+        .addToBack(completeComment);
     ref.read(commentPoolProvider).putAll([completeComment]);
+
+    // Increment comment count
+    final post = ref.read(postProvider(widget.id)).value;
+    if (post != null) {
+      final updatedPost = post.copyWith(commentCount: post.commentCount + 1);
+      ref.read(postPoolProvider).putAll([updatedPost]);
+    }
+
+    if (commentsScrollController.hasClients) {
+      commentsScrollController.animateTo(
+        commentsScrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    }
   }
 
   void replyPressed(String username) {
@@ -231,9 +259,14 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
     final height = MediaQuery.sizeOf(context).height;
     final width = c.widthGetter(context);
     final asyncPost = ref.watch(postProvider(widget.id));
+    final provider = ref.watch(commentListProvider(widget.id));
 
     Future<void> onRefresh() async {
-      await ref.read(currentUserProvider.notifier).reload();
+      await Future.wait([
+        ref.read(currentUserProvider.notifier).reload(),
+        ref.read(commentListProvider(widget.id).notifier).refresh(),
+      ]);
+      ref.invalidate(postProvider(widget.id));
     }
 
     return asyncPost.when(
@@ -296,16 +329,21 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
             body: Column(
               children: [
                 Expanded(
-                  child: IndexedStack(
+                  child: 
+                  IndexedStack(
                     index: isAtSymbolTyped ? 1 : 0,
                     children: [
-                      InfiniteScrolly<String, String>(
-                        getter: (data) async {
-                          return await commentsGetter(data, ref, widget.id);
-                        },
-                        widget: commentCardBuilder,
+                      InfiniteScrollyShell<String>(
+                        isEnd: provider.$2,
+                        list: provider.$1,
                         header: PostCard(id: widget.id, isPostPage: true),
+                        getter: () => ref
+                            .read(commentListProvider(widget.id).notifier)
+                            .getter(widget.id),
                         onRefresh: onRefresh,
+                        widget: commentCardBuilder,
+                        // Add the controller here
+                        controller: commentsScrollController,
                       ),
                       // prov.Provider.of<PostPageController>(context,
                       //             listen: true)
