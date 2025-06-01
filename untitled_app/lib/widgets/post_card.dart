@@ -144,15 +144,16 @@ class _PostCardState extends ConsumerState<PostCard> {
   bool sharing = false;
   bool isSelf = false;
 
-  bool isBlockedByMe() {
-    return false;
-    // return locator<CurrentUser>().blockedUsers.contains(post.author.uid);
-  }
-
-  bool blocksMe() {
-    return false;
-    // return locator<CurrentUser>().blockedBy.contains(post.author.uid);
-  }
+  //  bool isBlockedByMe() {
+  // ref.watch()
+  //    return false;
+  //    // return locator<CurrentUser>().blockedUsers.contains(post.author.uid);
+  //  }
+  //
+  //  bool blocksMe() {
+  //    return false;
+  //    // return locator<CurrentUser>().blockedBy.contains(post.author.uid);
+  //  }
 
   bool isLoggedIn() {
     // if (locator<CurrentUser>().getUID() == '') {
@@ -212,12 +213,18 @@ class _PostCardState extends ConsumerState<PostCard> {
 
   @override
   Widget build(BuildContext context) {
-    if (!widget.visible || isBlockedByMe() || blocksMe()) {
+    if (!widget.visible) {
       return SizedBox.shrink();
     }
     final asyncPost = ref.watch(postProvider(widget.id));
 
     return asyncPost.when(data: (post) {
+      final currentUser = ref.watch(currentUserProvider);
+      if (currentUser.blockedUsers.contains(post.uid) ||
+          currentUser.blockedBy.contains(post.uid)) {
+        return SizedBox.shrink();
+      }
+
       return PostCardFromPost(
           isOnProfile: widget.isOnProfile,
           sharePressed: sharePressed,
