@@ -4,7 +4,7 @@ import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:untitled_app/providers/user_provider.dart';
 import 'package:untitled_app/widgets/infinite_scrolly.dart';
-import '../widgets/searched_user_card.dart';
+import '../widgets/user_card.dart';
 import '../utilities/constants.dart' as c;
 
 class Following extends ConsumerStatefulWidget {

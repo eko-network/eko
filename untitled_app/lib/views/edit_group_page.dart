@@ -6,7 +6,7 @@ import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:untitled_app/models/group_handler.dart';
 import 'package:go_router/go_router.dart';
 import '../custom_widgets/pagination.dart';
-import '../widgets/searched_user_card.dart';
+import '../widgets/user_card.dart';
 import '../utilities/constants.dart' as c;
 
 class EditGroupPage extends StatelessWidget {

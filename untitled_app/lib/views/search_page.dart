@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:untitled_app/interfaces/search.dart';
 import 'package:untitled_app/widgets/infinite_scrolly.dart';
 import 'package:untitled_app/widgets/shimmer_loaders.dart';
-import '../widgets/searched_user_card.dart';
+import '../widgets/user_card.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import '../utilities/constants.dart' as c;
 
@@ -143,7 +143,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
           initialLoadingWidget: UserLoader(
             length: 12,
           ),
-          widget: searchPageBuilder,
+          widget: userCardBuilder,
           header: _SearchBar(controller: controller),
         ),
       ),

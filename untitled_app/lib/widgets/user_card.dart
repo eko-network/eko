@@ -11,7 +11,7 @@ import 'package:untitled_app/widgets/shimmer_loaders.dart';
 import '../custom_widgets/profile_avatar.dart';
 import '../utilities/constants.dart' as c;
 
-Widget searchPageBuilder(String uid) {
+Widget userCardBuilder(String uid) {
   return UserCard(
     uid: uid,
   );

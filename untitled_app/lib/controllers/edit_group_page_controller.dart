@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:untitled_app/widgets/searched_user_card.dart';
+import 'package:untitled_app/widgets/user_card.dart';
 import 'package:untitled_app/custom_widgets/warning_dialog.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:untitled_app/models/post_handler.dart';
