@@ -484,7 +484,7 @@ class _ComposePageState extends ConsumerState<ComposePage> {
                                           pollOptions: pollOptions,
                                         )
                                       : image != null
-                                          ? ImageWidget(text: image!)
+                                          ? ImageWidget(ascii: image!)
                                           : Image.network(
                                               // gif!.images!.fixedWidth.url,
                                               gif ?? '',
