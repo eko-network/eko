@@ -4,7 +4,7 @@ import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:untitled_app/providers/user_provider.dart';
 import 'package:untitled_app/widgets/infinite_scrolly.dart';
-import '../custom_widgets/searched_user_card.dart';
+import '../widgets/user_card.dart';
 import '../utilities/constants.dart' as c;
 
 class Followers extends ConsumerStatefulWidget {
@@ -15,7 +15,6 @@ class Followers extends ConsumerStatefulWidget {
 }
 
 class _FollowersState extends ConsumerState<Followers> {
-  
   Future<(List<MapEntry<String, Never?>>, bool)> getter(
       List<MapEntry<String, Never?>> data, List<String> fullFollowers) async {
     // // value form constants
@@ -45,8 +44,6 @@ class _FollowersState extends ConsumerState<Followers> {
 
   @override
   Widget build(BuildContext context) {
-    final height = MediaQuery.sizeOf(context).height;
-
     final asyncUser = ref.watch(userProvider(widget.uid));
     return switch (asyncUser) {
       AsyncData(:final value) => Scaffold(
@@ -70,14 +67,11 @@ class _FollowersState extends ConsumerState<Followers> {
               ),
             ),
           ),
-          body: Padding(
-              padding:
-                  EdgeInsets.symmetric(vertical: height * 0.01, horizontal: 6),
-              child: InfiniteScrolly<String, Never?>(
-                getter: (data) => getter(data, value.followers),
-                widget: (uid) => UserCard(uid: uid),
-                onRefresh: onRefresh,
-              )),
+          body: InfiniteScrolly<String, Never?>(
+            getter: (data) => getter(data, value.followers),
+            widget: (uid) => UserCard(uid: uid),
+            onRefresh: onRefresh,
+          ),
         ),
       AsyncError(:final error) => Center(child: Text('Error: $error')),
       _ => const Center(child: CircularProgressIndicator()),

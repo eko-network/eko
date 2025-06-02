@@ -11,7 +11,7 @@ import 'package:untitled_app/localization/generated/app_localizations.dart';
 import '../custom_widgets/warning_dialog.dart';
 import 'package:untitled_app/custom_widgets/controllers/pagination_controller.dart'
     show Cache, PaginationGetterReturn;
-import '../custom_widgets/searched_user_card.dart';
+import '../widgets/user_card.dart';
 
 class CreateGroupPageController extends ChangeNotifier {
   String icon = '';

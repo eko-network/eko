@@ -9,6 +9,7 @@ part '../generated/providers/new_feed_provider.g.dart';
 @riverpod
 class NewFeed extends _$NewFeed {
   final List<String> _timestamps = [];
+  final Set<String> _set = {};
   @override
   (List<String>, bool) build() {
     return ([], false);
@@ -27,22 +28,27 @@ class NewFeed extends _$NewFeed {
     ref.read(postPoolProvider).putAll(postList);
     final newList = [...state.$1];
     for (final post in postList) {
-      newList.add(post.id);
-      _timestamps.add(post.createdAt);
+      if (_set.add(post.id)) {
+        newList.add(post.id);
+        _timestamps.add(post.createdAt);
+      }
     }
     state = (newList, postList.length < c.postsOnRefresh);
   }
 
   Future<void> refresh() async {
+    _set.clear();
     _timestamps.clear();
     state = ([], false);
     await getter();
   }
 
   void insertAtIndex(int index, PostModel post) {
-    final newList = [...state.$1];
-    newList.insert(index, post.id);
-    _timestamps.add(post.createdAt);
-    state = (newList, state.$2);
+    if (_set.add(post.id)) {
+      final newList = [...state.$1];
+      newList.insert(index, post.id);
+      _timestamps.add(post.createdAt);
+      state = (newList, state.$2);
+    }
   }
 }

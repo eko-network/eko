@@ -7,7 +7,7 @@ import 'package:untitled_app/providers/nav_bar_provider.dart';
 import 'package:untitled_app/types/current_user.dart';
 import 'package:untitled_app/widgets/divider.dart';
 import 'package:untitled_app/widgets/infinite_scrolly.dart';
-import 'package:untitled_app/widgets/post_loader.dart';
+import 'package:untitled_app/widgets/shimmer_loaders.dart';
 import '../custom_widgets/profile_page_header.dart';
 import '../utilities/constants.dart' as c;
 import '../widgets/post_card.dart';

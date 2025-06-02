@@ -7,7 +7,7 @@ import 'package:untitled_app/types/group.dart';
 import 'package:untitled_app/widgets/infinite_scrolly.dart';
 import 'package:untitled_app/widgets/loading_spinner.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
-import 'package:untitled_app/widgets/post_loader.dart';
+import 'package:untitled_app/widgets/shimmer_loaders.dart';
 import 'package:go_router/go_router.dart';
 import 'package:untitled_app/widgets/post_card.dart';
 import '../utilities/constants.dart' as c;

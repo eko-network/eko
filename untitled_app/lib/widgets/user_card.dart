@@ -6,13 +6,13 @@ import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
 import 'package:untitled_app/providers/user_provider.dart';
 import 'package:untitled_app/types/user.dart';
-import 'package:provider/provider.dart' as prov;
+import 'package:untitled_app/widgets/shimmer_loaders.dart';
 import '../custom_widgets/profile_avatar.dart';
 import '../utilities/constants.dart' as c;
 
-Widget searchPageBuilder(dynamic uid) {
+Widget userCardBuilder(String uid) {
   return UserCard(
-    uid: uid.uid,
+    uid: uid,
   );
 }
 
@@ -46,42 +46,24 @@ class UserCard extends ConsumerStatefulWidget {
 }
 
 class _UserCardState extends ConsumerState<UserCard> {
-  late UserModel? loadedUser;
-  bool isFollowing = false;
   late bool added;
 
   @override
   void initState() {
     super.initState();
-    final user = ref.read(userProvider(widget.uid)).maybeWhen(
-          data: (u) => u,
-          orElse: () => null,
-        );
-
-    loadedUser = user;
     if (widget.groupSearch) {
       added = widget.adder != null ? widget.initialBool ?? false : false;
     }
   }
 
-  bool isBlockedByMe(UserModel user) {
-    return false;
-  }
-
-  bool blocksMe(UserModel user) {
-    return false;
-  }
-
-  void onCardPressed(UserModel user) {
+  void onCardPressed() {
     if (!widget.blockedPage) {
-      context.push('/feed/sub_profile/${user.uid}');
+      context.push('/feed/sub_profile/${widget.uid}');
     }
   }
 
   void unblockPressed(UserModel user) {
-    final controller =
-        prov.Provider.of<BlockedUsersPageController>(context, listen: false);
-    controller.unblockUser(user.uid);
+    ref.read(currentUserProvider.notifier).unBlockUser(widget.uid);
   }
 
   Future<void> onFollowPressed(WidgetRef ref, UserModel user) async {
@@ -107,14 +89,15 @@ class _UserCardState extends ConsumerState<UserCard> {
     final width = c.widthGetter(context);
     final height = MediaQuery.sizeOf(context).height;
     final userAsync = ref.watch(userProvider(widget.uid));
-    final currentUser = ref.read(currentUserProvider);
 
     return userAsync.when(
       data: (user) {
-        if (!widget.blockedPage && (isBlockedByMe(user) || blocksMe(user))) {
-          return const SizedBox.shrink();
+        final currentUser = ref.watch(currentUserProvider);
+        if (!widget.blockedPage &&
+            (currentUser.blockedUsers.contains(user.uid) ||
+                currentUser.blockedBy.contains(user.uid))) {
+          return SizedBox.shrink();
         }
-
         return InkWell(
           onTap: () {
             if (widget.groupSearch) {
@@ -122,7 +105,7 @@ class _UserCardState extends ConsumerState<UserCard> {
             } else if (widget.tagSearch) {
               widget.onCardTap?.call(user.username);
             } else {
-              onCardPressed(user);
+              onCardPressed();
             }
           },
           child: Padding(
@@ -237,7 +220,7 @@ class _UserCardState extends ConsumerState<UserCard> {
         );
       },
       error: (err, _) => Text('Oops $err'),
-      loading: () => const CircularProgressIndicator(),
+      loading: () => const UserLoader(),
     );
   }
 }

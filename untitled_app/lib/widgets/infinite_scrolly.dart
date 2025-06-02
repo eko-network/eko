@@ -264,6 +264,10 @@ class _InfiniteScrollyShell<T> extends State<InfiniteScrollyShell<T>> {
                       ),
                     );
               }),
+          const SliverFillRemaining(
+            hasScrollBody: false,
+            child: SizedBox(),
+          ),
         ],
       ),
     );

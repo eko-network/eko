@@ -26,6 +26,7 @@ abstract class CurrentUserModel with _$CurrentUserModel {
       unreadGroup: json['unreadGroup'] ?? false,
     );
   }
+
   // this is the initial state of the current user. It is only to make the current user not nullable
   factory CurrentUserModel.loading() {
     return CurrentUserModel(

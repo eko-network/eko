@@ -9,7 +9,7 @@ import 'package:untitled_app/types/user.dart';
 import 'package:untitled_app/widgets/infinite_scrolly.dart';
 import 'package:untitled_app/widgets/loading_spinner.dart';
 import 'package:untitled_app/custom_widgets/profile_page_header.dart';
-import 'package:untitled_app/widgets/post_loader.dart';
+import 'package:untitled_app/widgets/shimmer_loaders.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import '../utilities/constants.dart' as c;
 import '../widgets/post_card.dart';

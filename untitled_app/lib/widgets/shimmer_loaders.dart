@@ -26,6 +26,25 @@ class PostLoader extends StatelessWidget {
   }
 }
 
+class UserLoader extends StatelessWidget {
+  final int length;
+  const UserLoader({this.length = 1, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return _Shimmer(
+      child: Column(
+        children: List.generate(
+          length,
+          (_) {
+            return _BlankUser();
+          },
+        ),
+      ),
+    );
+  }
+}
+
 class _BlankPost extends StatelessWidget {
   const _BlankPost();
   @override
@@ -79,6 +98,55 @@ class _BlankPost extends StatelessWidget {
               Container(
                 width: width * 0.6,
                 height: 24,
+                decoration: BoxDecoration(
+                  color: Colors.black,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+            ],
+          )
+        ],
+      ),
+    );
+  }
+}
+
+class _BlankUser extends StatelessWidget {
+  const _BlankUser();
+
+  @override
+  Widget build(BuildContext context) {
+    final width = c.widthGetter(context);
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Container(
+            width: width * 0.115,
+            height: width * 0.115,
+            decoration: const BoxDecoration(
+              color: Colors.black,
+              shape: BoxShape.circle,
+            ),
+          ),
+          const SizedBox(width: 7),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: width * 0.55,
+                height: width * 0.043,
+                decoration: BoxDecoration(
+                  color: Colors.black,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+              const SizedBox(height: 10),
+              Container(
+                width: width * 0.7,
+                height: width * 0.043,
                 decoration: BoxDecoration(
                   color: Colors.black,
                   borderRadius: BorderRadius.circular(16),

@@ -80,6 +80,7 @@ class _EditProfileState extends ConsumerState<EditProfile> {
 
   @override
   void dispose() {
+    _debounce?.cancel();
     usernameController.removeListener(usernameListener);
     nameController.dispose();
     bioController.dispose();

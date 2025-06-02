@@ -9,7 +9,7 @@ import 'package:untitled_app/utilities/shared_pref_service.dart';
 import 'package:untitled_app/widgets/icons.dart';
 import 'package:untitled_app/widgets/infinite_scrolly.dart';
 import 'package:untitled_app/widgets/post_card.dart';
-import 'package:untitled_app/widgets/post_loader.dart';
+import 'package:untitled_app/widgets/shimmer_loaders.dart';
 
 const appBarHeight = 80.0;
 const tabStorageKey = 'LAST_FEED_PAGE_INDEX';

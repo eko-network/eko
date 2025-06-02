@@ -6,12 +6,17 @@ class PoolService<T> {
   PoolService(
       {required this.keySelector, required this.onInsert, this.validTime});
 
+  void put(T item, {DateTime? time}) {
+    final now = time ?? DateTime.now();
+    final key = this.keySelector(item);
+    _map[key] = _CacheEntry(value: item, insertedAt: now);
+    this.onInsert(key);
+  }
+
   void putAll(Iterable<T> items) {
     final now = DateTime.now();
     for (final item in items) {
-      final key = this.keySelector(item);
-      _map[key] = _CacheEntry(value: item, insertedAt: now);
-      this.onInsert(key);
+      put(item, time: now);
     }
   }
 

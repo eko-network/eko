@@ -147,20 +147,33 @@ class CurrentUser extends _$CurrentUser {
     }
   }
 
-  Future<bool> blockUser(String blockedUid) async {
+  Future<void> blockUser(String uid) async {
+    state = state.copyWith(blockedUsers: <String>{...state.blockedUsers, uid});
     try {
       final firestore = FirebaseFirestore.instance;
-      final uid = ref.read(authProvider).uid!;
-      await firestore.collection('users').doc(uid).update({
-        'blockedUsers': FieldValue.arrayUnion([blockedUid])
+      await firestore.collection('users').doc(state.user.uid).update({
+        'blockedUsers': FieldValue.arrayUnion([uid])
       });
-
-      state.blockedBy.add(blockedUid);
-
-      removeFollower(blockedUid);
-      return true;
     } catch (e) {
-      return false;
+      final blocked = <String>{...state.blockedUsers};
+      blocked.remove(uid);
+      state = state.copyWith(blockedUsers: blocked);
+    }
+    removeFollower(uid);
+  }
+
+  Future<void> unBlockUser(String uid) async {
+    final blocked = <String>{...state.blockedUsers};
+    blocked.remove(uid);
+    state = state.copyWith(blockedUsers: blocked);
+    try {
+      final firestore = FirebaseFirestore.instance;
+      await firestore.collection('users').doc(state.user.uid).update({
+        'blockedUsers': FieldValue.arrayRemove([uid])
+      });
+    } catch (e) {
+      state =
+          state.copyWith(blockedUsers: <String>{...state.blockedUsers, uid});
     }
   }
 

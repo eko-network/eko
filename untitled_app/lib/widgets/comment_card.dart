@@ -133,6 +133,10 @@ class _CommentCardState extends ConsumerState<CommentCard> {
 
     return asyncComment.when(
       data: (comment) {
+        if (currentUser.blockedUsers.contains(comment.uid) ||
+            currentUser.blockedBy.contains(comment.uid)) {
+          return SizedBox.shrink();
+        }
         return TapRegion(
           onTapOutside: (v) => scrollToStart(),
           child: NotificationListener<ScrollEndNotification>(

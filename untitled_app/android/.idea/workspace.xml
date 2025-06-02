@@ -10,18 +10,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ba78a03b-e065-4050-8db6-c45f0b94a767" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable-anydpi-v24/ic_stat_name.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable-hdpi/ic_stat_name.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable-mdpi/ic_stat_name.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable-xhdpi/ic_stat_name.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable-xxhdpi/ic_stat_name.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../lib/interfaces/post.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/interfaces/post.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../lib/localization/generated/app_localizations.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/localization/generated/app_localizations.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../lib/localization/generated/app_localizations_en.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/localization/generated/app_localizations_en.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../lib/localization/generated/app_localizations_es.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/localization/generated/app_localizations_es.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/../pubspec.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/views/view_likes_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/views/view_likes_page.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -60,7 +50,8 @@
     "dart.analysis.tool.window.visible": "false",
     "git-widget-placeholder": "main",
     "kotlin-language-version-configured": "true",
-    "settings.editor.selected.configurable": "AndroidSdkUpdater"
+    "settings.editor.selected.configurable": "AndroidSdkUpdater",
+    "show.migrate.to.gradle.popup": "false"
   }
 }]]></component>
   <component name="RunManager">
@@ -153,12 +144,12 @@
       <map>
         <entry key="com.echo.android">
           <value>
-            <CheckInfo lastCheckTimestamp="1747897584512" />
+            <CheckInfo lastCheckTimestamp="1748752821855" />
           </value>
         </entry>
         <entry key="com.echo.android.test">
           <value>
-            <CheckInfo lastCheckTimestamp="1747897584514" />
+            <CheckInfo lastCheckTimestamp="1748752821856" />
           </value>
         </entry>
       </map>

@@ -19,6 +19,7 @@ class _Chunk {
 @riverpod
 class FollowingFeed extends _$FollowingFeed {
   final List<_Chunk> _feedChunks = [];
+  final Set<String> _set = {};
   @override
   (List<String>, bool) build() {
     return ([], false);
@@ -77,23 +78,38 @@ class FollowingFeed extends _$FollowingFeed {
         _feedChunks.removeAt(0);
         if (_feedChunks.isEmpty) {
           ref.read(postPoolProvider).putAll(gottenPosts);
-          state = ([...state.$1, ...gottenPosts.map((item) => item.id)], true);
+          final newList = [...state.$1];
+          for (final post in gottenPosts) {
+            if (_set.add(post.id)) {
+              newList.add(post.id);
+            }
+          }
+          state = (newList, true);
         }
       }
     }
     ref.read(postPoolProvider).putAll(gottenPosts);
-    state = ([...state.$1, ...gottenPosts.map((item) => item.id)], false);
+    final newList = [...state.$1];
+    for (final post in gottenPosts) {
+      if (_set.add(post.id)) {
+        newList.add(post.id);
+      }
+    }
+    state = (newList, false);
   }
 
   void insertAtIndex(int index, PostModel post) {
     if (_feedChunks.isNotEmpty) {
-      final newList = [...state.$1];
-      newList.insert(index, post.id);
-      state = (newList, state.$2);
+      if (_set.add(post.id)) {
+        final newList = [...state.$1];
+        newList.insert(index, post.id);
+        state = (newList, state.$2);
+      }
     }
   }
 
   Future<void> refresh() async {
+    _set.clear();
     _feedChunks.clear();
     state = ([], false);
     await getter();
