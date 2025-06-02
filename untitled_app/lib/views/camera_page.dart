@@ -3,7 +3,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:image_to_ascii/image_to_ascii.dart';
 import 'package:go_router/go_router.dart';
 import 'package:untitled_app/custom_widgets/image_widget.dart';
-import 'package:untitled_app/localization/generated/app_localizations.dart';
 
 class CameraPage extends StatefulWidget {
   const CameraPage({super.key});
@@ -13,20 +12,39 @@ class CameraPage extends StatefulWidget {
 }
 
 class _CameraPageState extends State<CameraPage> {
+  late final AsciiCameraController _ctrl;
+  String frame = '';
   XFile? selectedImage;
   String? asciiImage;
-  bool isLoading = false;
+  bool isLoading = true;
   bool isDarkMode = true;
 
-  Future<void> _convertImageToAscii() async {
+  void clearAll() => setState(() {
+        asciiImage = null;
+        selectedImage = null;
+      });
+
+  Future<void> pickImage() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? picked = await picker.pickImage(source: ImageSource.gallery);
+    if (picked == null) return;
+
+    setState(() {
+      selectedImage = picked;
+    });
+
+    await convertImage();
+  }
+
+  Future<void> convertImage() async {
     if (selectedImage == null) return;
 
     setState(() {
       isLoading = true;
     });
 
-    final ascii = await ImageToAscii()
-        .convertImageToAscii(selectedImage!.path, darkMode: isDarkMode);
+    final ascii = await convertImageToAscii(selectedImage!.path,
+        darkMode: isDarkMode, color: false);
 
     setState(() {
       asciiImage = ascii;
@@ -34,31 +52,36 @@ class _CameraPageState extends State<CameraPage> {
     });
   }
 
-  Future<void> _pickImage() async {
-    final ImagePicker picker = ImagePicker();
-    final XFile? imageLocal =
-        await picker.pickImage(source: ImageSource.gallery);
-
-    if (imageLocal == null) return;
-
-    setState(() {
-      selectedImage = imageLocal;
-    });
-
-    await _convertImageToAscii();
-  }
-
   void _toggleDarkMode() {
     setState(() {
       isDarkMode = !isDarkMode;
     });
-    _convertImageToAscii();
+    convertImage();
+  }
+
+  void captureFrame() {
+    setState(() {
+      asciiImage = frame;
+    });
   }
 
   @override
   void initState() {
     super.initState();
-    _pickImage();
+    // TODO: set dark mode based on theme provider
+    _ctrl = AsciiCameraController(darkMode: true);
+    _ctrl.initialize().then((_) {
+      _ctrl.stream.listen((ascii) => setState(() {
+            frame = ascii;
+            isLoading = false;
+          }));
+    });
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
   }
 
   @override
@@ -70,27 +93,57 @@ class _CameraPageState extends State<CameraPage> {
           icon: Icon(Icons.arrow_back_ios_rounded),
           onPressed: () => context.pop(),
         ),
+        actions: [
+          if (asciiImage != null) ...[
+            IconButton(
+              onPressed: clearAll,
+              icon: Icon(
+                Icons.delete,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+            ),
+          ],
+        ],
       ),
       body: Column(
         children: [
-          // Main content area (image or placeholder)
           Expanded(
-            child: isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : asciiImage != null
-                    ? Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: ImageWidget(text: asciiImage!),
-                      )
-                    : Center(
-                        child: Text(
-                          AppLocalizations.of(context)!.noImageSelected,
-                          style: TextStyle(
-                            fontSize: 18,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : asciiImage != null
+                      ? ImageWidget(ascii: asciiImage!)
+                      : ImageWidget(ascii: frame),
+            ),
+          ),
+          SizedBox(
+            height: 90,
+            child: Center(
+              child: asciiImage == null
+                  ? GestureDetector(
+                      onTap: captureFrame,
+                      child: Container(
+                        height: 70,
+                        width: 70,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            width: 4,
+                          ),
+                        ),
+                        child: Container(
+                          margin: const EdgeInsets.all(3),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
                             color: Theme.of(context).colorScheme.onSurface,
                           ),
                         ),
                       ),
+                    )
+                  : const SizedBox(),
+            ),
           ),
 
           // Bottom toolbar
@@ -103,7 +156,7 @@ class _CameraPageState extends State<CameraPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     IconButton(
-                        onPressed: _pickImage,
+                        onPressed: pickImage,
                         icon: Icon(
                           Icons.perm_media,
                           color: Theme.of(context).colorScheme.onSurface,

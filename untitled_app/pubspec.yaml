@@ -73,7 +73,6 @@ dependencies:
     path: ./like_button-custom/
   flutter_dotenv: ^5.2.1
   flutter_expandable_fab: ^2.3.0
-  google_fonts: ^6.2.1
   flutter_riverpod: ^2.6.1
   riverpod_annotation: ^2.6.1
   freezed_annotation: ^3.0.0
@@ -82,7 +81,7 @@ dependencies:
     # path: ../../image_to_ascii
     git:
       url: https://github.com/ericbreh/image_to_ascii.git
-      ref: 6f927b4ba0ec4e9370e019e88e9f9a45849db5ac
+      ref: c75b8d34c1fd766d4965e4c6e6b2e0e4e06a8f3f
       
   image: ^3.3.0
   flutter_staggered_grid_view: ^0.7.0

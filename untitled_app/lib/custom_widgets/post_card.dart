@@ -484,7 +484,7 @@ class _PostCardState extends State<PostCard> {
                               if (post.gifURL != null)
                                 GifWidget(url: post.gifURL!),
                               if (post.image != null)
-                                ImageWidget(text: post.image!),
+                                ImageWidget(ascii: post.image!),
                               if (post.gifURL != null ||
                                   post.image != null ||
                                   post.isPoll)
