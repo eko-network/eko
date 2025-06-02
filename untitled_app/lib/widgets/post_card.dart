@@ -144,17 +144,6 @@ class _PostCardState extends ConsumerState<PostCard> {
   bool sharing = false;
   bool isSelf = false;
 
-  //  bool isBlockedByMe() {
-  // ref.watch()
-  //    return false;
-  //    // return locator<CurrentUser>().blockedUsers.contains(post.author.uid);
-  //  }
-  //
-  //  bool blocksMe() {
-  //    return false;
-  //    // return locator<CurrentUser>().blockedBy.contains(post.author.uid);
-  //  }
-
   bool isLoggedIn() {
     // if (locator<CurrentUser>().getUID() == '') {
     //   showLogInDialog();

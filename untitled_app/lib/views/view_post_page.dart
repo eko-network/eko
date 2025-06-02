@@ -271,7 +271,16 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
 
     return asyncPost.when(
       data: (post) {
-        // TODO: handle if blocked
+        final currentUser = ref.watch(currentUserProvider);
+        if (currentUser.blockedUsers.contains(post.uid) ||
+            currentUser.blockedBy.contains(post.uid)) {
+          return Center(
+            child: SizedBox(
+              width: width * 0.7,
+              child: Text(AppLocalizations.of(context)!.blockedByUserMessage),
+            ),
+          );
+        }
         return GestureDetector(
           onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
           child: Scaffold(
@@ -329,8 +338,7 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
             body: Column(
               children: [
                 Expanded(
-                  child: 
-                  IndexedStack(
+                  child: IndexedStack(
                     index: isAtSymbolTyped ? 1 : 0,
                     children: [
                       InfiniteScrollyShell<String>(
