@@ -78,8 +78,8 @@
 
 
     "close":"Close",
-    "likes":"Likes",
-    "dislikes":"Dislikes",
+    "likes":"Up-Ekos",
+    "dislikes":"Down-Ekos",
     "like":"Like",
     "dislike":"Dislike",
     "comments":"Comments",
@@ -183,8 +183,8 @@
 
 
     "gifLoadingError":"Failed to load",
-    "viewLikes":"See Likes",
-    "viewDislikes":"See Dislikes",
+    "viewLikes":"See Up-Ekos",
+    "viewDislikes":"See Down-Ekos",
 
 
     "updateRequiredTitle":"Update Required",

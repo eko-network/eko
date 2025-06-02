@@ -329,8 +329,7 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
             body: Column(
               children: [
                 Expanded(
-                  child: 
-                  IndexedStack(
+                  child: IndexedStack(
                     index: isAtSymbolTyped ? 1 : 0,
                     children: [
                       InfiniteScrollyShell<String>(
