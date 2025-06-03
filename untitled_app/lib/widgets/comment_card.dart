@@ -13,6 +13,7 @@ import 'package:untitled_app/providers/user_provider.dart';
 import 'package:untitled_app/types/comment.dart';
 import 'package:untitled_app/widgets/comment_like_buttons.dart';
 import 'package:untitled_app/widgets/profile_picture.dart';
+import 'package:untitled_app/widgets/shimmer_loaders.dart';
 import 'package:untitled_app/widgets/user_tag.dart';
 import '../localization/generated/app_localizations.dart';
 import '../utilities/constants.dart' as c;
@@ -37,9 +38,7 @@ class _Error extends StatelessWidget {
 class _Loading extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: CircularProgressIndicator(),
-    );
+    return const UserLoader();
   }
 }
 

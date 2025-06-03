@@ -7,6 +7,7 @@ import 'package:untitled_app/types/user.dart';
 import 'package:untitled_app/widgets/profile_picture.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:go_router/go_router.dart';
+import 'package:untitled_app/widgets/shimmer_loaders.dart';
 import '../utilities/constants.dart' as c;
 
 Widget recentActivityCardBuilder(String id) {
@@ -92,7 +93,7 @@ class ActivityCardWidget extends ConsumerWidget {
           );
         },
         error: (_, __) => Text('error'),
-        loading: () => CircularProgressIndicator());
+        loading: () => UserLoader());
   }
 }
 

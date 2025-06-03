@@ -36,6 +36,7 @@ class Comment extends _$Comment {
     // await Future.delayed(Duration(seconds: 100));
     final cacheValue = ref.read(commentPoolProvider).getItem(id);
     if (cacheValue != null) {
+      print('Comment $id loaded from cache');
       return cacheValue;
     }
 

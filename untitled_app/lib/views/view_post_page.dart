@@ -18,6 +18,7 @@ import 'package:untitled_app/types/comment.dart';
 import 'package:untitled_app/widgets/loading_spinner.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:untitled_app/widgets/post_card.dart';
+import 'package:untitled_app/widgets/shimmer_loaders.dart';
 import '../utilities/constants.dart' as c;
 import '../widgets/comment_card.dart';
 import '../widgets/infinite_scrolly.dart';
@@ -350,7 +351,6 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
                             .getter(widget.id),
                         onRefresh: onRefresh,
                         widget: commentCardBuilder,
-                        // Add the controller here
                         controller: commentsScrollController,
                       ),
                       // prov.Provider.of<PostPageController>(context,

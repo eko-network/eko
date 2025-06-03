@@ -4,6 +4,7 @@ import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:untitled_app/providers/user_provider.dart';
 import 'package:untitled_app/widgets/infinite_scrolly.dart';
+import 'package:untitled_app/widgets/shimmer_loaders.dart';
 import '../widgets/user_card.dart';
 import '../utilities/constants.dart' as c;
 
@@ -71,6 +72,9 @@ class _FollowersState extends ConsumerState<Followers> {
             getter: (data) => getter(data, value.followers),
             widget: (uid) => UserCard(uid: uid),
             onRefresh: onRefresh,
+            initialLoadingWidget: UserLoader(
+              length: 12,
+            ),
           ),
         ),
       AsyncError(:final error) => Center(child: Text('Error: $error')),

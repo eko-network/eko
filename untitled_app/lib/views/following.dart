@@ -4,6 +4,7 @@ import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:untitled_app/providers/user_provider.dart';
 import 'package:untitled_app/widgets/infinite_scrolly.dart';
+import 'package:untitled_app/widgets/shimmer_loaders.dart';
 import '../widgets/user_card.dart';
 import '../utilities/constants.dart' as c;
 
@@ -69,8 +70,12 @@ class _FollowingState extends ConsumerState<Following> {
             ),
           ),
           body: InfiniteScrolly<String, Never?>(
-              getter: (data) => getter(data, value.following),
-              widget: (uid) => UserCard(uid: uid))),
+            getter: (data) => getter(data, value.following),
+            widget: (uid) => UserCard(uid: uid),
+            initialLoadingWidget: UserLoader(
+              length: 12,
+            ),
+          )),
       AsyncError(:final error) => Center(child: Text('Error: $error')),
       _ => const Center(child: CircularProgressIndicator()),
     };
