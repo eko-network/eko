@@ -317,24 +317,26 @@ class PostCardFromPost extends ConsumerWidget {
                             ),
                           ),
                         const SizedBox(height: 6.0),
-                        if (post.isPoll)
-                          PollWidget(
-                            postId: post.id,
-                            options: post.pollOptions!,
-                            pollVoteCounts: post.pollVoteCounts!,
-                            isPreview: isPreview,
-                          ),
-                        if (post.gifUrl != null) GifWidget(url: post.gifUrl!),
+                        if (post.gifUrl != null)
+                          Padding(
+                              padding: EdgeInsets.only(bottom: 6),
+                              child: GifWidget(url: post.gifUrl!)),
                         if (post.imageString != null)
                           Padding(
-                              padding: const EdgeInsets.only(right: 50),
+                              padding:
+                                  const EdgeInsets.only(right: 50, bottom: 6),
                               child: ImageWidget(
                                 ascii: post.imageString!,
                               )),
-                        if (post.gifUrl != null ||
-                            post.imageString != null ||
-                            post.isPoll)
-                          const SizedBox(height: 6.0),
+                        if (post.isPoll)
+                          Padding(
+                              padding: EdgeInsets.only(bottom: 6),
+                              child: PollWidget(
+                                postId: post.id,
+                                options: post.pollOptions!,
+                                pollVoteCounts: post.pollVoteCounts ?? {},
+                                isPreview: isPreview,
+                              )),
                         if (post.body.isNotEmpty) TextWithTags(text: post.body),
                       ],
                     ),

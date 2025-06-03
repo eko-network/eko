@@ -21,7 +21,7 @@ class _PollCreatorState extends State<PollCreator> {
     return Container(
       width: widget.width * 0.9,
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainer,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(color: Theme.of(context).colorScheme.outline),
       ),

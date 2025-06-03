@@ -80,6 +80,7 @@ class _ComposePageState extends ConsumerState<ComposePage> {
     if (url != null) {
       setState(() {
         gif = url;
+        image = null;
       });
     }
   }
@@ -93,7 +94,6 @@ class _ComposePageState extends ConsumerState<ComposePage> {
       setState(() {
         image = asciiArt;
         gif = null;
-        isPoll = false;
       });
     }
   }
@@ -102,8 +102,6 @@ class _ComposePageState extends ConsumerState<ComposePage> {
     ref.read(navBarProvider.notifier).disable();
     setState(() {
       isPoll = true;
-      gif = null;
-      image = null;
     });
     ref.read(navBarProvider.notifier).enable();
   }
@@ -123,7 +121,6 @@ class _ComposePageState extends ConsumerState<ComposePage> {
 
   void _removeMedia() {
     setState(() {
-      isPoll = false;
       gif = null;
       image = null;
     });
@@ -445,7 +442,7 @@ class _ComposePageState extends ConsumerState<ComposePage> {
                             }
                             return SizedBox();
                           }),
-                      if (gif != null || image != null || isPoll)
+                      if (gif != null || image != null)
                         FittedBox(
                           fit: BoxFit.scaleDown,
                           child: Stack(
@@ -458,51 +455,83 @@ class _ComposePageState extends ConsumerState<ComposePage> {
                                     horizontal: height * 0.025),
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(10),
-                                  child: isPoll
-                                      ? PollCreator(
-                                          height: height,
-                                          width: width,
-                                          pollOptions: pollOptions,
-                                        )
-                                      : image != null
-                                          ? ImageWidget(ascii: image!)
-                                          : Image.network(
-                                              // gif!.images!.fixedWidth.url,
-                                              gif ?? '',
-                                              loadingBuilder:
-                                                  (BuildContext context,
-                                                      Widget child,
-                                                      ImageChunkEvent?
-                                                          loadingProgress) {
-                                                if (loadingProgress == null) {
-                                                  return child;
-                                                }
-                                                return Container(
-                                                  alignment: Alignment.center,
-                                                  width: 200,
-                                                  height: 150,
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .onSurface,
-                                                  child:
-                                                      CircularProgressIndicator(
-                                                    value: loadingProgress
-                                                                .expectedTotalBytes !=
-                                                            null
-                                                        ? loadingProgress
-                                                                .cumulativeBytesLoaded /
-                                                            loadingProgress
-                                                                .expectedTotalBytes!
-                                                        : null,
-                                                  ),
-                                                );
-                                              },
-                                            ),
+                                  child: image != null
+                                      ? ImageWidget(ascii: image!)
+                                      : Image.network(
+                                          // gif!.images!.fixedWidth.url,
+                                          gif ?? '',
+                                          loadingBuilder: (BuildContext context,
+                                              Widget child,
+                                              ImageChunkEvent?
+                                                  loadingProgress) {
+                                            if (loadingProgress == null) {
+                                              return child;
+                                            }
+                                            return Container(
+                                              alignment: Alignment.center,
+                                              width: 200,
+                                              height: 150,
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .onSurface,
+                                              child: CircularProgressIndicator(
+                                                value: loadingProgress
+                                                            .expectedTotalBytes !=
+                                                        null
+                                                    ? loadingProgress
+                                                            .cumulativeBytesLoaded /
+                                                        loadingProgress
+                                                            .expectedTotalBytes!
+                                                    : null,
+                                              ),
+                                            );
+                                          },
+                                        ),
                                 ),
                               ),
                               IconButton(
                                 iconSize: image != null ? 150 : 30,
                                 onPressed: () => _removeMedia(),
+                                icon: DecoratedBox(
+                                  decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .surface),
+                                  child: Icon(
+                                    Icons.cancel,
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                      if (isPoll)
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Stack(
+                            alignment: Alignment.topRight,
+                            children: [
+                              Container(
+                                alignment: Alignment.center,
+                                padding: EdgeInsets.symmetric(
+                                    vertical: height * 0.025,
+                                    horizontal: height * 0.025),
+                                child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: PollCreator(
+                                      height: height,
+                                      width: width,
+                                      pollOptions: pollOptions,
+                                    )),
+                              ),
+                              IconButton(
+                                iconSize: 30,
+                                onPressed: () => setState(() {
+                                  isPoll = false;
+                                }),
                                 icon: DecoratedBox(
                                   decoration: BoxDecoration(
                                       shape: BoxShape.circle,
