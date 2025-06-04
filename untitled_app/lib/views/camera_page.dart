@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image_to_ascii/image_to_ascii.dart';
 import 'package:go_router/go_router.dart';
-import 'package:untitled_app/custom_widgets/image_widget.dart';
+import 'package:untitled_app/utilities/ascii_image_cropper.dart';
 
 class CameraPage extends StatefulWidget {
   const CameraPage({super.key});
@@ -43,7 +43,9 @@ class _CameraPageState extends State<CameraPage> {
       isLoading = true;
     });
 
-    final ascii = await convertImageToAscii(selectedImage!.path,
+    final croppedImage = await cropToAspectRatio(selectedImage!.path,
+        desiredWidth: 150, vScale: 0.75);
+    final ascii = await convertImageToAsciiFromImage(croppedImage,
         darkMode: isDarkMode, color: false);
 
     setState(() {
@@ -68,13 +70,17 @@ class _CameraPageState extends State<CameraPage> {
   @override
   void initState() {
     super.initState();
-    // TODO: set dark mode based on theme provider
-    _ctrl = AsciiCameraController(darkMode: true);
-    _ctrl.initialize().then((_) {
-      _ctrl.stream.listen((ascii) => setState(() {
-            frame = ascii;
-            isLoading = false;
-          }));
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _ctrl = AsciiCameraController(
+          darkMode: Theme.of(context).brightness == Brightness.dark,
+          width: 150,
+          height: 150);
+      _ctrl.initialize().then((_) {
+        _ctrl.stream.listen((ascii) => setState(() {
+              frame = ascii;
+              isLoading = false;
+            }));
+      });
     });
   }
 
@@ -113,8 +119,10 @@ class _CameraPageState extends State<CameraPage> {
               child: isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : asciiImage != null
-                      ? ImageWidget(ascii: asciiImage!)
-                      : ImageWidget(ascii: frame),
+                      ? AsciiImageWidget(ascii: asciiImage!)
+                      : AsciiImageWidget(
+                          ascii: frame,
+                        ),
             ),
           ),
           SizedBox(

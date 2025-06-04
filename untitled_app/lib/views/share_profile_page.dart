@@ -6,38 +6,36 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:qr_flutter_new/qr_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 
 import 'package:untitled_app/localization/generated/app_localizations.dart';
-import 'package:untitled_app/models/current_user.dart';
-import 'package:untitled_app/utilities/locator.dart';
+import 'package:untitled_app/providers/current_user_provider.dart';
 import '../utilities/constants.dart' as c;
 
 GlobalKey repaintKey = GlobalKey();
 
-class ShareProfile extends StatefulWidget {
+class ShareProfile extends ConsumerStatefulWidget {
   const ShareProfile({super.key});
 
   @override
-  State<ShareProfile> createState() => _ShareProfileState();
+  ConsumerState<ShareProfile> createState() => _ShareProfileState();
 }
 
-class _ShareProfileState extends State<ShareProfile> {
+class _ShareProfileState extends ConsumerState<ShareProfile> {
   bool linkCopied = false;
   bool sharing = false;
-  void copyLinkPressed() {
-    Clipboard.setData(ClipboardData(
-        text:
-            '${c.appURL}/feed/sub_profile/${locator<CurrentUser>().getUID()}'));
+  void copyLinkPressed(String url) {
+    Clipboard.setData(ClipboardData(text: url));
     setState(() {
       linkCopied = true;
     });
   }
 
-  void sharePressed() async {
+  void sharePressed(String url) async {
     if (sharing) return;
     sharing = true;
     RenderRepaintBoundary boundary =
@@ -51,16 +49,21 @@ class _ShareProfileState extends State<ShareProfile> {
 
     Share.shareXFiles(
       [XFile(imgFile.path)],
-      text: '${c.appURL}/feed/sub_profile/${locator<CurrentUser>().getUID()}',
+      text: url,
     );
     sharing = false;
   }
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final String shareUrl =
+        '${c.appURL}/feed/sub_profile/${ref.read(currentUserProvider).user.uid}';
     final width = c.widthGetter(context);
-    final url =
-        '${c.appURL}/feed/sub_profile/${locator<CurrentUser>().getUID()}';
     final icon = kIsWeb
         ? CupertinoIcons.arrowshape_turn_up_right
         : Platform.isIOS
@@ -100,12 +103,12 @@ class _ShareProfileState extends State<ShareProfile> {
                     children: [
                       const SizedBox(height: 12),
                       Text(
-                        '@${locator<CurrentUser>().username}',
+                        '@${ref.watch(currentUserProvider).user.username}',
                         style: TextStyle(fontSize: 24),
                       ),
                       QrImageView(
                         //gapless: true,
-                        data: url,
+                        data: shareUrl,
                         //backgroundColor: Theme.of(context).colorScheme.surface,
                         dataModuleStyle: QrDataModuleStyle(
                             borderRadius: 4,
@@ -129,7 +132,7 @@ class _ShareProfileState extends State<ShareProfile> {
                     _Icon(
                       icon: icon,
                       text: AppLocalizations.of(context)!.share,
-                      onTap: sharePressed,
+                      onTap: () => sharePressed(shareUrl),
                     ),
                   if (!kIsWeb) const Spacer(),
                   _Icon(
@@ -137,7 +140,7 @@ class _ShareProfileState extends State<ShareProfile> {
                     text: linkCopied
                         ? AppLocalizations.of(context)!.copyLink
                         : AppLocalizations.of(context)!.copied,
-                    onTap: copyLinkPressed,
+                    onTap: () => copyLinkPressed(shareUrl),
                   )
                 ],
               )
