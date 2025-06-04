@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:untitled_app/types/user.dart';
-import '../custom_widgets/profile_avatar.dart';
+import 'package:untitled_app/widgets/profile_picture.dart';
 import '../utilities/constants.dart' as c;
 
 class ProfileHeader extends StatelessWidget {
@@ -26,16 +26,14 @@ class ProfileHeader extends StatelessWidget {
           Row(
             children: [
               IconButton(
-                onPressed: () async {
-                  if (loggedIn) {
-                    await context.pushNamed('profile_picture_detail',
-                        pathParameters: {'id': user.uid});
-                  }
-                },
-                icon: ProfileAvatar(
-                    size: c.widthGetter(context) * 0.24,
-                    url: user.profilePicture),
-              ),
+                  onPressed: () async {
+                    if (loggedIn) {
+                      await context.pushNamed('profile_picture_detail',
+                          pathParameters: {'id': user.uid});
+                    }
+                  },
+                  icon: ProfilePicture(
+                      uid: user.uid, size: c.widthGetter(context) * 0.24)),
               Flexible(
                 child: Padding(
                   padding: const EdgeInsets.only(left: 10),

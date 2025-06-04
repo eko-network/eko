@@ -944,9 +944,11 @@ packages:
   image_to_ascii:
     dependency: "direct main"
     description:
-      path: "../../image_to_ascii"
-      relative: true
-    source: path
+      path: "."
+      ref: "2eddaa72cae081e7ee7710fdca1ebb19200015d2"
+      resolved-ref: "2eddaa72cae081e7ee7710fdca1ebb19200015d2"
+      url: "https://github.com/ericbreh/image_to_ascii.git"
+    source: git
     version: "0.0.1"
   intl:
     dependency: "direct main"

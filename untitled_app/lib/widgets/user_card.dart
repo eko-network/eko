@@ -3,11 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
-import 'package:untitled_app/providers/online_provider.dart';
 import 'package:untitled_app/providers/user_provider.dart';
 import 'package:untitled_app/types/user.dart';
+import 'package:untitled_app/widgets/profile_picture.dart';
 import 'package:untitled_app/widgets/shimmer_loaders.dart';
-import '../custom_widgets/profile_avatar.dart';
 import '../utilities/constants.dart' as c;
 
 Widget userCardBuilder(String uid) {
@@ -89,7 +88,6 @@ class _UserCardState extends ConsumerState<UserCard> {
     final width = c.widthGetter(context);
     final height = MediaQuery.sizeOf(context).height;
     final userAsync = ref.watch(userProvider(widget.uid));
-    final online = ref.watch(onlineProvider(widget.uid));
 
     return userAsync.when(
       data: (user) {
@@ -117,10 +115,9 @@ class _UserCardState extends ConsumerState<UserCard> {
               children: [
                 Row(
                   children: [
-                    ProfileAvatar(
-                      url: user.profilePicture,
+                    ProfilePicture(
+                      uid: user.uid,
                       size: width * 0.115,
-                      online: online.online,
                     ),
                     Padding(
                       padding: EdgeInsets.all(width * 0.02),

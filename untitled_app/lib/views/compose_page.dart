@@ -379,6 +379,7 @@ class _ComposePageState extends ConsumerState<ComposePage> {
                 children: [
                   ProfilePicture(
                       uid: ref.watch(currentUserProvider).user.uid,
+                      onlineIndicatorEnabled: false,
                       size: width * 0.115),
                   const SizedBox(width: 9),
                   OutlinedButton(

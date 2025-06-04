@@ -279,6 +279,7 @@ class PostCardFromPost extends ConsumerWidget {
                     uid: post.uid,
                     size: width * 0.115,
                     padding: const EdgeInsets.symmetric(horizontal: 5),
+                    onlineIndicatorEnabled: !isOnProfile,
                   ),
                   const SizedBox(width: 5),
                   Expanded(

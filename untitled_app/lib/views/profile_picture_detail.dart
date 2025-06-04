@@ -20,7 +20,11 @@ class ProfilePictureDetail extends StatelessWidget {
             height: double.infinity,
             decoration:
                 BoxDecoration(color: Theme.of(context).colorScheme.shadow),
-            child: ProfilePicture(uid: uid, size: width * 0.75)),
+            child: ProfilePicture(
+              uid: uid,
+              size: width * 0.75,
+              onlineIndicatorEnabled: false,
+            )),
       ),
     );
   }

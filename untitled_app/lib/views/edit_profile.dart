@@ -268,7 +268,11 @@ class _EditProfileState extends ConsumerState<EditProfile> {
                         alignment: Alignment.bottomRight,
                         children: [
                           newProfileImage == null
-                              ? ProfilePicture(uid: user.uid, size: width * 0.4)
+                              ? ProfilePicture(
+                                  uid: user.uid,
+                                  size: width * 0.4,
+                                  onlineIndicatorEnabled: false,
+                                )
                               : ProfilePictureFromFile(
                                   size: width * 0.4, file: newProfileImage!),
                           ElevatedButton(
