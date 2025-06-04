@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import '../utilities/constants.dart' as c;
-import '../models/uri_launcher.dart';
+import '../interfaces/uri_launcher.dart';
 
 class UpdateRequiredPage extends StatelessWidget {
   const UpdateRequiredPage({super.key});

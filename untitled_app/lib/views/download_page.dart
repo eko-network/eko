@@ -6,7 +6,7 @@ import 'package:qr_flutter_new/qr_flutter.dart';
 import '../utilities/constants.dart' as c;
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
-import '../models/uri_launcher.dart';
+import '../interfaces/uri_launcher.dart';
 
 class DownloadPage extends StatelessWidget {
   const DownloadPage({super.key});

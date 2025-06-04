@@ -14,7 +14,7 @@ class Comment extends _$Comment {
   bool _isLiking = false;
 
   @override
-  FutureOr<CommentModel> build(String id) async {
+  FutureOr<CommentModel> build(String id) {
     // *** This block is for lifecycle management *** //
     // Keep provider alive
     final link = ref.keepAlive();

@@ -14,7 +14,7 @@ class Post extends _$Post {
   Timer? _disposeTimer;
   bool _isLiking = false;
   @override
-  FutureOr<PostModel> build(String id) async {
+  FutureOr<PostModel> build(String id) {
     // *** This block is for lifecycle management *** //
     // Keep provider alive
     final link = ref.keepAlive();
