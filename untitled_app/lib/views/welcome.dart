@@ -31,7 +31,9 @@ class WelcomePage extends StatelessWidget {
             ),
             SizedBox(
               width: width * 0.7,
-              child: Eko(),
+              child: Eko(
+                useDefault: true,
+              ),
             ),
             SizedBox(
               height: height * .28,

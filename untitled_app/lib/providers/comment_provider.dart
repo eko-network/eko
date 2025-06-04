@@ -14,7 +14,7 @@ class Comment extends _$Comment {
   bool _isLiking = false;
 
   @override
-  FutureOr<CommentModel> build(String id) async {
+  FutureOr<CommentModel> build(String id) {
     // *** This block is for lifecycle management *** //
     // Keep provider alive
     final link = ref.keepAlive();
@@ -36,6 +36,7 @@ class Comment extends _$Comment {
     // await Future.delayed(Duration(seconds: 100));
     final cacheValue = ref.read(commentPoolProvider).getItem(id);
     if (cacheValue != null) {
+      print('Comment $id loaded from cache');
       return cacheValue;
     }
 

@@ -4,7 +4,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:untitled_app/providers/current_user_provider.dart';
-import 'package:untitled_app/providers/pool_providers.dart';
 import 'package:untitled_app/providers/user_provider.dart';
 import 'package:untitled_app/types/user.dart';
 import 'package:untitled_app/utilities/constants.dart' as c;

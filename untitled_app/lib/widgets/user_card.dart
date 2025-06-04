@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:untitled_app/controllers/blocked_users_page_controller.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
 import 'package:untitled_app/providers/online_provider.dart';
@@ -30,7 +29,7 @@ class UserCard extends ConsumerStatefulWidget {
   final bool groupSearch;
   final bool tagSearch;
   final String uid;
-  final Function(String)? onCardTap;
+  final void Function(String)? onTagCardTap;
   final void Function(dynamic, bool)? adder;
   const UserCard(
       {super.key,
@@ -38,7 +37,7 @@ class UserCard extends ConsumerStatefulWidget {
       this.blockedPage = false,
       this.groupSearch = false,
       this.tagSearch = false,
-      this.onCardTap,
+      this.onTagCardTap,
       this.adder,
       this.initialBool});
 
@@ -90,7 +89,6 @@ class _UserCardState extends ConsumerState<UserCard> {
     final width = c.widthGetter(context);
     final height = MediaQuery.sizeOf(context).height;
     final userAsync = ref.watch(userProvider(widget.uid));
-    final currentUser = ref.read(currentUserProvider);
     final online = ref.watch(onlineProvider(widget.uid));
 
     return userAsync.when(
@@ -106,7 +104,7 @@ class _UserCardState extends ConsumerState<UserCard> {
             if (widget.groupSearch) {
               onAddPressed(user);
             } else if (widget.tagSearch) {
-              widget.onCardTap?.call(user.username);
+              widget.onTagCardTap?.call(user.username);
             } else {
               onCardPressed();
             }

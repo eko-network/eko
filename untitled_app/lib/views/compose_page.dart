@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:image_to_ascii/image_to_ascii.dart';
 import 'package:untitled_app/custom_widgets/error_snack_bar.dart';
-import 'package:untitled_app/custom_widgets/group_card.dart';
+import 'package:untitled_app/widgets/group_card.dart';
 import 'package:untitled_app/custom_widgets/image_widget.dart';
 import 'package:untitled_app/interfaces/post.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
@@ -20,6 +18,7 @@ import 'package:untitled_app/widgets/infinite_scrolly.dart';
 import 'package:untitled_app/widgets/poll_creator.dart';
 import 'package:untitled_app/widgets/post_card.dart';
 import 'package:untitled_app/widgets/profile_picture.dart';
+import 'package:untitled_app/widgets/tag_search.dart';
 import '../utilities/constants.dart' as c;
 import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 
@@ -32,7 +31,6 @@ class ComposePage extends ConsumerStatefulWidget {
 
 class _ComposePageState extends ConsumerState<ComposePage> {
   final _key = GlobalKey<ExpandableFabState>();
-  bool _isLoadingImage = false;
   String? audiance;
   String? gif;
   String? image;
@@ -40,31 +38,26 @@ class _ComposePageState extends ConsumerState<ComposePage> {
   List<String> pollOptions = ['', ''];
   final titleController = TextEditingController();
   final bodyController = TextEditingController();
+  final scrollController = ScrollController();
   final bodyFocus = FocusNode();
   final titleFocus = FocusNode();
   int bodyNewLines = 0;
   bool isPosting = false;
-
-  void _setState() {
-    setState(() {});
-  }
+  String? partialTag;
 
   @override
-  void initState() {
-    super.initState();
-    audiance = widget.groupId;
-    bodyController.addListener(_onBodyChanged);
-    titleController.addListener(_setState);
-    titleFocus.addListener(_setState);
-    bodyFocus.addListener(_setState);
+  void didUpdateWidget(covariant ComposePage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.groupId != widget.groupId) {
+      setState(() {
+        audiance = widget.groupId;
+      });
+    }
   }
 
   @override
   void dispose() {
-    bodyController.removeListener(_onBodyChanged);
-    titleController.removeListener(_setState);
-    titleFocus.removeListener(_setState);
-    bodyFocus.removeListener(_setState);
+    scrollController.dispose();
     titleController.dispose();
     bodyController.dispose();
     titleFocus.dispose();
@@ -82,18 +75,12 @@ class _ComposePageState extends ConsumerState<ComposePage> {
     return count;
   }
 
-  void _onBodyChanged() {
-    final count = _countNewLines(bodyController.text.trim());
-    setState(() {
-      bodyNewLines = count;
-    });
-  }
-
   void _addGifPressed() async {
     String? url = await context.pushNamed('gif');
     if (url != null) {
       setState(() {
         gif = url;
+        image = null;
       });
     }
   }
@@ -107,7 +94,6 @@ class _ComposePageState extends ConsumerState<ComposePage> {
       setState(() {
         image = asciiArt;
         gif = null;
-        isPoll = false;
       });
     }
   }
@@ -116,8 +102,6 @@ class _ComposePageState extends ConsumerState<ComposePage> {
     ref.read(navBarProvider.notifier).disable();
     setState(() {
       isPoll = true;
-      gif = null;
-      image = null;
     });
     ref.read(navBarProvider.notifier).enable();
   }
@@ -137,7 +121,6 @@ class _ComposePageState extends ConsumerState<ComposePage> {
 
   void _removeMedia() {
     setState(() {
-      isPoll = false;
       gif = null;
       image = null;
     });
@@ -269,7 +252,6 @@ class _ComposePageState extends ConsumerState<ComposePage> {
   Widget build(BuildContext context) {
     final width = c.widthGetter(context);
     final height = MediaQuery.sizeOf(context).height;
-
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
@@ -381,203 +363,278 @@ class _ComposePageState extends ConsumerState<ComposePage> {
           ),
           backgroundColor: Theme.of(context).colorScheme.surface,
         ),
-        body: IndexedStack(
-          index: 0,
-          // !prov.Provider.of<ComposeController>(context, listen: false)
-          //         .isAtSymbolTyped
-          //     ? 0
-          //     : 1,
-          children: [
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: width * 0.04),
-              child: ListView(
-                keyboardDismissBehavior:
-                    ScrollViewKeyboardDismissBehavior.onDrag,
+        body: Padding(
+          padding: EdgeInsets.symmetric(horizontal: width * 0.04),
+          child: ListView(
+            controller: scrollController,
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+            children: [
+              SizedBox(height: height * 0.01),
+              Row(
                 children: [
-                  SizedBox(height: height * 0.01),
-                  Row(
-                    children: [
-                      ProfilePicture(
-                          uid: ref.watch(currentUserProvider).user.uid,
-                          size: width * 0.115),
-                      const SizedBox(width: 9),
-                      OutlinedButton(
-                        style: OutlinedButton.styleFrom(
-                          backgroundColor:
-                              Theme.of(context).colorScheme.outline,
-                          side: BorderSide(
-                            width: 0.5,
-                            color:
-                                Theme.of(context).colorScheme.onSurfaceVariant,
-                            style: BorderStyle.solid,
-                          ),
-                        ),
-                        onPressed: () => _audianceButtonPressed(
-                            context,
-                            (id) => setState(() {
-                                  audiance = id;
-                                })),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            _AudianceText(id: audiance),
-                            Icon(Icons.expand_more_rounded,
-                                color: Theme.of(context).colorScheme.onSurface),
-                          ],
-                        ),
-                      )
-                    ],
-                  ),
-                  SizedBox(height: height * 0.01),
-                  // ConstrainedBox(
-                  //   constraints: BoxConstraints(maxHeight: height * 0.5),
-                  //   child:
-                  TextField(
-                    textCapitalization: TextCapitalization.sentences,
-                    focusNode: titleFocus,
-                    controller: titleController,
-                    maxLines: null,
-                    cursorColor: Theme.of(context).colorScheme.onSurface,
-                    keyboardType: TextInputType.text,
-                    style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.onSurface),
-                    decoration: InputDecoration(
-                      contentPadding: EdgeInsets.all(height * 0.01),
-                      hintText: AppLocalizations.of(context)!.postTitle,
-                      hintStyle: TextStyle(
-                          fontSize: 22,
-                          color:
-                              Theme.of(context).colorScheme.onSurfaceVariant),
-                      border: InputBorder.none,
-                    ),
-                    // ),
-                  ),
-                  (titleFocus.hasPrimaryFocus &&
-                          titleController.text.isNotEmpty)
-                      ? Text(
-                          '${titleController.text.length}/${c.maxTitleChars} ${AppLocalizations.of(context)!.characters}')
-                      : Container(),
-                  if (gif != null || image != null || isPoll || _isLoadingImage)
-                    FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Stack(
-                        alignment: Alignment.topRight,
-                        children: [
-                          Container(
-                            alignment: Alignment.center,
-                            padding: EdgeInsets.symmetric(
-                                vertical: height * 0.025,
-                                horizontal: height * 0.025),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(10),
-                              child: _isLoadingImage
-                                  ? SizedBox(
-                                      child: Padding(
-                                          padding: EdgeInsets.all(10),
-                                          child: CircularProgressIndicator()))
-                                  : isPoll
-                                      ? PollCreator(
-                                          height: height,
-                                          width: width,
-                                          pollOptions: pollOptions,
-                                        )
-                                      : image != null
-                                          ? ImageWidget(ascii: image!)
-                                          : Image.network(
-                                              // gif!.images!.fixedWidth.url,
-                                              gif ?? '',
-                                              loadingBuilder:
-                                                  (BuildContext context,
-                                                      Widget child,
-                                                      ImageChunkEvent?
-                                                          loadingProgress) {
-                                                if (loadingProgress == null) {
-                                                  return child;
-                                                }
-                                                return Container(
-                                                  alignment: Alignment.center,
-                                                  width: 200,
-                                                  height: 150,
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .onSurface,
-                                                  child:
-                                                      CircularProgressIndicator(
-                                                    value: loadingProgress
-                                                                .expectedTotalBytes !=
-                                                            null
-                                                        ? loadingProgress
-                                                                .cumulativeBytesLoaded /
-                                                            loadingProgress
-                                                                .expectedTotalBytes!
-                                                        : null,
-                                                  ),
-                                                );
-                                              },
-                                            ),
-                            ),
-                          ),
-                          IconButton(
-                            iconSize: image != null && _isLoadingImage == false
-                                ? 150
-                                : 30,
-                            onPressed: () => _removeMedia(),
-                            icon: DecoratedBox(
-                              decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Theme.of(context).colorScheme.surface),
-                              child: Icon(
-                                Icons.cancel,
-                                color: Theme.of(context).colorScheme.onSurface,
-                              ),
-                            ),
-                          )
-                        ],
+                  ProfilePicture(
+                      uid: ref.watch(currentUserProvider).user.uid,
+                      size: width * 0.115),
+                  const SizedBox(width: 9),
+                  OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      backgroundColor: Theme.of(context).colorScheme.outline,
+                      side: BorderSide(
+                        width: 0.5,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        style: BorderStyle.solid,
                       ),
                     ),
-                  ConstrainedBox(
-                    constraints: BoxConstraints(),
-                    child: TextField(
-                      textCapitalization: TextCapitalization.sentences,
-                      focusNode: bodyFocus,
-                      controller: bodyController,
-                      maxLines: null,
-                      cursorColor: Theme.of(context).colorScheme.onSurface,
-                      keyboardType: TextInputType.multiline,
-                      style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.normal,
-                          color: Theme.of(context).colorScheme.onSurface),
-                      decoration: InputDecoration(
-                        contentPadding: EdgeInsets.all(height * 0.01),
-                        hintText: AppLocalizations.of(context)!.addText,
-                        hintStyle: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.normal,
-                            color:
-                                Theme.of(context).colorScheme.onSurfaceVariant),
-                        border: InputBorder.none,
-                      ),
+                    onPressed: () => _audianceButtonPressed(
+                        context,
+                        (id) => setState(() {
+                              audiance = id;
+                            })),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        _AudianceText(id: audiance),
+                        Icon(Icons.expand_more_rounded,
+                            color: Theme.of(context).colorScheme.onSurface),
+                      ],
                     ),
-                  ),
-                  (bodyFocus.hasPrimaryFocus && bodyController.text.isNotEmpty)
-                      ? Row(
-                          children: [
-                            Text(
-                                '${bodyController.text.length}/${c.maxPostChars} ${AppLocalizations.of(context)!.characters}'),
-                            const Spacer(),
-                            if (bodyNewLines != 0 || true)
-                              Text(
-                                  '$bodyNewLines/${c.maxPostLines} ${AppLocalizations.of(context)!.newLines}'),
-                          ],
-                        )
-                      : Container(),
+                  )
                 ],
               ),
-            ),
-          ],
+              SizedBox(height: height * 0.01),
+              // ConstrainedBox(
+              //   constraints: BoxConstraints(maxHeight: height * 0.5),
+              //   child:
+              TextField(
+                textCapitalization: TextCapitalization.sentences,
+                focusNode: titleFocus,
+                controller: titleController,
+                maxLines: null,
+                cursorColor: Theme.of(context).colorScheme.onSurface,
+                keyboardType: TextInputType.text,
+                style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.onSurface),
+                decoration: InputDecoration(
+                  contentPadding: EdgeInsets.all(height * 0.01),
+                  hintText: AppLocalizations.of(context)!.postTitle,
+                  hintStyle: TextStyle(
+                      fontSize: 22,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant),
+                  border: InputBorder.none,
+                ),
+                // ),
+              ),
+              Stack(
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      AnimatedBuilder(
+                          animation:
+                              Listenable.merge([titleController, titleFocus]),
+                          builder: (context, _) {
+                            if (titleFocus.hasPrimaryFocus &&
+                                titleController.text.isNotEmpty) {
+                              return Text(
+                                  '${titleController.text.length}/${c.maxTitleChars} ${AppLocalizations.of(context)!.characters}');
+                            }
+                            return SizedBox();
+                          }),
+                      if (gif != null || image != null)
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Stack(
+                            alignment: Alignment.topRight,
+                            children: [
+                              Container(
+                                alignment: Alignment.center,
+                                padding: EdgeInsets.symmetric(
+                                    vertical: height * 0.025,
+                                    horizontal: height * 0.025),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: image != null
+                                      ? ImageWidget(ascii: image!)
+                                      : Image.network(
+                                          // gif!.images!.fixedWidth.url,
+                                          gif ?? '',
+                                          loadingBuilder: (BuildContext context,
+                                              Widget child,
+                                              ImageChunkEvent?
+                                                  loadingProgress) {
+                                            if (loadingProgress == null) {
+                                              return child;
+                                            }
+                                            return Container(
+                                              alignment: Alignment.center,
+                                              width: 200,
+                                              height: 150,
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .onSurface,
+                                              child: CircularProgressIndicator(
+                                                value: loadingProgress
+                                                            .expectedTotalBytes !=
+                                                        null
+                                                    ? loadingProgress
+                                                            .cumulativeBytesLoaded /
+                                                        loadingProgress
+                                                            .expectedTotalBytes!
+                                                    : null,
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                ),
+                              ),
+                              IconButton(
+                                iconSize: image != null ? 150 : 30,
+                                onPressed: () => _removeMedia(),
+                                icon: DecoratedBox(
+                                  decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .surface),
+                                  child: Icon(
+                                    Icons.cancel,
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                      if (isPoll)
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Stack(
+                            alignment: Alignment.topRight,
+                            children: [
+                              Container(
+                                alignment: Alignment.center,
+                                padding: EdgeInsets.symmetric(
+                                    vertical: height * 0.025,
+                                    horizontal: height * 0.025),
+                                child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: PollCreator(
+                                      height: height,
+                                      width: width,
+                                      pollOptions: pollOptions,
+                                    )),
+                              ),
+                              IconButton(
+                                iconSize: 30,
+                                onPressed: () => setState(() {
+                                  isPoll = false;
+                                }),
+                                icon: DecoratedBox(
+                                  decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .surface),
+                                  child: Icon(
+                                    Icons.cancel,
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                      ConstrainedBox(
+                        constraints: BoxConstraints(),
+                        child: TextField(
+                          textCapitalization: TextCapitalization.sentences,
+                          focusNode: bodyFocus,
+                          controller: bodyController,
+                          maxLines: null,
+                          cursorColor: Theme.of(context).colorScheme.onSurface,
+                          keyboardType: TextInputType.multiline,
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.normal,
+                              color: Theme.of(context).colorScheme.onSurface),
+                          decoration: InputDecoration(
+                            contentPadding: EdgeInsets.all(height * 0.01),
+                            hintText: AppLocalizations.of(context)!.addText,
+                            hintStyle: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.normal,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurfaceVariant),
+                            border: InputBorder.none,
+                          ),
+                        ),
+                      ),
+                      AnimatedBuilder(
+                        animation:
+                            Listenable.merge([bodyController, bodyFocus]),
+                        builder: (context, _) {
+                          if (bodyFocus.hasPrimaryFocus &&
+                              bodyController.text.isNotEmpty) {
+                            return Row(
+                              children: [
+                                Text(
+                                    '${bodyController.text.length}/${c.maxPostChars} ${AppLocalizations.of(context)!.characters}'),
+                                const Spacer(),
+                                if (bodyNewLines != 0 || true)
+                                  Text(
+                                      '${_countNewLines(bodyController.text.trim())}/${c.maxPostLines} ${AppLocalizations.of(context)!.newLines}'),
+                              ],
+                            );
+                          }
+                          return SizedBox();
+                        },
+                      ),
+                      AnimatedBuilder(
+                        animation:
+                            Listenable.merge([bodyController, bodyFocus]),
+                        builder: (context, _) {
+                          final text = searchText(bodyController);
+                          if (text != null && bodyFocus.hasFocus) {
+                            WidgetsBinding.instance.addPostFrameCallback(
+                              (_) => scrollController.jumpTo(
+                                  scrollController.position.maxScrollExtent),
+                            );
+                            return TagSearch(
+                              onCardTap: (username) =>
+                                  onCardTap(username, bodyController),
+                              searchText: text,
+                              height: MediaQuery.sizeOf(context).height * 0.4,
+                            );
+                          }
+                          return SizedBox();
+                        },
+                      ),
+                    ],
+                  ),
+                  AnimatedBuilder(
+                    animation: Listenable.merge([titleController, titleFocus]),
+                    builder: (context, _) {
+                      final text = searchText(titleController);
+                      if (text != null && titleFocus.hasFocus) {
+                        return TagSearch(
+                          onCardTap: (username) =>
+                              onCardTap(username, titleController),
+                          searchText: text,
+                          height: MediaQuery.sizeOf(context).height * 0.4,
+                        );
+                      }
+                      return SizedBox();
+                    },
+                  ),
+                ],
+              )
+            ],
+          ),
         ),
       ),
     );

@@ -49,4 +49,8 @@ class Auth extends _$Auth {
       return (e.code);
     }
   }
+
+  Future<void> deleteAccount() async {
+    await FirebaseAuth.instance.currentUser?.delete();
+  }
 }

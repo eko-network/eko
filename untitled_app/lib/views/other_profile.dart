@@ -175,12 +175,16 @@ class OtherProfile extends ConsumerWidget {
                   title: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
-                        '@${profileUser.username}',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20,
-                          color: Theme.of(context).colorScheme.onSurface,
+                      Flexible(
+                        child: Text(
+                          '@${profileUser.username}',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
                         ),
                       ),
                       if (profileUser.isVerified)

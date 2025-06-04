@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:overlay_support/overlay_support.dart';
-import 'package:untitled_app/models/notification_helper.dart';
+import 'package:untitled_app/interfaces/notification_helper.dart';
 import 'package:untitled_app/models/version_control.dart';
 import 'package:untitled_app/providers/theme_provider.dart';
 import 'package:untitled_app/utilities/logo_service.dart';

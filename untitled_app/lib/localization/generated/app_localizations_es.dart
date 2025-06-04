@@ -51,19 +51,22 @@ class AppLocalizationsEs extends AppLocalizations {
   String get usernameTakenTitle => 'Este nombre de usuario ha sido tomado.';
 
   @override
-  String get usernameTakenBody => 'Por favor escoja un nombre de usuario diferente.';
+  String get usernameTakenBody =>
+      'Por favor escoja un nombre de usuario diferente.';
 
   @override
   String get invalidEmailTittle => 'Formato de correo electrónico invalido';
 
   @override
-  String get invalidEmailBody => 'Por favor revise su correo electrónico y vuelva a intentar.';
+  String get invalidEmailBody =>
+      'Por favor revise su correo electrónico y vuelva a intentar.';
 
   @override
   String get userNotFoundTitle => 'No hemos encontrado esta cuenta';
 
   @override
-  String get userNotFoundBody => 'No hemos encontado una cuenta con este correo electrónico. Intente otro correo electrónico o cree una cuenta.';
+  String get userNotFoundBody =>
+      'No hemos encontado una cuenta con este correo electrónico. Intente otro correo electrónico o cree una cuenta.';
 
   @override
   String get wrongPasswordTittle => 'Contraseña incorrecta';
@@ -75,37 +78,44 @@ class AppLocalizationsEs extends AppLocalizations {
   String get userDisabledTittle => 'Cuenta no disponible';
 
   @override
-  String get userDisabledBody => 'Su cuenta ha sido deshabilitada. Para preguntas comunicarse con conetechnologiesdev@gmail.com.';
+  String get userDisabledBody =>
+      'Su cuenta ha sido deshabilitada. Para preguntas comunicarse con conetechnologiesdev@gmail.com.';
 
   @override
   String get weakPasswordTitle => 'Contraseña débil';
 
   @override
-  String get weakPasswordBody => 'Revise los requisitos para su contraseña e intente de nuevo.';
+  String get weakPasswordBody =>
+      'Revise los requisitos para su contraseña e intente de nuevo.';
 
   @override
   String get defaultErrorTittle => 'Oops! Algo salió mal';
 
   @override
-  String get defaultErrorBody => 'Por favor intente de nuevo o contacte conetechnologiesdev@gmail.com.';
+  String get defaultErrorBody =>
+      'Por favor intente de nuevo o contacte conetechnologiesdev@gmail.com.';
 
   @override
   String get emailAlreadyInUseTitle => 'Correo electrónico en uso';
 
   @override
-  String get emailAlreadyInUseBody => 'Una cuenta con este correo electrónico ya existe.';
+  String get emailAlreadyInUseBody =>
+      'Una cuenta con este correo electrónico ya existe.';
 
   @override
   String get forgotPasswordTittle => 'Recibiste un correo!';
 
   @override
-  String get forgotPasswordBody => 'Intenta usar el link que mandamos a tu correo electrónico.';
+  String get forgotPasswordBody =>
+      'Intenta usar el link que mandamos a tu correo electrónico.';
 
   @override
-  String get exitCreateAccountTitle => 'Quieres regresar a la página de inicio?';
+  String get exitCreateAccountTitle =>
+      'Quieres regresar a la página de inicio?';
 
   @override
-  String get exitCreateAccountBody => 'Estas seguro de que quieres regresar a la página de inicio? Tu informacion será borrada.';
+  String get exitCreateAccountBody =>
+      'Estas seguro de que quieres regresar a la página de inicio? Tu informacion será borrada.';
 
   @override
   String get exitEditProfileTitle => 'Estas seguro de que quieres salir?';
@@ -285,10 +295,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get createAPassword => 'Create a Password';
 
   @override
-  String get deleteAcountTitle => 'Are you sure you want to delete your account?';
+  String get deleteAcountTitle =>
+      'Are you sure you want to delete your account?';
 
   @override
-  String get deleteAcountBody => 'All account data will be deleted. This action cannot be undone. Press \"Go Back\" to cancel';
+  String get deleteAcountBody =>
+      'All account data will be deleted. This action cannot be undone. Press \"Go Back\" to cancel';
 
   @override
   String get delete => 'Delete';
@@ -366,7 +378,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get userNotFound => 'User Not Found';
 
   @override
-  String get usernameReqs => 'Usernames must be between 3 and 24 characters. Usernames can only contain lowercase letters, numbers, and underscores.';
+  String get usernameReqs =>
+      'Usernames must be between 3 and 24 characters. Usernames can only contain lowercase letters, numbers, and underscores.';
 
   @override
   String get followText => 'started following you';
@@ -375,7 +388,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get taggedText => 'tagged you:';
 
   @override
-  String get badAuthState => 'Request is invalid or has expired. Please try again.';
+  String get badAuthState =>
+      'Request is invalid or has expired. Please try again.';
 
   @override
   String get resetPasswordPromt => 'Reset password for:';
@@ -411,7 +425,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get updateRequiredTitle => 'Update Required';
 
   @override
-  String get updateRequiredBody => 'Please download the latest update to continue.';
+  String get updateRequiredBody =>
+      'Please download the latest update to continue.';
 
   @override
   String get updateAvailable => 'Update Available';
@@ -426,10 +441,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get groupNotFound => 'Group Not Found';
 
   @override
-  String get leaveGroupWarningTitle => 'Are you sure you want to leave the group?';
+  String get leaveGroupWarningTitle =>
+      'Are you sure you want to leave the group?';
 
   @override
-  String get leaveGroupWarningBody => 'A group member will need to re-add you should you want to join again.';
+  String get leaveGroupWarningBody =>
+      'A group member will need to re-add you should you want to join again.';
 
   @override
   String get share => 'Share';
@@ -444,7 +461,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get shareProfile => 'Share Profile';
 
   @override
-  String get deleteAcountReAuthWarning => 'Please enter your password to confirm you wish to delete your account. This Action cannot be undone. Upon clicking the button below, your account will be deleted.';
+  String get deleteAcountReAuthWarning =>
+      'Please enter your password to confirm you wish to delete your account. This Action cannot be undone. Upon clicking the button below, your account will be deleted.';
 
   @override
   String get logIntoApp => 'Login required';
@@ -459,7 +477,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get send => 'Send';
 
   @override
-  String get reportDetails => 'Please provide information on why you are reporting this post.';
+  String get reportDetails =>
+      'Please provide information on why you are reporting this post.';
 
   @override
   String get commentRequired => 'Comment Required';
@@ -468,7 +487,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get tooEarlyDeleteTitle => 'Please Wait';
 
   @override
-  String get tooEarlyDeleteBody => 'Posts/comments may only be deleted 48 hours after they are posted.';
+  String get tooEarlyDeleteBody =>
+      'Posts/comments may only be deleted 48 hours after they are posted.';
 
   @override
   String get deletePostWarningTitle => 'Delete Post';
@@ -477,10 +497,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get deleteCommentWarningTitle => 'Delete Comment';
 
   @override
-  String get deletePostWarningBody => 'Are you sure you wish to proceed? This action cannot be undone.';
+  String get deletePostWarningBody =>
+      'Are you sure you wish to proceed? This action cannot be undone.';
 
   @override
-  String get invalidSession => 'This Eko account is being used on another device. Press below to continue on this device.';
+  String get invalidSession =>
+      'This Eko account is being used on another device. Press below to continue on this device.';
 
   @override
   String get birthday => 'Birthday';
@@ -522,7 +544,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get blockTitle => 'Block User';
 
   @override
-  String get blockBody => 'This will hide content the user posts and prevent them from viewing your profile.';
+  String get blockBody =>
+      'This will hide content the user posts and prevent them from viewing your profile.';
 
   @override
   String get blockedAccounts => 'Blocked Accounts';
@@ -531,10 +554,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get newActivityNotifications => 'New Activity Notifications';
 
   @override
-  String get blockedByUserMessage => 'You do not currently have permission to view this content.';
+  String get blockedByUserMessage =>
+      'You do not currently have permission to view this content.';
 
   @override
-  String get birthdayExplanation => 'We use this to ensure you are old enough to use the app.';
+  String get birthdayExplanation =>
+      'We use this to ensure you are old enough to use the app.';
 
   @override
   String get noImageSelected => 'No image selected';

@@ -1,4 +1,3 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
@@ -17,6 +16,7 @@ import 'package:untitled_app/widgets/divider.dart';
 import 'package:untitled_app/widgets/like_buttons.dart';
 import 'package:untitled_app/widgets/shimmer_loaders.dart';
 import 'package:untitled_app/widgets/profile_picture.dart';
+import 'package:untitled_app/widgets/text_with_tags.dart';
 import 'package:untitled_app/widgets/time_stamp.dart';
 import 'package:untitled_app/widgets/user_tag.dart';
 import '../utilities/constants.dart' as c;
@@ -144,17 +144,6 @@ class _PostCardState extends ConsumerState<PostCard> {
   bool sharing = false;
   bool isSelf = false;
 
-  //  bool isBlockedByMe() {
-  // ref.watch()
-  //    return false;
-  //    // return locator<CurrentUser>().blockedUsers.contains(post.author.uid);
-  //  }
-  //
-  //  bool blocksMe() {
-  //    return false;
-  //    // return locator<CurrentUser>().blockedBy.contains(post.author.uid);
-  //  }
-
   bool isLoggedIn() {
     // if (locator<CurrentUser>().getUID() == '') {
     //   showLogInDialog();
@@ -200,16 +189,6 @@ class _PostCardState extends ConsumerState<PostCard> {
       }
     }
   }
-
-  // Future<void> tagPressed(String username) async {
-  //   String? uid = await getUidFromUsername(username);
-  //   if (!mounted) return;
-  //   if (ref.read(currentUserProvider).user.uid == uid) {
-  //     context.go('/profile');
-  //   } else {
-  //     context.push('/feed/sub_profile/$uid');
-  //   }
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -329,102 +308,36 @@ class PostCardFromPost extends ConsumerWidget {
                         ),
                         const SizedBox(height: 6.0),
                         if (post.title.isNotEmpty)
-                          RichText(
-                            text: TextSpan(
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontFamily: DefaultTextStyle.of(context)
-                                    .style
-                                    .fontFamily,
-                              ),
-                              children: post.title.map((chunk) {
-                                if (chunk.startsWith('@')) {
-                                  // This is a username, create a hyperlink
-                                  return TextSpan(
-                                    text: chunk,
-                                    style: TextStyle(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .surfaceTint),
-                                    recognizer: TapGestureRecognizer()
-                                      ..onTap = () async {
-                                        if (!isPreview) {
-                                          // tagPressed(chunk.substring(1));
-                                        }
-                                      },
-                                  );
-                                } else {
-                                  // This is a normal text, create a TextSpan
-                                  return TextSpan(
-                                    text: chunk,
-                                    style: TextStyle(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurface,
-                                    ),
-                                  );
-                                }
-                              }).toList(),
+                          TextWithTags(
+                            text: post.title,
+                            baseTextStyle: TextStyle(
+                              fontSize: 15,
+                              fontFamily:
+                                  DefaultTextStyle.of(context).style.fontFamily,
                             ),
                           ),
                         const SizedBox(height: 6.0),
-                        if (post.isPoll)
-                          PollWidget(
-                            postId: post.id,
-                            options: post.pollOptions!,
-                            pollVoteCounts: post.pollVoteCounts!,
-                            isPreview: isPreview,
-                          ),
-                        if (post.gifUrl != null) GifWidget(url: post.gifUrl!),
+                        if (post.gifUrl != null)
+                          Padding(
+                              padding: EdgeInsets.only(bottom: 6),
+                              child: GifWidget(url: post.gifUrl!)),
                         if (post.imageString != null)
                           Padding(
-                              padding: const EdgeInsets.only(right: 50),
+                              padding:
+                                  const EdgeInsets.only(right: 50, bottom: 6),
                               child: ImageWidget(
                                 ascii: post.imageString!,
                               )),
-                        if (post.gifUrl != null ||
-                            post.imageString != null ||
-                            post.isPoll)
-                          const SizedBox(height: 6.0),
-                        if (post.body.isNotEmpty)
-                          RichText(
-                            text: TextSpan(
-                              style: TextStyle(
-                                fontFamily: DefaultTextStyle.of(context)
-                                    .style
-                                    .fontFamily,
-                              ),
-                              children: post.body.map((chunk) {
-                                if (chunk.startsWith('@')) {
-                                  // This is a username, create a hyperlink
-                                  return TextSpan(
-                                    text: chunk,
-                                    style: TextStyle(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .surfaceTint),
-                                    recognizer: TapGestureRecognizer()
-                                      ..onTap = () {
-                                        if (!isPreview) {
-                                          // tagPressed(chunk.substring(1));
-                                        }
-                                      },
-                                  );
-                                } else {
-                                  // This is a normal text, create a TextSpan
-                                  return TextSpan(
-                                    text: chunk,
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurface,
-                                    ),
-                                  );
-                                }
-                              }).toList(),
-                            ),
-                          ),
+                        if (post.isPoll)
+                          Padding(
+                              padding: EdgeInsets.only(bottom: 6),
+                              child: PollWidget(
+                                postId: post.id,
+                                options: post.pollOptions!,
+                                pollVoteCounts: post.pollVoteCounts ?? {},
+                                isPreview: isPreview,
+                              )),
+                        if (post.body.isNotEmpty) TextWithTags(text: post.body),
                       ],
                     ),
                   ),

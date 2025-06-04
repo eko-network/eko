@@ -17,7 +17,7 @@ class SettingsController extends ChangeNotifier {
     init();
   }
   init() async {
-    activityNotification = await getActivityNotification();
+    activityNotification = getActivityNotification();
     notifyListeners();
   }
 

@@ -9,6 +9,7 @@ import 'package:untitled_app/widgets/infinite_scrolly.dart';
 import 'package:untitled_app/widgets/recent_activity_card.dart';
 import 'package:go_router/go_router.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
+import 'package:untitled_app/widgets/shimmer_loaders.dart';
 
 class RecentActivity extends ConsumerWidget {
   const RecentActivity({super.key});
@@ -55,8 +56,12 @@ class RecentActivity extends ConsumerWidget {
         ),
       ),
       body: InfiniteScrolly<String, String>(
-          getter: (data) => getter(data, ref),
-          widget: recentActivityCardBuilder),
+        getter: (data) => getter(data, ref),
+        widget: recentActivityCardBuilder,
+        initialLoadingWidget: UserLoader(
+          length: 12,
+        ),
+      ),
     );
   }
 }

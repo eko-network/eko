@@ -75,7 +75,6 @@ Future<String?> getUidFromUsername(String username) async {
       .collection('users')
       .where('username', isEqualTo: username)
       .get();
-
   if (querySnapshot.docs.isEmpty) {
     return null;
   } else {

@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:untitled_app/providers/group_list_provider.dart';
 import 'package:untitled_app/widgets/infinite_scrolly.dart';
-import '../custom_widgets/group_card.dart';
+import '../widgets/group_card.dart';
 import '../utilities/constants.dart' as c;
 
 class GroupsPage extends ConsumerStatefulWidget {

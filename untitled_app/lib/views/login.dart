@@ -188,7 +188,13 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               SizedBox(
                 height: height * .055,
               ),
-              SizedBox(height: height * .25, width: width * 0.7, child: Eko()),
+              SizedBox(
+                height: height * .25,
+                width: width * 0.7,
+                child: Eko(
+                  useDefault: true,
+                ),
+              ),
               SizedBox(height: height * .05),
               CustomInputField(
                 focus: emailFocus,

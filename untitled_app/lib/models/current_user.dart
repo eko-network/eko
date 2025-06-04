@@ -179,7 +179,7 @@ class CurrentUser extends AppUser {
           Map<String, int>.from(userData['profileData']['pollVotes'] ?? {});
       if (fcmTokens == null) {
         addFCM();
-      } else if (await getActivityNotification()) {
+      } else if (getActivityNotification()) {
         List<String> fcmTokens = List<String>.from(userData['fcmTokens'] ?? []);
         final String currentDeviceToken =
             await FirebaseMessaging.instance.getToken() ?? '';

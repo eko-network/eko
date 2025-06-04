@@ -220,9 +220,7 @@ class _InfiniteScrollyShell<T> extends State<InfiniteScrollyShell<T>> {
       child: CustomScrollView(
         // shrinkWrap: true,
         keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-        physics: isEmptySet
-            ? const NeverScrollableScrollPhysics()
-            : const AlwaysScrollableScrollPhysics(),
+        physics: const AlwaysScrollableScrollPhysics(),
         controller: scrollController,
         slivers: [
           if (widget.appBar != null) widget.appBar!,
