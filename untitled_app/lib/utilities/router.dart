@@ -1,3 +1,4 @@
+import 'package:cross_file/cross_file.dart' show XFile;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:untitled_app/custom_widgets/safe_area.dart';
@@ -7,6 +8,7 @@ import 'package:untitled_app/views/blocked_users_page.dart';
 import 'package:untitled_app/views/download_page.dart';
 import 'package:untitled_app/views/edit_group_page.dart';
 import 'package:untitled_app/views/camera_page.dart';
+import 'package:untitled_app/views/edit_picture.dart';
 import 'package:untitled_app/views/invalid_session_page.dart';
 import 'package:untitled_app/views/login.dart';
 import 'package:untitled_app/views/re_auth_page.dart';
@@ -121,17 +123,18 @@ final goRouter = GoRouter(
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) {
         return PopScope(
-            canPop: navigationShell.currentIndex == 0,
-            onPopInvokedWithResult: (bool didPop, Object? result) {
-              if (didPop) return;
-              navigationShell.goBranch(0);
-            },
-            child: NotificationHandler(
-              child: RequireAuth(
-                child: ScaffoldWithNestedNavigation(
-                    navigationShell: navigationShell),
-              ),
-            ),);
+          canPop: navigationShell.currentIndex == 0,
+          onPopInvokedWithResult: (bool didPop, Object? result) {
+            if (didPop) return;
+            navigationShell.goBranch(0);
+          },
+          child: NotificationHandler(
+            child: RequireAuth(
+              child: ScaffoldWithNestedNavigation(
+                  navigationShell: navigationShell),
+            ),
+          ),
+        );
       },
       branches: [
         StatefulShellBranch(
@@ -262,6 +265,14 @@ final goRouter = GoRouter(
                   path: '/camera',
                   name: 'camera',
                   builder: (context, state) => const CameraPage(),
+                ),
+                GoRoute(
+                  path: '/edit_picture',
+                  name: 'edit_picture',
+                  builder: (context, state) {
+                    final file = state.extra as XFile;
+                    return EditPicture(picture: file);
+                  },
                 ),
                 GoRoute(
                   path: '/gif',

@@ -1,6 +1,9 @@
+import 'package:cross_file/cross_file.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_to_ascii/image_to_ascii.dart';
+import 'package:universal_html/js_util.dart';
 import 'package:untitled_app/custom_widgets/error_snack_bar.dart';
 import 'package:untitled_app/widgets/group_card.dart';
 import 'package:untitled_app/custom_widgets/image_widget.dart';
@@ -33,7 +36,7 @@ class _ComposePageState extends ConsumerState<ComposePage> {
   final _key = GlobalKey<ExpandableFabState>();
   String? audiance;
   String? gif;
-  String? image;
+  AsciiImage? image;
   bool isPoll = false;
   List<String> pollOptions = ['', ''];
   final titleController = TextEditingController();
@@ -87,15 +90,27 @@ class _ComposePageState extends ConsumerState<ComposePage> {
 
   Future<void> _addImagePressed() async {
     ref.read(navBarProvider.notifier).disable();
-    final asciiArt = await context.pushNamed('camera');
+    final pickedImage = await context.pushNamed<XFile?>('camera');
+
+    if (pickedImage == null || !mounted) {
+      ref.read(navBarProvider.notifier).enable();
+      return;
+    }
+
+    final asciiImage = await context.pushNamed<AsciiImage?>('edit_picture',
+        extra: pickedImage);
+    setState(() {
+      image = asciiImage;
+    });
+
     ref.read(navBarProvider.notifier).enable();
 
-    if (asciiArt != null && asciiArt is String) {
-      setState(() {
-        image = asciiArt;
-        gif = null;
-      });
-    }
+    // if (asciiArt != null && asciiArt is String) {
+    //   setState(() {
+    //     image = asciiArt;
+    //     gif = null;
+    //   });
+    // }
   }
 
   void _addPollPressed() {
@@ -177,7 +192,8 @@ class _ComposePageState extends ConsumerState<ComposePage> {
       createdAt: DateTime.now().toUtc().toIso8601String(),
       isPoll: isPoll,
       pollOptions: isPoll ? pollOptions : null,
-      imageString: image,
+      //FIXME
+      imageString: image?.data,
       gifUrl: gif,
       title: parseTextToTags(title),
       body: parseTextToTags(body),
@@ -445,7 +461,8 @@ class _ComposePageState extends ConsumerState<ComposePage> {
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(10),
                                   child: image != null
-                                      ? ImageWidget(ascii: image!)
+                                      //FIXME
+                                      ? AsciiImageWidget(ascii: image!.data)
                                       : Image.network(
                                           // gif!.images!.fixedWidth.url,
                                           gif ?? '',
