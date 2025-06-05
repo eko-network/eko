@@ -36,11 +36,12 @@ class _EditPictureState extends State<EditPicture> {
         surfaceTintColor: Colors.transparent,
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios_rounded),
-          onPressed: () => context.pop(asciiPicture),
+          onPressed: () => context.pop(),
         ),
       ),
       body: Column(
         children: [
+          // Image.file(File(widget.picture.path)),
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(16),
@@ -56,44 +57,31 @@ class _EditPictureState extends State<EditPicture> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      // IconButton(
-                      //     onPressed: pickImage,
-                      //     icon: Icon(
-                      //       Icons.perm_media,
-                      //       color: Theme.of(context).colorScheme.onSurface,
-                      //     )),
-                      // if (asciiImage != null) ...[
-                      //   IconButton(
-                      //       onPressed: _toggleDarkMode,
-                      //       icon: Icon(
-                      //         (isDarkMode) ? Icons.dark_mode : Icons.light_mode,
-                      //         color: Theme.of(context).colorScheme.onSurface,
-                      //       )),
-                      if (asciiPicture != null)
-                        InkWell(
-                          onTap: () {
-                            context.pop(asciiPicture);
-                          },
-                          borderRadius: BorderRadius.circular(12),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 12),
-                            decoration: BoxDecoration(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    if (asciiPicture != null)
+                      InkWell(
+                        onTap: () {
+                          context.pop(asciiPicture);
+                        },
+                        borderRadius: BorderRadius.circular(12),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 12),
+                          decoration: BoxDecoration(
+                            color:
+                                Theme.of(context).colorScheme.primaryContainer,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(Icons.arrow_forward,
+                              size: 20,
                               color: Theme.of(context)
                                   .colorScheme
-                                  .primaryContainer,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Icon(Icons.arrow_forward,
-                                size: 20,
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onPrimaryContainer),
-                          ),
+                                  .onPrimaryContainer),
                         ),
-                    ]),
+                      ),
+                  ],
+                ),
               ],
             ),
           ),

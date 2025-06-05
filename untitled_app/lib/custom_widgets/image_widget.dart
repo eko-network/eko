@@ -8,7 +8,6 @@ class ImageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(ascii.version);
     return AsciiImageWidget(ascii: ascii);
   }
 }

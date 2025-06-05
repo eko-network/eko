@@ -1,6 +1,10 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:cross_file/cross_file.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gallery_saver_plus/gallery_saver.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_to_ascii/image_to_ascii.dart';
 import 'package:universal_html/js_util.dart';
@@ -99,18 +103,17 @@ class _ComposePageState extends ConsumerState<ComposePage> {
 
     final asciiImage = await context.pushNamed<AsciiImage?>('edit_picture',
         extra: pickedImage);
+
+    if (asciiImage != null) {
+      GallerySaver.saveImage(pickedImage.path, toDcim: true)
+          .then((_) => File(pickedImage.path).delete());
+    }
+
     setState(() {
       image = asciiImage;
     });
 
     ref.read(navBarProvider.notifier).enable();
-
-    // if (asciiArt != null && asciiArt is String) {
-    //   setState(() {
-    //     image = asciiArt;
-    //     gif = null;
-    //   });
-    // }
   }
 
   void _addPollPressed() {
