@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image_to_ascii/image_to_ascii.dart';
 import 'package:go_router/go_router.dart';
+import 'package:untitled_app/custom_widgets/image_widget.dart';
 
 class CameraPage extends StatelessWidget {
   const CameraPage({super.key});
@@ -32,7 +33,7 @@ class _InnerCameraPageState extends State<InnerCameraPage> {
   }
 
   void captureFrame() async {
-    final picture = await _ctrl?.takePicture();
+    final picture = await _ctrl.takePicture();
     if (picture != null) {
       if (mounted) context.pop(picture);
     }
@@ -74,8 +75,8 @@ class _InnerCameraPageState extends State<InnerCameraPage> {
                     //TODO
                     return Text(snapshot.error.toString());
                   } else if (snapshot.hasData && snapshot.data != null) {
-                    return AsciiImageWidget(
-                      ascii: snapshot.data!,
+                    return ImageWidget(
+                      ascii: AsciiImage.fromV0String(snapshot.data!),
                     );
                   }
                   return Center(child: CircularProgressIndicator());

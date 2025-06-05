@@ -19,8 +19,11 @@ mixin _$PostModel implements DiagnosticableTreeMixin {
   String get uid;
   String get id;
   String? get gifUrl;
-  @JsonKey(name: 'image')
-  String? get imageString;
+  @JsonKey(
+      name: 'image',
+      fromJson: _asciiImageFromString,
+      toJson: _asciiImageToString)
+  AsciiImage? get imageString;
   @JsonKey(fromJson: parseTextToTags, toJson: _joinList)
   List<String> get title;
   @JsonKey(fromJson: parseTextToTags, toJson: _joinList)
@@ -126,7 +129,11 @@ abstract mixin class $PostModelCopyWith<$Res> {
       {@JsonKey(name: 'author') String uid,
       String id,
       String? gifUrl,
-      @JsonKey(name: 'image') String? imageString,
+      @JsonKey(
+          name: 'image',
+          fromJson: _asciiImageFromString,
+          toJson: _asciiImageToString)
+      AsciiImage? imageString,
       @JsonKey(fromJson: parseTextToTags, toJson: _joinList) List<String> title,
       @JsonKey(fromJson: parseTextToTags, toJson: _joinList) List<String> body,
       List<String> tags,
@@ -182,7 +189,7 @@ class _$PostModelCopyWithImpl<$Res> implements $PostModelCopyWith<$Res> {
       imageString: freezed == imageString
           ? _self.imageString
           : imageString // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as AsciiImage?,
       title: null == title
           ? _self.title
           : title // ignore: cast_nullable_to_non_nullable
@@ -234,7 +241,11 @@ class _PostModel extends PostModel with DiagnosticableTreeMixin {
       {@JsonKey(name: 'author') required this.uid,
       required this.id,
       this.gifUrl,
-      @JsonKey(name: 'image') this.imageString,
+      @JsonKey(
+          name: 'image',
+          fromJson: _asciiImageFromString,
+          toJson: _asciiImageToString)
+      this.imageString,
       @JsonKey(fromJson: parseTextToTags, toJson: _joinList)
       final List<String> title = const <String>[],
       @JsonKey(fromJson: parseTextToTags, toJson: _joinList)
@@ -264,8 +275,11 @@ class _PostModel extends PostModel with DiagnosticableTreeMixin {
   @override
   final String? gifUrl;
   @override
-  @JsonKey(name: 'image')
-  final String? imageString;
+  @JsonKey(
+      name: 'image',
+      fromJson: _asciiImageFromString,
+      toJson: _asciiImageToString)
+  final AsciiImage? imageString;
   final List<String> _title;
   @override
   @JsonKey(fromJson: parseTextToTags, toJson: _joinList)
@@ -427,7 +441,11 @@ abstract mixin class _$PostModelCopyWith<$Res>
       {@JsonKey(name: 'author') String uid,
       String id,
       String? gifUrl,
-      @JsonKey(name: 'image') String? imageString,
+      @JsonKey(
+          name: 'image',
+          fromJson: _asciiImageFromString,
+          toJson: _asciiImageToString)
+      AsciiImage? imageString,
       @JsonKey(fromJson: parseTextToTags, toJson: _joinList) List<String> title,
       @JsonKey(fromJson: parseTextToTags, toJson: _joinList) List<String> body,
       List<String> tags,
@@ -483,7 +501,7 @@ class __$PostModelCopyWithImpl<$Res> implements _$PostModelCopyWith<$Res> {
       imageString: freezed == imageString
           ? _self.imageString
           : imageString // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as AsciiImage?,
       title: null == title
           ? _self._title
           : title // ignore: cast_nullable_to_non_nullable

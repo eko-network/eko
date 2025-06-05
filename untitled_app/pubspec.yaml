@@ -81,7 +81,7 @@ dependencies:
     # path: ../../image_to_ascii
     git:
       url: https://github.com/ericbreh/image_to_ascii.git
-      ref: d6d9d8ba023f6eed7dbd05e7dfd8f651d4ab6338
+      ref: ba311bebe4cc462bcc6c09b74f2695cfc4434abb
       
   image: ^3.3.0
   flutter_staggered_grid_view: ^0.7.0

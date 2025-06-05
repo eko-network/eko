@@ -192,8 +192,7 @@ class _ComposePageState extends ConsumerState<ComposePage> {
       createdAt: DateTime.now().toUtc().toIso8601String(),
       isPoll: isPoll,
       pollOptions: isPoll ? pollOptions : null,
-      //FIXME
-      imageString: image?.data,
+      imageString: image,
       gifUrl: gif,
       title: parseTextToTags(title),
       body: parseTextToTags(body),
@@ -462,8 +461,7 @@ class _ComposePageState extends ConsumerState<ComposePage> {
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(10),
                                   child: image != null
-                                      //FIXME
-                                      ? AsciiImageWidget(ascii: image!.data)
+                                      ? ImageWidget(ascii: image!)
                                       : Image.network(
                                           // gif!.images!.fixedWidth.url,
                                           gif ?? '',
