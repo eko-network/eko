@@ -24,10 +24,14 @@ class _EditPictureState extends State<EditPicture> {
   AsciiImage? asciiPicture;
   bool isDark = true;
   bool isColor = false;
+  int density = 150;
+  bool densityControllVisible = false;
+  bool downloading = false;
+  GlobalKey imageKey = GlobalKey();
 
   Future<void> convert() async {
     final cropped = await cropToAspectRatio(widget.picture.path,
-        desiredWidth: 150, vScale: 0.75);
+        desiredWidth: density, vScale: 0.75);
     final img =
         await convertImageToAscii(cropped, dark: isDark, color: isColor);
     setState(() {
@@ -49,14 +53,28 @@ class _EditPictureState extends State<EditPicture> {
     convert();
   }
 
+  void changeDensity(int newDensity) {
+    setState(() {
+      density = newDensity;
+    });
+    convert();
+  }
+
+  double mapDensityToSlider(int densityValue) {
+    // Linear mapping from [10,200] to [0,100]
+    return ((densityValue - 10) / 190) * 100;
+  }
+
+  int mapSliderToDensity(double sliderValue) {
+    // Linear mapping from [0,100] to [10,200]
+    return (sliderValue / 100 * 190 + 10).round();
+  }
+
   void copyPressed() {
     if (asciiPicture != null) {
       Clipboard.setData(ClipboardData(text: asciiPicture!.toDisplayString()));
     }
   }
-
-  bool downloading = false;
-  GlobalKey imageKey = GlobalKey();
 
   void downloadPressed() async {
     if (downloading) return;
@@ -71,7 +89,7 @@ class _EditPictureState extends State<EditPicture> {
     // Create a temporary file
     final Directory tempDir = await getTemporaryDirectory();
     final String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
-    final String tempPath = '${tempDir.path}/ascii_image_$timestamp.png';
+    final String tempPath = '${tempDir.path}/$timestamp.png';
 
     // Save to temp file
     File tempFile = File(tempPath);
@@ -128,20 +146,20 @@ class _EditPictureState extends State<EditPicture> {
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
+                SizedBox(width: 10),
                 InkWell(
                   onTap: () {
                     if (asciiPicture != null) context.pop(asciiPicture);
                   },
                   borderRadius: BorderRadius.circular(12),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 12),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                     decoration: BoxDecoration(
                       color: Theme.of(context).colorScheme.primaryContainer,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(Icons.arrow_forward,
-                        size: 20,
                         color:
                             Theme.of(context).colorScheme.onPrimaryContainer),
                   ),
@@ -162,6 +180,43 @@ class _EditPictureState extends State<EditPicture> {
                       key: imageKey, child: ImageWidget(ascii: asciiPicture!)),
             ),
           ),
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            height: densityControllVisible ? 60 : 0,
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Slider(
+                            value: mapDensityToSlider(density),
+                            min: 0,
+                            max: 100,
+                            divisions: 100,
+                            label:
+                                mapDensityToSlider(density).toInt().toString(),
+                            onChanged: (value) {
+                              setState(() {
+                                density = mapSliderToDensity(value);
+                              });
+                            },
+                            onChangeEnd: (value) {
+                              changeDensity(mapSliderToDensity(value));
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          // toolbar
           Padding(
             padding: EdgeInsets.only(bottom: 25),
             child: Row(
@@ -181,6 +236,20 @@ class _EditPictureState extends State<EditPicture> {
                     size: 35,
                     isColor ? Icons.palette : Icons.filter_b_and_w,
                     color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
+                IconButton(
+                  onPressed: () {
+                    setState(() {
+                      densityControllVisible = !densityControllVisible;
+                    });
+                  },
+                  icon: Icon(
+                    size: 35,
+                    Icons.tune,
+                    color: densityControllVisible
+                        ? Theme.of(context).colorScheme.primary
+                        : Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
               ],
