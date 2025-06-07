@@ -24,7 +24,6 @@ _PostModel _$PostModelFromJson(Map<String, dynamic> json) => _PostModel(
       dislikes: (json['dislikes'] as num?)?.toInt() ?? 0,
       commentCount: (json['commentCount'] as num?)?.toInt() ?? 0,
       createdAt: json['time'] as String,
-      isPoll: json['isPoll'] as bool? ?? false,
       pollOptions: (json['pollOptions'] as List<dynamic>?)
           ?.map((e) => e as String)
           .toList(),
@@ -46,7 +45,6 @@ Map<String, dynamic> _$PostModelToJson(_PostModel instance) =>
       'dislikes': instance.dislikes,
       'commentCount': instance.commentCount,
       'time': instance.createdAt,
-      'isPoll': instance.isPoll,
       'pollOptions': instance.pollOptions,
       'pollVoteCounts': instance.pollVoteCounts,
     };

@@ -147,7 +147,7 @@ class _InnerCameraPageState extends State<InnerCameraPage> {
             ),
           ),
           Padding(
-              padding: EdgeInsetsGeometry.only(bottom: 25),
+              padding: EdgeInsets.only(bottom: 25),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [

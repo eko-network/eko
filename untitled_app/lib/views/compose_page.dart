@@ -104,10 +104,11 @@ class _ComposePageState extends ConsumerState<ComposePage> {
     final asciiImage = await context.pushNamed<AsciiImage?>('edit_picture',
         extra: pickedImage);
 
-    if (asciiImage != null) {
-      GallerySaver.saveImage(pickedImage.path, toDcim: true)
-          .then((_) => File(pickedImage.path).delete());
-    }
+    // Removed since it saved even if you uploaded from camera roll
+    // if (asciiImage != null) {
+    //   GallerySaver.saveImage(pickedImage.path, toDcim: true)
+    //       .then((_) => File(pickedImage.path).delete());
+    // }
 
     setState(() {
       image = asciiImage;
@@ -193,7 +194,6 @@ class _ComposePageState extends ConsumerState<ComposePage> {
       dislikes: 0,
       commentCount: 0,
       createdAt: DateTime.now().toUtc().toIso8601String(),
-      isPoll: isPoll,
       pollOptions: isPoll ? pollOptions : null,
       imageString: image,
       gifUrl: gif,

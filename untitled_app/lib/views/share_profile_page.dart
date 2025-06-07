@@ -138,8 +138,8 @@ class _ShareProfileState extends ConsumerState<ShareProfile> {
                   _Icon(
                     icon: Icons.link,
                     text: linkCopied
-                        ? AppLocalizations.of(context)!.copyLink
-                        : AppLocalizations.of(context)!.copied,
+                        ? AppLocalizations.of(context)!.copied
+                        : AppLocalizations.of(context)!.copyLink,
                     onTap: () => copyLinkPressed(shareUrl),
                   )
                 ],

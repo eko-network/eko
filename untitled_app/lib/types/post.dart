@@ -54,7 +54,6 @@ abstract class PostModel with _$PostModel {
     @Default(0) int dislikes,
     @Default(0) int commentCount,
     @JsonKey(name: 'time') required String createdAt,
-    @Default(false) bool isPoll,
     List<String>? pollOptions,
     Map<String, int>? pollVoteCounts,
   }) = _PostModel;
