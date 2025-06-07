@@ -253,6 +253,7 @@
    
     "blockedAccounts":"Blocked Accounts",
     "newActivityNotifications":"New Activity Notifications",
+	"shareOnlineStatus":"Share Online Status",
 
 
     "blockedByUserMessage":"You do not currently have permission to view this content.",

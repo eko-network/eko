@@ -15,6 +15,7 @@ abstract class UserModel with _$UserModel {
     required List<String> following,
     required String uid,
     required bool isVerified,
+    @JsonKey(name: 'share_online_status') required bool shareOnlineStatus,
   }) = _UserModel;
 
   factory UserModel.userNotFound() {
@@ -28,6 +29,7 @@ abstract class UserModel with _$UserModel {
       followers: [],
       following: [],
       uid: '',
+      shareOnlineStatus: false,
     );
   }
 
@@ -47,6 +49,7 @@ abstract class UserModel with _$UserModel {
       following: List<String>.from(profileData['following'] ?? []),
       uid: json['uid'] ?? '',
       isVerified: json['isVerified'] ?? false,
+      shareOnlineStatus: json['share_online_status'] ?? true,
     );
   }
 }

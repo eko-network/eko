@@ -79,6 +79,16 @@ class CurrentUser extends _$CurrentUser {
     }
   }
 
+  Future<void> toggleShareOnlineStatus(bool selection) async {
+    state = state.copyWith(
+      user: state.user.copyWith(shareOnlineStatus: selection),
+    );
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(state.user.uid)
+        .update({'share_online_status': selection});
+  }
+
   Future<String?> _uploadProfilePicture(File img) async {
     final uid = state.user.uid;
     try {

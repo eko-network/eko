@@ -551,6 +551,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get newActivityNotifications => 'New Activity Notifications';
 
   @override
+  String get shareOnlineStatus => 'Share Online Status';
+
+  @override
   String get blockedByUserMessage =>
       'You do not currently have permission to view this content.';
 

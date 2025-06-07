@@ -1142,6 +1142,12 @@ abstract class AppLocalizations {
   /// **'New Activity Notifications'**
   String get newActivityNotifications;
 
+  /// No description provided for @shareOnlineStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Share Online Status'**
+  String get shareOnlineStatus;
+
   /// No description provided for @blockedByUserMessage.
   ///
   /// In en, this message translates to:

@@ -78,6 +78,16 @@ class _UserSettingsState extends ConsumerState<UserSettings> {
             },
             activeColor: Theme.of(context).colorScheme.primary,
           ),
+          SwitchListTile(
+            title: Text(AppLocalizations.of(context)!.shareOnlineStatus),
+            value: ref.watch(currentUserProvider).user.shareOnlineStatus,
+            onChanged: (value) {
+              ref
+                  .read(currentUserProvider.notifier)
+                  .toggleShareOnlineStatus(value);
+            },
+            activeColor: Theme.of(context).colorScheme.primary,
+          ),
           ListTile(
             title: Text(AppLocalizations.of(context)!.blockedAccounts),
             leading: const Icon(Icons.no_accounts_outlined),
