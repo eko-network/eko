@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:untitled_app/widgets/user_card.dart';
 import 'package:untitled_app/custom_widgets/warning_dialog.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
-import 'package:untitled_app/models/post_handler.dart';
 import 'package:untitled_app/utilities/locator.dart';
 import '../custom_widgets/controllers/pagination_controller.dart';
 import '../utilities/constants.dart' as c;
@@ -208,7 +207,8 @@ class EditGroupPageController extends ChangeNotifier {
     if (members.isNotEmpty) {
       GroupHandler().updateGroupMembers(group, members);
     } else {
-      locator<PostsHandling>().deleteData('groups/${group.id}');
+      // JUST REMOVED THIS, IDK WHAT IT DOES
+      // locator<PostsHandling>().deleteData('groups/${group.id}');
     }
     context.go('/groups', extra: true);
   }

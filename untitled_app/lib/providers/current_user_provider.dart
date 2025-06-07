@@ -1,14 +1,15 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:untitled_app/interfaces/activity.dart';
 import 'package:untitled_app/interfaces/user.dart';
-import 'package:untitled_app/models/post_handler.dart';
 import 'package:untitled_app/providers/auth_provider.dart';
 import 'package:untitled_app/providers/user_provider.dart';
 import 'package:untitled_app/types/current_user.dart';
-import 'package:untitled_app/utilities/locator.dart';
+import 'package:untitled_app/types/activity.dart';
 
 // Necessary for code-generation to work
 part '../generated/providers/current_user_provider.g.dart';
@@ -123,6 +124,11 @@ class CurrentUser extends _$CurrentUser {
 
   // END LIKES //
 
+  Future<void> signOut() async {
+    await removeFCM(state.user.uid);
+    await FirebaseAuth.instance.signOut();
+  }
+
   void addPollVote(String id, int optionIndex) {
     final votes = Map<String, int>.from(state.pollVotes);
     votes[id] = optionIndex;
@@ -220,7 +226,7 @@ class CurrentUser extends _$CurrentUser {
 
       // Update database
       final firestore = FirebaseFirestore.instance;
-      final uid = ref.read(authProvider).uid!;
+      final uid = state.user.uid;
       await Future.wait([
         firestore.collection('users').doc(uid).update({
           'profileData.following': FieldValue.arrayUnion([otherUid])
@@ -228,11 +234,14 @@ class CurrentUser extends _$CurrentUser {
         firestore.collection('users').doc(otherUid).update({
           'profileData.followers': FieldValue.arrayUnion([uid])
         }),
-        locator<PostsHandling>().addActivty(
-            type: 'follow',
-            content: 'Someone followed you',
-            path: uid,
-            user: otherUid)
+        uploadActivity(
+            ActivityModel(
+                createdAt: DateTime.now().toUtc().toIso8601String(),
+                id: '',
+                content: 'Someone followed you',
+                type: 'follow',
+                path: uid),
+            uid),
       ]);
     } catch (e) {
       // Revert state updates on error

@@ -10,7 +10,6 @@ import 'package:image_cropper/image_cropper.dart';
 import 'package:untitled_app/models/shared_pref_model.dart';
 import 'package:untitled_app/utilities/locator.dart';
 import '../models/users.dart';
-import '../models/post_handler.dart';
 
 class CurrentUser extends AppUser {
   bool newActivity = false;
@@ -214,11 +213,7 @@ class CurrentUser extends AppUser {
           firestore.collection('users').doc(otherUid).update({
             'profileData.followers': FieldValue.arrayUnion([user])
           }),
-          locator<PostsHandling>().addActivty(
-              type: 'follow',
-              content: 'Someone followed you',
-              path: user,
-              user: otherUid)
+          
         ]);
 
         following.add(otherUid);
@@ -742,7 +737,7 @@ class CurrentUser extends AppUser {
   }
 
   void clearVariables() {
-    locator<PostsHandling>().feedChunks.clear();
+  
     uid = '';
 
     name = '';

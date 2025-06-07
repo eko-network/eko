@@ -37,7 +37,6 @@ import 'package:untitled_app/models/group_handler.dart' show Group;
 import 'package:untitled_app/views/auth_action_interface.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:untitled_app/views/view_likes_page.dart';
-import 'package:untitled_app/views/update_required_page.dart';
 import 'package:untitled_app/widgets/gifs.dart';
 import 'package:untitled_app/widgets/require_auth.dart';
 import 'package:untitled_app/widgets/require_no_auth.dart';
@@ -102,13 +101,6 @@ final goRouter = GoRouter(
             name: 'download',
             builder: (context, state) {
               return const AppSafeArea(child: DownloadPage());
-            },
-          ),
-          GoRoute(
-            path: 'update',
-            name: 'update',
-            builder: (context, state) {
-              return const AppSafeArea(child: UpdateRequiredPage());
             },
           ),
           GoRoute(

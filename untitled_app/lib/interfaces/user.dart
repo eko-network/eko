@@ -59,6 +59,34 @@ Future<void> addFCM(String uid) async {
   }
 }
 
+Future<void> removeFCM(String uid) async {
+  if (!kIsWeb) {
+    // TODO: eventually needs to support timestamp
+    final DocumentReference userDocRef =
+        FirebaseFirestore.instance.collection('users').doc(uid);
+
+    try {
+      // Get the current data
+      final DocumentSnapshot userSnapshot = await userDocRef.get();
+      if (userSnapshot.exists) {
+        // Retrieve the FCM tokens array
+        List<String> fcmTokens =
+            List<String>.from(userSnapshot['fcmTokens'] ?? []);
+        final String? currentDeviceToken =
+            await FirebaseMessaging.instance.getToken();
+        // Remove the current device's FCM token from the array
+        fcmTokens.remove(currentDeviceToken);
+
+        // Update the Firestore document with the modified FCM tokens array
+        await userDocRef.update({'fcmTokens': fcmTokens});
+        setActivityNotification(false);
+      }
+    } catch (e) {
+      // TODO: Handle the error as needed
+    }
+  }
+}
+
 Future<String> forgotPassword(
     {required String? countryCode, required String email}) async {
   await FirebaseAuth.instance.setLanguageCode(countryCode);

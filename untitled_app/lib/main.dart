@@ -5,13 +5,13 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:untitled_app/interfaces/notification_helper.dart';
-import 'package:untitled_app/models/version_control.dart';
 import 'package:untitled_app/providers/theme_provider.dart';
 import 'package:untitled_app/utilities/logo_service.dart';
 import 'package:untitled_app/utilities/provider_debugger.dart';
 import 'package:untitled_app/utilities/shared_pref_service.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
+import 'package:untitled_app/widgets/check_verson.dart';
 import 'utilities/router.dart';
 import 'utilities/locator.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
@@ -30,9 +30,9 @@ Future<void> _checkFirstInstall() async {
   }
 }
 
-Future<void> _buildVersion() async {
-  if (!kIsWeb) await locator<Version>().init();
-}
+// Future<void> _buildVersion() async {
+//   if (!kIsWeb) await locator<Version>().init();
+// }
 
 Future<void> main() async {
   usePathUrlStrategy();
@@ -49,7 +49,6 @@ Future<void> main() async {
   //protected/dependent services
   await Future.wait([
     _checkFirstInstall(),
-    _buildVersion(),
     LogoService.init(),
     NotificationHelper.setupNotifications(),
     FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true)
@@ -61,7 +60,12 @@ Future<void> main() async {
   ]);
   final List<ProviderObserver>? observers =
       kDebugMode ? [ProviderDebuggerObserver()] : null;
-  runApp(ProviderScope(observers: observers, child: const MyApp()));
+  runApp(
+    ProviderScope(
+      observers: observers,
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends ConsumerWidget {
@@ -92,6 +96,7 @@ class MyApp extends ConsumerWidget {
           Locale('en'), // English
           Locale('es'), // Spanish
         ],
+        builder: (context, child) => CheckVersion(child: child),
         routerConfig: goRouter,
       ),
     );

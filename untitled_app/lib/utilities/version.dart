@@ -9,14 +9,13 @@ class Version {
   String targetVersion = '';
   String minimumVersion = '';
   Future<void> init() async {
-    await getCurrentAppVersion();
-    await getAppVersion();
+    await Future.wait([getCurrentAppVersion(), getAppVersion()]);
     lessThanMin = compareVersions(currentVersion, minimumVersion) == -1;
     lessThanTarget = compareVersions(currentVersion, targetVersion) == -1;
   }
 
 // Function to retrieve the current app version
-  Future<void> getCurrentAppVersion() async {
+  Future<void> getCurrentAppVersion() async  {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     currentVersion = packageInfo.version;
   }
