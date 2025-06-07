@@ -19,6 +19,8 @@ OnlineStatus _$OnlineStatusFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$OnlineStatus implements DiagnosticableTreeMixin {
   bool get online;
+  bool get valid;
+  String? get id;
   @JsonKey(name: 'last_changed')
   int get lastChanged;
 
@@ -38,6 +40,8 @@ mixin _$OnlineStatus implements DiagnosticableTreeMixin {
     properties
       ..add(DiagnosticsProperty('type', 'OnlineStatus'))
       ..add(DiagnosticsProperty('online', online))
+      ..add(DiagnosticsProperty('valid', valid))
+      ..add(DiagnosticsProperty('id', id))
       ..add(DiagnosticsProperty('lastChanged', lastChanged));
   }
 
@@ -47,17 +51,19 @@ mixin _$OnlineStatus implements DiagnosticableTreeMixin {
         (other.runtimeType == runtimeType &&
             other is OnlineStatus &&
             (identical(other.online, online) || other.online == online) &&
+            (identical(other.valid, valid) || other.valid == valid) &&
+            (identical(other.id, id) || other.id == id) &&
             (identical(other.lastChanged, lastChanged) ||
                 other.lastChanged == lastChanged));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, online, lastChanged);
+  int get hashCode => Object.hash(runtimeType, online, valid, id, lastChanged);
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'OnlineStatus(online: $online, lastChanged: $lastChanged)';
+    return 'OnlineStatus(online: $online, valid: $valid, id: $id, lastChanged: $lastChanged)';
   }
 }
 
@@ -67,7 +73,11 @@ abstract mixin class $OnlineStatusCopyWith<$Res> {
           OnlineStatus value, $Res Function(OnlineStatus) _then) =
       _$OnlineStatusCopyWithImpl;
   @useResult
-  $Res call({bool online, @JsonKey(name: 'last_changed') int lastChanged});
+  $Res call(
+      {bool online,
+      bool valid,
+      String? id,
+      @JsonKey(name: 'last_changed') int lastChanged});
 }
 
 /// @nodoc
@@ -83,6 +93,8 @@ class _$OnlineStatusCopyWithImpl<$Res> implements $OnlineStatusCopyWith<$Res> {
   @override
   $Res call({
     Object? online = null,
+    Object? valid = null,
+    Object? id = freezed,
     Object? lastChanged = null,
   }) {
     return _then(_self.copyWith(
@@ -90,6 +102,14 @@ class _$OnlineStatusCopyWithImpl<$Res> implements $OnlineStatusCopyWith<$Res> {
           ? _self.online
           : online // ignore: cast_nullable_to_non_nullable
               as bool,
+      valid: null == valid
+          ? _self.valid
+          : valid // ignore: cast_nullable_to_non_nullable
+              as bool,
+      id: freezed == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String?,
       lastChanged: null == lastChanged
           ? _self.lastChanged
           : lastChanged // ignore: cast_nullable_to_non_nullable
@@ -104,11 +124,17 @@ class _$OnlineStatusCopyWithImpl<$Res> implements $OnlineStatusCopyWith<$Res> {
 class _ with DiagnosticableTreeMixin implements OnlineStatus {
   const _(
       {required this.online,
+      required this.valid,
+      required this.id,
       @JsonKey(name: 'last_changed') required this.lastChanged});
   factory _.fromJson(Map<String, dynamic> json) => _$FromJson(json);
 
   @override
   final bool online;
+  @override
+  final bool valid;
+  @override
+  final String? id;
   @override
   @JsonKey(name: 'last_changed')
   final int lastChanged;
@@ -132,6 +158,8 @@ class _ with DiagnosticableTreeMixin implements OnlineStatus {
     properties
       ..add(DiagnosticsProperty('type', 'OnlineStatus'))
       ..add(DiagnosticsProperty('online', online))
+      ..add(DiagnosticsProperty('valid', valid))
+      ..add(DiagnosticsProperty('id', id))
       ..add(DiagnosticsProperty('lastChanged', lastChanged));
   }
 
@@ -141,17 +169,19 @@ class _ with DiagnosticableTreeMixin implements OnlineStatus {
         (other.runtimeType == runtimeType &&
             other is _ &&
             (identical(other.online, online) || other.online == online) &&
+            (identical(other.valid, valid) || other.valid == valid) &&
+            (identical(other.id, id) || other.id == id) &&
             (identical(other.lastChanged, lastChanged) ||
                 other.lastChanged == lastChanged));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, online, lastChanged);
+  int get hashCode => Object.hash(runtimeType, online, valid, id, lastChanged);
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'OnlineStatus(online: $online, lastChanged: $lastChanged)';
+    return 'OnlineStatus(online: $online, valid: $valid, id: $id, lastChanged: $lastChanged)';
   }
 }
 
@@ -160,7 +190,11 @@ abstract mixin class _$CopyWith<$Res> implements $OnlineStatusCopyWith<$Res> {
   factory _$CopyWith(_ value, $Res Function(_) _then) = __$CopyWithImpl;
   @override
   @useResult
-  $Res call({bool online, @JsonKey(name: 'last_changed') int lastChanged});
+  $Res call(
+      {bool online,
+      bool valid,
+      String? id,
+      @JsonKey(name: 'last_changed') int lastChanged});
 }
 
 /// @nodoc
@@ -176,6 +210,8 @@ class __$CopyWithImpl<$Res> implements _$CopyWith<$Res> {
   @pragma('vm:prefer-inline')
   $Res call({
     Object? online = null,
+    Object? valid = null,
+    Object? id = freezed,
     Object? lastChanged = null,
   }) {
     return _then(_(
@@ -183,6 +219,14 @@ class __$CopyWithImpl<$Res> implements _$CopyWith<$Res> {
           ? _self.online
           : online // ignore: cast_nullable_to_non_nullable
               as bool,
+      valid: null == valid
+          ? _self.valid
+          : valid // ignore: cast_nullable_to_non_nullable
+              as bool,
+      id: freezed == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String?,
       lastChanged: null == lastChanged
           ? _self.lastChanged
           : lastChanged // ignore: cast_nullable_to_non_nullable

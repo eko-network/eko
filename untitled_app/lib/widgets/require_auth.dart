@@ -5,6 +5,7 @@ import 'package:untitled_app/providers/auth_provider.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
 import 'package:untitled_app/providers/online_provider.dart';
 import 'package:untitled_app/types/online_status.dart';
+import 'package:untitled_app/views/invalid_session_page.dart';
 import 'package:untitled_app/widgets/loading_spinner.dart';
 
 class RequireAuth extends ConsumerWidget {
@@ -29,6 +30,13 @@ class RequireAuth extends ConsumerWidget {
     }
     // force one device on
     OnlineStatus online = ref.watch(onlineProvider(auth.uid!));
+    print(online.valid);
+    if (!online.valid) {
+      return InvalidSessionPage();
+    }
+    // else {
+    //      ref.read(onlineProvider(auth.uid!).notifier).setSessionActive();
+    //    }
     // check the timestamp algorithm TODO
     return child;
   }

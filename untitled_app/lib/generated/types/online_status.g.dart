@@ -8,10 +8,14 @@ part of '../../types/online_status.dart';
 
 _ _$FromJson(Map<String, dynamic> json) => _(
       online: json['online'] as bool,
+      valid: json['valid'] as bool,
+      id: json['id'] as String?,
       lastChanged: (json['last_changed'] as num).toInt(),
     );
 
 Map<String, dynamic> _$ToJson(_ instance) => <String, dynamic>{
       'online': instance.online,
+      'valid': instance.valid,
+      'id': instance.id,
       'last_changed': instance.lastChanged,
     };

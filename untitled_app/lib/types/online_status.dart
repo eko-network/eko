@@ -8,6 +8,8 @@ abstract class OnlineStatus with _$OnlineStatus {
   @JsonSerializable(explicitToJson: true)
   const factory OnlineStatus({
     required bool online,
+    required bool valid,
+    required String? id,
     @JsonKey(name: 'last_changed') required int lastChanged,
   }) = _;
 
