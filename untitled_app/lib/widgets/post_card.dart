@@ -334,8 +334,6 @@ class PostCardFromPost extends ConsumerWidget {
                               padding: EdgeInsets.only(bottom: 6),
                               child: PollWidget(
                                 postId: post.id,
-                                options: post.pollOptions!,
-                                pollVoteCounts: post.pollVoteCounts ?? {},
                                 isPreview: isPreview,
                               )),
                         if (post.body.isNotEmpty) TextWithTags(text: post.body),
