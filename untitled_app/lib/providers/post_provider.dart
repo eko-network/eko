@@ -13,6 +13,7 @@ part '../generated/providers/post_provider.g.dart';
 class Post extends _$Post {
   Timer? _disposeTimer;
   bool _isLiking = false;
+  bool _isVoting = false;
   @override
   FutureOr<PostModel> build(String id) {
     // *** This block is for lifecycle management *** //
@@ -197,5 +198,94 @@ class Post extends _$Post {
       }
     }
     _isLiking = false;
+  }
+
+  Future<void> _addVoteToDb(String id, int optionIndex) async {
+    final firestore = FirebaseFirestore.instance;
+    final uid = ref.read(currentUserProvider).user.uid;
+    await Future.wait([
+      firestore
+          .collection('users')
+          .doc(uid)
+          .update({'profileData.pollVotes.$id': optionIndex}),
+      firestore
+          .collection('posts')
+          .doc(id)
+          .update({'pollVoteCounts.$optionIndex': FieldValue.increment(1)}),
+    ]);
+  }
+
+  Future<void> _removeVoteFromDb(String id, int currentVote) async {
+    final firestore = FirebaseFirestore.instance;
+    final uid = ref.read(currentUserProvider).user.uid;
+    await Future.wait([
+      firestore
+          .collection('users')
+          .doc(uid)
+          .update({'profileData.pollVotes.$id': FieldValue.delete()}),
+      firestore
+          .collection('posts')
+          .doc(id)
+          .update({'pollVoteCounts.$currentVote': FieldValue.increment(-1)}),
+    ]);
+  }
+
+  Future<void> addPollVote({required int optionIndex}) async {
+    final prevState = await future;
+    if (_isVoting ||
+        ref.read(currentUserProvider).pollVotes.containsKey(prevState.id)) {
+      return;
+    }
+    _isVoting = true;
+
+    ref
+        .read(currentUserProvider.notifier)
+        .addPollVote(prevState.id, optionIndex);
+
+    final updatedPollVoteCounts =
+        Map<String, int>.from(prevState.pollVoteCounts ?? {});
+    updatedPollVoteCounts[optionIndex.toString()] =
+        (updatedPollVoteCounts[optionIndex.toString()] ?? 0) + 1;
+
+    state =
+        AsyncData(prevState.copyWith(pollVoteCounts: updatedPollVoteCounts));
+
+    try {
+      await _addVoteToDb(prevState.id, optionIndex);
+    } catch (_) {
+      ref.read(currentUserProvider.notifier).removePollVote(prevState.id);
+      state = AsyncData(prevState);
+    }
+
+    _isVoting = false;
+  }
+
+  Future<void> removePollVote() async {
+    final prevState = await future;
+    if (_isVoting ||
+        !ref.read(currentUserProvider).pollVotes.containsKey(prevState.id)) {
+      return;
+    }
+    _isVoting = true;
+    final currentVote = ref.read(currentUserProvider).pollVotes[prevState.id]!;
+
+    ref.read(currentUserProvider.notifier).removePollVote(prevState.id);
+
+    final updatedPollVoteCounts =
+        Map<String, int>.from(prevState.pollVoteCounts!);
+    updatedPollVoteCounts[currentVote.toString()] =
+        (updatedPollVoteCounts[currentVote.toString()] ?? 1) - 1;
+
+    state =
+        AsyncData(prevState.copyWith(pollVoteCounts: updatedPollVoteCounts));
+
+    try {
+      await _removeVoteFromDb(prevState.id, currentVote);
+    } catch (_) {
+      ref.read(currentUserProvider.notifier).removePollVote(prevState.id);
+      state = AsyncData(prevState);
+    }
+
+    _isVoting = false;
   }
 }

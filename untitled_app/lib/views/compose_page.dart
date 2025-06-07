@@ -1,6 +1,13 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:cross_file/cross_file.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gallery_saver_plus/gallery_saver.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_to_ascii/image_to_ascii.dart';
+import 'package:universal_html/js_util.dart';
 import 'package:untitled_app/custom_widgets/error_snack_bar.dart';
 import 'package:untitled_app/widgets/group_card.dart';
 import 'package:untitled_app/custom_widgets/image_widget.dart';
@@ -33,7 +40,7 @@ class _ComposePageState extends ConsumerState<ComposePage> {
   final _key = GlobalKey<ExpandableFabState>();
   String? audiance;
   String? gif;
-  String? image;
+  AsciiImage? image;
   bool isPoll = false;
   List<String> pollOptions = ['', ''];
   final titleController = TextEditingController();
@@ -87,15 +94,27 @@ class _ComposePageState extends ConsumerState<ComposePage> {
 
   Future<void> _addImagePressed() async {
     ref.read(navBarProvider.notifier).disable();
-    final asciiArt = await context.pushNamed('camera');
-    ref.read(navBarProvider.notifier).enable();
+    final pickedImage = await context.pushNamed<XFile?>('camera');
 
-    if (asciiArt != null && asciiArt is String) {
-      setState(() {
-        image = asciiArt;
-        gif = null;
-      });
+    if (pickedImage == null || !mounted) {
+      ref.read(navBarProvider.notifier).enable();
+      return;
     }
+
+    final asciiImage = await context.pushNamed<AsciiImage?>('edit_picture',
+        extra: pickedImage);
+
+    // Removed since it saved even if you uploaded from camera roll
+    // if (asciiImage != null) {
+    //   GallerySaver.saveImage(pickedImage.path, toDcim: true)
+    //       .then((_) => File(pickedImage.path).delete());
+    // }
+
+    setState(() {
+      image = asciiImage;
+    });
+
+    ref.read(navBarProvider.notifier).enable();
   }
 
   void _addPollPressed() {
@@ -175,7 +194,6 @@ class _ComposePageState extends ConsumerState<ComposePage> {
       dislikes: 0,
       commentCount: 0,
       createdAt: DateTime.now().toUtc().toIso8601String(),
-      isPoll: isPoll,
       pollOptions: isPoll ? pollOptions : null,
       imageString: image,
       gifUrl: gif,

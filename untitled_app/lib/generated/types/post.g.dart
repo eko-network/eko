@@ -10,7 +10,7 @@ _PostModel _$PostModelFromJson(Map<String, dynamic> json) => _PostModel(
       uid: json['author'] as String,
       id: json['id'] as String,
       gifUrl: json['gifUrl'] as String?,
-      imageString: json['image'] as String?,
+      imageString: _asciiImageFromString(json['image'] as String?),
       title: json['title'] == null
           ? const <String>[]
           : parseTextToTags(json['title'] as String?),
@@ -24,7 +24,6 @@ _PostModel _$PostModelFromJson(Map<String, dynamic> json) => _PostModel(
       dislikes: (json['dislikes'] as num?)?.toInt() ?? 0,
       commentCount: (json['commentCount'] as num?)?.toInt() ?? 0,
       createdAt: json['time'] as String,
-      isPoll: json['isPoll'] as bool? ?? false,
       pollOptions: (json['pollOptions'] as List<dynamic>?)
           ?.map((e) => e as String)
           .toList(),
@@ -38,7 +37,7 @@ Map<String, dynamic> _$PostModelToJson(_PostModel instance) =>
       'author': instance.uid,
       'id': instance.id,
       'gifUrl': instance.gifUrl,
-      'image': instance.imageString,
+      'image': _asciiImageToString(instance.imageString),
       'title': _joinList(instance.title),
       'body': _joinList(instance.body),
       'tags': instance.tags,
@@ -46,7 +45,6 @@ Map<String, dynamic> _$PostModelToJson(_PostModel instance) =>
       'dislikes': instance.dislikes,
       'commentCount': instance.commentCount,
       'time': instance.createdAt,
-      'isPoll': instance.isPoll,
       'pollOptions': instance.pollOptions,
       'pollVoteCounts': instance.pollVoteCounts,
     };

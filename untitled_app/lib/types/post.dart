@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:image_to_ascii/image_to_ascii.dart';
 import 'package:untitled_app/interfaces/post.dart';
+import 'dart:convert';
 part '../generated/types/post.freezed.dart';
 part '../generated/types/post.g.dart';
 
@@ -12,6 +14,17 @@ String _joinList(List<String>? list) {
   return list.join('');
 }
 
+String? _asciiImageToString(AsciiImage? image) {
+  if (image == null) return null;
+  final json = image.toJson();
+  return jsonEncode(json);
+}
+
+AsciiImage? _asciiImageFromString(String? image) {
+  if (image == null) return null;
+  return AsciiImage.fromString(image);
+}
+
 @freezed
 abstract class PostModel with _$PostModel {
   const PostModel._();
@@ -19,7 +32,11 @@ abstract class PostModel with _$PostModel {
     @JsonKey(name: 'author') required String uid,
     required String id,
     String? gifUrl,
-    @JsonKey(name: 'image') String? imageString,
+    @JsonKey(
+        name: 'image',
+        fromJson: _asciiImageFromString,
+        toJson: _asciiImageToString)
+    AsciiImage? imageString,
     @Default(<String>[])
     @JsonKey(
       fromJson: parseTextToTags,
@@ -37,7 +54,6 @@ abstract class PostModel with _$PostModel {
     @Default(0) int dislikes,
     @Default(0) int commentCount,
     @JsonKey(name: 'time') required String createdAt,
-    @Default(false) bool isPoll,
     List<String>? pollOptions,
     Map<String, int>? pollVoteCounts,
   }) = _PostModel;

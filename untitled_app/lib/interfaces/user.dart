@@ -81,3 +81,21 @@ Future<String?> getUidFromUsername(String username) async {
     return querySnapshot.docs.first.id;
   }
 }
+
+Future<String> verifyPasswordReset(String code) async {
+  try {
+    return await FirebaseAuth.instance.verifyPasswordResetCode(code);
+  } on FirebaseAuthException {
+    rethrow;
+  }
+}
+
+Future<String> resetPassword(String code, String password) async {
+  try {
+    await FirebaseAuth.instance
+        .confirmPasswordReset(code: code, newPassword: password);
+    return 'success';
+  } on FirebaseAuthException catch (e) {
+    return (e.code);
+  }
+}

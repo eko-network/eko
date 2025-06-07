@@ -117,6 +117,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           title: Text(AppLocalizations.of(context)!.resetPassword),
           content: SingleChildScrollView(
             child: CustomInputField(
+              autofillHints: [AutofillHints.email],
               label: AppLocalizations.of(context)!.email,
               controller: emailController,
               inputType: TextInputType.emailAddress,
@@ -196,20 +197,28 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 ),
               ),
               SizedBox(height: height * .05),
-              CustomInputField(
-                focus: emailFocus,
-                label: AppLocalizations.of(context)!.email,
-                controller: emailController,
-                inputType: TextInputType.emailAddress,
-              ),
-              CustomInputField(
-                textInputAction: TextInputAction.go,
-                onEditingComplete: () => loginPressed(),
-                focus: passwordFocus,
-                label: AppLocalizations.of(context)!.password,
-                controller: passwordController,
-                inputType: TextInputType.visiblePassword,
-                password: true,
+              AutofillGroup(
+                child: Column(
+                  children: [
+                    CustomInputField(
+                      autofillHints: [AutofillHints.email],
+                      focus: emailFocus,
+                      label: AppLocalizations.of(context)!.email,
+                      controller: emailController,
+                      inputType: TextInputType.emailAddress,
+                    ),
+                    CustomInputField(
+                      autofillHints: [AutofillHints.password],
+                      textInputAction: TextInputAction.go,
+                      onEditingComplete: () => loginPressed(),
+                      focus: passwordFocus,
+                      label: AppLocalizations.of(context)!.password,
+                      controller: passwordController,
+                      inputType: TextInputType.visiblePassword,
+                      password: true,
+                    ),
+                  ],
+                ),
               ),
               SizedBox(height: height * 0.015),
               SizedBox(

@@ -18,6 +18,7 @@ class CustomInputField extends StatefulWidget {
   final bool showCounter;
   final TextInputAction textInputAction;
   final double? height;
+  final Iterable<String>? autofillHints;
 
   final void Function(String)? onChanged;
   final void Function()? onEditingComplete;
@@ -29,6 +30,7 @@ class CustomInputField extends StatefulWidget {
       this.padding = true,
       this.onEditingComplete,
       this.focus,
+      this.autofillHints,
       this.width,
       this.height,
       this.showCounter = true,
@@ -72,6 +74,7 @@ class _CustomInputField extends State<CustomInputField> {
       width: feildWidth,
       height: widget.height,
       child: TextFormField(
+        autofillHints: widget.autofillHints,
         maxLength: widget.maxLen,
         cursorColor: Theme.of(context).colorScheme.onSurface,
         obscureText: hidden,

@@ -1,260 +1,253 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:untitled_app/interfaces/user.dart';
+import 'package:untitled_app/widgets/create_password.dart';
 import 'package:untitled_app/widgets/loading_spinner.dart';
-import '../custom_widgets/login_text_feild.dart';
-
-import 'package:provider/provider.dart' as prov;
 import 'package:untitled_app/localization/generated/app_localizations.dart';
-import '../controllers/auth_action_interface_controller.dart';
+import '../custom_widgets/warning_dialog.dart';
 import '../utilities/constants.dart' as c;
 
-class AuthActionInterface extends StatelessWidget {
+//Forgot password page
+
+class AuthActionInterface extends StatefulWidget {
   final Map<String, String> urlData;
   const AuthActionInterface({super.key, required this.urlData});
 
   @override
-  Widget build(BuildContext context) {
-    return prov.ChangeNotifierProvider(
-      create: (context) =>
-          AuthActionInterfaceController(context: context, urlData: urlData),
-      builder: (context, child) {
-        return PopScope(
-          canPop: false,
-          onPopInvoked: (didPop) =>
-              prov.Provider.of<AuthActionInterfaceController>(context,
-                      listen: false)
-                  .backPressed(didPop: didPop),
-          child: Center(
-            child: SizedBox(
-              width: c.widthGetter(context),
-              child: PageView(
-                controller: prov.Provider.of<AuthActionInterfaceController>(
-                        context,
-                        listen: false)
-                    .pageController,
-                physics: const NeverScrollableScrollPhysics(),
-                children: const <Widget>[
-                  _LoadingPage(),
-                  _InvalidPage(),
-                  _ResetPasswordPage(),
+  State<AuthActionInterface> createState() => _AuthActionInterfaceState();
+}
+
+class _AuthActionInterfaceState extends State<AuthActionInterface> {
+  final passwordController = TextEditingController();
+  final confirmPasswordController = TextEditingController();
+  final passwordFocus = FocusNode();
+  final confirmPasswordFocus = FocusNode();
+  String email = '';
+
+  bool isLoading = false;
+
+  void showExitWarning() {
+    showMyDialog(
+        AppLocalizations.of(context)!.exitEditProfileTitle,
+        '',
+        [
+          AppLocalizations.of(context)!.exit,
+          AppLocalizations.of(context)!.stay
+        ],
+        [
+          () {
+            context.pop();
+            context.pop();
+          },
+          context.pop
+        ],
+        context);
+  }
+
+  Future<void> setPasswordPressed() async {
+    FocusManager.instance.primaryFocus?.unfocus();
+    if (passwordController.text == '') {
+      passwordFocus.requestFocus();
+    } else {
+      if (isValidPassword(
+          passwordController.text, confirmPasswordController.text)) {
+        setState(() {
+          isLoading = true;
+        });
+        if ((await resetPassword(
+                widget.urlData['oobCode'] ?? '', passwordController.text)) ==
+            'success') {
+          if (mounted) {
+            showMyDialog(
+                AppLocalizations.of(context)!.passwordResetTitle,
+                AppLocalizations.of(context)!.passwordResetBody,
+                [AppLocalizations.of(context)!.ok],
+                [
+                  () {
+                    context.pop();
+                    context.go('/login');
+                  }
                 ],
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-}
+                context);
+          }
+        } else {
+          passwordController.text = '';
+          confirmPasswordController.text = '';
+          setState(() {
+            index = 1;
+          });
+        }
 
-class _LoadingPage extends StatelessWidget {
-  const _LoadingPage();
+        setState(() {
+          isLoading = true;
+        });
+      } else {
+        showMyDialog(
+            AppLocalizations.of(context)!.weakPasswordTitle,
+            AppLocalizations.of(context)!.weakPasswordBody,
+            [AppLocalizations.of(context)!.tryAgain],
+            [context.pop],
+            context);
+      }
+    }
+  }
 
   @override
-  Widget build(BuildContext context) {
-    return const Center(child: LoadingSpinner());
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if ((widget.urlData['mode'] ?? '') == 'resetPassword') {
+        try {
+          final userEmail =
+              await verifyPasswordReset(widget.urlData['oobCode'] ?? '');
+          setState(() {
+            email = userEmail;
+            index = 2;
+          });
+        } on FirebaseAuthException {
+          setState(() {
+            index = 1;
+          });
+        }
+      } else {
+        setState(() {
+          index = 1;
+        });
+      }
+    });
+    super.initState();
   }
-}
-
-class _InvalidPage extends StatelessWidget {
-  const _InvalidPage();
 
   @override
-  Widget build(BuildContext context) {
-    final width = c.widthGetter(context);
-    return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SizedBox(
-              width: width * 0.8,
-              child: Text(
-                AppLocalizations.of(context)!.badAuthState,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface,
-                    fontSize: 18),
-              ),
-            ),
-            TextButton(
-              onPressed: () => prov.Provider.of<AuthActionInterfaceController>(
-                      context,
-                      listen: false)
-                  .exitOnPagePressed(),
-              style: TextButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.primary),
-              child: Text(
-                AppLocalizations.of(context)!.exit,
-                style:
-                    TextStyle(color: Theme.of(context).colorScheme.onPrimary),
-              ),
-            )
-          ],
-        ),
-      ),
-    );
+  void dispose() {
+    passwordController.dispose();
+    confirmPasswordFocus.dispose();
+    confirmPasswordController.dispose();
+    passwordFocus.dispose();
+    super.dispose();
   }
-}
 
-class _ResetPasswordPage extends StatelessWidget {
-  const _ResetPasswordPage();
-
+  int index = 0;
   @override
   Widget build(BuildContext context) {
-    final width = c.widthGetter(context);
     final height = MediaQuery.sizeOf(context).height;
-    return Scaffold(
-      body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: width * 0.05),
-        child: Center(
-          child: ListView(
-            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-            children: [
-              // const _BackButton(),
-              // SizedBox(
-              //     height: height * .1,
-              //     child: Align(
-              //       child: Text(AppLocalizations.of(context)!.createAPassword,
-              //           style: TextStyle(
-              //               fontSize: 35,
-              //               color: Theme.of(context).colorScheme.onBackground)),
-              //     )),
-              // Divider(
-              //   height: 0,
-              //   thickness: height * 0.002,
-              //   indent: width * 0.07,
-              //   endIndent: width * 0.07,
-              //   color: Theme.of(context).colorScheme.onBackground,
-              // ),
-              SizedBox(
-                height: height * 0.03,
-              ),
-              Text(
-                '${AppLocalizations.of(context)!.resetPasswordPromt} ${prov.Provider.of<AuthActionInterfaceController>(context, listen: true).userEmail}',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface,
-                    fontSize: 20),
-              ),
-
-              SizedBox(height: height * c.loginPadding),
-              CustomInputField(
-                onChanged: (s) =>
-                    prov.Provider.of<AuthActionInterfaceController>(context,
-                            listen: false)
-                        .passwordChanged(),
-                onEditingComplete: () =>
-                    prov.Provider.of<AuthActionInterfaceController>(context,
-                            listen: false)
-                        .passwordConfirmFocus
-                        .requestFocus(),
-                label: AppLocalizations.of(context)!.password,
-                focus: prov.Provider.of<AuthActionInterfaceController>(context,
-                        listen: false)
-                    .passwordFocus,
-                controller: prov.Provider.of<AuthActionInterfaceController>(
-                        context,
-                        listen: false)
-                    .passwordController,
-                inputType: TextInputType.visiblePassword,
-                password: true,
-              ),
-              SizedBox(height: height * c.loginPadding),
-              CustomInputField(
-                onChanged: (s) =>
-                    prov.Provider.of<AuthActionInterfaceController>(context,
-                            listen: false)
-                        .passwordChanged(),
-                onEditingComplete: () =>
-                    prov.Provider.of<AuthActionInterfaceController>(context,
-                            listen: false)
-                        .setPasswordPressed(),
-                textInputAction: TextInputAction.done,
-                label: AppLocalizations.of(context)!.confirmPassword,
-                focus: prov.Provider.of<AuthActionInterfaceController>(context,
-                        listen: false)
-                    .passwordConfirmFocus,
-                controller: prov.Provider.of<AuthActionInterfaceController>(
-                        context,
-                        listen: false)
-                    .passwordConfirmController,
-                inputType: TextInputType.visiblePassword,
-                password: true,
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(
-                  vertical: height * c.loginPadding,
-                ),
-                child: LinearProgressIndicator(
-                  minHeight: 12,
-                  value: prov.Provider.of<AuthActionInterfaceController>(
-                          context,
-                          listen: true)
-                      .passwordPercent,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-              ),
-              Container(
-                alignment: Alignment.centerLeft,
-                child: prov.Consumer<AuthActionInterfaceController>(
-                  builder: (context, signUpController, _) => Text(
-                    '${signUpController.passed[0]}${AppLocalizations.of(context)!.passwordLen}\n'
-                    '${signUpController.passed[1]}${AppLocalizations.of(context)!.passwordLower}\n'
-                    '${signUpController.passed[2]}${AppLocalizations.of(context)!.passwordUpper}\n'
-                    '${signUpController.passed[3]}${AppLocalizations.of(context)!.passwordNumber}\n'
-                    '${signUpController.passed[4]}${AppLocalizations.of(context)!.passwordSpecial}\n'
-                    '${signUpController.passed[5]}${AppLocalizations.of(context)!.passwordMatch}\n',
-                    style: const TextStyle(fontSize: 16),
+    final width = c.widthGetter(context);
+    return PopScope(
+      canPop: index == 1,
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop) return;
+        if (index == 2) {
+          showExitWarning();
+        }
+      },
+      child: Center(
+        child: SizedBox(
+          width: width,
+          child: IndexedStack(
+            index: index,
+            children: <Widget>[
+              Center(child: LoadingSpinner()),
+              Scaffold(
+                body: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        width: width * 0.8,
+                        child: Text(
+                          AppLocalizations.of(context)!.badAuthState,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface,
+                              fontSize: 18),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () => context.go('/'),
+                        style: TextButton.styleFrom(
+                            backgroundColor:
+                                Theme.of(context).colorScheme.primary),
+                        child: Text(
+                          AppLocalizations.of(context)!.exit,
+                          style: TextStyle(
+                              color: Theme.of(context).colorScheme.onPrimary),
+                        ),
+                      )
+                    ],
                   ),
                 ),
               ),
-              //const Spacer(),
-              SizedBox(
-                height: height * 0.05,
-              ),
-              SizedBox(
-                width: width * 0.9,
-                height: width * 0.15,
-                child: TextButton(
-                  onPressed: () =>
-                      prov.Provider.of<AuthActionInterfaceController>(context,
-                              listen: false)
-                          .setPasswordPressed(),
-                  style: TextButton.styleFrom(
-                      backgroundColor: Theme.of(context).colorScheme.primary),
-                  child: prov.Provider.of<AuthActionInterfaceController>(
-                              context,
-                              listen: true)
-                          .loggingIn
-                      ? CircularProgressIndicator(
-                          color: Theme.of(context).colorScheme.onPrimary,
-                        )
-                      : Text(
-                          AppLocalizations.of(context)!.setPassword,
-                          overflow: TextOverflow.ellipsis,
+              Scaffold(
+                body: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: width * 0.05),
+                  child: Center(
+                    child: ListView(
+                      keyboardDismissBehavior:
+                          ScrollViewKeyboardDismissBehavior.onDrag,
+                      children: [
+                        SizedBox(
+                          height: height * 0.03,
+                        ),
+                        Text(
+                          '${AppLocalizations.of(context)!.resetPasswordPromt} $email',
+                          textAlign: TextAlign.center,
                           style: TextStyle(
-                            fontSize: 18,
-                            letterSpacing: 1,
-                            fontWeight: FontWeight.normal,
-                            color: Theme.of(context).colorScheme.onPrimary,
+                              color: Theme.of(context).colorScheme.onSurface,
+                              fontSize: 20),
+                        ),
+                        SizedBox(height: height * c.loginPadding),
+                        CreatePassword(
+                          passwordController: passwordController,
+                          confirmPasswordController: confirmPasswordController,
+                          passwordFocus: passwordFocus,
+                          confirmPasswordFocus: confirmPasswordFocus,
+                        ),
+                        SizedBox(
+                          height: height * 0.05,
+                        ),
+                        SizedBox(
+                          width: width * 0.9,
+                          height: width * 0.15,
+                          child: TextButton(
+                            onPressed: () => setPasswordPressed(),
+                            style: TextButton.styleFrom(
+                                backgroundColor:
+                                    Theme.of(context).colorScheme.primary),
+                            child: isLoading
+                                ? CircularProgressIndicator(
+                                    color:
+                                        Theme.of(context).colorScheme.onPrimary,
+                                  )
+                                : Text(
+                                    AppLocalizations.of(context)!.setPassword,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      letterSpacing: 1,
+                                      fontWeight: FontWeight.normal,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onPrimary,
+                                    ),
+                                  ),
                           ),
                         ),
+                        TextButton(
+                          child: Text(
+                            AppLocalizations.of(context)!.cancel,
+                            style: TextStyle(
+                                decoration: TextDecoration.underline,
+                                color: Theme.of(context).colorScheme.onSurface,
+                                fontSize: 18),
+                          ),
+                          onPressed: () => showExitWarning(),
+                        ),
+                        SizedBox(height: height * 0.03),
+                      ],
+                    ),
+                  ),
                 ),
               ),
-              TextButton(
-                child: Text(
-                  AppLocalizations.of(context)!.cancel,
-                  style: TextStyle(
-                      decoration: TextDecoration.underline,
-                      color: Theme.of(context).colorScheme.onSurface,
-                      fontSize: 18),
-                ),
-                onPressed: () =>
-                    prov.Provider.of<AuthActionInterfaceController>(context,
-                            listen: false)
-                        .showExitWarning(),
-              ),
-              SizedBox(height: height * 0.03),
             ],
           ),
         ),

@@ -123,6 +123,18 @@ class CurrentUser extends _$CurrentUser {
 
   // END LIKES //
 
+  void addPollVote(String id, int optionIndex) {
+    final votes = Map<String, int>.from(state.pollVotes);
+    votes[id] = optionIndex;
+    state = state.copyWith(pollVotes: votes);
+  }
+
+  void removePollVote(String id) {
+    final votes = Map<String, int>.from(state.pollVotes);
+    votes.remove(id);
+    state = state.copyWith(pollVotes: votes);
+  }
+
   Future<void> setUnreadGroup(bool toggle) async {
     final firestore = FirebaseFirestore.instance;
     final uid = ref.read(authProvider).uid!;

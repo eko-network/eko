@@ -1,92 +1,117 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image_to_ascii/image_to_ascii.dart';
 import 'package:go_router/go_router.dart';
-import 'package:untitled_app/utilities/ascii_image_cropper.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:sensors_plus/sensors_plus.dart';
+import 'package:untitled_app/custom_widgets/image_widget.dart';
+import 'package:image/image.dart' as img;
+import 'package:untitled_app/widgets/always_oriented.dart';
 
-class CameraPage extends StatefulWidget {
+class CameraPage extends StatelessWidget {
   const CameraPage({super.key});
 
   @override
-  State<CameraPage> createState() => _CameraPageState();
+  Widget build(BuildContext context) {
+    return InnerCameraPage(
+        isDark: Theme.of(context).brightness == Brightness.dark);
+  }
 }
 
-class _CameraPageState extends State<CameraPage> {
+class InnerCameraPage extends StatefulWidget {
+  final bool isDark;
+  const InnerCameraPage({super.key, required this.isDark});
+
+  @override
+  State<InnerCameraPage> createState() => _InnerCameraPageState();
+}
+
+class _InnerCameraPageState extends State<InnerCameraPage> {
   late final AsciiCameraController _ctrl;
-  String frame = '';
-  XFile? selectedImage;
-  String? asciiImage;
-  bool isLoading = true;
-  bool isDarkMode = true;
-
-  void clearAll() => setState(() {
-        asciiImage = null;
-        selectedImage = null;
-      });
-
+  late final StreamSubscription _accelerometer;
+  DeviceOrientation orientation = DeviceOrientation.portraitUp;
   Future<void> pickImage() async {
     final ImagePicker picker = ImagePicker();
     final XFile? picked = await picker.pickImage(source: ImageSource.gallery);
     if (picked == null) return;
-
-    setState(() {
-      selectedImage = picked;
-    });
-
-    await convertImage();
+    if (mounted) context.pop(picked);
   }
 
-  Future<void> convertImage() async {
-    if (selectedImage == null) return;
-
-    setState(() {
-      isLoading = true;
-    });
-
-    final croppedImage = await cropToAspectRatio(selectedImage!.path,
-        desiredWidth: 150, vScale: 0.75);
-    final ascii = await convertImageToAsciiFromImage(croppedImage,
-        darkMode: isDarkMode, color: false);
-
-    setState(() {
-      asciiImage = ascii;
-      isLoading = false;
-    });
-  }
-
-  void _toggleDarkMode() {
-    setState(() {
-      isDarkMode = !isDarkMode;
-    });
-    convertImage();
-  }
-
-  void captureFrame() {
-    setState(() {
-      asciiImage = frame;
-    });
+  void captureFrame() async {
+    final currentOrientaion = orientation;
+    final picture = await _ctrl.takePicture();
+    if (picture != null) {
+      if (currentOrientaion != DeviceOrientation.portraitUp) {
+        final original = img.decodeImage(await picture.readAsBytes());
+        if (original == null) {
+          if (mounted) context.pop(picture);
+          return;
+        }
+        num angle = 0;
+        if (currentOrientaion == DeviceOrientation.landscapeRight) {
+          angle = 90;
+        } else if (currentOrientaion == DeviceOrientation.landscapeLeft) {
+          angle = 270;
+        } else {
+          angle = 180;
+        }
+        final rotated = img.copyRotate(original, angle: angle);
+        final tempDir = await getTemporaryDirectory();
+        final path =
+            '${tempDir.path}/${DateTime.now().millisecondsSinceEpoch}.jpg';
+        await img.encodeJpgFile(path, rotated);
+        if (mounted) context.pop(XFile(path));
+        return;
+      }
+      if (mounted) context.pop(picture);
+    }
   }
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _ctrl = AsciiCameraController(
-          darkMode: Theme.of(context).brightness == Brightness.dark,
-          width: 150,
-          height: 150);
-      _ctrl.initialize().then((_) {
-        _ctrl.stream.listen((ascii) => setState(() {
-              frame = ascii;
-              isLoading = false;
-            }));
-      });
+    _ctrl =
+        AsciiCameraController(darkMode: widget.isDark, width: 150, height: 150);
+    _ctrl.initialize();
+
+    _accelerometer =
+        accelerometerEventStream().listen((AccelerometerEvent event) {
+      final x = event.x;
+      final y = event.y;
+      if (x.abs() < 5 && y < -7) {
+        if (orientation != DeviceOrientation.portraitDown) {
+          setState(() {
+            orientation = DeviceOrientation.portraitDown;
+          });
+        }
+      } else if (y.abs() < 5 && x > 7) {
+        if (orientation != DeviceOrientation.landscapeLeft) {
+          setState(() {
+            orientation = DeviceOrientation.landscapeLeft;
+          });
+        }
+      } else if (y.abs() < 5 && x < -7) {
+        if (orientation != DeviceOrientation.landscapeRight) {
+          setState(() {
+            orientation = DeviceOrientation.landscapeRight;
+          });
+        }
+      } else if (x.abs() < 5 && y > 7) {
+        if (orientation != DeviceOrientation.portraitUp) {
+          setState(() {
+            orientation = DeviceOrientation.portraitUp;
+          });
+        }
+      }
     });
   }
 
   @override
   void dispose() {
     _ctrl.dispose();
+    _accelerometer.cancel();
     super.dispose();
   }
 
@@ -99,37 +124,46 @@ class _CameraPageState extends State<CameraPage> {
           icon: Icon(Icons.arrow_back_ios_rounded),
           onPressed: () => context.pop(),
         ),
-        actions: [
-          if (asciiImage != null) ...[
-            IconButton(
-              onPressed: clearAll,
-              icon: Icon(
-                Icons.delete,
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
-            ),
-          ],
-        ],
       ),
       body: Column(
         children: [
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(16),
-              child: isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : asciiImage != null
-                      ? AsciiImageWidget(ascii: asciiImage!)
-                      : AsciiImageWidget(
-                          ascii: frame,
-                        ),
+              child: StreamBuilder(
+                stream: _ctrl.stream,
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    //TODO
+                    return Text(snapshot.error.toString());
+                  } else if (snapshot.hasData && snapshot.data != null) {
+                    return ImageWidget(
+                      ascii: AsciiImage.fromV0String(snapshot.data!),
+                    );
+                  }
+                  return Center(child: CircularProgressIndicator());
+                },
+              ),
             ),
           ),
-          SizedBox(
-            height: 90,
-            child: Center(
-              child: asciiImage == null
-                  ? GestureDetector(
+          Padding(
+              padding: EdgeInsets.only(bottom: 25),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  AlwaysOriented(
+                      orientation: orientation,
+                      child: IconButton(
+                        onPressed: pickImage,
+                        icon: Icon(
+                          size: 35,
+                          Icons.perm_media,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                      )),
+                  SizedBox(
+                    height: 90,
+                    child: GestureDetector(
                       onTap: captureFrame,
                       child: Container(
                         height: 70,
@@ -149,59 +183,21 @@ class _CameraPageState extends State<CameraPage> {
                           ),
                         ),
                       ),
-                    )
-                  : const SizedBox(),
-            ),
-          ),
-
-          // Bottom toolbar
-          Container(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(
-                        onPressed: pickImage,
-                        icon: Icon(
-                          Icons.perm_media,
-                          color: Theme.of(context).colorScheme.onSurface,
-                        )),
-                    if (asciiImage != null) ...[
-                      IconButton(
-                          onPressed: _toggleDarkMode,
-                          icon: Icon(
-                            (isDarkMode) ? Icons.dark_mode : Icons.light_mode,
-                            color: Theme.of(context).colorScheme.onSurface,
-                          )),
-                      InkWell(
-                        onTap: () {
-                          context.pop(asciiImage);
-                        },
-                        borderRadius: BorderRadius.circular(12),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 12),
-                          decoration: BoxDecoration(
-                            color:
-                                Theme.of(context).colorScheme.primaryContainer,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Icon(Icons.arrow_forward,
-                              size: 20,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onPrimaryContainer),
-                        ),
+                    ),
+                  ),
+                  AlwaysOriented(
+                    orientation: orientation,
+                    child: IconButton(
+                      onPressed: pickImage,
+                      icon: Icon(
+                        Icons.autorenew,
+                        size: 35,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
-                    ]
-                  ],
-                ),
-              ],
-            ),
-          ),
+                    ),
+                  )
+                ],
+              )),
         ],
       ),
     );
