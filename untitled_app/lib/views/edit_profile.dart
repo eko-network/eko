@@ -13,27 +13,8 @@ import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
 import 'package:untitled_app/types/user.dart';
 import 'package:untitled_app/widgets/profile_picture.dart';
+import 'package:untitled_app/widgets/username_check_display.dart';
 import '../utilities/constants.dart' as c;
-
-class _UserNameCheckLoading extends StatelessWidget {
-  const _UserNameCheckLoading();
-
-  @override
-  Widget build(BuildContext context) {
-    final width = c.widthGetter(context);
-    return Padding(
-      padding: const EdgeInsets.only(top: 5, left: 10),
-      child: Align(
-        alignment: Alignment.centerLeft,
-        child: SizedBox(
-          width: width * 0.05,
-          height: width * 0.05,
-          child: const CircularProgressIndicator(),
-        ),
-      ),
-    );
-  }
-}
 
 class EditProfile extends ConsumerStatefulWidget {
   const EditProfile({super.key});
@@ -48,25 +29,8 @@ class _EditProfileState extends ConsumerState<EditProfile> {
   late final TextEditingController usernameController;
   final usernameFocus = FocusNode();
   File? newProfileImage;
-  Future<bool>? isUsernameAvailableAsync;
-  Timer? _debounce;
   bool isLoading = false;
-  void usernameListener() {
-    final username = usernameController.text.trim();
-    if (!isUsernameValid(username)) return;
-    if (isUsernameAvailableAsync != null) {
-      setState(() {
-        isUsernameAvailableAsync = null;
-      });
-    }
-    if (_debounce?.isActive ?? false) _debounce!.cancel();
-    _debounce =
-        Timer(const Duration(milliseconds: c.searchPageDebounce), () async {
-      setState(() {
-        isUsernameAvailableAsync = isUsernameAvailable(username);
-      });
-    });
-  }
+  bool usernameValid = false;
 
   @override
   void initState() {
@@ -74,14 +38,11 @@ class _EditProfileState extends ConsumerState<EditProfile> {
     nameController = TextEditingController(text: user.name);
     bioController = TextEditingController(text: user.bio);
     usernameController = TextEditingController(text: user.username);
-    usernameController.addListener(usernameListener);
     super.initState();
   }
 
   @override
   void dispose() {
-    _debounce?.cancel();
-    usernameController.removeListener(usernameListener);
     nameController.dispose();
     bioController.dispose();
     usernameController.dispose();
@@ -89,26 +50,10 @@ class _EditProfileState extends ConsumerState<EditProfile> {
     super.dispose();
   }
 
-  void _showUserNameReqs() {
-    showMyDialog(
-        AppLocalizations.of(context)!.invalidUserName,
-        AppLocalizations.of(context)!.usernameReqs,
-        [AppLocalizations.of(context)!.ok],
-        [
-          () {
-            context.pop();
-            usernameFocus.requestFocus();
-          }
-        ],
-        context);
-  }
-
   Future<bool> _validateUsername(String s) async {
     if (!isUsernameValid(s)) return false;
     // really shouldn't be null. if it is just let the next check deal with it
-    if (isUsernameAvailableAsync == null) return true;
-    if (!await isUsernameAvailableAsync!) return false;
-    return true;
+    return usernameValid;
   }
 
   void _savePressed(UserModel user) async {
@@ -323,71 +268,12 @@ class _EditProfileState extends ConsumerState<EditProfile> {
                   inputType: TextInputType.text,
                   //maxLength: c.maxUsernameChars,
                 ),
-                ValueListenableBuilder<TextEditingValue>(
-                  valueListenable: usernameController,
-                  builder: (BuildContext context, TextEditingValue value, __) {
-                    if (user.username == value.text.trim()) {
-                      return SizedBox.shrink();
-                    }
-                    if (!isUsernameValid(value.text.trim())) {
-                      return Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            AppLocalizations.of(context)!.invalidUserName,
-                            style: TextStyle(
-                                color: Theme.of(context).colorScheme.error),
-                          ),
-                          IconButton(
-                              onPressed: () {
-                                _showUserNameReqs();
-                              },
-                              icon: const Icon(Icons.help_outline_outlined))
-                        ],
-                      );
-                    }
-                    if (isUsernameAvailableAsync == null) {
-                      return _UserNameCheckLoading();
-                    }
-                    return FutureBuilder(
-                      future: isUsernameAvailableAsync,
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData) {
-                          if (snapshot.data!) {
-                            return Padding(
-                              padding: const EdgeInsets.only(top: 5),
-                              child: Text(
-                                AppLocalizations.of(context)!.available,
-                                style: TextStyle(
-                                    color:
-                                        Theme.of(context).colorScheme.primary),
-                              ),
-                            );
-                          } else {
-                            return Padding(
-                              padding: const EdgeInsets.only(top: 5),
-                              child: Text(
-                                AppLocalizations.of(context)!.usernameInUse,
-                                style: TextStyle(
-                                    color: Theme.of(context).colorScheme.error),
-                              ),
-                            );
-                          }
-                        }
-                        if (snapshot.hasError) {
-                          return Padding(
-                            padding: const EdgeInsets.only(top: 5),
-                            child: Text(
-                              'error',
-                              style: TextStyle(
-                                  color: Theme.of(context).colorScheme.error),
-                            ),
-                          );
-                        }
-                        return _UserNameCheckLoading();
-                      },
-                    );
-                  },
+                UsernameCheckDisplay(
+                  controller: usernameController,
+                  focus: usernameFocus,
+                  onValidate: (v) => setState(() {
+                    usernameValid = v;
+                  }),
                 ),
               ],
             ),
