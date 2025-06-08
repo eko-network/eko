@@ -11,7 +11,6 @@ import 'package:image_to_ascii/image_to_ascii.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:untitled_app/custom_widgets/image_widget.dart';
-import 'package:untitled_app/widgets/blur_loading.dart';
 
 class EditPicture extends StatefulWidget {
   final XFile picture;

@@ -29,9 +29,10 @@ class InnerCameraPage extends StatefulWidget {
 }
 
 class _InnerCameraPageState extends State<InnerCameraPage> {
-  late final AsciiCameraController _ctrl;
+  AsciiCameraController? _ctrl;
   late final StreamSubscription _accelerometer;
   DeviceOrientation orientation = DeviceOrientation.portraitUp;
+  bool cameraAvailable = false;
   Future<void> pickImage() async {
     final ImagePicker picker = ImagePicker();
     final XFile? picked = await picker.pickImage(source: ImageSource.gallery);
@@ -41,7 +42,7 @@ class _InnerCameraPageState extends State<InnerCameraPage> {
 
   void captureFrame() async {
     final currentOrientaion = orientation;
-    final picture = await _ctrl.takePicture();
+    final picture = await _ctrl?.takePicture();
     if (picture != null) {
       if (currentOrientaion != DeviceOrientation.portraitUp) {
         final original = img.decodeImage(await picture.readAsBytes());
@@ -74,7 +75,9 @@ class _InnerCameraPageState extends State<InnerCameraPage> {
     super.initState();
     _ctrl =
         AsciiCameraController(darkMode: widget.isDark, width: 150, height: 150);
-    _ctrl.initialize();
+    _ctrl?.initialize().then((_) => setState(() {
+          cameraAvailable = true;
+        }));
 
     _accelerometer =
         accelerometerEventStream().listen((AccelerometerEvent event) {
@@ -110,7 +113,7 @@ class _InnerCameraPageState extends State<InnerCameraPage> {
 
   @override
   void dispose() {
-    _ctrl.dispose();
+    _ctrl?.dispose();
     _accelerometer.cancel();
     super.dispose();
   }
@@ -131,7 +134,7 @@ class _InnerCameraPageState extends State<InnerCameraPage> {
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: StreamBuilder(
-                stream: _ctrl.stream,
+                stream: _ctrl?.stream,
                 builder: (context, snapshot) {
                   if (snapshot.hasError) {
                     //TODO
@@ -147,6 +150,13 @@ class _InnerCameraPageState extends State<InnerCameraPage> {
               ),
             ),
           ),
+          if (cameraAvailable)
+            Row(
+              children: List.generate(_ctrl?.cameras.length ?? 0, (index) {
+                final camera = _ctrl?.cameras[index];
+                return Text('$index');
+              }, growable: false),
+            ),
           Padding(
               padding: EdgeInsets.only(bottom: 25),
               child: Row(
@@ -189,7 +199,13 @@ class _InnerCameraPageState extends State<InnerCameraPage> {
                   AlwaysOriented(
                     orientation: orientation,
                     child: IconButton(
-                      onPressed: pickImage,
+                      onPressed: () {
+                        if (_ctrl?.currentCameraIndex == 0) {
+                          _ctrl?.switchToCamera(1);
+                        } else {
+                          _ctrl?.switchToCamera(0);
+                        }
+                      },
                       icon: Icon(
                         Icons.autorenew,
                         size: 35,
