@@ -331,11 +331,12 @@ class PostCardFromPost extends ConsumerWidget {
                               )),
                         if (post.pollOptions != null)
                           Padding(
-                              padding: EdgeInsets.only(bottom: 6),
-                              child: PollWidget(
-                                postId: post.id,
-                                isPreview: isPreview,
-                              )),
+                            padding: EdgeInsets.only(bottom: 6),
+                            child: PollWidget(
+                              post: post,
+                              isPreview: isPreview,
+                            ),
+                          ),
                         if (post.body.isNotEmpty) TextWithTags(text: post.body),
                       ],
                     ),
