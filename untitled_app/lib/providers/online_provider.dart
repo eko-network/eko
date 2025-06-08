@@ -14,6 +14,7 @@ class Online extends _$Online {
   OnlineStatus build(String id) {
     final user = ref.watch(userProvider(id));
     if (user.hasValue && user.value!.shareOnlineStatus) _init(id);
+    ref.onDispose(() => _listener?.cancel());
     return const OnlineStatus(online: false, id: '', lastChanged: 0);
   }
 
@@ -32,6 +33,5 @@ class Online extends _$Online {
         );
       }
     });
-    ref.onDispose(_listener!.cancel);
   }
 }
