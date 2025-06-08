@@ -73,7 +73,13 @@ class PollWidget extends ConsumerWidget {
                               percentage,
                           decoration: BoxDecoration(
                             color: currentUser.pollVotes.containsKey(post.id)
-                                ? Theme.of(context).colorScheme.primaryContainer
+                                ? (currentUser.pollVotes[post.id] == index)
+                                    ? Theme.of(context)
+                                        .colorScheme
+                                        .primaryContainer
+                                    : Theme.of(context)
+                                        .colorScheme
+                                        .surfaceContainerHighest
                                 : Theme.of(context).colorScheme.outlineVariant,
                             borderRadius: BorderRadius.circular(8),
                           ),
