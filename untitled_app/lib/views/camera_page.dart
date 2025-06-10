@@ -29,7 +29,7 @@ class InnerCameraPage extends StatefulWidget {
 }
 
 class _InnerCameraPageState extends State<InnerCameraPage> {
-  AsciiCameraController? _ctrl;
+  late final AsciiCameraController _ctrl;
   late final StreamSubscription _accelerometer;
   DeviceOrientation orientation = DeviceOrientation.portraitUp;
   bool cameraAvailable = false;
@@ -42,7 +42,7 @@ class _InnerCameraPageState extends State<InnerCameraPage> {
 
   void captureFrame() async {
     final currentOrientaion = orientation;
-    final picture = await _ctrl?.takePicture();
+    final picture = await _ctrl.takePicture();
     if (picture != null) {
       if (currentOrientaion != DeviceOrientation.portraitUp) {
         final original = img.decodeImage(await picture.readAsBytes());
@@ -75,7 +75,7 @@ class _InnerCameraPageState extends State<InnerCameraPage> {
     super.initState();
     _ctrl =
         AsciiCameraController(darkMode: widget.isDark, width: 150, height: 150);
-    _ctrl?.initialize().then((_) => setState(() {
+    _ctrl.initialize().then((_) => setState(() {
           cameraAvailable = true;
         }));
 
@@ -113,7 +113,7 @@ class _InnerCameraPageState extends State<InnerCameraPage> {
 
   @override
   void dispose() {
-    _ctrl?.dispose();
+    _ctrl.dispose();
     _accelerometer.cancel();
     super.dispose();
   }
@@ -134,7 +134,7 @@ class _InnerCameraPageState extends State<InnerCameraPage> {
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: StreamBuilder(
-                stream: _ctrl?.stream,
+                stream: _ctrl.stream,
                 builder: (context, snapshot) {
                   if (snapshot.hasError) {
                     //TODO
@@ -142,7 +142,7 @@ class _InnerCameraPageState extends State<InnerCameraPage> {
                   } else if (snapshot.hasData && snapshot.data != null) {
                     return Align(
                       child: ImageWidget(
-                          ascii: AsciiImage.fromV0String(snapshot.data!)),
+                          ascii: AsciiImage.fromSimpleString(snapshot.data!)),
                     );
                   }
                   return Center(child: CircularProgressIndicator());
@@ -150,71 +150,94 @@ class _InnerCameraPageState extends State<InnerCameraPage> {
               ),
             ),
           ),
-          if (cameraAvailable)
-            Row(
-              children: List.generate(_ctrl?.cameras.length ?? 0, (index) {
-                final camera = _ctrl?.cameras[index];
-                return Text('$index');
-              }, growable: false),
-            ),
+          // if (cameraAvailable &&
+          // //     !_ctrl.frontCameras.contains(_ctrl.currentCameraIndex))
+          // DecoratedBox(
+          //     decoration: BoxDecoration(),
+          //     child: Row(
+          //       mainAxisSize: MainAxisSize.min,
+          //       mainAxisAlignment: MainAxisAlignment.center,
+          //       children: List.generate(_ctrl.cameras.length, (index) {
+          //         // final camera = _ctrl.cameras[index];
+          //         return InkWell(
+          //             onTap: () async {
+          //               await _ctrl.switchToCamera(index);
+          //               setState(() {});
+          //             },
+          //             child: Padding(
+          //               padding: EdgeInsetsGeometry.symmetric(horizontal: 1),
+          //               child: DecoratedBox(
+          //                 decoration: BoxDecoration(
+          //                     shape: BoxShape.circle,
+          //                     color: Theme.of(context).colorScheme.primary),
+          //                 child: Padding(
+          //                   padding: EdgeInsetsGeometry.all(8),
+          //                   child: Text('${index + 1}'),
+          //                 ),
+          //               ),
+          //             ));
+          //       }, growable: false),
+          //     )),
           Padding(
-              padding: EdgeInsets.only(bottom: 25),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  AlwaysOriented(
-                      orientation: orientation,
-                      child: IconButton(
-                        onPressed: pickImage,
-                        icon: Icon(
-                          size: 35,
-                          Icons.perm_media,
+            padding: EdgeInsets.only(bottom: 25),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                AlwaysOriented(
+                    orientation: orientation,
+                    child: IconButton(
+                      onPressed: pickImage,
+                      icon: Icon(
+                        size: 35,
+                        Icons.perm_media,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                    )),
+                SizedBox(
+                  height: 90,
+                  child: GestureDetector(
+                    onTap: captureFrame,
+                    child: Container(
+                      height: 70,
+                      width: 70,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
                           color: Theme.of(context).colorScheme.onSurface,
+                          width: 4,
                         ),
-                      )),
-                  SizedBox(
-                    height: 90,
-                    child: GestureDetector(
-                      onTap: captureFrame,
+                      ),
                       child: Container(
-                        height: 70,
-                        width: 70,
+                        margin: const EdgeInsets.all(3),
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          border: Border.all(
-                            color: Theme.of(context).colorScheme.onSurface,
-                            width: 4,
-                          ),
-                        ),
-                        child: Container(
-                          margin: const EdgeInsets.all(3),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Theme.of(context).colorScheme.onSurface,
-                          ),
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
                     ),
                   ),
-                  AlwaysOriented(
-                    orientation: orientation,
-                    child: IconButton(
-                      onPressed: () {
-                        if (_ctrl?.currentCameraIndex == 0) {
-                          _ctrl?.switchToCamera(1);
-                        } else {
-                          _ctrl?.switchToCamera(0);
-                        }
-                      },
-                      icon: Icon(
-                        Icons.autorenew,
-                        size: 35,
-                        color: Theme.of(context).colorScheme.onSurface,
-                      ),
+                ),
+                AlwaysOriented(
+                  orientation: orientation,
+                  child: IconButton(
+                    onPressed: () async {
+                      if (_ctrl.backCameras
+                          .contains(_ctrl.currentCameraIndex)) {
+                        await _ctrl.switchToFront();
+                      } else {
+                        await _ctrl.switchToBack();
+                      }
+                    },
+                    icon: Icon(
+                      Icons.autorenew,
+                      size: 35,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
-                  )
-                ],
-              )),
+                  ),
+                )
+              ],
+            ),
+          ),
         ],
       ),
     );

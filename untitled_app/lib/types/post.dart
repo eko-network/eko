@@ -16,13 +16,12 @@ String _joinList(List<String>? list) {
 
 String? _asciiImageToString(AsciiImage? image) {
   if (image == null) return null;
-  final json = image.toJson();
-  return jsonEncode(json);
+  return image.toStorableString();
 }
 
 AsciiImage? _asciiImageFromString(String? image) {
   if (image == null) return null;
-  return AsciiImage.fromString(image);
+  return AsciiImage.fromStorableString(image);
 }
 
 @freezed

@@ -51,6 +51,7 @@ class _ComposePageState extends ConsumerState<ComposePage> {
   int bodyNewLines = 0;
   bool isUploading = false;
   String? partialTag;
+  bool showFab = true;
 
   @override
   void didUpdateWidget(covariant ComposePage oldWidget) {
@@ -63,7 +64,20 @@ class _ComposePageState extends ConsumerState<ComposePage> {
   }
 
   @override
+  void initState() {
+    bodyFocus.addListener(bodyFocusListen);
+    super.initState();
+  }
+
+  void bodyFocusListen() {
+    setState(() {
+      showFab = !bodyFocus.hasPrimaryFocus;
+    });
+  }
+
+  @override
   void dispose() {
+    bodyFocus.removeListener(bodyFocusListen);
     scrollController.dispose();
     titleController.dispose();
     bodyController.dispose();
@@ -264,7 +278,7 @@ class _ComposePageState extends ConsumerState<ComposePage> {
       child: Scaffold(
         floatingActionButtonLocation: ExpandableFab.location,
         floatingActionButton: Visibility(
-          visible: !bodyFocus.hasPrimaryFocus,
+          visible: showFab,
           child: ExpandableFab(
             onOpen: () => FocusManager.instance.primaryFocus?.unfocus(),
             key: _key,
@@ -464,7 +478,7 @@ class _ComposePageState extends ConsumerState<ComposePage> {
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(10),
                                   child: image != null
-                                      ? ImageWidget(ascii: image!)
+                                      ? Align(child: ImageWidget(ascii: image!))
                                       : Image.network(
                                           // gif!.images!.fixedWidth.url,
                                           gif ?? '',
