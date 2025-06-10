@@ -19,13 +19,14 @@ import '../custom_widgets/edit_profile_text_field.dart';
 import '../utilities/constants.dart' as c;
 
 Widget selectedUserCardBuilder(String uid) {
-  return SelectedUser(
-    user: createGroupPageController.selectedPeople[index],
-    index: index,
-    selected: (index == createGroupPageController.selectedToDelete),
-    setter: prov.Provider.of<CreateGroupPageController>(context, listen: false)
-        .setSelectedToDelete,
-  );
+  // return SelectedUser(
+  //   user: createGroupPageController.selectedPeople[index],
+  //   index: index,
+  //   selected: (index == createGroupPageController.selectedToDelete),
+  //   setter: prov.Provider.of<CreateGroupPageController>(context, listen: false)
+  //       .setSelectedToDelete,
+  // );
+  return SizedBox();
 }
 
 void _showConfirmExit(BuildContext context) {
