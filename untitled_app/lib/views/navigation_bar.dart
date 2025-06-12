@@ -3,9 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:untitled_app/custom_widgets/download_button_if_web.dart';
 import 'package:untitled_app/custom_widgets/safe_area.dart';
+import 'package:untitled_app/providers/current_user_provider.dart';
 import 'package:untitled_app/providers/nav_bar_provider.dart';
-import '../models/current_user.dart';
-import '../utilities/locator.dart';
 import '../utilities/constants.dart' as c;
 
 const List<IconData> _passiveIconList = [
@@ -82,6 +81,7 @@ class ScaffoldWithNavigationBar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.watch(currentUserProvider);
     return AppSafeArea(
       child: Scaffold(
         floatingActionButton: downloadButtonIfWeb(),
@@ -117,7 +117,7 @@ class ScaffoldWithNavigationBar extends ConsumerWidget {
                                 _passiveIconList[i],
                                 size: c.navBarIconSize,
                               ),
-                              if (i == 1 && locator<CurrentUser>().unreadGroup)
+                              if (i == 1 && user.unreadGroup)
                                 Positioned(
                                   right: 1.5,
                                   child: Container(
@@ -138,7 +138,7 @@ class ScaffoldWithNavigationBar extends ConsumerWidget {
                                 _activeIconList[i],
                                 size: c.navBarIconSize + c.navBarIconSizeAdder,
                               ),
-                              if (i == 1 && locator<CurrentUser>().unreadGroup)
+                              if (i == 1 && user.unreadGroup)
                                 Positioned(
                                   right: 1.5,
                                   child: Container(
@@ -177,6 +177,7 @@ class ScaffoldWithNavigationRail extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.watch(currentUserProvider);
     return AppSafeArea(
       child: Scaffold(
         floatingActionButton: downloadButtonIfWeb(),
@@ -200,7 +201,7 @@ class ScaffoldWithNavigationRail extends ConsumerWidget {
                             _passiveIconList[i],
                             size: c.navBarIconSize,
                           ),
-                          if (i == 1 && locator<CurrentUser>().unreadGroup)
+                          if (i == 1 && user.unreadGroup)
                             Positioned(
                               right: 1.5,
                               child: Container(
@@ -219,7 +220,7 @@ class ScaffoldWithNavigationRail extends ConsumerWidget {
                             _activeIconList[i],
                             size: c.navBarIconSize + c.navBarIconSizeAdder,
                           ),
-                          if (i == 1 && locator<CurrentUser>().unreadGroup)
+                          if (i == 1 && user.unreadGroup)
                             Positioned(
                               right: 1.5,
                               child: Container(

@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
-import 'package:untitled_app/models/shared_pref_model.dart';
+import 'package:untitled_app/interfaces/shared_pref_model.dart';
 import '../utilities/constants.dart' as c;
 
 Future<bool> isUsernameAvailable(String username) async {

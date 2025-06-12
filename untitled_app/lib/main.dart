@@ -13,9 +13,8 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:untitled_app/widgets/check_verson.dart';
 import 'utilities/router.dart';
-import 'utilities/locator.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
-import '../models/shared_pref_model.dart';
+import '../interfaces/shared_pref_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:untitled_app/firebase_options.dart';
@@ -45,7 +44,7 @@ Future<void> main() async {
       options: DefaultFirebaseOptions.currentPlatform,
     )
   ]);
-  setupLocator();
+  // setupLocator();
   //protected/dependent services
   await Future.wait([
     _checkFirstInstall(),
