@@ -36,7 +36,7 @@ class GroupCard extends ConsumerWidget {
                         .setUnreadGroup(false);
                     ref
                         .read(groupProvider(groupId).notifier)
-                        .toggleUnread(false);
+                        .toggleUnread(group.id, false);
                   }
                   context.push('/groups/sub_group/$groupId', extra: group);
                 } else {

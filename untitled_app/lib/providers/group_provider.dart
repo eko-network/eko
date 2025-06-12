@@ -66,8 +66,8 @@ class Group extends _$Group {
     ref.read(groupListProvider.notifier).removeGroupById(id);
   }
 
-  Future<void> toggleUnread(bool toggle) async {
-    // TODO Christian: jank. need to rethought with the sub group controller stuff
+  Future<void> toggleUnread(String id, bool toggle) async {
+    removeFromNotSeenGroup(id, ref.read(currentUserProvider).user.uid);
     if (toggle == false) {
       state.whenData((group) {
         final newNotSeen = List<String>.from(group.notSeen)
