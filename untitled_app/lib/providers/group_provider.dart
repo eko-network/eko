@@ -70,8 +70,9 @@ class Group extends _$Group {
     // TODO Christian: jank. need to rethought with the sub group controller stuff
     if (toggle == false) {
       state.whenData((group) {
-        group.notSeen.remove(ref.read(currentUserProvider).user.uid);
-        state = AsyncData(group.copyWith(notSeen: group.notSeen));
+        final newNotSeen = List<String>.from(group.notSeen)
+          ..remove(ref.read(currentUserProvider).user.uid);
+        state = AsyncData(group.copyWith(notSeen: newNotSeen));
       });
     }
   }

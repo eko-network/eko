@@ -30,7 +30,6 @@ class GroupCard extends ConsumerWidget {
         data: (group) => InkWell(
               onTap: () async {
                 if (onPressed == null) {
-                  context.push('/groups/sub_group/$groupId', extra: group);
                   if (unseen) {
                     ref
                         .read(currentUserProvider.notifier)
@@ -39,6 +38,7 @@ class GroupCard extends ConsumerWidget {
                         .read(groupProvider(groupId).notifier)
                         .toggleUnread(false);
                   }
+                  context.push('/groups/sub_group/$groupId', extra: group);
                 } else {
                   //if in compose page
                   onPressed!(groupId);
