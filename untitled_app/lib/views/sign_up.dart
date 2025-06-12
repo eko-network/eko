@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -11,7 +10,6 @@ import 'package:untitled_app/interfaces/user.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:untitled_app/providers/auth_provider.dart';
 import 'package:untitled_app/providers/nav_bar_provider.dart';
-import 'package:untitled_app/providers/theme_provider.dart';
 import 'package:untitled_app/widgets/create_password.dart';
 import 'package:untitled_app/widgets/username_check_display.dart';
 import 'package:url_launcher/url_launcher.dart';

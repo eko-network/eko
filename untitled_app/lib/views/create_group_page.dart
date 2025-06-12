@@ -1,13 +1,11 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:untitled_app/custom_widgets/warning_dialog.dart';
 import 'package:untitled_app/interfaces/search.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
-import 'package:untitled_app/models/search_model.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
 import 'package:untitled_app/providers/group_list_provider.dart';
 import 'package:untitled_app/providers/nav_bar_provider.dart';
@@ -72,7 +70,6 @@ class _CreateGroupState extends ConsumerState<CreateGroup> {
   ListenableSet<String> selectedPeople = ListenableSet<String>();
   bool isLoading = false;
   int? selectedToDelete;
-  final searchModel = SearchModel();
   String query = '';
   // Cache searchedListData = Cache(items: [], end: false);
   bool creatingGroup = false;

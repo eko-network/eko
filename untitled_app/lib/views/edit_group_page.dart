@@ -1,17 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:provider/provider.dart' as prov;
-import 'package:untitled_app/custom_widgets/selected_user_groups.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:untitled_app/providers/group_provider.dart';
-import 'package:untitled_app/providers/pool_providers.dart';
 import 'package:untitled_app/providers/user_provider.dart';
-import 'package:untitled_app/types/group.dart';
 import 'package:untitled_app/widgets/infinite_scrolly.dart';
 import 'package:untitled_app/widgets/loading_spinner.dart';
 import 'package:untitled_app/widgets/shimmer_loaders.dart';
-import '../custom_widgets/pagination.dart';
 import '../widgets/user_card.dart';
 import '../utilities/constants.dart' as c;
 
@@ -19,6 +14,7 @@ class EditGroup extends ConsumerWidget {
   final String id;
   const EditGroup({required this.id, super.key});
 
+// FIXME change variable names
   Future<(List<MapEntry<String, Never?>>, bool)> getter(
       List<MapEntry<String, Never?>> data,
       List<String> fullFollowers,
@@ -47,7 +43,6 @@ class EditGroup extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final width = c.widthGetter(context);
-    final height = MediaQuery.sizeOf(context).height;
     final asyncGroup = ref.watch(groupProvider(id));
 
     return Scaffold(
@@ -153,8 +148,6 @@ class EditGroup extends ConsumerWidget {
     ));
   }
 }
-
-// FIXME change variable names
 
 class _ErrorMessage extends StatelessWidget {
   final String message;

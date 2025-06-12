@@ -3,7 +3,6 @@ import 'package:flutter/foundation.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:image_to_ascii/image_to_ascii.dart';
 import 'package:untitled_app/interfaces/post.dart';
-import 'dart:convert';
 part '../generated/types/post.freezed.dart';
 part '../generated/types/post.g.dart';
 

@@ -7,7 +7,6 @@ import 'package:untitled_app/widgets/infinite_scrolly.dart';
 import 'package:untitled_app/widgets/shimmer_loaders.dart';
 import 'package:untitled_app/widgets/user_search_bar.dart';
 import '../widgets/user_card.dart';
-import 'package:untitled_app/localization/generated/app_localizations.dart';
 import '../utilities/constants.dart' as c;
 
 class FloatingSearchBar extends SliverPersistentHeaderDelegate {
