@@ -37,9 +37,10 @@ void _showConfirmExit(BuildContext context) {
 }
 
 class ListenableSet<T> extends ChangeNotifier {
-  final Set<T> _set = {};
+  final Set<T> _set;
 
   Set<T> get set => _set;
+  ListenableSet([List<T> list = const []]) : _set = Set<T>.from(list);
 
   bool add(T item) {
     final res = _set.add(item);

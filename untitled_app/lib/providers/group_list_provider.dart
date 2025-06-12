@@ -67,6 +67,12 @@ class GroupList extends _$GroupList {
     await getter();
   }
 
+  void removeGroupById(String id) async {
+    final newList = [...state.$1];
+    newList.remove(id);
+    state = (newList, state.$2);
+  }
+
   void insertAtIndex(int index, GroupModel group) {
     final newList = [...state.$1];
     newList.insert(index, group.id);

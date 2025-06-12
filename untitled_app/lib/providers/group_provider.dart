@@ -2,7 +2,9 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:untitled_app/interfaces/groups.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
+import 'package:untitled_app/providers/group_list_provider.dart';
 import 'package:untitled_app/providers/pool_providers.dart';
 import 'package:untitled_app/types/group.dart';
 // Necessary for code-generation to work
@@ -48,22 +50,20 @@ class Group extends _$Group {
     return GroupModel.fromFirestore(postData, data.id);
   }
 
-  Future<String> createGroup(GroupModel group) async {
-    // TODO Christian: needs to be added to the group list
-    final firestore = FirebaseFirestore.instance;
-    final snapshot = await firestore.collection('groups').add(group.toJson());
-    return snapshot.id;
+  Future<void> updateGroupMembers(List<String> members) async {
+    await setGroupMembers(id, members);
+    final previousState = await future;
+    state = AsyncData(previousState.copyWith(members: members));
   }
 
-  Future<void> updateGroupMembers(
-      GroupModel group, List<String> members) async {
-    final firestore = FirebaseFirestore.instance;
-    await firestore.collection('groups').doc(group.id).update({
-      'members': members,
-    });
-    state.whenData((group) {
-      state = AsyncData(group.copyWith(members: members));
-    });
+  Future<void> leaveGroup(String id, List<String> members) async {
+    final updatedMembers = List<String>.from(members);
+    updatedMembers.remove(ref.read(currentUserProvider).user.uid);
+
+    final previousState = await future;
+    await setGroupMembers(id, updatedMembers);
+    state = AsyncData(previousState.copyWith(members: updatedMembers));
+    ref.read(groupListProvider.notifier).removeGroupById(id);
   }
 
   Future<void> toggleUnread(bool toggle) async {

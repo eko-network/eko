@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:untitled_app/custom_widgets/safe_area.dart';
 import 'package:untitled_app/interfaces/notification_helper.dart';
+import 'package:untitled_app/types/group.dart';
 import 'package:untitled_app/types/user.dart';
 import 'package:untitled_app/views/blocked_users_page.dart';
 import 'package:untitled_app/views/download_page.dart';
 import 'package:untitled_app/views/edit_group_page.dart';
 import 'package:untitled_app/views/camera_page.dart';
 import 'package:untitled_app/views/edit_picture.dart';
+import 'package:untitled_app/views/group_add_people.dart';
 import 'package:untitled_app/views/invalid_session_page.dart';
 import 'package:untitled_app/views/login.dart';
 import 'package:untitled_app/views/re_auth_page.dart';
@@ -211,11 +213,22 @@ final goRouter = GoRouter(
                           path: 'edit_group',
                           name: 'edit_group',
                           pageBuilder: (context, state) {
-                            Group? group = state.extra as Group;
+                            String id = state.pathParameters['id']!;
                             return NoTransitionPage(
-                              child: EditGroupPage(group: group),
+                              child: EditGroup(id: id),
                             );
-                          }),
+                          },
+                          routes: [
+                            GoRoute(
+                                path: 'add_people',
+                                name: 'add_people',
+                                pageBuilder: (context, state) {
+                                  String id = state.pathParameters['id']!;
+                                  return NoTransitionPage(
+                                    child: AddPeoplePage(id: id),
+                                  );
+                                })
+                          ]),
                     ]),
                 GoRoute(
                   path: 'create_group',

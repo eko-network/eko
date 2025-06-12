@@ -162,7 +162,7 @@ class _GifSearchSectionState extends State<GifSearchSection> {
                     isDense: true,
                     filled: true,
                     fillColor: Theme.of(context).colorScheme.outlineVariant,
-                    hintText: 'Search for gifs',
+                    hintText: 'Search Tenor',
                     prefixIcon: Icon(Icons.search),
                     border: InputBorder.none,
                   ),
