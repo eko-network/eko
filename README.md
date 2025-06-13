@@ -93,3 +93,11 @@ A page for users to log in.
 A page for users to share their profile with others.
 
 <img src="./images/readme/qr1.png" alt="drawing" width="200"/>
+
+## Developing
+
+### Build for Web
+
+```bash
+flutter build web && firebase deploy
+```

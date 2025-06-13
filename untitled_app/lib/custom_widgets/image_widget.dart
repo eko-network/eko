@@ -8,6 +8,14 @@ class ImageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AsciiImageWidget(ascii: ascii);
+    return AsciiImageWidget(
+      ascii: ascii,
+      textStyle: TextStyle(
+        fontFamily: 'MartianMono',
+        fontWeight: FontWeight.w700,
+        fontSize: 40,
+        height: 1,
+      ),
+    );
   }
 }

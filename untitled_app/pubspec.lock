@@ -670,14 +670,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.5.1"
-  flutter_hooks:
-    dependency: "direct main"
-    description:
-      name: flutter_hooks
-      sha256: b772e710d16d7a20c0740c4f855095026b31c7eb5ba3ab67d2bd52021cd9461d
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.21.2"
   flutter_lints:
     dependency: "direct dev"
     description:
@@ -952,9 +944,11 @@ packages:
   image_to_ascii:
     dependency: "direct main"
     description:
-      path: "../../image_to_ascii"
-      relative: true
-    source: path
+      path: "."
+      ref: cc34b6f6e50c3bc7eac5bc12d76cb78581e9e581
+      resolved-ref: cc34b6f6e50c3bc7eac5bc12d76cb78581e9e581
+      url: "https://github.com/ericbreh/image_to_ascii.git"
+    source: git
     version: "0.0.1"
   intl:
     dependency: "direct main"

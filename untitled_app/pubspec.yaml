@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.5.1+8
+version: 1.6.0+0
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
@@ -64,7 +64,6 @@ dependencies:
   permission_handler: ^12.0.0+1
   cloud_functions: ^5.3.4
   emoji_picker_flutter: ^4.3.0
-  flutter_hooks: ^0.21.2
   universal_html: ^2.2.4
   firebase_database: ^11.3.7
   like_button: 
@@ -76,10 +75,10 @@ dependencies:
   freezed_annotation: ^3.0.0
   json_annotation: ^4.9.0
   image_to_ascii:
-    path: ../../image_to_ascii
-    # git:
-    #   url: https://github.com/ericbreh/image_to_ascii.git
-    #   ref: c2df8928a12e449e4603d9317eca54ae6a0a1e40
+    # path: ../../image_to_ascii
+    git:
+      url: https://github.com/ericbreh/image_to_ascii.git
+      ref: cc34b6f6e50c3bc7eac5bc12d76cb78581e9e581
       
   image: ^4.5.4
   flutter_staggered_grid_view: ^0.7.0
@@ -115,6 +114,10 @@ flutter:
   # the material Icons class.
   uses-material-design: true
 
+  fonts:
+    - family: MartianMono
+      fonts:
+        - asset: fonts/martian_mono_bold.ttf
   # To add assets to your application, add an assets section, like this:
   assets:
     - images/
