@@ -29,7 +29,10 @@ class Online extends _$Online {
         final jsonData = Map<String, dynamic>.from(data as Map);
         OnlineStatus status = OnlineStatus.fromJson(jsonData);
         state = state.copyWith(
-          online: status.online,
+          online: status.online &&
+              DateTime.now().toUtc().difference(
+                      DateTime.fromMillisecondsSinceEpoch(status.lastChanged)) >
+                  Duration(minutes: 15),
         );
       }
     });

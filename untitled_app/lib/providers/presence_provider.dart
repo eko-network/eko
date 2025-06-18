@@ -25,6 +25,7 @@ String _getWebUdid() {
 class Presence extends _$Presence with WidgetsBindingObserver {
   DatabaseReference? _onlineRef;
   StreamSubscription<DatabaseEvent>? _statusSubscription;
+  Timer? _setTimer;
 
   final _uuid = _getWebUdid();
 
@@ -32,13 +33,18 @@ class Presence extends _$Presence with WidgetsBindingObserver {
   OnlineStatus build() {
     WidgetsBinding.instance.addObserver(this);
     _init();
-    ref.onDispose(() => _onlineRef?.remove());
-    ref.onDispose(() => _statusSubscription?.cancel());
+    ref.onDispose(() {
+      _onlineRef?.remove();
+      _statusSubscription?.cancel();
+      _setTimer?.cancel();
+    });
     return const OnlineStatus(online: false, id: '', lastChanged: 0);
   }
 
   void _init() async {
     await setOnline();
+    _setTimer = Timer.periodic(
+        const Duration(minutes: 10), (_) => maybeUpdateTimestamp());
 
     final uid = ref.read(authProvider).uid!;
     final deviceUid = kIsWeb ? _uuid : await FlutterUdid.udid;
@@ -96,6 +102,15 @@ class Presence extends _$Presence with WidgetsBindingObserver {
       'id': deviceUid,
       'last_changed': ServerValue.timestamp,
     });
+  }
+
+  Future<void> maybeUpdateTimestamp() async {
+    final uid = ref.read(authProvider).uid!;
+    if (state.valid) {
+      await FirebaseDatabase.instance
+          .ref('status/$uid')
+          .update({'last_changed': ServerValue.timestamp});
+    }
   }
 
   @override
