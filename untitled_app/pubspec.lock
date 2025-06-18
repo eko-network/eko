@@ -173,10 +173,10 @@ packages:
     dependency: transitive
     description:
       name: camera_avfoundation
-      sha256: ca244564876d5a76f2126bca501aec25243cad23ba1784819242aea2fd25cf70
+      sha256: fdc0e668f65c8ddfb3be6c10ef4737fb6274cd04d8053a9525d410642f7989c0
       url: "https://pub.dev"
     source: hosted
-    version: "0.9.19+2"
+    version: "0.9.19+1"
   camera_platform_interface:
     dependency: transitive
     description:
@@ -781,6 +781,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "15.1.3"
+  google_fonts:
+    dependency: transitive
+    description:
+      name: google_fonts
+      sha256: b1ac0fe2832c9cc95e5e88b57d627c5e68c223b9657f4b96e1487aa9098c7b82
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.2.1"
   graphs:
     dependency: transitive
     description:
@@ -937,8 +945,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: cc34b6f6e50c3bc7eac5bc12d76cb78581e9e581
-      resolved-ref: cc34b6f6e50c3bc7eac5bc12d76cb78581e9e581
+      ref: "7ea452306f1a15e83356fe5f0949c4f32ec0c854"
+      resolved-ref: "7ea452306f1a15e83356fe5f0949c4f32ec0c854"
       url: "https://github.com/ericbreh/image_to_ascii.git"
     source: git
     version: "0.0.1"
