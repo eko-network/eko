@@ -6,6 +6,7 @@ import 'package:like_button/like_button.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
 import 'package:untitled_app/providers/post_provider.dart';
 import 'package:untitled_app/types/post.dart';
+import 'package:untitled_app/widgets/icons.dart' as icons;
 import '../utilities/constants.dart' as c;
 
 class Count extends StatelessWidget {
@@ -45,6 +46,7 @@ class LikeButtons extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final fillColor = Color(0xFFFF3040);
     final user = ref.watch(currentUserProvider);
     return Row(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -53,17 +55,12 @@ class LikeButtons extends ConsumerWidget {
           LikeButton(
             isLiked: !disabled && user.likedPosts.contains(post.id),
             likeBuilder: (isLiked) {
-              return SvgPicture.string(
-                '''
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-           fill="${isLiked ? '#FF3040' : 'none'}" 
-           stroke="${isLiked ? '#FF3040' : '#${Theme.of(context).colorScheme.onSurface.toARGB32().toRadixString(16).substring(2)}'}" 
-           stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M9 18v-6H5l7-7 7 7h-4v6H9z"/>
-      </svg>
-      ''',
-                width: c.postIconSize,
-                height: c.postIconSize,
+              return icons.Like(
+                size: c.postIconSize,
+                fillColor: isLiked ? fillColor : null,
+                strokeColor: isLiked
+                    ? fillColor
+                    : Theme.of(context).colorScheme.onSurfaceVariant,
               );
             },
             onTap: (isLiked) async {
@@ -97,17 +94,12 @@ class LikeButtons extends ConsumerWidget {
             isLiked:
                 !disabled && user.dislikedPosts.contains(post.id), //dislike
             likeBuilder: (isDisliked) {
-              return SvgPicture.string(
-                '''
-<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-           fill="${isDisliked ? '#FF3040' : 'none'}" 
-           stroke="${isDisliked ? '#FF3040' : '#${Theme.of(context).colorScheme.onSurface.toARGB32().toRadixString(16).substring(2)}'}" 
-           stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M15 6v6h4l-7 7-7-7h4V6h6z"/>
-      </svg>
-      ''',
-                width: c.postIconSize,
-                height: c.postIconSize,
+              return icons.Dislike(
+                size: c.postIconSize,
+                fillColor: isDisliked ? fillColor : null,
+                strokeColor: isDisliked
+                    ? fillColor
+                    : Theme.of(context).colorScheme.onSurfaceVariant,
               );
             },
             onTap: (isDisliked) async {
