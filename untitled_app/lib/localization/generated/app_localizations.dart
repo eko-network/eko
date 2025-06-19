@@ -770,6 +770,12 @@ abstract class AppLocalizations {
   /// **'commented on your post'**
   String get commentText;
 
+  /// No description provided for @crossGroupRepost.
+  ///
+  /// In en, this message translates to:
+  /// **'You may not post chamber posts in public or in another group.'**
+  String get crossGroupRepost;
+
   /// No description provided for @groups.
   ///
   /// In en, this message translates to:

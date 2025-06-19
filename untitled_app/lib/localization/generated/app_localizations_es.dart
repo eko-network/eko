@@ -358,6 +358,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get commentText => 'commented on your post';
 
   @override
+  String get crossGroupRepost =>
+      'You may not post chamber posts in public or in another group.';
+
+  @override
   String get groups => 'Groups';
 
   @override

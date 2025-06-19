@@ -98,8 +98,7 @@ class RepostCard extends ConsumerWidget {
                                         },
                                         uid: post.uid,
                                       )),
-                                      if (!isPreview)
-                                        TimeStamp(time: post.getDateTime()),
+                                      TimeStamp(time: post.getDateTime()),
                                     ],
                                   ),
                                   const SizedBox(height: 6.0),

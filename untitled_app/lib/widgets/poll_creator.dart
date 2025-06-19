@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
+import 'package:untitled_app/utilities/constants.dart' as c;
 
 class PollCreator extends StatefulWidget {
   final double height;
@@ -23,7 +24,9 @@ class _PollCreatorState extends State<PollCreator> {
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Theme.of(context).colorScheme.outline),
+        border: Border.all(
+            color: Theme.of(context).colorScheme.outline,
+            width: c.dividerWidth),
       ),
       padding: EdgeInsets.all(16),
       child: Column(
@@ -42,7 +45,9 @@ class _PollCreatorState extends State<PollCreator> {
                       decoration: InputDecoration(
                         hintText:
                             '${AppLocalizations.of(context)!.option} ${index + 1}',
-                        border: OutlineInputBorder(),
+                        border: OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10))),
                         contentPadding:
                             EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                         errorText: widget.pollOptions[index].length > 50

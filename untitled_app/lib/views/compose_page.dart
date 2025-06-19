@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_to_ascii/image_to_ascii.dart';
 import 'package:untitled_app/custom_widgets/error_snack_bar.dart';
+import 'package:untitled_app/custom_widgets/gif_widget.dart';
+import 'package:untitled_app/providers/post_provider.dart';
 import 'package:untitled_app/widgets/group_card.dart';
 import 'package:untitled_app/custom_widgets/image_widget.dart';
 import 'package:untitled_app/interfaces/post.dart';
@@ -25,6 +27,46 @@ import 'package:untitled_app/widgets/repost_card.dart';
 import 'package:untitled_app/widgets/tag_search.dart';
 import '../utilities/constants.dart' as c;
 import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
+
+class _CornerClose extends StatelessWidget {
+  final void Function() onPressed;
+  final Widget child;
+  const _CornerClose({required this.onPressed, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.center,
+      child: IntrinsicWidth(
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Container(
+                alignment: Alignment.center,
+                padding: EdgeInsets.symmetric(vertical: 1, horizontal: 1),
+                child: child),
+            Positioned(
+                right: -17,
+                top: -17,
+                child: IconButton(
+                  iconSize: 25,
+                  onPressed: onPressed,
+                  icon: DecoratedBox(
+                    decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Theme.of(context).colorScheme.surface),
+                    child: Icon(
+                      Icons.cancel,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                  ),
+                ))
+          ],
+        ),
+      ),
+    );
+  }
+}
 
 class ComposePage extends ConsumerStatefulWidget {
   final String? groupId;
@@ -49,6 +91,7 @@ class _ComposePageState extends ConsumerState<ComposePage> {
   final titleFocus = FocusNode();
   int bodyNewLines = 0;
   bool isUploading = false;
+  bool isChecking = false;
   String? partialTag;
   bool showFab = true;
 
@@ -108,6 +151,7 @@ class _ComposePageState extends ConsumerState<ComposePage> {
       setState(() {
         gif = url;
         image = null;
+        repostId = null;
       });
     }
   }
@@ -124,14 +168,10 @@ class _ComposePageState extends ConsumerState<ComposePage> {
     final asciiImage = await context.pushNamed<AsciiImage?>('edit_picture',
         extra: pickedImage);
 
-    // Removed since it saved even if you uploaded from camera roll
-    // if (asciiImage != null) {
-    //   GallerySaver.saveImage(pickedImage.path, toDcim: true)
-    //       .then((_) => File(pickedImage.path).delete());
-    // }
-
     setState(() {
       image = asciiImage;
+      gif = null;
+      repostId = null;
     });
 
     ref.read(navBarProvider.notifier).enable();
@@ -159,14 +199,9 @@ class _ComposePageState extends ConsumerState<ComposePage> {
     });
   }
 
-  void _removeMedia() {
-    setState(() {
-      gif = null;
-      image = null;
-    });
-  }
-
   Future<void> _postPressed() async {
+    if (isChecking) return;
+    isChecking = true;
     final title = titleController.text.trim();
     final body = bodyController.text.trim();
     final List<String> tags = [audiance ?? 'public'];
@@ -175,36 +210,57 @@ class _ComposePageState extends ConsumerState<ComposePage> {
       showSnackBar(
           text: AppLocalizations.of(context)!.emptyFieldError,
           context: context);
+      isChecking = false;
       return;
     }
     if (title.length > c.maxTitleChars) {
       titleFocus.requestFocus();
       showSnackBar(
           text: AppLocalizations.of(context)!.tooManyChar, context: context);
+      isChecking = false;
       return;
     }
     if (body.length > c.maxPostChars) {
       bodyFocus.requestFocus();
       showSnackBar(
           text: AppLocalizations.of(context)!.tooManyChar, context: context);
+      isChecking = false;
       return;
     }
     if (_countNewLines(body) > c.maxPostLines) {
       bodyFocus.requestFocus();
       showSnackBar(
           text: AppLocalizations.of(context)!.tooManyLine, context: context);
+      isChecking = false;
       return;
     }
     if (isPoll &&
         pollOptions.where((option) => option.trim().isNotEmpty).length < 2) {
       showSnackBar(
           text: AppLocalizations.of(context)!.needTwoOptions, context: context);
+      isChecking = false;
       return;
     }
     if (isPoll && pollOptions.any((option) => option.length > c.maxPollChars)) {
       showSnackBar(
           text: AppLocalizations.of(context)!.tooManyChar, context: context);
+      isChecking = false;
       return;
+    }
+
+    if (repostId != null) {
+      final post = await ref.read(postProvider(repostId!).future);
+      if (post.tags.isNotEmpty &&
+          post.tags.first != 'public' &&
+          post.tags.first != audiance) {
+        if (mounted) {
+          showSnackBar(
+              text: AppLocalizations.of(context)!.crossGroupRepost,
+              context: context);
+        }
+        isChecking = false;
+        return;
+      }
     }
 
     final post = PostModel(
@@ -223,58 +279,61 @@ class _ComposePageState extends ConsumerState<ComposePage> {
       body: parseTextToTags(body),
     );
 
-    showDialog(
-      barrierDismissible: true,
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: Theme.of(context).colorScheme.outlineVariant,
-          title: Text(
-              'Post to ${audiance == null ? AppLocalizations.of(context)!.public : ref.watch(groupProvider(audiance!)).when(data: (group) => group.name, loading: () => '--', error: (_, __) => '--')}?'),
-          content: SingleChildScrollView(
-            child: PostCardFromPost(post: post, isPreview: true),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text(AppLocalizations.of(context)!.cancel),
-              onPressed: () {
-                context.pop();
-              },
+    if (mounted) {
+      showDialog(
+        barrierDismissible: true,
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            backgroundColor: Theme.of(context).colorScheme.outlineVariant,
+            title: Text(
+                'Post to ${audiance == null ? AppLocalizations.of(context)!.public : ref.watch(groupProvider(audiance!)).when(data: (group) => group.name, loading: () => '--', error: (_, __) => '--')}?'),
+            content: SingleChildScrollView(
+              child: PostCardFromPost(post: post, isPreview: true),
             ),
-            TextButton(
-              child: Text(AppLocalizations.of(context)!.post),
-              onPressed: () async {
-                if (isUploading) return;
-                isUploading = true;
-                final postToUpload = post.copyWith(
-                    createdAt: DateTime.now().toUtc().toIso8601String());
-                final id = await uploadPost(postToUpload, ref);
-                if (context.mounted) context.pop();
-                _clear();
-                if (context.mounted) {
-                  if (post.tags.contains('public')) {
-                    final completePost = postToUpload.copyWith(
-                      id: id,
-                    );
-                    ref
-                        .read(newFeedProvider.notifier)
-                        .insertAtIndex(0, completePost);
-                    ref
-                        .read(followingFeedProvider.notifier)
-                        .insertAtIndex(0, completePost);
-                    ref.read(postPoolProvider).putAll([completePost]);
-                    context.go('/feed');
-                  } else {
-                    context.go('/groups/sub_group/${post.tags.first}');
+            actions: <Widget>[
+              TextButton(
+                child: Text(AppLocalizations.of(context)!.cancel),
+                onPressed: () {
+                  context.pop();
+                },
+              ),
+              TextButton(
+                child: Text(AppLocalizations.of(context)!.post),
+                onPressed: () async {
+                  if (isUploading) return;
+                  isUploading = true;
+                  final postToUpload = post.copyWith(
+                      createdAt: DateTime.now().toUtc().toIso8601String());
+                  final id = await uploadPost(postToUpload, ref);
+                  if (context.mounted) context.pop();
+                  _clear();
+                  if (context.mounted) {
+                    if (post.tags.contains('public')) {
+                      final completePost = postToUpload.copyWith(
+                        id: id,
+                      );
+                      ref
+                          .read(newFeedProvider.notifier)
+                          .insertAtIndex(0, completePost);
+                      ref
+                          .read(followingFeedProvider.notifier)
+                          .insertAtIndex(0, completePost);
+                      ref.read(postPoolProvider).putAll([completePost]);
+                      context.go('/feed');
+                    } else {
+                      context.go('/groups/sub_group/${post.tags.first}');
+                    }
                   }
-                }
-                isUploading = false;
-              },
-            ),
-          ],
-        );
-      },
-    ).then((_) => FocusManager.instance.primaryFocus?.unfocus());
+                  isUploading = false;
+                },
+              ),
+            ],
+          );
+        },
+      ).then((_) => FocusManager.instance.primaryFocus?.unfocus());
+    }
+    isChecking = false;
   }
 
   @override
@@ -470,115 +529,51 @@ class _ComposePageState extends ConsumerState<ComposePage> {
                             }
                             return SizedBox();
                           }),
-                      if (widget.repostId != null)
-                        RepostCard(
-                            postId: widget.repostId!,
-                            isLoggedIn: true,
-                            isPreview: true),
-                      if (gif != null || image != null)
-                        FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: Stack(
-                            alignment: Alignment.topRight,
-                            children: [
-                              Container(
-                                alignment: Alignment.center,
-                                padding: EdgeInsets.symmetric(
-                                    vertical: height * 0.025,
-                                    horizontal: height * 0.025),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(10),
-                                  child: image != null
-                                      ? Align(child: ImageWidget(ascii: image!))
-                                      : Image.network(
-                                          // gif!.images!.fixedWidth.url,
-                                          gif ?? '',
-                                          loadingBuilder: (BuildContext context,
-                                              Widget child,
-                                              ImageChunkEvent?
-                                                  loadingProgress) {
-                                            if (loadingProgress == null) {
-                                              return child;
-                                            }
-                                            return Container(
-                                              alignment: Alignment.center,
-                                              width: 200,
-                                              height: 150,
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .onSurface,
-                                              child: CircularProgressIndicator(
-                                                value: loadingProgress
-                                                            .expectedTotalBytes !=
-                                                        null
-                                                    ? loadingProgress
-                                                            .cumulativeBytesLoaded /
-                                                        loadingProgress
-                                                            .expectedTotalBytes!
-                                                    : null,
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                ),
+                      if (repostId != null)
+                        _CornerClose(
+                          onPressed: () => setState(() {
+                            repostId = null;
+                          }),
+                          child: ConstrainedBox(
+                              constraints: BoxConstraints(
+                                minWidth: width * 0.8,
                               ),
-                              IconButton(
-                                iconSize: image != null ? 150 : 30,
-                                onPressed: () => _removeMedia(),
-                                icon: DecoratedBox(
-                                  decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .surface),
-                                  child: Icon(
-                                    Icons.cancel,
-                                    color:
-                                        Theme.of(context).colorScheme.onSurface,
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
+                              child: RepostCard(
+                                  postId: widget.repostId!,
+                                  isLoggedIn: true,
+                                  isPreview: true)),
+                        ),
+                      if (gif != null)
+                        _CornerClose(
+                          onPressed: () => setState(() {
+                            gif = null;
+                          }),
+                          child: GifWidget(url: gif!),
+                        ),
+                      if (image != null)
+                        _CornerClose(
+                          onPressed: () => setState(() {
+                            image = null;
+                          }),
+                          child: Align(child: ImageWidget(ascii: image!)),
+                        ),
+                      if (isPoll &&
+                          (image != null || gif != null || repostId != null))
+                        SizedBox(
+                          height: 5,
                         ),
                       if (isPoll)
-                        FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: Stack(
-                            alignment: Alignment.topRight,
-                            children: [
-                              Container(
-                                alignment: Alignment.center,
-                                padding: EdgeInsets.symmetric(
-                                    vertical: height * 0.025,
-                                    horizontal: height * 0.025),
-                                child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(10),
-                                    child: PollCreator(
-                                      height: height,
-                                      width: width,
-                                      pollOptions: pollOptions,
-                                    )),
-                              ),
-                              IconButton(
-                                iconSize: 30,
-                                onPressed: () => setState(() {
-                                  isPoll = false;
-                                }),
-                                icon: DecoratedBox(
-                                  decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .surface),
-                                  child: Icon(
-                                    Icons.cancel,
-                                    color:
-                                        Theme.of(context).colorScheme.onSurface,
-                                  ),
-                                ),
-                              )
-                            ],
+                        Padding(
+                          padding: EdgeInsetsGeometry.symmetric(horizontal: 10),
+                          child: _CornerClose(
+                            onPressed: () => setState(() {
+                              isPoll = false;
+                            }),
+                            child: PollCreator(
+                              height: height,
+                              width: width,
+                              pollOptions: pollOptions,
+                            ),
                           ),
                         ),
                       ConstrainedBox(
