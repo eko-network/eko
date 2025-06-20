@@ -1,0 +1,17 @@
+[
+	{
+		"origin": [
+			"https://eko-app.com",
+			"untitled-2832f.web.app",
+			"untitled-2832f.firebaseapp.com"
+		],
+		"method": [
+			"GET"
+		],
+		"responseHeader": [
+			"Content-Type",
+			"Authorization"
+		],
+		"maxAgeSeconds": 3600
+	}
+]
