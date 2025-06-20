@@ -410,6 +410,9 @@ class PostCardFromPost extends ConsumerWidget {
                               final Map<String, dynamic> queryParameters = {
                                 'repostId': post.id
                               };
+                              queryParameters['timestamp'] = DateTime.now()
+                                  .millisecondsSinceEpoch
+                                  .toString();
                               if (post.tags.isNotEmpty &&
                                   post.tags.first != 'public') {
                                 queryParameters['id'] = post.tags.first;

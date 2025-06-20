@@ -136,7 +136,10 @@ class RepostCard extends ConsumerWidget {
                                       ),
                                     ),
                                   if (post.body.isNotEmpty)
-                                    TextWithTags(text: post.body),
+                                    Padding(
+                                      padding: EdgeInsets.only(bottom: 6),
+                                      child: TextWithTags(text: post.body),
+                                    ),
                                 ],
                               ),
                             ),

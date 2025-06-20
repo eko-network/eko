@@ -124,8 +124,13 @@ class SubGroupPage extends ConsumerWidget {
         child: FloatingActionButton(
           onPressed: () {
             context.goNamed('compose',
-                queryParameters:
-                    asyncGroup.hasValue ? {'id': asyncGroup.value?.id} : {});
+                queryParameters: asyncGroup.hasValue
+                    ? {
+                        'id': asyncGroup.value?.id,
+                        'timestamp':
+                            DateTime.now().millisecondsSinceEpoch.toString()
+                      }
+                    : {});
           },
           shape: const CircleBorder(),
           child: const Icon(Icons.add, size: 40),

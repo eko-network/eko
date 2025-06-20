@@ -71,7 +71,9 @@ class _CornerClose extends StatelessWidget {
 class ComposePage extends ConsumerStatefulWidget {
   final String? groupId;
   final String? repostId;
-  const ComposePage({super.key, this.groupId, this.repostId});
+  final String? timestamp;
+
+  const ComposePage({super.key, this.groupId, this.repostId, this.timestamp});
   @override
   ConsumerState<ComposePage> createState() => _ComposePageState();
 }
@@ -81,6 +83,7 @@ class _ComposePageState extends ConsumerState<ComposePage> {
   String? audiance;
   String? repostId;
   String? gif;
+  String? timestamp;
   AsciiImage? image;
   bool isPoll = false;
   List<String> pollOptions = ['', ''];
@@ -98,14 +101,18 @@ class _ComposePageState extends ConsumerState<ComposePage> {
   @override
   void didUpdateWidget(covariant ComposePage oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.groupId != widget.groupId) {
+    if (oldWidget.groupId != widget.groupId ||
+        oldWidget.timestamp != widget.timestamp) {
       setState(() {
         audiance = widget.groupId;
+        timestamp = widget.timestamp;
       });
     }
-    if (oldWidget.repostId != widget.repostId) {
+    if (oldWidget.repostId != widget.repostId ||
+        oldWidget.timestamp != widget.timestamp) {
       setState(() {
         repostId = widget.repostId;
+        timestamp = widget.timestamp;
       });
     }
   }
@@ -115,6 +122,7 @@ class _ComposePageState extends ConsumerState<ComposePage> {
     bodyFocus.addListener(bodyFocusListen);
     repostId = widget.repostId;
     audiance = widget.groupId;
+    timestamp = widget.timestamp;
     super.initState();
   }
 
