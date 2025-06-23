@@ -18,12 +18,13 @@ OnlineStatus _$OnlineStatusFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$OnlineStatus implements DiagnosticableTreeMixin {
-  bool get online;
+// if there is a deveice online
+  bool get online; // true if current device id matches the active device
   @JsonKey(includeFromJson: false)
-  bool get valid;
-  String? get id;
+  bool get valid; // the id of the active device
+  String? get id; // timestamp of last change
   @JsonKey(name: 'last_changed')
-  int get lastChanged;
+  int? get lastChanged;
 
   /// Create a copy of OnlineStatus
   /// with the given fields replaced by the non-null parameter values.
@@ -78,7 +79,7 @@ abstract mixin class $OnlineStatusCopyWith<$Res> {
       {bool online,
       @JsonKey(includeFromJson: false) bool valid,
       String? id,
-      @JsonKey(name: 'last_changed') int lastChanged});
+      @JsonKey(name: 'last_changed') int? lastChanged});
 }
 
 /// @nodoc
@@ -96,7 +97,7 @@ class _$OnlineStatusCopyWithImpl<$Res> implements $OnlineStatusCopyWith<$Res> {
     Object? online = null,
     Object? valid = null,
     Object? id = freezed,
-    Object? lastChanged = null,
+    Object? lastChanged = freezed,
   }) {
     return _then(_self.copyWith(
       online: null == online
@@ -111,10 +112,10 @@ class _$OnlineStatusCopyWithImpl<$Res> implements $OnlineStatusCopyWith<$Res> {
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as String?,
-      lastChanged: null == lastChanged
+      lastChanged: freezed == lastChanged
           ? _self.lastChanged
           : lastChanged // ignore: cast_nullable_to_non_nullable
-              as int,
+              as int?,
     ));
   }
 }
@@ -126,21 +127,25 @@ class _ with DiagnosticableTreeMixin implements OnlineStatus {
   const _(
       {this.online = false,
       @JsonKey(includeFromJson: false) this.valid = true,
-      required this.id,
-      @JsonKey(name: 'last_changed') required this.lastChanged});
+      this.id,
+      @JsonKey(name: 'last_changed') this.lastChanged});
   factory _.fromJson(Map<String, dynamic> json) => _$FromJson(json);
 
+// if there is a deveice online
   @override
   @JsonKey()
   final bool online;
+// true if current device id matches the active device
   @override
   @JsonKey(includeFromJson: false)
   final bool valid;
+// the id of the active device
   @override
   final String? id;
+// timestamp of last change
   @override
   @JsonKey(name: 'last_changed')
-  final int lastChanged;
+  final int? lastChanged;
 
   /// Create a copy of OnlineStatus
   /// with the given fields replaced by the non-null parameter values.
@@ -197,7 +202,7 @@ abstract mixin class _$CopyWith<$Res> implements $OnlineStatusCopyWith<$Res> {
       {bool online,
       @JsonKey(includeFromJson: false) bool valid,
       String? id,
-      @JsonKey(name: 'last_changed') int lastChanged});
+      @JsonKey(name: 'last_changed') int? lastChanged});
 }
 
 /// @nodoc
@@ -215,7 +220,7 @@ class __$CopyWithImpl<$Res> implements _$CopyWith<$Res> {
     Object? online = null,
     Object? valid = null,
     Object? id = freezed,
-    Object? lastChanged = null,
+    Object? lastChanged = freezed,
   }) {
     return _then(_(
       online: null == online
@@ -230,10 +235,10 @@ class __$CopyWithImpl<$Res> implements _$CopyWith<$Res> {
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as String?,
-      lastChanged: null == lastChanged
+      lastChanged: freezed == lastChanged
           ? _self.lastChanged
           : lastChanged // ignore: cast_nullable_to_non_nullable
-              as int,
+              as int?,
     ));
   }
 }

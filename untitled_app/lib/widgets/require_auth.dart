@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:untitled_app/providers/auth_provider.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
 import 'package:untitled_app/providers/presence_provider.dart';
-import 'package:untitled_app/types/online_status.dart';
 import 'package:untitled_app/views/invalid_session_page.dart';
 import 'package:untitled_app/widgets/loading_spinner.dart';
 
@@ -16,6 +15,7 @@ class RequireAuth extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final auth = ref.watch(authProvider);
     final user = ref.watch(currentUserProvider);
+    final online = ref.watch(presenceProvider);
     if (auth.isLoading) {
       return Center(child: LoadingSpinner());
     }
@@ -29,7 +29,6 @@ class RequireAuth extends ConsumerWidget {
       return Center(child: LoadingSpinner());
     }
     // force one device on
-    OnlineStatus online = ref.watch(presenceProvider);
     if (!online.valid) {
       return InvalidSessionPage();
     }

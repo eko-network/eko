@@ -21,48 +21,91 @@ String _getWebUdid() {
   return fromPref;
 }
 
+Future<String> _getUdid() async {
+  return kIsWeb ? _getWebUdid() : await FlutterUdid.udid;
+}
+
 @riverpod
 class Presence extends _$Presence with WidgetsBindingObserver {
   DatabaseReference? _onlineRef;
   StreamSubscription<DatabaseEvent>? _statusSubscription;
-  Timer? _setTimer;
-
-  final _uuid = _getWebUdid();
+  Timer? _periodicUpdate;
+  AppLifecycleListener? _appLifecycleListener;
+  bool _isActive = true;
 
   @override
   OnlineStatus build() {
-    WidgetsBinding.instance.addObserver(this);
-    _init();
+    // uid will be null if the auth hasn't finished. build will get recalled if auth changes
+    final uid = ref.watch(authProvider).uid;
+
+    _init(uid);
+
+    AppLifecycleListener(
+      onResume: () {
+        //gaurd becuase this can fire twice
+        if (_isActive) return;
+        _isActive = true;
+        // re initialize
+        final uid = ref.watch(authProvider).uid;
+        _init(uid);
+      },
+      onPause: () {
+        if (!_isActive) return;
+        _isActive = false;
+
+        // set offline if the lead device
+        if (state.valid) {
+          _onlineRef!.update({'online': false});
+        }
+
+        // dispose
+        _statusSubscription?.cancel();
+        _periodicUpdate?.cancel();
+        _statusSubscription = null;
+        _periodicUpdate = null;
+      },
+    );
+
     ref.onDispose(() {
+      // these get killed here and on background
       _onlineRef?.remove();
       _statusSubscription?.cancel();
-      _setTimer?.cancel();
+      _periodicUpdate?.cancel();
+      // this should always be running
+      _appLifecycleListener?.dispose();
     });
+    // set to false while we figure out device status
     return const OnlineStatus(online: false, id: '', lastChanged: 0);
   }
 
-  void _init() async {
-    await setOnline();
-    _setTimer = Timer.periodic(
-        const Duration(minutes: 10), (_) => maybeUpdateTimestamp());
+  void _init(String? uid) async {
+    if (uid == null) return;
 
-    final uid = ref.read(authProvider).uid!;
-    final deviceUid = kIsWeb ? _uuid : await FlutterUdid.udid;
-    _onlineRef = FirebaseDatabase.instance.ref('status/$uid');
+    //null aware assignment to avoid creating two timers on accident.
+    _periodicUpdate ??= Timer.periodic(
+        const Duration(minutes: 8), (_) => maybeUpdateTimestamp());
 
+    _onlineRef ??= FirebaseDatabase.instance.ref('status/$uid');
+
+    final udid = await _getUdid();
     _statusSubscription = _onlineRef!.onValue.listen((DatabaseEvent event) {
       final data = event.snapshot.value;
       if (data != null) {
         final jsonData = Map<String, dynamic>.from(data as Map);
         final status = OnlineStatus.fromJson(jsonData);
-        final valid = status.id == deviceUid;
-
+        final valid = status.id == udid;
+        // if offline we need to set to online and take the lead
         if (!status.online) validateSession();
+        // if online don't interfere with current device
         state = state.copyWith(
           online: status.online,
           lastChanged: status.lastChanged,
           valid: valid,
         );
+      } else {
+        // if there is no entry we need to create one the write will trigger an update
+        // which will update state in the other side of this condition.
+        validateSession();
       }
     });
 
@@ -70,33 +113,11 @@ class Presence extends _$Presence with WidgetsBindingObserver {
     await _onlineRef!.onDisconnect().update({'online': false});
   }
 
-  Future<void> setOnline() async {
-    final uid = ref.read(authProvider).uid!;
-    final dbRef = FirebaseDatabase.instance.ref('status/$uid');
-
-    final deviceUid = kIsWeb ? _uuid : await FlutterUdid.udid;
-
-    final snapshot = await dbRef.get();
-    final onlineData = {
-      'online': true,
-      'last_changed': ServerValue.timestamp,
-    };
-
-    if (snapshot.exists) {
-      final jsonData = Map<String, dynamic>.from(snapshot.value as Map);
-      final status = OnlineStatus.fromJson(jsonData);
-
-      if (!status.online && status.id != deviceUid) {
-        onlineData['id'] = deviceUid;
-      }
-    }
-
-    await dbRef.update(onlineData);
-  }
-
   Future<void> validateSession() async {
-    final uid = ref.read(authProvider).uid!;
-    final deviceUid = kIsWeb ? _uuid : await FlutterUdid.udid;
+    final uid = ref.read(authProvider).uid;
+    if (uid == null) return;
+    final deviceUid = await _getUdid();
+    // set to online with current device as lead
     await FirebaseDatabase.instance.ref('status/$uid').set({
       'online': true,
       'id': deviceUid,
@@ -104,27 +125,10 @@ class Presence extends _$Presence with WidgetsBindingObserver {
     });
   }
 
-  Future<void> maybeUpdateTimestamp() async {
-    final uid = ref.read(authProvider).uid!;
-    if (state.valid) {
-      await FirebaseDatabase.instance
-          .ref('status/$uid')
-          .update({'last_changed': ServerValue.timestamp});
-    }
-  }
-
-  @override
-  // make sure the disconnect to firebase is not dirty when app goes to foreground
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (_onlineRef == null) return;
-
-    if (state == AppLifecycleState.paused) {
-      // app going to background
-      _onlineRef!.update({'online': false});
-      _statusSubscription?.cancel();
-      _statusSubscription = null;
-    } else if (state == AppLifecycleState.resumed) {
-      _init();
+  void maybeUpdateTimestamp() {
+    final uid = ref.read(authProvider).uid;
+    if (state.valid && uid != null) {
+      _onlineRef?.update({'last_changed': ServerValue.timestamp});
     }
   }
 }

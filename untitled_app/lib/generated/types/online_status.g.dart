@@ -9,7 +9,7 @@ part of '../../types/online_status.dart';
 _ _$FromJson(Map<String, dynamic> json) => _(
       online: json['online'] as bool? ?? false,
       id: json['id'] as String?,
-      lastChanged: (json['last_changed'] as num).toInt(),
+      lastChanged: (json['last_changed'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$ToJson(_ instance) => <String, dynamic>{

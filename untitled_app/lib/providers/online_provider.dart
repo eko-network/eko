@@ -23,18 +23,22 @@ class Online extends _$Online {
       return;
     }
     DatabaseReference onlineRef = FirebaseDatabase.instance.ref('status/$id');
-    _listener = onlineRef.onValue.listen((DatabaseEvent event) {
-      final data = event.snapshot.value;
-      if (data != null) {
-        final jsonData = Map<String, dynamic>.from(data as Map);
-        OnlineStatus status = OnlineStatus.fromJson(jsonData);
-        state = state.copyWith(
-          online: status.online &&
-              DateTime.now().toUtc().difference(
-                      DateTime.fromMillisecondsSinceEpoch(status.lastChanged)) >
-                  Duration(minutes: 15),
-        );
-      }
-    });
+    _listener = onlineRef.onValue.listen(
+      (DatabaseEvent event) {
+        final data = event.snapshot.value;
+        if (data != null) {
+          final jsonData = Map<String, dynamic>.from(data as Map);
+          OnlineStatus status = OnlineStatus.fromJson(jsonData);
+          state = state.copyWith(
+            online: status.online &&
+                status.lastChanged != null &&
+                DateTime.now().toUtc().difference(
+                        DateTime.fromMillisecondsSinceEpoch(
+                            status.lastChanged!)) >
+                    Duration(minutes: 10),
+          );
+        }
+      },
+    );
   }
 }
