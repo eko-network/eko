@@ -69,7 +69,7 @@ class _FollowersState extends ConsumerState<Followers> {
             ),
           ),
           body: InfiniteScrolly<String, Never?>(
-            getter: (data) => getter(data, value.followers),
+            getter: (data) => getter(data, []),
             widget: (uid) => UserCard(uid: uid),
             onRefresh: onRefresh,
             initialLoadingWidget: UserLoader(

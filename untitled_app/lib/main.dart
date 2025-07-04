@@ -19,6 +19,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:untitled_app/firebase_options.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future<void> _checkFirstInstall() async {
   if ((PrefsService.instance.getBool('NOT_FIRST_INSTALL')) == null) {
@@ -27,6 +28,13 @@ Future<void> _checkFirstInstall() async {
     }
     setBool('NOT_FIRST_INSTALL', true);
   }
+}
+
+Future<void> _initSupabase() async {
+  await Supabase.initialize(
+    url: dotenv.env['SUPABASE_URL']!,
+    anonKey: dotenv.env['SUPABASE_KEY']!,
+  );
 }
 
 // Future<void> _buildVersion() async {
@@ -47,6 +55,7 @@ Future<void> main() async {
   // setupLocator();
   //protected/dependent services
   await Future.wait([
+    _initSupabase(),
     _checkFirstInstall(),
     LogoService.init(),
     NotificationHelper.setupNotifications(),

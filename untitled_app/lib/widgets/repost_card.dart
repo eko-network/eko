@@ -59,7 +59,7 @@ class RepostCard extends ConsumerWidget {
                               onPressed: () {
                                 if (!isPreview) {
                                   if (post.uid !=
-                                      ref.read(currentUserProvider).user.uid) {
+                                      ref.read(currentUserProvider).uid) {
                                     context
                                         .push('/feed/sub_profile/${post.uid}');
                                   } else {
@@ -87,7 +87,7 @@ class RepostCard extends ConsumerWidget {
                                             if (post.uid !=
                                                 ref
                                                     .read(currentUserProvider)
-                                                    .user
+                                                    
                                                     .uid) {
                                               context.push(
                                                   '/feed/sub_profile/${post.uid}');

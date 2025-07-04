@@ -51,7 +51,7 @@ class CommentLikeButtons extends ConsumerWidget {
       Row(
         children: [
           LikeButton(
-            isLiked: user.likedPosts.contains(comment.id),
+            isLiked: false, //user.likedPosts.contains(comment.id),
             likeBuilder: (isLiked) {
               return icons.Like(
                 size: c.postIconSize,
@@ -90,7 +90,7 @@ class CommentLikeButtons extends ConsumerWidget {
       Row(
         children: [
           LikeButton(
-            isLiked: user.dislikedPosts.contains(comment.id), //dislike
+            isLiked: false, //user.dislikedPosts.contains(comment.id), //dislike
             likeBuilder: (isDisliked) {
               return icons.Dislike(
                 size: c.postIconSize,

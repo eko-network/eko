@@ -117,19 +117,19 @@ class ScaffoldWithNavigationBar extends ConsumerWidget {
                                 _passiveIconList[i],
                                 size: c.navBarIconSize,
                               ),
-                              if (i == 1 && user.unreadGroup)
-                                Positioned(
-                                  right: 1.5,
-                                  child: Container(
-                                    width: 9,
-                                    height: 9,
-                                    decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .error),
-                                  ),
-                                )
+                              // if (i == 1 && user.unreadGroup)
+                              //   Positioned(
+                              //     right: 1.5,
+                              //     child: Container(
+                              //       width: 9,
+                              //       height: 9,
+                              //       decoration: BoxDecoration(
+                              //           shape: BoxShape.circle,
+                              //           color: Theme.of(context)
+                              //               .colorScheme
+                              //               .error),
+                              //     ),
+                              //   )
                             ],
                           ),
                           activeIcon: Stack(
@@ -138,19 +138,19 @@ class ScaffoldWithNavigationBar extends ConsumerWidget {
                                 _activeIconList[i],
                                 size: c.navBarIconSize + c.navBarIconSizeAdder,
                               ),
-                              if (i == 1 && user.unreadGroup)
-                                Positioned(
-                                  right: 1.5,
-                                  child: Container(
-                                    width: 9,
-                                    height: 9,
-                                    decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .error),
-                                  ),
-                                )
+                              // if (i == 1 && user.unreadGroup)
+                              //   Positioned(
+                              //     right: 1.5,
+                              //     child: Container(
+                              //       width: 9,
+                              //       height: 9,
+                              //       decoration: BoxDecoration(
+                              //           shape: BoxShape.circle,
+                              //           color: Theme.of(context)
+                              //               .colorScheme
+                              //               .error),
+                              //     ),
+                              //   )
                             ],
                           ),
                           label: ''),
@@ -201,17 +201,17 @@ class ScaffoldWithNavigationRail extends ConsumerWidget {
                             _passiveIconList[i],
                             size: c.navBarIconSize,
                           ),
-                          if (i == 1 && user.unreadGroup)
-                            Positioned(
-                              right: 1.5,
-                              child: Container(
-                                width: 9,
-                                height: 9,
-                                decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Theme.of(context).colorScheme.error),
-                              ),
-                            )
+                          // if (i == 1 && user.unreadGroup)
+                          //   Positioned(
+                          //     right: 1.5,
+                          //     child: Container(
+                          //       width: 9,
+                          //       height: 9,
+                          //       decoration: BoxDecoration(
+                          //           shape: BoxShape.circle,
+                          //           color: Theme.of(context).colorScheme.error),
+                          //     ),
+                          //   )
                         ],
                       ),
                       selectedIcon: Stack(
@@ -220,17 +220,17 @@ class ScaffoldWithNavigationRail extends ConsumerWidget {
                             _activeIconList[i],
                             size: c.navBarIconSize + c.navBarIconSizeAdder,
                           ),
-                          if (i == 1 && user.unreadGroup)
-                            Positioned(
-                              right: 1.5,
-                              child: Container(
-                                width: 9,
-                                height: 9,
-                                decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Theme.of(context).colorScheme.error),
-                              ),
-                            )
+                          // if (i == 1 && user.unreadGroup)
+                          //   Positioned(
+                          //     right: 1.5,
+                          //     child: Container(
+                          //       width: 9,
+                          //       height: 9,
+                          //       decoration: BoxDecoration(
+                          //           shape: BoxShape.circle,
+                          //           color: Theme.of(context).colorScheme.error),
+                          //     ),
+                          //   )
                         ],
                       ),
                     ),

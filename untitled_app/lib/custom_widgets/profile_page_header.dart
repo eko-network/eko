@@ -44,7 +44,8 @@ class ProfileHeader extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           _ProfilePageTopNumberDisplay(
-                            number: user.followers.length,
+                            // number: user.followers.length,
+                            number: 0,
                             label: AppLocalizations.of(context)!.followers,
                             onPressed: () {
                               if (loggedIn) {
@@ -53,7 +54,8 @@ class ProfileHeader extends StatelessWidget {
                             },
                           ),
                           _ProfilePageTopNumberDisplay(
-                            number: user.following.length,
+                            // number: user.following.length,
+                            number: 0,
                             label: AppLocalizations.of(context)!.following,
                             onPressed: () {
                               if (loggedIn) {

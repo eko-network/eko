@@ -34,8 +34,9 @@ class User extends _$User {
     // ********************************************* //
 
     if (ref.watch(authProvider).uid == uid) {
-      return UserModel.fromCurrent(ref.watch(currentUserProvider)!);
+      return ref.watch(currentUserProvider)!;
     }
+
     final cacheValue = ref.read(userPoolProvider).getItem(uid);
     if (cacheValue != null) {
       return cacheValue;
@@ -45,13 +46,14 @@ class User extends _$User {
 
   Future<UserModel> _fetchUserModel(String uid) async {
     final userRef = FirebaseFirestore.instance.collection('users');
-    final data = await userRef.doc(uid).get();
-    return UserModel.fromJson(data.data());
+    final data = (await userRef.doc(uid).get()).data();
+    if(data == null) return UserModel.userNotFound();
+    return UserModel.fromJson(data);
   }
 
   void updateFollowers(List<String> newFollowers) {
-    state.whenData((user) {
-      state = AsyncData(user.copyWith(followers: newFollowers));
-    });
+    // state.whenData((user) {
+    //   state = AsyncData(user.copyWith(followers: newFollowers));
+    // });
   }
 }

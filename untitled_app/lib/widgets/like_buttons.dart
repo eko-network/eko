@@ -53,7 +53,7 @@ class LikeButtons extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           LikeButton(
-            isLiked: !disabled && user.likedPosts.contains(post.id),
+            isLiked: false, //!disabled && user.likedPosts.contains(post.id),
             likeBuilder: (isLiked) {
               return icons.Like(
                 size: c.postIconSize,
@@ -91,8 +91,8 @@ class LikeButtons extends ConsumerWidget {
                   },
           ),
           LikeButton(
-            isLiked:
-                !disabled && user.dislikedPosts.contains(post.id), //dislike
+            isLiked: false,
+                // !disabled && user.dislikedPosts.contains(post.id), //dislike
             likeBuilder: (isDisliked) {
               return icons.Dislike(
                 size: c.postIconSize,

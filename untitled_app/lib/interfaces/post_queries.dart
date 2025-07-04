@@ -23,7 +23,7 @@ Future<List<PostModel>> getPosts(
 
 Future<(List<MapEntry<String, String>>, bool)> profilePageGetter(
     List<MapEntry<String, String>> list, WidgetRef ref) async {
-  final uid = ref.read(currentUserProvider).user.uid;
+  final uid = ref.read(currentUserProvider).uid;
   final baseQuery = FirebaseFirestore.instance
       .collection('posts')
       .where('author', isEqualTo: uid)

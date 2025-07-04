@@ -6,7 +6,7 @@ import '../providers/post_provider.dart';
 
 Future<void> addReport(WidgetRef ref, String id, String message) async {
   final firestore = FirebaseFirestore.instance;
-  final uid = ref.read(currentUserProvider).user.uid;
+  final uid = ref.read(currentUserProvider).uid;
   final post = await ref.read(postProvider(id).future);
 
   final report = {

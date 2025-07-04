@@ -20,8 +20,9 @@ class FollowButton extends ConsumerWidget {
   const FollowButton({super.key, required this.user});
 
   Future<void> onFollowPressed(WidgetRef ref, UserModel user) async {
-    final isFollowing =
-        ref.watch(currentUserProvider).user.following.contains(user.uid);
+    final isFollowing = false;
+    //FIXME
+        // ref.watch(currentUserProvider).user.following.contains(user.uid);
     if (isFollowing) {
       await ref.read(currentUserProvider.notifier).removeFollower(user.uid);
     } else {
@@ -33,7 +34,7 @@ class FollowButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final width = c.widthGetter(context);
     final currentUser = ref.watch(currentUserProvider);
-    if (user.uid == currentUser.user.uid) {
+    if (user.uid == currentUser.uid) {
       return SizedBox();
     }
     return InkWell(
@@ -44,14 +45,17 @@ class FollowButton extends ConsumerWidget {
         alignment: Alignment.center,
         decoration: BoxDecoration(
           borderRadius: const BorderRadius.all(Radius.circular(10)),
-          color: currentUser.user.following.contains(user.uid)
-              ? Theme.of(context).colorScheme.outlineVariant
-              : Theme.of(context).colorScheme.primaryContainer,
+          color:
+          //  currentUser.user.following.contains(user.uid)
+          //     ? Theme.of(context).colorScheme.outlineVariant
+          //     : 
+              Theme.of(context).colorScheme.primaryContainer,
         ),
         child: Text(
-          currentUser.user.following.contains(user.uid)
-              ? AppLocalizations.of(context)!.following
-              : AppLocalizations.of(context)!.follow,
+          // currentUser.user.following.contains(user.uid)
+          //     ? AppLocalizations.of(context)!.following
+          //     : 
+              AppLocalizations.of(context)!.follow,
           maxLines: 1,
           style: TextStyle(
             fontSize: 13,
@@ -90,11 +94,12 @@ class UserCard extends ConsumerWidget {
     return userAsync.when(
       data: (user) {
         final currentUser = ref.watch(currentUserProvider);
-        if (!showBlockedUsers &&
-            (currentUser.blockedUsers.contains(user.uid) ||
-                currentUser.blockedBy.contains(user.uid))) {
-          return SizedBox.shrink();
-        }
+        //FIXME
+        // if (!showBlockedUsers &&
+        //     (currentUser.blockedUsers.contains(user.uid) ||
+        //         currentUser.blockedBy.contains(user.uid))) {
+        //   return SizedBox.shrink();
+        // }
         return InkWell(
           onTap: () {
             if (onCardPressed != null) {

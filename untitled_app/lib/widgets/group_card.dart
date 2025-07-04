@@ -21,7 +21,7 @@ class GroupCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final double width = c.widthGetter(context);
     final group = ref.watch(groupProvider(groupId));
-    final uid = ref.read(currentUserProvider).user.uid;
+    final uid = ref.read(currentUserProvider).uid;
     bool unseen = group.when(
         data: (data) => (data.notSeen.contains(uid)),
         error: (_, __) => false,

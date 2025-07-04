@@ -10,7 +10,7 @@ abstract class OnlineStatus with _$OnlineStatus {
     // if there is a deveice online
     @Default(false) bool online,
     // true if current device id matches the active device
-    @JsonKey(includeFromJson: false) @Default(true) bool valid,
+    @JsonKey(includeFromJson: false) @Default(false) bool valid,
     // the id of the active device
     String? id,
     // timestamp of last change

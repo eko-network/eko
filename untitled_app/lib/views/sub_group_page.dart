@@ -138,7 +138,7 @@ class SubGroupPage extends ConsumerWidget {
       ),
       body: asyncGroup.when(
         data: (group) => group.members
-                .contains(ref.watch(currentUserProvider).user.uid)
+                .contains(ref.watch(currentUserProvider).uid)
             ? InfiniteScrolly<String, String>(
                 appBar: _appBar(context, group),
                 getter: (data) async {

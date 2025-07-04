@@ -62,7 +62,7 @@ class Post extends _$Post {
 
   Future<void> _addLikeToDb(String id) async {
     final firestore = FirebaseFirestore.instance;
-    final uid = ref.read(currentUserProvider).user.uid;
+    final uid = ref.read(currentUserProvider).uid;
     await Future.wait([
       firestore.collection('users').doc(uid).update({
         'profileData.likedPosts': FieldValue.arrayUnion([id])
@@ -76,7 +76,7 @@ class Post extends _$Post {
 
   Future<void> _removeLikeFromDb(String id) async {
     final firestore = FirebaseFirestore.instance;
-    final uid = ref.read(currentUserProvider).user.uid;
+    final uid = ref.read(currentUserProvider).uid;
     await Future.wait([
       firestore.collection('users').doc(uid).update({
         'profileData.likedPosts': FieldValue.arrayRemove([id])
@@ -90,7 +90,7 @@ class Post extends _$Post {
 
   Future<void> _addDislikeToDb(String id) async {
     final firestore = FirebaseFirestore.instance;
-    final uid = ref.read(currentUserProvider).user.uid;
+    final uid = ref.read(currentUserProvider).uid;
     await Future.wait([
       firestore.collection('users').doc(uid).update({
         'profileData.dislikedPosts': FieldValue.arrayUnion([id])
@@ -104,7 +104,7 @@ class Post extends _$Post {
 
   Future<void> _removeDisikeFromDb(String id) async {
     final firestore = FirebaseFirestore.instance;
-    final uid = ref.read(currentUserProvider).user.uid;
+    final uid = ref.read(currentUserProvider).uid;
     await Future.wait([
       firestore.collection('users').doc(uid).update({
         'profileData.dislikedPosts': FieldValue.arrayRemove([id])
@@ -117,92 +117,92 @@ class Post extends _$Post {
   }
 
   Future<void> likePostToggle() async {
-    final prevState = await future;
-    if (_isLiking) return;
-    _isLiking = true;
-    // liked -> not liked
-    if (ref.read(currentUserProvider).likedPosts.contains(prevState.id)) {
-      ref.read(currentUserProvider.notifier).removeIdFromLiked(prevState.id);
-      state = AsyncData(prevState.copyWith(likes: prevState.likes - 1));
-      try {
-        await _removeLikeFromDb(prevState.id);
-      } catch (_) {
-        ref.read(currentUserProvider.notifier).addIdToLiked(prevState.id);
-        state = AsyncData(prevState);
-      }
-      // not liked -> liked
-    } else {
-      bool wasDisliked = false;
-      final List<Future<void>> ops = [_addLikeToDb(prevState.id)];
-      ref.read(currentUserProvider.notifier).addIdToLiked(prevState.id);
-      if (ref.read(currentUserProvider).dislikedPosts.contains(prevState.id)) {
-        wasDisliked = true;
-        ref
-            .read(currentUserProvider.notifier)
-            .removeIdFromDisliked(prevState.id);
-        state = AsyncData(prevState.copyWith(
-            dislikes: prevState.dislikes - 1, likes: prevState.likes + 1));
-        ops.add(_removeDisikeFromDb(prevState.id));
-      } else {
-        state = AsyncData(prevState.copyWith(likes: prevState.likes + 1));
-      }
-      try {
-        await Future.wait(ops);
-      } catch (_) {
-        ref.read(currentUserProvider.notifier).removeIdFromLiked(prevState.id);
-        if (wasDisliked) {
-          ref.read(currentUserProvider.notifier).addIdToDisliked(prevState.id);
-        }
-        state = AsyncData(prevState);
-      }
-    }
-    _isLiking = false;
+    // final prevState = await future;
+    // if (_isLiking) return;
+    // _isLiking = true;
+    // // liked -> not liked
+    // if (ref.read(currentUserProvider).likedPosts.contains(prevState.id)) {
+    //   ref.read(currentUserProvider.notifier).removeIdFromLiked(prevState.id);
+    //   state = AsyncData(prevState.copyWith(likes: prevState.likes - 1));
+    //   try {
+    //     await _removeLikeFromDb(prevState.id);
+    //   } catch (_) {
+    //     ref.read(currentUserProvider.notifier).addIdToLiked(prevState.id);
+    //     state = AsyncData(prevState);
+    //   }
+    //   // not liked -> liked
+    // } else {
+    //   bool wasDisliked = false;
+    //   final List<Future<void>> ops = [_addLikeToDb(prevState.id)];
+    //   ref.read(currentUserProvider.notifier).addIdToLiked(prevState.id);
+    //   if (ref.read(currentUserProvider).dislikedPosts.contains(prevState.id)) {
+    //     wasDisliked = true;
+    //     ref
+    //         .read(currentUserProvider.notifier)
+    //         .removeIdFromDisliked(prevState.id);
+    //     state = AsyncData(prevState.copyWith(
+    //         dislikes: prevState.dislikes - 1, likes: prevState.likes + 1));
+    //     ops.add(_removeDisikeFromDb(prevState.id));
+    //   } else {
+    //     state = AsyncData(prevState.copyWith(likes: prevState.likes + 1));
+    //   }
+    //   try {
+    //     await Future.wait(ops);
+    //   } catch (_) {
+    //     ref.read(currentUserProvider.notifier).removeIdFromLiked(prevState.id);
+    //     if (wasDisliked) {
+    //       ref.read(currentUserProvider.notifier).addIdToDisliked(prevState.id);
+    //     }
+    //     state = AsyncData(prevState);
+    //   }
+    // }
+    // _isLiking = false;
   }
 
   Future<void> dislikePostToggle() async {
-    final prevState = await future;
-    if (_isLiking) return;
-    _isLiking = true;
-    if (ref.read(currentUserProvider).dislikedPosts.contains(prevState.id)) {
-      ref.read(currentUserProvider.notifier).removeIdFromDisliked(prevState.id);
-      state = AsyncData(prevState.copyWith(dislikes: prevState.dislikes - 1));
-      try {
-        await _removeDisikeFromDb(prevState.id);
-      } catch (_) {
-        ref.read(currentUserProvider.notifier).addIdToDisliked(prevState.id);
-        state = AsyncData(prevState);
-      }
-    } else {
-      bool wasLiked = false;
-      final List<Future<void>> ops = [_addDislikeToDb(prevState.id)];
-      ref.read(currentUserProvider.notifier).addIdToDisliked(prevState.id);
-      if (ref.read(currentUserProvider).likedPosts.contains(prevState.id)) {
-        wasLiked = true;
-        ref.read(currentUserProvider.notifier).removeIdFromLiked(prevState.id);
-        state = AsyncData(prevState.copyWith(
-            likes: prevState.likes - 1, dislikes: prevState.dislikes + 1));
-        ops.add(_removeLikeFromDb(prevState.id));
-      } else {
-        state = AsyncData(prevState.copyWith(dislikes: prevState.dislikes + 1));
-      }
-      try {
-        await Future.wait(ops);
-      } catch (_) {
-        ref
-            .read(currentUserProvider.notifier)
-            .removeIdFromDisliked(prevState.id);
-        if (wasLiked) {
-          ref.read(currentUserProvider.notifier).addIdToLiked(prevState.id);
-        }
-        state = AsyncData(prevState);
-      }
-    }
-    _isLiking = false;
+    // final prevState = await future;
+    // if (_isLiking) return;
+    // _isLiking = true;
+    // if (ref.read(currentUserProvider).dislikedPosts.contains(prevState.id)) {
+    //   ref.read(currentUserProvider.notifier).removeIdFromDisliked(prevState.id);
+    //   state = AsyncData(prevState.copyWith(dislikes: prevState.dislikes - 1));
+    //   try {
+    //     await _removeDisikeFromDb(prevState.id);
+    //   } catch (_) {
+    //     ref.read(currentUserProvider.notifier).addIdToDisliked(prevState.id);
+    //     state = AsyncData(prevState);
+    //   }
+    // } else {
+    //   bool wasLiked = false;
+    //   final List<Future<void>> ops = [_addDislikeToDb(prevState.id)];
+    //   ref.read(currentUserProvider.notifier).addIdToDisliked(prevState.id);
+    //   if (ref.read(currentUserProvider).likedPosts.contains(prevState.id)) {
+    //     wasLiked = true;
+    //     ref.read(currentUserProvider.notifier).removeIdFromLiked(prevState.id);
+    //     state = AsyncData(prevState.copyWith(
+    //         likes: prevState.likes - 1, dislikes: prevState.dislikes + 1));
+    //     ops.add(_removeLikeFromDb(prevState.id));
+    //   } else {
+    //     state = AsyncData(prevState.copyWith(dislikes: prevState.dislikes + 1));
+    //   }
+    //   try {
+    //     await Future.wait(ops);
+    //   } catch (_) {
+    //     ref
+    //         .read(currentUserProvider.notifier)
+    //         .removeIdFromDisliked(prevState.id);
+    //     if (wasLiked) {
+    //       ref.read(currentUserProvider.notifier).addIdToLiked(prevState.id);
+    //     }
+    //     state = AsyncData(prevState);
+    //   }
+    // }
+    // _isLiking = false;
   }
 
   Future<void> _addVoteToDb(String id, int optionIndex) async {
     final firestore = FirebaseFirestore.instance;
-    final uid = ref.read(currentUserProvider).user.uid;
+    final uid = ref.read(currentUserProvider).uid;
     await Future.wait([
       firestore
           .collection('users')
@@ -217,7 +217,7 @@ class Post extends _$Post {
 
   Future<void> _removeVoteFromDb(String id, int currentVote) async {
     final firestore = FirebaseFirestore.instance;
-    final uid = ref.read(currentUserProvider).user.uid;
+    final uid = ref.read(currentUserProvider).uid;
     await Future.wait([
       firestore
           .collection('users')
@@ -231,61 +231,61 @@ class Post extends _$Post {
   }
 
   Future<void> addPollVote({required int optionIndex}) async {
-    final prevState = await future;
-    if (_isVoting ||
-        ref.read(currentUserProvider).pollVotes.containsKey(prevState.id)) {
-      return;
-    }
-    _isVoting = true;
+    // final prevState = await future;
+    // if (_isVoting ||
+    //     ref.read(currentUserProvider).pollVotes.containsKey(prevState.id)) {
+    //   return;
+    // }
+    // _isVoting = true;
 
-    ref
-        .read(currentUserProvider.notifier)
-        .addPollVote(prevState.id, optionIndex);
+    // ref
+    //     .read(currentUserProvider.notifier)
+    //     .addPollVote(prevState.id, optionIndex);
 
-    final updatedPollVoteCounts =
-        Map<String, int>.from(prevState.pollVoteCounts ?? {});
-    updatedPollVoteCounts[optionIndex.toString()] =
-        (updatedPollVoteCounts[optionIndex.toString()] ?? 0) + 1;
+    // final updatedPollVoteCounts =
+    //     Map<String, int>.from(prevState.pollVoteCounts ?? {});
+    // updatedPollVoteCounts[optionIndex.toString()] =
+    //     (updatedPollVoteCounts[optionIndex.toString()] ?? 0) + 1;
 
-    state =
-        AsyncData(prevState.copyWith(pollVoteCounts: updatedPollVoteCounts));
+    // state =
+    //     AsyncData(prevState.copyWith(pollVoteCounts: updatedPollVoteCounts));
 
-    try {
-      await _addVoteToDb(prevState.id, optionIndex);
-    } catch (_) {
-      ref.read(currentUserProvider.notifier).removePollVote(prevState.id);
-      state = AsyncData(prevState);
-    }
+    // try {
+    //   await _addVoteToDb(prevState.id, optionIndex);
+    // } catch (_) {
+    //   ref.read(currentUserProvider.notifier).removePollVote(prevState.id);
+    //   state = AsyncData(prevState);
+    // }
 
-    _isVoting = false;
+    // _isVoting = false;
   }
 
   Future<void> removePollVote() async {
-    final prevState = await future;
-    if (_isVoting ||
-        !ref.read(currentUserProvider).pollVotes.containsKey(prevState.id)) {
-      return;
-    }
-    _isVoting = true;
-    final currentVote = ref.read(currentUserProvider).pollVotes[prevState.id]!;
+    // final prevState = await future;
+    // if (_isVoting ||
+    //     !ref.read(currentUserProvider).pollVotes.containsKey(prevState.id)) {
+    //   return;
+    // }
+    // _isVoting = true;
+    // final currentVote = ref.read(currentUserProvider).pollVotes[prevState.id]!;
 
-    ref.read(currentUserProvider.notifier).removePollVote(prevState.id);
+    // ref.read(currentUserProvider.notifier).removePollVote(prevState.id);
 
-    final updatedPollVoteCounts =
-        Map<String, int>.from(prevState.pollVoteCounts!);
-    updatedPollVoteCounts[currentVote.toString()] =
-        (updatedPollVoteCounts[currentVote.toString()] ?? 1) - 1;
+    // final updatedPollVoteCounts =
+    //     Map<String, int>.from(prevState.pollVoteCounts!);
+    // updatedPollVoteCounts[currentVote.toString()] =
+    //     (updatedPollVoteCounts[currentVote.toString()] ?? 1) - 1;
 
-    state =
-        AsyncData(prevState.copyWith(pollVoteCounts: updatedPollVoteCounts));
+    // state =
+    //     AsyncData(prevState.copyWith(pollVoteCounts: updatedPollVoteCounts));
 
-    try {
-      await _removeVoteFromDb(prevState.id, currentVote);
-    } catch (_) {
-      ref.read(currentUserProvider.notifier).removePollVote(prevState.id);
-      state = AsyncData(prevState);
-    }
+    // try {
+    //   await _removeVoteFromDb(prevState.id, currentVote);
+    // } catch (_) {
+    //   ref.read(currentUserProvider.notifier).removePollVote(prevState.id);
+    //   state = AsyncData(prevState);
+    // }
 
-    _isVoting = false;
+    // _isVoting = false;
   }
 }

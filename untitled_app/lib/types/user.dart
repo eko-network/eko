@@ -9,13 +9,16 @@ abstract class UserModel with _$UserModel {
   const factory UserModel({
     required String name,
     required String username,
+    @JsonKey(
+        name: 'profilePicture',
+        defaultValue:
+            'https://firebasestorage.googleapis.com/v0/b/untitled-2832f.appspot.com/o/profile_pictures%2Fdefault%2Fprofile.jpg?alt=media&token=2543c4eb-f991-468f-9ce8-68c576ffca7c')
     required String profilePicture,
-    required String bio,
-    required List<String> followers,
-    required List<String> following,
-    required String uid,
-    required bool isVerified,
-    @JsonKey(name: 'share_online_status') required bool shareOnlineStatus,
+    @JsonKey(defaultValue: '') required String bio,
+    @JsonKey(name: 'id') required String uid,
+    @JsonKey(name: 'is_verified', defaultValue: false) required bool isVerified,
+    @JsonKey(name: 'share_online_status', defaultValue: true)
+    required bool shareOnlineStatus,
   }) = _UserModel;
 
   factory UserModel.userNotFound() {
@@ -26,30 +29,27 @@ abstract class UserModel with _$UserModel {
       profilePicture:
           'https://firebasestorage.googleapis.com/v0/b/untitled-2832f.appspot.com/o/profile_pictures%2Fdefault%2Fprofile.jpg?alt=media&token=2543c4eb-f991-468f-9ce8-68c576ffca7c',
       bio: '',
-      followers: [],
-      following: [],
       uid: '',
       shareOnlineStatus: false,
     );
   }
 
-  factory UserModel.fromCurrent(CurrentUserModel cur) {
-    return cur.user;
-  }
+//   factory UserModel.fromJson(Map<String, dynamic>? json) {
+//     if (json == null) return UserModel.userNotFound();
+//     final profileData = json['profileData'] ?? {};
+//     return UserModel(
+//       name: json['name'] ?? '',
+//       username: json['username'] ?? '',
+//       profilePicture: profileData['profilePicture'] ??
+//           'https://firebasestorage.googleapis.com/v0/b/untitled-2832f.appspot.com/o/profile_pictures%2Fdefault%2Fprofile.jpg?alt=media&token=2543c4eb-f991-468f-9ce8-68c576ffca7c',
+//       bio: profileData['bio'] ?? '',
+//       uid: json['uid'] ?? '',
+//       isVerified: json['is_verified'] ?? false,
+//       shareOnlineStatus: json['share_online_status'] ?? true,
+//     );
+//   }
+// }
 
-  factory UserModel.fromJson(Map<String, dynamic>? json) {
-    if (json == null) return UserModel.userNotFound();
-    final profileData = json['profileData'] ?? {};
-    return UserModel(
-      name: json['name'] ?? '',
-      username: json['username'] ?? '',
-      profilePicture: profileData['profilePicture'] ?? '',
-      bio: profileData['bio'] ?? '',
-      followers: List<String>.from(profileData['followers'] ?? []),
-      following: List<String>.from(profileData['following'] ?? []),
-      uid: json['uid'] ?? '',
-      isVerified: json['isVerified'] ?? false,
-      shareOnlineStatus: json['share_online_status'] ?? true,
-    );
-  }
+  factory UserModel.fromJson(Map<String, dynamic> json) =>
+      _$UserModelFromJson(json);
 }

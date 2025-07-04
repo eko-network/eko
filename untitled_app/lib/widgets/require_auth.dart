@@ -25,7 +25,7 @@ class RequireAuth extends ConsumerWidget {
       });
       return SizedBox.expand();
     }
-    if (user.user.uid.isEmpty) {
+    if (user.uid.isEmpty) {
       return Center(child: LoadingSpinner());
     }
     // force one device on

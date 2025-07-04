@@ -58,7 +58,7 @@ class Group extends _$Group {
 
   Future<void> leaveGroup(String id, List<String> members) async {
     final updatedMembers = List<String>.from(members);
-    updatedMembers.remove(ref.read(currentUserProvider).user.uid);
+    updatedMembers.remove(ref.read(currentUserProvider).uid);
 
     final previousState = await future;
     await setGroupMembers(id, updatedMembers);
@@ -67,11 +67,11 @@ class Group extends _$Group {
   }
 
   Future<void> toggleUnread(String id, bool toggle) async {
-    removeFromNotSeenGroup(id, ref.read(currentUserProvider).user.uid);
+    removeFromNotSeenGroup(id, ref.read(currentUserProvider).uid);
     if (toggle == false) {
       state.whenData((group) {
         final newNotSeen = List<String>.from(group.notSeen)
-          ..remove(ref.read(currentUserProvider).user.uid);
+          ..remove(ref.read(currentUserProvider).uid);
         state = AsyncData(group.copyWith(notSeen: newNotSeen));
       });
     }

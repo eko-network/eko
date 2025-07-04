@@ -59,7 +59,7 @@ class GroupBadge extends ConsumerWidget {
           if (group == null) {
             return;
           }
-          if (group.members.contains(ref.watch(currentUserProvider).user.uid)) {
+          if (group.members.contains(ref.watch(currentUserProvider).uid)) {
             context.push('/groups/sub_group/${group.id}', extra: group);
           } else {
             showMyDialog(AppLocalizations.of(context)!.notInGroup, '',
@@ -201,10 +201,11 @@ class _PostCardState extends ConsumerState<PostCard> {
 
     return asyncPost.when(data: (post) {
       final currentUser = ref.watch(currentUserProvider);
-      if (currentUser.blockedUsers.contains(post.uid) ||
-          currentUser.blockedBy.contains(post.uid)) {
-        return SizedBox.shrink();
-      }
+      //FIXME
+      // if (currentUser.blockedUsers.contains(post.uid) ||
+      //     currentUser.blockedBy.contains(post.uid)) {
+      //   return SizedBox.shrink();
+      // }
 
       return PostCardFromPost(
           isOnProfile: widget.isOnProfile,
@@ -271,7 +272,7 @@ class PostCardFromPost extends ConsumerWidget {
                     onPressed: () {
                       if (!isPreview && !isOnProfile) {
                         if (post.uid !=
-                            ref.read(currentUserProvider).user.uid) {
+                            ref.read(currentUserProvider).uid) {
                           context.push('/feed/sub_profile/${post.uid}');
                         } else {
                           context.go('/profile');
@@ -296,7 +297,7 @@ class PostCardFromPost extends ConsumerWidget {
                               onPressed: () {
                                 if (!isPreview && !isOnProfile) {
                                   if (post.uid !=
-                                      ref.read(currentUserProvider).user.uid) {
+                                      ref.read(currentUserProvider).uid) {
                                     context
                                         .push('/feed/sub_profile/${post.uid}');
                                   } else {

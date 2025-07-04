@@ -18,7 +18,7 @@ class OnlineIndicator extends ConsumerWidget {
     final online = ref.watch(onlineProvider(uid));
     final currentUser = ref.watch(currentUserProvider);
 
-    if (online.online && uid != currentUser.user.uid) {
+    if (online.online && uid != currentUser.uid) {
       return Align(
         alignment: Alignment.bottomRight,
         child: Container(

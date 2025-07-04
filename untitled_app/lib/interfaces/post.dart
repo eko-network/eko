@@ -86,7 +86,7 @@ Future<String> uploadPost(PostModel post, WidgetRef ref) async {
 
   final taggedUsers = await Future.wait(idFutures);
   // make sure not to notify yourself
-  final Set<String> sentActivites = {ref.watch(currentUserProvider).user.uid};
+  final Set<String> sentActivites = {ref.watch(currentUserProvider).uid};
   final List<Future<void>> activityFutures = [];
 
   late final Set<String>? members;
@@ -141,7 +141,7 @@ Future<String> uploadComment(CommentModel comment, WidgetRef ref) async {
       .add(json)
       .then((documentSnapshot) => documentSnapshot.id);
 
-  if (ref.watch(currentUserProvider).user.uid != post.uid) {
+  if (ref.watch(currentUserProvider).uid != post.uid) {
     final activity = ActivityModel(
         id: '',
         createdAt: comment.createdAt,
@@ -165,7 +165,7 @@ Future<String> uploadComment(CommentModel comment, WidgetRef ref) async {
   final taggedUsers = await Future.wait(idFutures);
 
   // make sure not to notify yourself
-  final Set<String> sentActivites = {ref.watch(currentUserProvider).user.uid};
+  final Set<String> sentActivites = {ref.watch(currentUserProvider).uid};
   final List<Future<void>> activityFutures = [];
 
   for (final user in taggedUsers) {

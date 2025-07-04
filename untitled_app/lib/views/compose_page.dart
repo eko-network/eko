@@ -272,7 +272,7 @@ class _ComposePageState extends ConsumerState<ComposePage> {
     }
 
     final post = PostModel(
-      uid: ref.watch(currentUserProvider).user.uid,
+      uid: ref.watch(currentUserProvider).uid,
       id: '',
       tags: tags,
       likes: 0,
@@ -470,7 +470,7 @@ class _ComposePageState extends ConsumerState<ComposePage> {
               Row(
                 children: [
                   ProfilePicture(
-                      uid: ref.watch(currentUserProvider).user.uid,
+                      uid: ref.watch(currentUserProvider).uid,
                       onlineIndicatorEnabled: false,
                       size: width * 0.115),
                   const SizedBox(width: 9),

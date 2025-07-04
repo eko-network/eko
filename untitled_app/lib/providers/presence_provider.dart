@@ -55,7 +55,7 @@ class Presence extends _$Presence with WidgetsBindingObserver {
 
         // set offline if the lead device
         if (state.valid) {
-          _onlineRef!.update({'online': false});
+          _onlineRef?.update({'online': false});
         }
 
         // dispose

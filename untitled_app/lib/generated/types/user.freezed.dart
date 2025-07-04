@@ -17,13 +17,18 @@ T _$identity<T>(T value) => value;
 mixin _$UserModel {
   String get name;
   String get username;
+  @JsonKey(
+      name: 'profilePicture',
+      defaultValue:
+          'https://firebasestorage.googleapis.com/v0/b/untitled-2832f.appspot.com/o/profile_pictures%2Fdefault%2Fprofile.jpg?alt=media&token=2543c4eb-f991-468f-9ce8-68c576ffca7c')
   String get profilePicture;
+  @JsonKey(defaultValue: '')
   String get bio;
-  List<String> get followers;
-  List<String> get following;
+  @JsonKey(name: 'id')
   String get uid;
+  @JsonKey(name: 'is_verified', defaultValue: false)
   bool get isVerified;
-  @JsonKey(name: 'share_online_status')
+  @JsonKey(name: 'share_online_status', defaultValue: true)
   bool get shareOnlineStatus;
 
   /// Create a copy of UserModel
@@ -32,6 +37,9 @@ mixin _$UserModel {
   @pragma('vm:prefer-inline')
   $UserModelCopyWith<UserModel> get copyWith =>
       _$UserModelCopyWithImpl<UserModel>(this as UserModel, _$identity);
+
+  /// Serializes this UserModel to a JSON map.
+  Map<String, dynamic> toJson();
 
   @override
   bool operator ==(Object other) {
@@ -44,8 +52,6 @@ mixin _$UserModel {
             (identical(other.profilePicture, profilePicture) ||
                 other.profilePicture == profilePicture) &&
             (identical(other.bio, bio) || other.bio == bio) &&
-            const DeepCollectionEquality().equals(other.followers, followers) &&
-            const DeepCollectionEquality().equals(other.following, following) &&
             (identical(other.uid, uid) || other.uid == uid) &&
             (identical(other.isVerified, isVerified) ||
                 other.isVerified == isVerified) &&
@@ -53,22 +59,14 @@ mixin _$UserModel {
                 other.shareOnlineStatus == shareOnlineStatus));
   }
 
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      name,
-      username,
-      profilePicture,
-      bio,
-      const DeepCollectionEquality().hash(followers),
-      const DeepCollectionEquality().hash(following),
-      uid,
-      isVerified,
-      shareOnlineStatus);
+  int get hashCode => Object.hash(runtimeType, name, username, profilePicture,
+      bio, uid, isVerified, shareOnlineStatus);
 
   @override
   String toString() {
-    return 'UserModel(name: $name, username: $username, profilePicture: $profilePicture, bio: $bio, followers: $followers, following: $following, uid: $uid, isVerified: $isVerified, shareOnlineStatus: $shareOnlineStatus)';
+    return 'UserModel(name: $name, username: $username, profilePicture: $profilePicture, bio: $bio, uid: $uid, isVerified: $isVerified, shareOnlineStatus: $shareOnlineStatus)';
   }
 }
 
@@ -80,13 +78,16 @@ abstract mixin class $UserModelCopyWith<$Res> {
   $Res call(
       {String name,
       String username,
+      @JsonKey(
+          name: 'profilePicture',
+          defaultValue:
+              'https://firebasestorage.googleapis.com/v0/b/untitled-2832f.appspot.com/o/profile_pictures%2Fdefault%2Fprofile.jpg?alt=media&token=2543c4eb-f991-468f-9ce8-68c576ffca7c')
       String profilePicture,
-      String bio,
-      List<String> followers,
-      List<String> following,
-      String uid,
-      bool isVerified,
-      @JsonKey(name: 'share_online_status') bool shareOnlineStatus});
+      @JsonKey(defaultValue: '') String bio,
+      @JsonKey(name: 'id') String uid,
+      @JsonKey(name: 'is_verified', defaultValue: false) bool isVerified,
+      @JsonKey(name: 'share_online_status', defaultValue: true)
+      bool shareOnlineStatus});
 }
 
 /// @nodoc
@@ -105,8 +106,6 @@ class _$UserModelCopyWithImpl<$Res> implements $UserModelCopyWith<$Res> {
     Object? username = null,
     Object? profilePicture = null,
     Object? bio = null,
-    Object? followers = null,
-    Object? following = null,
     Object? uid = null,
     Object? isVerified = null,
     Object? shareOnlineStatus = null,
@@ -128,14 +127,6 @@ class _$UserModelCopyWithImpl<$Res> implements $UserModelCopyWith<$Res> {
           ? _self.bio
           : bio // ignore: cast_nullable_to_non_nullable
               as String,
-      followers: null == followers
-          ? _self.followers
-          : followers // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-      following: null == following
-          ? _self.following
-          : following // ignore: cast_nullable_to_non_nullable
-              as List<String>,
       uid: null == uid
           ? _self.uid
           : uid // ignore: cast_nullable_to_non_nullable
@@ -159,46 +150,41 @@ class _UserModel implements UserModel {
   const _UserModel(
       {required this.name,
       required this.username,
+      @JsonKey(
+          name: 'profilePicture',
+          defaultValue:
+              'https://firebasestorage.googleapis.com/v0/b/untitled-2832f.appspot.com/o/profile_pictures%2Fdefault%2Fprofile.jpg?alt=media&token=2543c4eb-f991-468f-9ce8-68c576ffca7c')
       required this.profilePicture,
-      required this.bio,
-      required final List<String> followers,
-      required final List<String> following,
-      required this.uid,
+      @JsonKey(defaultValue: '') required this.bio,
+      @JsonKey(name: 'id') required this.uid,
+      @JsonKey(name: 'is_verified', defaultValue: false)
       required this.isVerified,
-      @JsonKey(name: 'share_online_status') required this.shareOnlineStatus})
-      : _followers = followers,
-        _following = following;
+      @JsonKey(name: 'share_online_status', defaultValue: true)
+      required this.shareOnlineStatus});
+  factory _UserModel.fromJson(Map<String, dynamic> json) =>
+      _$UserModelFromJson(json);
 
   @override
   final String name;
   @override
   final String username;
   @override
+  @JsonKey(
+      name: 'profilePicture',
+      defaultValue:
+          'https://firebasestorage.googleapis.com/v0/b/untitled-2832f.appspot.com/o/profile_pictures%2Fdefault%2Fprofile.jpg?alt=media&token=2543c4eb-f991-468f-9ce8-68c576ffca7c')
   final String profilePicture;
   @override
+  @JsonKey(defaultValue: '')
   final String bio;
-  final List<String> _followers;
   @override
-  List<String> get followers {
-    if (_followers is EqualUnmodifiableListView) return _followers;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_followers);
-  }
-
-  final List<String> _following;
-  @override
-  List<String> get following {
-    if (_following is EqualUnmodifiableListView) return _following;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_following);
-  }
-
-  @override
+  @JsonKey(name: 'id')
   final String uid;
   @override
+  @JsonKey(name: 'is_verified', defaultValue: false)
   final bool isVerified;
   @override
-  @JsonKey(name: 'share_online_status')
+  @JsonKey(name: 'share_online_status', defaultValue: true)
   final bool shareOnlineStatus;
 
   /// Create a copy of UserModel
@@ -208,6 +194,13 @@ class _UserModel implements UserModel {
   @pragma('vm:prefer-inline')
   _$UserModelCopyWith<_UserModel> get copyWith =>
       __$UserModelCopyWithImpl<_UserModel>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$UserModelToJson(
+      this,
+    );
+  }
 
   @override
   bool operator ==(Object other) {
@@ -220,10 +213,6 @@ class _UserModel implements UserModel {
             (identical(other.profilePicture, profilePicture) ||
                 other.profilePicture == profilePicture) &&
             (identical(other.bio, bio) || other.bio == bio) &&
-            const DeepCollectionEquality()
-                .equals(other._followers, _followers) &&
-            const DeepCollectionEquality()
-                .equals(other._following, _following) &&
             (identical(other.uid, uid) || other.uid == uid) &&
             (identical(other.isVerified, isVerified) ||
                 other.isVerified == isVerified) &&
@@ -231,22 +220,14 @@ class _UserModel implements UserModel {
                 other.shareOnlineStatus == shareOnlineStatus));
   }
 
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      name,
-      username,
-      profilePicture,
-      bio,
-      const DeepCollectionEquality().hash(_followers),
-      const DeepCollectionEquality().hash(_following),
-      uid,
-      isVerified,
-      shareOnlineStatus);
+  int get hashCode => Object.hash(runtimeType, name, username, profilePicture,
+      bio, uid, isVerified, shareOnlineStatus);
 
   @override
   String toString() {
-    return 'UserModel(name: $name, username: $username, profilePicture: $profilePicture, bio: $bio, followers: $followers, following: $following, uid: $uid, isVerified: $isVerified, shareOnlineStatus: $shareOnlineStatus)';
+    return 'UserModel(name: $name, username: $username, profilePicture: $profilePicture, bio: $bio, uid: $uid, isVerified: $isVerified, shareOnlineStatus: $shareOnlineStatus)';
   }
 }
 
@@ -261,13 +242,16 @@ abstract mixin class _$UserModelCopyWith<$Res>
   $Res call(
       {String name,
       String username,
+      @JsonKey(
+          name: 'profilePicture',
+          defaultValue:
+              'https://firebasestorage.googleapis.com/v0/b/untitled-2832f.appspot.com/o/profile_pictures%2Fdefault%2Fprofile.jpg?alt=media&token=2543c4eb-f991-468f-9ce8-68c576ffca7c')
       String profilePicture,
-      String bio,
-      List<String> followers,
-      List<String> following,
-      String uid,
-      bool isVerified,
-      @JsonKey(name: 'share_online_status') bool shareOnlineStatus});
+      @JsonKey(defaultValue: '') String bio,
+      @JsonKey(name: 'id') String uid,
+      @JsonKey(name: 'is_verified', defaultValue: false) bool isVerified,
+      @JsonKey(name: 'share_online_status', defaultValue: true)
+      bool shareOnlineStatus});
 }
 
 /// @nodoc
@@ -286,8 +270,6 @@ class __$UserModelCopyWithImpl<$Res> implements _$UserModelCopyWith<$Res> {
     Object? username = null,
     Object? profilePicture = null,
     Object? bio = null,
-    Object? followers = null,
-    Object? following = null,
     Object? uid = null,
     Object? isVerified = null,
     Object? shareOnlineStatus = null,
@@ -309,14 +291,6 @@ class __$UserModelCopyWithImpl<$Res> implements _$UserModelCopyWith<$Res> {
           ? _self.bio
           : bio // ignore: cast_nullable_to_non_nullable
               as String,
-      followers: null == followers
-          ? _self._followers
-          : followers // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-      following: null == following
-          ? _self._following
-          : following // ignore: cast_nullable_to_non_nullable
-              as List<String>,
       uid: null == uid
           ? _self.uid
           : uid // ignore: cast_nullable_to_non_nullable

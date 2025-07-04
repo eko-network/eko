@@ -1,28 +1,34 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart' show debugPrint;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:untitled_app/interfaces/user.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' show AuthState;
 import 'package:untitled_app/types/auth.dart';
+import 'package:untitled_app/utilities/supabase_ref.dart';
 // Necessary for code-generation to work
 part '../generated/providers/auth_provider.g.dart';
 
 @Riverpod(keepAlive: true)
 class Auth extends _$Auth {
+  StreamSubscription<AuthState>? _authSubscription;
   @override
   AuthModel build() {
     _init();
+    ref.onDispose(() {
+      _authSubscription?.cancel();
+    });
     return AuthModel.loading();
   }
 
   void _init() {
-    // TODO This should also handle presence
-    FirebaseAuth.instance.authStateChanges().listen((User? user) {
+    _authSubscription = supabase.auth.onAuthStateChange.listen((_) {
+      final user = supabase.auth.currentUser;
       if (user == null) {
         state = AuthModel.signedOut();
       } else {
         state =
-            state.copyWith(uid: user.uid, isLoading: false, email: user.email);
+            state.copyWith(uid: user.id, isLoading: false, email: user.email);
       }
     });
   }
@@ -34,53 +40,31 @@ class Auth extends _$Auth {
       required String name,
       required String birthday}) async {
     try {
-      final UserCredential user =
-          await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: email.trim(),
-        password: password,
-      );
-      if (user.user?.uid == null) return 'unknown';
-      final userData = {
-        'uid': user.user?.uid,
-        'email': email.trim(),
+      await supabase.auth
+          .signUp(email: email.trim(), password: password, data: {
         'username': username,
         'name': name,
-        'fcmTokens': [],
-        'blockedUsers': [],
-        'isVerified': false,
-        'profileData': {
-          'birthday': birthday,
-          'likedPosts': [],
-          'dislikedPosts': [],
-          'pollVotes': {},
-          'bio': '',
-          'followers': [],
-          'following': [],
-          'likes': 0,
-          'dislikes': 0,
-          'profilePicture':
-              'https://firebasestorage.googleapis.com/v0/b/untitled-2832f.appspot.com/o/profile_pictures%2Fdefault%2Fprofile.jpg?alt=media&token=2543c4eb-f991-468f-9ce8-68c576ffca7c',
-        }
-      };
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.user?.uid)
-          .set(userData);
+        'birthday': birthday,
+      });
 
-      await addFCM(user.user!.uid);
+      // await addFCM(user.user!.uid);
 
       return ('success');
-    } on FirebaseAuthException catch (e) {
-      return (e.code);
+    } catch (e) {
+      debugPrint(e.toString());
+      return (e.toString());
     }
   }
 
   Future<String> signIn(
       {required String email, required String password}) async {
     try {
-      final UserCredential user = await FirebaseAuth.instance
-          .signInWithEmailAndPassword(email: email.trim(), password: password);
-      if (user.user != null) addFCM(user.user!.uid);
+      await supabase.auth.signInWithPassword(
+        email: email,
+        password: password,
+      );
+
+      // if (user.user != null) addFCM(user.user!.uid);
       return ('success');
     } on FirebaseAuthException catch (e) {
       debugPrint(e.code);
@@ -89,6 +73,6 @@ class Auth extends _$Auth {
   }
 
   Future<void> deleteAccount() async {
-    await FirebaseAuth.instance.currentUser?.delete();
+    // await supabase.auth.();
   }
 }

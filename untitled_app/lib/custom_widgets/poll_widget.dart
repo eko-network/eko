@@ -72,15 +72,20 @@ class PollWidget extends ConsumerWidget {
                               0.7 *
                               percentage,
                           decoration: BoxDecoration(
-                            color: currentUser.pollVotes.containsKey(post.id)
-                                ? (currentUser.pollVotes[post.id] == index)
-                                    ? Theme.of(context)
+                            color: 
+                            Theme.of(context)
                                         .colorScheme
-                                        .primaryContainer
-                                    : Theme.of(context)
-                                        .colorScheme
-                                        .surfaceContainerHighest
-                                : Theme.of(context).colorScheme.outlineVariant,
+                                        .primaryContainer,
+                                        //FIXME
+                            // currentUser.pollVotes.containsKey(post.id)
+                            //     ? (currentUser.pollVotes[post.id] == index)
+                            //         ? Theme.of(context)
+                            //             .colorScheme
+                            //             .primaryContainer
+                            //         : Theme.of(context)
+                            //             .colorScheme
+                            //             .surfaceContainerHighest
+                            //     : Theme.of(context).colorScheme.outlineVariant,
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
@@ -100,15 +105,16 @@ class PollWidget extends ConsumerWidget {
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ),
-                              if (currentUser.pollVotes.containsKey(post.id))
-                                Text(
-                                  '${(percentage * 100).toStringAsFixed(0)}%',
-                                  style: TextStyle(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurfaceVariant,
-                                  ),
-                                ),
+                              //FIXME
+                              // if (currentUser.pollVotes.containsKey(post.id))
+                              //   Text(
+                              //     '${(percentage * 100).toStringAsFixed(0)}%',
+                              //     style: TextStyle(
+                              //       color: Theme.of(context)
+                              //           .colorScheme
+                              //           .onSurfaceVariant,
+                              //     ),
+                              //   ),
                             ],
                           ),
                         ),
@@ -119,34 +125,35 @@ class PollWidget extends ConsumerWidget {
               ),
             );
           }),
-          if (currentUser.pollVotes.containsKey(post.id) && !isPreview)
-            Padding(
-              padding: const EdgeInsets.only(top: 8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    '$totalVotes ${AppLocalizations.of(context)!.votes}',
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      fontSize: 12,
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: () => ref
-                        .read(postProvider(post.id).notifier)
-                        .removePollVote(),
-                    child: Text(
-                      AppLocalizations.of(context)!.removeVote,
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        fontSize: 12,
-                      ),
-                    ),
-                  )
-                ],
-              ),
-            ),
+          //FIXME
+          // if (currentUser.pollVotes.containsKey(post.id) && !isPreview)
+          //   Padding(
+          //     padding: const EdgeInsets.only(top: 8.0),
+          //     child: Row(
+          //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //       children: [
+          //         Text(
+          //           '$totalVotes ${AppLocalizations.of(context)!.votes}',
+          //           style: TextStyle(
+          //             color: Theme.of(context).colorScheme.onSurfaceVariant,
+          //             fontSize: 12,
+          //           ),
+          //         ),
+          //         TextButton(
+          //           onPressed: () => ref
+          //               .read(postProvider(post.id).notifier)
+          //               .removePollVote(),
+          //           child: Text(
+          //             AppLocalizations.of(context)!.removeVote,
+          //             style: TextStyle(
+          //               color: Theme.of(context).colorScheme.onSurfaceVariant,
+          //               fontSize: 12,
+          //             ),
+          //           ),
+          //         )
+          //       ],
+          //     ),
+          //   ),
         ],
       ),
     );

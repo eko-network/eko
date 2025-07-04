@@ -25,24 +25,27 @@ class OtherProfile extends ConsumerWidget {
     final currentUser = ref.watch(currentUserProvider);
 
     // Check if we're viewing our own profile
-    if (currentUser.user.uid == uid) {
+    if (currentUser.uid == uid) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         context.go('/profile');
       });
     }
 
+    //FIXME
     // Check if the user is blocked
-    final isBlockedByMe = userAsync.when(
-      data: (profileUser) => currentUser.blockedUsers.contains(profileUser.uid),
-      loading: () => false,
-      error: (_, __) => false,
-    );
+    final isBlockedByMe = false; 
+    // userAsync.when(
+    //   data: (profileUser) => currentUser.blockedUsers.contains(profileUser.uid),
+    //   loading: () => false,
+    //   error: (_, __) => false,
+    // );
 
-    final blocksMe = userAsync.when(
-      data: (profileUser) => currentUser.blockedBy.contains(profileUser.uid),
-      loading: () => false,
-      error: (_, __) => false,
-    );
+    final blocksMe = false;
+    // userAsync.when(
+    //   data: (profileUser) => currentUser.blockedBy.contains(profileUser.uid),
+    //   loading: () => false,
+    //   error: (_, __) => false,
+    // );
 
     void popDialog() {
       Navigator.of(context, rootNavigator: true).pop();
@@ -272,8 +275,8 @@ class _Header extends ConsumerWidget {
   const _Header({required this.user});
 
   Future<void> _onFollowPressed(WidgetRef ref) async {
-    final isFollowing =
-        ref.watch(currentUserProvider).user.following.contains(user.uid);
+    final isFollowing = false;
+        // ref.watch(currentUserProvider).user.following.contains(user.uid);
 
     if (isFollowing) {
       await ref.read(currentUserProvider.notifier).removeFollower(user.uid);
@@ -286,7 +289,8 @@ class _Header extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final width = c.widthGetter(context);
     final currentUser = ref.watch(currentUserProvider);
-    final isFollowing = currentUser.user.following.contains(user.uid);
+    //FIXME
+    final isFollowing = false;//currentUser.user.following.contains(user.uid);
 
     return Column(
       children: [

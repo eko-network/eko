@@ -28,9 +28,9 @@ class _UserSettingsState extends ConsumerState<UserSettings> {
       activityNotification = value;
     });
     if (value) {
-      addFCM(ref.read(currentUserProvider).user.uid);
+      addFCM(ref.read(currentUserProvider).uid);
     } else {
-      removeFCM(ref.read(currentUserProvider).user.uid);
+      removeFCM(ref.read(currentUserProvider).uid);
     }
   }
 
@@ -80,7 +80,7 @@ class _UserSettingsState extends ConsumerState<UserSettings> {
           ),
           SwitchListTile(
             title: Text(AppLocalizations.of(context)!.shareOnlineStatus),
-            value: ref.watch(currentUserProvider).user.shareOnlineStatus,
+            value: ref.watch(currentUserProvider).shareOnlineStatus,
             onChanged: (value) {
               ref
                   .read(currentUserProvider.notifier)

@@ -6,6 +6,7 @@ import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
 import 'package:untitled_app/providers/nav_bar_provider.dart';
 import 'package:untitled_app/types/current_user.dart';
+import 'package:untitled_app/types/user.dart';
 import 'package:untitled_app/widgets/divider.dart';
 import 'package:untitled_app/widgets/infinite_scrolly.dart';
 import 'package:untitled_app/widgets/shimmer_loaders.dart';
@@ -40,7 +41,7 @@ class ProfilePage extends ConsumerWidget {
 }
 
 class _Header extends ConsumerWidget {
-  final CurrentUserModel currentUser;
+  final UserModel currentUser;
   const _Header({required this.currentUser});
 
   @override
@@ -55,14 +56,14 @@ class _Header extends ConsumerWidget {
               child: Row(
                 children: [
                   Text(
-                    '@${currentUser.user.username}',
+                    '@${currentUser.username}',
                     style: TextStyle(
                         color: Theme.of(context).colorScheme.onSurface,
                         fontWeight: FontWeight.bold,
                         fontSize: 22),
                     overflow: TextOverflow.ellipsis,
                   ),
-                  if (currentUser.user.isVerified)
+                  if (currentUser.isVerified)
                     Padding(
                       padding: const EdgeInsets.only(left: 6),
                       child: Icon(
@@ -89,7 +90,7 @@ class _Header extends ConsumerWidget {
               ),
             ),
             ProfileHeader(
-              user: currentUser.user,
+              user: currentUser,
             ),
           ],
         ),

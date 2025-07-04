@@ -59,7 +59,7 @@ class Comment extends _$Comment {
 
   Future<void> _addLikeToDb(String id) async {
     final firestore = FirebaseFirestore.instance;
-    final uid = ref.read(currentUserProvider).user.uid;
+    final uid = ref.read(currentUserProvider).uid;
     final comment = await future;
     final postId = comment.postId;
 
@@ -78,7 +78,7 @@ class Comment extends _$Comment {
 
   Future<void> _removeLikeFromDb(String commentId) async {
     final firestore = FirebaseFirestore.instance;
-    final uid = ref.read(currentUserProvider).user.uid;
+    final uid = ref.read(currentUserProvider).uid;
     final comment = await future;
     final postId = comment.postId;
 
@@ -97,7 +97,7 @@ class Comment extends _$Comment {
 
   Future<void> _addDislikeToDb(String commentId) async {
     final firestore = FirebaseFirestore.instance;
-    final uid = ref.read(currentUserProvider).user.uid;
+    final uid = ref.read(currentUserProvider).uid;
     final comment = await future;
     final postId = comment.postId;
 
@@ -116,7 +116,7 @@ class Comment extends _$Comment {
 
   Future<void> _removeDisikeFromDb(String commentId) async {
     final firestore = FirebaseFirestore.instance;
-    final uid = ref.read(currentUserProvider).user.uid;
+    final uid = ref.read(currentUserProvider).uid;
     final comment = await future;
     final postId = comment.postId;
 
@@ -134,86 +134,86 @@ class Comment extends _$Comment {
   }
 
   Future<void> likeCommentToggle() async {
-    final prevState = await future;
-    if (_isLiking) return;
-    _isLiking = true;
-    // liked -> not liked
-    if (ref.read(currentUserProvider).likedPosts.contains(prevState.id)) {
-      ref.read(currentUserProvider.notifier).removeIdFromLiked(prevState.id);
-      state = AsyncData(prevState.copyWith(likes: prevState.likes - 1));
-      try {
-        await _removeLikeFromDb(prevState.id);
-      } catch (_) {
-        ref.read(currentUserProvider.notifier).addIdToLiked(prevState.id);
-        state = AsyncData(prevState);
-      }
-      // not liked -> liked
-    } else {
-      bool wasDisliked = false;
-      final List<Future<void>> ops = [_addLikeToDb(prevState.id)];
-      ref.read(currentUserProvider.notifier).addIdToLiked(prevState.id);
-      if (ref.read(currentUserProvider).dislikedPosts.contains(prevState.id)) {
-        wasDisliked = true;
-        ref
-            .read(currentUserProvider.notifier)
-            .removeIdFromDisliked(prevState.id);
-        state = AsyncData(prevState.copyWith(
-            dislikes: prevState.dislikes - 1, likes: prevState.likes + 1));
-        ops.add(_removeDisikeFromDb(prevState.id));
-      } else {
-        state = AsyncData(prevState.copyWith(likes: prevState.likes + 1));
-      }
-      try {
-        await Future.wait(ops);
-      } catch (_) {
-        ref.read(currentUserProvider.notifier).removeIdFromLiked(prevState.id);
-        if (wasDisliked) {
-          ref.read(currentUserProvider.notifier).addIdToDisliked(prevState.id);
-        }
-        state = AsyncData(prevState);
-      }
-    }
-    _isLiking = false;
+    // final prevState = await future;
+    // if (_isLiking) return;
+    // _isLiking = true;
+    // // liked -> not liked
+    // if (ref.read(currentUserProvider).likedPosts.contains(prevState.id)) {
+    //   ref.read(currentUserProvider.notifier).removeIdFromLiked(prevState.id);
+    //   state = AsyncData(prevState.copyWith(likes: prevState.likes - 1));
+    //   try {
+    //     await _removeLikeFromDb(prevState.id);
+    //   } catch (_) {
+    //     ref.read(currentUserProvider.notifier).addIdToLiked(prevState.id);
+    //     state = AsyncData(prevState);
+    //   }
+    //   // not liked -> liked
+    // } else {
+    //   bool wasDisliked = false;
+    //   final List<Future<void>> ops = [_addLikeToDb(prevState.id)];
+    //   ref.read(currentUserProvider.notifier).addIdToLiked(prevState.id);
+    //   if (ref.read(currentUserProvider).dislikedPosts.contains(prevState.id)) {
+    //     wasDisliked = true;
+    //     ref
+    //         .read(currentUserProvider.notifier)
+    //         .removeIdFromDisliked(prevState.id);
+    //     state = AsyncData(prevState.copyWith(
+    //         dislikes: prevState.dislikes - 1, likes: prevState.likes + 1));
+    //     ops.add(_removeDisikeFromDb(prevState.id));
+    //   } else {
+    //     state = AsyncData(prevState.copyWith(likes: prevState.likes + 1));
+    //   }
+    //   try {
+    //     await Future.wait(ops);
+    //   } catch (_) {
+    //     ref.read(currentUserProvider.notifier).removeIdFromLiked(prevState.id);
+    //     if (wasDisliked) {
+    //       ref.read(currentUserProvider.notifier).addIdToDisliked(prevState.id);
+    //     }
+    //     state = AsyncData(prevState);
+    //   }
+    // }
+    // _isLiking = false;
   }
 
   Future<void> dislikeCommentToggle() async {
-    final prevState = await future;
-    if (_isLiking) return;
-    _isLiking = true;
-    if (ref.read(currentUserProvider).dislikedPosts.contains(prevState.id)) {
-      ref.read(currentUserProvider.notifier).removeIdFromDisliked(prevState.id);
-      state = AsyncData(prevState.copyWith(dislikes: prevState.dislikes - 1));
-      try {
-        await _removeDisikeFromDb(prevState.id);
-      } catch (_) {
-        ref.read(currentUserProvider.notifier).addIdToDisliked(prevState.id);
-        state = AsyncData(prevState);
-      }
-    } else {
-      bool wasLiked = false;
-      final List<Future<void>> ops = [_addDislikeToDb(prevState.id)];
-      ref.read(currentUserProvider.notifier).addIdToDisliked(prevState.id);
-      if (ref.read(currentUserProvider).likedPosts.contains(prevState.id)) {
-        wasLiked = true;
-        ref.read(currentUserProvider.notifier).removeIdFromLiked(prevState.id);
-        state = AsyncData(prevState.copyWith(
-            likes: prevState.likes - 1, dislikes: prevState.dislikes + 1));
-        ops.add(_removeLikeFromDb(prevState.id));
-      } else {
-        state = AsyncData(prevState.copyWith(dislikes: prevState.dislikes + 1));
-      }
-      try {
-        await Future.wait(ops);
-      } catch (_) {
-        ref
-            .read(currentUserProvider.notifier)
-            .removeIdFromDisliked(prevState.id);
-        if (wasLiked) {
-          ref.read(currentUserProvider.notifier).addIdToLiked(prevState.id);
-        }
-        state = AsyncData(prevState);
-      }
-    }
-    _isLiking = false;
+  //   final prevState = await future;
+  //   if (_isLiking) return;
+  //   _isLiking = true;
+  //   if (ref.read(currentUserProvider).dislikedPosts.contains(prevState.id)) {
+  //     ref.read(currentUserProvider.notifier).removeIdFromDisliked(prevState.id);
+  //     state = AsyncData(prevState.copyWith(dislikes: prevState.dislikes - 1));
+  //     try {
+  //       await _removeDisikeFromDb(prevState.id);
+  //     } catch (_) {
+  //       ref.read(currentUserProvider.notifier).addIdToDisliked(prevState.id);
+  //       state = AsyncData(prevState);
+  //     }
+  //   } else {
+  //     bool wasLiked = false;
+  //     final List<Future<void>> ops = [_addDislikeToDb(prevState.id)];
+  //     ref.read(currentUserProvider.notifier).addIdToDisliked(prevState.id);
+  //     if (ref.read(currentUserProvider).likedPosts.contains(prevState.id)) {
+  //       wasLiked = true;
+  //       ref.read(currentUserProvider.notifier).removeIdFromLiked(prevState.id);
+  //       state = AsyncData(prevState.copyWith(
+  //           likes: prevState.likes - 1, dislikes: prevState.dislikes + 1));
+  //       ops.add(_removeLikeFromDb(prevState.id));
+  //     } else {
+  //       state = AsyncData(prevState.copyWith(dislikes: prevState.dislikes + 1));
+  //     }
+  //     try {
+  //       await Future.wait(ops);
+  //     } catch (_) {
+  //       ref
+  //           .read(currentUserProvider.notifier)
+  //           .removeIdFromDisliked(prevState.id);
+  //       if (wasLiked) {
+  //         ref.read(currentUserProvider.notifier).addIdToLiked(prevState.id);
+  //       }
+  //       state = AsyncData(prevState);
+  //     }
+  //   }
+  //   _isLiking = false;
   }
 }

@@ -7,7 +7,7 @@ import 'package:untitled_app/providers/current_user_provider.dart';
 
 Future<void> defaultTagPressed(
     String username, BuildContext context, WidgetRef ref) async {
-  if (ref.watch(currentUserProvider).user.username == username) {
+  if (ref.watch(currentUserProvider).username == username) {
     context.go('/profile');
   } else {
     String? uid = await getUidFromUsername(username);

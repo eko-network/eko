@@ -175,7 +175,7 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
         commentField.text = '';
         FocusManager.instance.primaryFocus?.unfocus();
         comment = CommentModel(
-          uid: ref.watch(currentUserProvider).user.uid,
+          uid: ref.watch(currentUserProvider).uid,
           id: '',
           postId: widget.id,
           createdAt: DateTime.now().toUtc().toIso8601String(),
@@ -184,7 +184,7 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
       }
     } else {
       comment = CommentModel(
-        uid: ref.watch(currentUserProvider).user.uid,
+        uid: ref.watch(currentUserProvider).uid,
         id: '',
         postId: widget.id,
         createdAt: DateTime.now().toUtc().toIso8601String(),
@@ -250,15 +250,16 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
     return asyncPost.when(
       data: (post) {
         final currentUser = ref.watch(currentUserProvider);
-        if (currentUser.blockedUsers.contains(post.uid) ||
-            currentUser.blockedBy.contains(post.uid)) {
-          return Center(
-            child: SizedBox(
-              width: width * 0.7,
-              child: Text(AppLocalizations.of(context)!.blockedByUserMessage),
-            ),
-          );
-        }
+        //FIXME
+        // if (currentUser.blockedUsers.contains(post.uid) ||
+        //     currentUser.blockedBy.contains(post.uid)) {
+        //   return Center(
+        //     child: SizedBox(
+        //       width: width * 0.7,
+        //       child: Text(AppLocalizations.of(context)!.blockedByUserMessage),
+        //     ),
+        //   );
+        // }
         return GestureDetector(
           onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
           child: Scaffold(
@@ -275,7 +276,7 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
                 PopupMenuButton<void Function()>(
                   itemBuilder: (context) {
                     return [
-                      if (post.uid != ref.read(currentUserProvider).user.uid)
+                      if (post.uid != ref.read(currentUserProvider).uid)
                         PopupMenuItem(
                           height: 25,
                           value: () => reportPressed(),

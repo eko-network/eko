@@ -16,7 +16,7 @@ class RecentActivity extends ConsumerWidget {
 
   Future<(List<MapEntry<String, String>>, bool)> getter(
       List<MapEntry<String, String>> list, WidgetRef ref) async {
-    final uid = ref.read(currentUserProvider).user.uid;
+    final uid = ref.read(currentUserProvider).uid;
     final baseQuery = FirebaseFirestore.instance
         .collection('users')
         .doc(uid)

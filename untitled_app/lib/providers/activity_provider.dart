@@ -42,7 +42,7 @@ class Activity extends _$Activity {
   Future<ActivityModel> _fetchActivityModel(String id) async {
     final actData = await FirebaseFirestore.instance
         .collection('users')
-        .doc(ref.watch(currentUserProvider).user.uid)
+        .doc(ref.watch(currentUserProvider).uid)
         .collection('newActivity')
         .doc(id)
         .get();

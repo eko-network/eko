@@ -9,15 +9,12 @@ part of '../../types/user.dart';
 _UserModel _$UserModelFromJson(Map<String, dynamic> json) => _UserModel(
       name: json['name'] as String,
       username: json['username'] as String,
-      profilePicture: json['profilePicture'] as String,
-      bio: json['bio'] as String,
-      followers:
-          (json['followers'] as List<dynamic>).map((e) => e as String).toList(),
-      following:
-          (json['following'] as List<dynamic>).map((e) => e as String).toList(),
-      uid: json['uid'] as String,
-      isVerified: json['isVerified'] as bool,
-      shareOnlineStatus: json['share_online_status'] as bool,
+      profilePicture: json['profilePicture'] as String? ??
+          'https://firebasestorage.googleapis.com/v0/b/untitled-2832f.appspot.com/o/profile_pictures%2Fdefault%2Fprofile.jpg?alt=media&token=2543c4eb-f991-468f-9ce8-68c576ffca7c',
+      bio: json['bio'] as String? ?? '',
+      uid: json['id'] as String,
+      isVerified: json['is_verified'] as bool? ?? false,
+      shareOnlineStatus: json['share_online_status'] as bool? ?? true,
     );
 
 Map<String, dynamic> _$UserModelToJson(_UserModel instance) =>
@@ -26,9 +23,7 @@ Map<String, dynamic> _$UserModelToJson(_UserModel instance) =>
       'username': instance.username,
       'profilePicture': instance.profilePicture,
       'bio': instance.bio,
-      'followers': instance.followers,
-      'following': instance.following,
-      'uid': instance.uid,
-      'isVerified': instance.isVerified,
+      'id': instance.uid,
+      'is_verified': instance.isVerified,
       'share_online_status': instance.shareOnlineStatus,
     };

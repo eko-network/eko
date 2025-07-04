@@ -42,7 +42,7 @@ class SearchInterface {
     List<MapEntry<String, int>> filteredHits = [];
     if (excludeCurrent) {
       for (final obj in hits) {
-        if (obj.key != ref.watch(currentUserProvider).user.uid) {
+        if (obj.key != ref.watch(currentUserProvider).uid) {
           filteredHits.add(obj);
           asyncUsers.add(ref.read(userProvider(obj.key).future));
         }

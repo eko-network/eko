@@ -34,7 +34,7 @@ class _EditProfileState extends ConsumerState<EditProfile> {
 
   @override
   void initState() {
-    final user = ref.read(currentUserProvider).user;
+    final user = ref.read(currentUserProvider);
     nameController = TextEditingController(text: user.name);
     bioController = TextEditingController(text: user.bio);
     usernameController = TextEditingController(text: user.username);
@@ -141,7 +141,7 @@ class _EditProfileState extends ConsumerState<EditProfile> {
   @override
   Widget build(BuildContext context) {
     final width = c.widthGetter(context);
-    final user = ref.watch(currentUserProvider).user;
+    final user = ref.watch(currentUserProvider);
 
     final height = MediaQuery.sizeOf(context).height;
     return PopScope(

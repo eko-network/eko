@@ -63,7 +63,7 @@ class _CommentCardState extends ConsumerState<CommentCard> {
       () {
         final scrollPercentage = scrollController.position.pixels /
             scrollController.position.maxScrollExtent;
-        if (comment.uid == ref.watch(currentUserProvider).user.uid) {
+        if (comment.uid == ref.watch(currentUserProvider).uid) {
           if (scrollPercentage >= 0.8) {
             scrollToEnd();
           } else {
@@ -132,10 +132,11 @@ class _CommentCardState extends ConsumerState<CommentCard> {
 
     return asyncComment.when(
       data: (comment) {
-        if (currentUser.blockedUsers.contains(comment.uid) ||
-            currentUser.blockedBy.contains(comment.uid)) {
-          return SizedBox.shrink();
-        }
+        //FIXME
+        // if (currentUser.blockedUsers.contains(comment.uid) ||
+        //     currentUser.blockedBy.contains(comment.uid)) {
+        //   return SizedBox.shrink();
+        // }
         return TapRegion(
           onTapOutside: (v) => scrollToStart(),
           child: NotificationListener<ScrollEndNotification>(
@@ -149,7 +150,7 @@ class _CommentCardState extends ConsumerState<CommentCard> {
               scrollDirection: Axis.horizontal,
               child: DecoratedBox(
                 decoration: BoxDecoration(
-                    color: (comment.uid == currentUser.user.uid)
+                    color: (comment.uid == currentUser.uid)
                         ? Colors.red
                         : Theme.of(context).colorScheme.outlineVariant),
                 child: Row(
@@ -166,7 +167,7 @@ class _CommentCardState extends ConsumerState<CommentCard> {
                     SizedBox(
                       width: width * 0.2,
                       //color: Colors.red,
-                      child: (comment.uid == currentUser.user.uid)
+                      child: (comment.uid == currentUser.uid)
                           ? GestureDetector(
                               onTap: () => deletePressed(comment),
                               child: Column(
@@ -213,7 +214,7 @@ class _Card extends ConsumerWidget {
 
   avatarPressed(
       BuildContext context, WidgetRef ref, CommentModel comment) async {
-    if (comment.uid == ref.watch(currentUserProvider).user.uid) {
+    if (comment.uid == ref.watch(currentUserProvider).uid) {
       await context.push('/feed/sub_profile/${comment.uid}');
     } else {
       context.go('/profile');
@@ -239,7 +240,7 @@ class _Card extends ConsumerWidget {
               children: [
                 ProfilePicture(
                   onPressed: () {
-                    if (comment.uid != ref.read(currentUserProvider).user.uid) {
+                    if (comment.uid != ref.read(currentUserProvider).uid) {
                       context.push('/feed/sub_profile/${comment.uid}');
                     } else {
                       context.go('/profile');
@@ -259,7 +260,7 @@ class _Card extends ConsumerWidget {
                           UserTag(
                             onPressed: () {
                               if (comment.uid !=
-                                  ref.read(currentUserProvider).user.uid) {
+                                  ref.read(currentUserProvider).uid) {
                                 context
                                     .push('/feed/sub_profile/${comment.uid}');
                               } else {

@@ -34,8 +34,8 @@ class FollowingFeed extends _$FollowingFeed {
     final List<PostModel> gottenPosts = [];
     if (_feedChunks.isEmpty) {
       final List<String> following = [
-        ref.read(currentUserProvider).user.uid,
-        ...ref.read(currentUserProvider).user.following
+        ref.read(currentUserProvider).uid,
+        // ...ref.read(currentUserProvider).user.following
       ];
       final slicedFollowing = following.slices(30).toList();
       final initResults = await Future.wait(slicedFollowing.map((slice) async {

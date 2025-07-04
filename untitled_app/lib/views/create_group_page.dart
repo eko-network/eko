@@ -157,7 +157,7 @@ class _CreateGroupState extends ConsumerState<CreateGroup> {
                             createdOn: now,
                             icon: groupIcon,
                             members: List<String>.from([
-                              ref.read(currentUserProvider).user.uid,
+                              ref.read(currentUserProvider).uid,
                               ...selectedPeople.set
                             ]),
                             notSeen: []);
