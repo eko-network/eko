@@ -6,6 +6,7 @@ import 'package:untitled_app/providers/auth_provider.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
 import 'package:untitled_app/providers/pool_providers.dart';
 import 'package:untitled_app/types/user.dart';
+import 'package:untitled_app/utilities/supabase_ref.dart';
 // Necessary for code-generation to work
 part '../generated/providers/user_provider.g.dart';
 
@@ -45,10 +46,9 @@ class User extends _$User {
   }
 
   Future<UserModel> _fetchUserModel(String uid) async {
-    final userRef = FirebaseFirestore.instance.collection('users');
-    final data = (await userRef.doc(uid).get()).data();
-    if(data == null) return UserModel.userNotFound();
-    return UserModel.fromJson(data);
+    final List response =
+        await supabase.rpc('get_user_by_id', params: {'p_uid': uid});
+    return UserModel.fromJson(response.first);
   }
 
   void updateFollowers(List<String> newFollowers) {

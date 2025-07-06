@@ -25,9 +25,10 @@ class ProfilePage extends ConsumerWidget {
     }
 
     return Scaffold(
-      body: InfiniteScrolly<String, String>(
+      body: InfiniteScrolly<int, String>(
         getter: (data) async {
-          return await profilePageGetter(data, ref);
+          // return await profilePageGetter(data, ref);
+          return null as dynamic;
         },
         widget: profilePostCardBuilder,
         header: _Header(currentUser: ref.watch(currentUserProvider)),

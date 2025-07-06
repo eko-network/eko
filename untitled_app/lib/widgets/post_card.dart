@@ -29,15 +29,15 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
 
-Widget profilePostCardBuilder(String id) {
+Widget profilePostCardBuilder(int id) {
   return PostCard(id: id, isOnProfile: true, showGroup: true);
 }
 
-Widget otherProfilePostCardBuilder(String id) {
+Widget otherProfilePostCardBuilder(int id) {
   return PostCard(id: id, isOnProfile: true);
 }
 
-Widget postCardBuilder(String id) {
+Widget postCardBuilder(int id) {
   return PostCard(
     id: id,
   );
@@ -106,7 +106,7 @@ class GroupBadge extends ConsumerWidget {
 }
 
 class PostCard extends ConsumerStatefulWidget {
-  final String id;
+  final int id;
   final bool isPreview;
   final bool isPostPage;
   final bool isBuiltFromId;
@@ -175,7 +175,7 @@ class _PostCardState extends ConsumerState<PostCard> {
     context.go('/');
   }
 
-  void sharePressed(String id) async {
+  void sharePressed(int id) async {
     if (kIsWeb) {
       Clipboard.setData(ClipboardData(
           text: 'Check out my post on Echo: ${c.appURL}/feed/post/$id'));
@@ -230,7 +230,7 @@ class PostCardFromPost extends ConsumerWidget {
   final bool isPostPage;
   final bool isOnProfile;
   final bool showGroup;
-  final void Function(String)? sharePressed;
+  final void Function(int)? sharePressed;
 
   const PostCardFromPost(
       {this.isOnProfile = false,
@@ -256,8 +256,8 @@ class PostCardFromPost extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (showGroup && post.tags.first != 'public')
-              GroupBadge(groupId: post.tags.first),
+            // if (showGroup &&  != 'public')
+            //   GroupBadge(groupId: post.tags.first),
             Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: c.postPaddingHoriz,
@@ -271,8 +271,7 @@ class PostCardFromPost extends ConsumerWidget {
                   ProfilePicture(
                     onPressed: () {
                       if (!isPreview && !isOnProfile) {
-                        if (post.uid !=
-                            ref.read(currentUserProvider).uid) {
+                        if (post.uid != ref.read(currentUserProvider).uid) {
                           context.push('/feed/sub_profile/${post.uid}');
                         } else {
                           context.go('/profile');
@@ -322,11 +321,11 @@ class PostCardFromPost extends ConsumerWidget {
                             ),
                           ),
                         const SizedBox(height: 6.0),
-                        if (post.repostId != null)
+                        if (post.ekoedId != null)
                           Padding(
                             padding: const EdgeInsets.only(bottom: 6),
                             child: RepostCard(
-                                postId: post.repostId!,
+                                postId: post.ekoedId!,
                                 isLoggedIn: isLoggedIn,
                                 isPreview: isPreview),
                           ),
@@ -414,10 +413,11 @@ class PostCardFromPost extends ConsumerWidget {
                               queryParameters['timestamp'] = DateTime.now()
                                   .millisecondsSinceEpoch
                                   .toString();
-                              if (post.tags.isNotEmpty &&
-                                  post.tags.first != 'public') {
-                                queryParameters['id'] = post.tags.first;
-                              }
+                              //FIXME
+                              // if (post.tags.isNotEmpty &&
+                              //     post.tags.first != 'public') {
+                              //   queryParameters['id'] = post.tags.first;
+                              // }
                               context.goNamed('compose',
                                   queryParameters: queryParameters);
                             }

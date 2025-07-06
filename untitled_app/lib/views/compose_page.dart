@@ -255,26 +255,25 @@ class _ComposePageState extends ConsumerState<ComposePage> {
       isChecking = false;
       return;
     }
-
-    if (repostId != null) {
-      final post = await ref.read(postProvider(repostId!).future);
-      if (post.tags.isNotEmpty &&
-          post.tags.first != 'public' &&
-          post.tags.first != audiance) {
-        if (mounted) {
-          showSnackBar(
-              text: AppLocalizations.of(context)!.crossGroupRepost,
-              context: context);
-        }
-        isChecking = false;
-        return;
-      }
-    }
+//FIXME
+    // if (repostId != null) {
+    //   final post = await ref.read(postProvider(repostId!).future);
+    //   if (post.tags.isNotEmpty &&
+    //       post.tags.first != 'public' &&
+    //       post.tags.first != audiance) {
+    //     if (mounted) {
+    //       showSnackBar(
+    //           text: AppLocalizations.of(context)!.crossGroupRepost,
+    //           context: context);
+    //     }
+    //     isChecking = false;
+    //     return;
+    //   }
+    // }
 
     final post = PostModel(
       uid: ref.watch(currentUserProvider).uid,
-      id: '',
-      tags: tags,
+      id: 0,
       likes: 0,
       dislikes: 0,
       commentCount: 0,
@@ -282,7 +281,7 @@ class _ComposePageState extends ConsumerState<ComposePage> {
       pollOptions: isPoll ? pollOptions : null,
       imageString: image,
       gifUrl: gif,
-      repostId: repostId,
+      ekoedId: repostId as int,
       title: parseTextToTags(title),
       body: parseTextToTags(body),
     );
@@ -317,21 +316,22 @@ class _ComposePageState extends ConsumerState<ComposePage> {
                   if (context.mounted) context.pop();
                   _clear();
                   if (context.mounted) {
-                    if (post.tags.contains('public')) {
-                      final completePost = postToUpload.copyWith(
-                        id: id,
-                      );
-                      ref
-                          .read(newFeedProvider.notifier)
-                          .insertAtIndex(0, completePost);
-                      ref
-                          .read(followingFeedProvider.notifier)
-                          .insertAtIndex(0, completePost);
-                      ref.read(postPoolProvider).putAll([completePost]);
-                      context.go('/feed');
-                    } else {
-                      context.go('/groups/sub_group/${post.tags.first}');
-                    }
+                    //FIXME
+                    // if (post.tags.contains('public')) {
+                    //   final completePost = postToUpload.copyWith(
+                    //     id: id,
+                    //   );
+                    //   ref
+                    //       .read(newFeedProvider.notifier)
+                    //       .insertAtIndex(0, completePost);
+                    //   ref
+                    //       .read(followingFeedProvider.notifier)
+                    //       .insertAtIndex(0, completePost);
+                    //   ref.read(postPoolProvider).putAll([completePost]);
+                    //   context.go('/feed');
+                    // } else {
+                    //   context.go('/groups/sub_group/${post.tags.first}');
+                    // }
                   }
                   isUploading = false;
                 },
@@ -547,7 +547,7 @@ class _ComposePageState extends ConsumerState<ComposePage> {
                                 minWidth: width * 0.8,
                               ),
                               child: RepostCard(
-                                  postId: widget.repostId!,
+                                  postId: widget.repostId! as int,
                                   isLoggedIn: true,
                                   isPreview: true)),
                         ),

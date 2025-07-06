@@ -19,9 +19,9 @@ class _Chunk {
 @riverpod
 class FollowingFeed extends _$FollowingFeed {
   final List<_Chunk> _feedChunks = [];
-  final Set<String> _set = {};
+  final Set<int> _set = {};
   @override
-  (List<String>, bool) build() {
+  (List<int>, bool) build() {
     return ([], false);
   }
 

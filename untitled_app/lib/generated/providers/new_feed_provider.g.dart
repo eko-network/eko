@@ -6,12 +6,12 @@ part of '../../providers/new_feed_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$newFeedHash() => r'5fc941178d89bf2136cc4fa15306d8eff674d329';
+String _$newFeedHash() => r'fe5f1b6d0db51baea3418840605a4093ef6c5cf1';
 
 /// See also [NewFeed].
 @ProviderFor(NewFeed)
 final newFeedProvider =
-    AutoDisposeNotifierProvider<NewFeed, (List<String>, bool)>.internal(
+    AutoDisposeNotifierProvider<NewFeed, (List<int>, bool)>.internal(
   NewFeed.new,
   name: r'newFeedProvider',
   debugGetCreateSourceHash:
@@ -20,6 +20,6 @@ final newFeedProvider =
   allTransitiveDependencies: null,
 );
 
-typedef _$NewFeed = AutoDisposeNotifier<(List<String>, bool)>;
+typedef _$NewFeed = AutoDisposeNotifier<(List<int>, bool)>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

@@ -158,7 +158,7 @@ final goRouter = GoRouter(
                   path: 'post/:id',
                   name: 'post',
                   builder: (context, state) =>
-                      ViewPostPage(id: state.pathParameters['id']!),
+                      ViewPostPage(id: int.parse(state.pathParameters['id']!)),
                   routes: [
                     GoRoute(
                       path: 'likes',

@@ -139,10 +139,11 @@ class SubGroupPage extends ConsumerWidget {
       body: asyncGroup.when(
         data: (group) => group.members
                 .contains(ref.watch(currentUserProvider).uid)
-            ? InfiniteScrolly<String, String>(
+            ? InfiniteScrolly<int, String>(
                 appBar: _appBar(context, group),
                 getter: (data) async {
-                  return await getGroupPosts(data, ref, group.id);
+                  // return await getGroupPosts(data, ref, group.id);
+                  return null as dynamic;
                 },
                 widget: postCardBuilder,
                 initialLoadingWidget: PostLoader(

@@ -15,8 +15,8 @@ import 'package:untitled_app/utilities/cache_service.dart';
 part '../generated/providers/pool_providers.g.dart';
 
 @Riverpod(keepAlive: true)
-PoolService<GroupModel> groupPool(Ref ref) {
-  return PoolService<GroupModel>(
+PoolService<String, GroupModel> groupPool(Ref ref) {
+  return PoolService<String, GroupModel>(
     onInsert: (id) {
       if (ref.exists(groupProvider(id))) {
         ref.invalidate(groupProvider(id));
@@ -28,8 +28,8 @@ PoolService<GroupModel> groupPool(Ref ref) {
 }
 
 @Riverpod(keepAlive: true)
-PoolService<PostModel> postPool(Ref ref) {
-  return PoolService<PostModel>(
+PoolService<int, PostModel> postPool(Ref ref) {
+  return PoolService<int, PostModel>(
     onInsert: (id) {
       if (ref.exists(postProvider(id))) {
         ref.invalidate(postProvider(id));
@@ -41,8 +41,8 @@ PoolService<PostModel> postPool(Ref ref) {
 }
 
 @Riverpod(keepAlive: true)
-PoolService<CommentModel> commentPool(Ref ref) {
-  return PoolService<CommentModel>(
+PoolService<String, CommentModel> commentPool(Ref ref) {
+  return PoolService<String, CommentModel>(
     onInsert: (id) {
       if (ref.exists(commentProvider(id))) {
         ref.invalidate(commentProvider(id));
@@ -54,8 +54,8 @@ PoolService<CommentModel> commentPool(Ref ref) {
 }
 
 @Riverpod(keepAlive: true)
-PoolService<UserModel> userPool(Ref ref) {
-  return PoolService<UserModel>(
+PoolService<String, UserModel> userPool(Ref ref) {
+  return PoolService<String, UserModel>(
     onInsert: (uid) {
       if (ref.exists(userProvider(uid))) {
         ref.invalidate(userProvider(uid));
@@ -67,8 +67,8 @@ PoolService<UserModel> userPool(Ref ref) {
 }
 
 @Riverpod(keepAlive: true)
-PoolService<ActivityModel> activityPool(Ref ref) {
-  return PoolService<ActivityModel>(
+PoolService<String, ActivityModel> activityPool(Ref ref) {
+  return PoolService<String, ActivityModel>(
     onInsert: (id) {
       if (ref.exists(activityProvider(id))) {
         ref.invalidate(activityProvider(id));

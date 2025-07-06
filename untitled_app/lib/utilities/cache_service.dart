@@ -1,26 +1,26 @@
-class PoolService<T> {
-  final Map<String, _CacheEntry<T>> _map = {};
-  final String Function(T) keySelector;
-  final void Function(String) onInsert;
+class PoolService<K, V> {
+  final Map<K, _CacheEntry<V>> _map = {};
+  final K Function(V) keySelector;
+  final void Function(K) onInsert;
   final Duration? validTime;
   PoolService(
       {required this.keySelector, required this.onInsert, this.validTime});
 
-  void put(T item, {DateTime? time}) {
+  void put(V item, {DateTime? time}) {
     final now = time ?? DateTime.now();
     final key = this.keySelector(item);
     _map[key] = _CacheEntry(value: item, insertedAt: now);
     this.onInsert(key);
   }
 
-  void putAll(Iterable<T> items) {
+  void putAll(Iterable<V> items) {
     final now = DateTime.now();
     for (final item in items) {
       put(item, time: now);
     }
   }
 
-  T? getItem(String key) {
+  V? getItem(K key) {
     final item = _map[key];
     // return null if the requested item is not present if it isn't null remove it from the map
     if (item == null) {

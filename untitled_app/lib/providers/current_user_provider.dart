@@ -210,10 +210,9 @@ class CurrentUser extends _$CurrentUser {
 
   Future<void> reload() async {
     final uid = ref.read(authProvider).uid!;
-    final response =
+    final List response =
         await supabase.rpc('get_user_by_id', params: {'p_uid': uid});
-    print(response[0]);
-    state = UserModel.fromJson(response[0]);
+    state = UserModel.fromJson(response.first);
   }
 
   Future<void> addFollower(String otherUid) async {

@@ -27,34 +27,28 @@ AsciiImage? _asciiImageFromString(String? image) {
 abstract class PostModel with _$PostModel {
   const PostModel._();
   const factory PostModel({
-    @JsonKey(name: 'author') required String uid,
-    required String id,
-    String? gifUrl,
+    @JsonKey(name: 'author_uid') required String uid,
+    required int id,
+    @JsonKey(name: 'gif') String? gifUrl,
     @JsonKey(
         name: 'image',
         fromJson: _asciiImageFromString,
         toJson: _asciiImageToString)
     AsciiImage? imageString,
     @Default(<String>[])
-    @JsonKey(
-      fromJson: parseTextToTags,
-      toJson: _joinList,
-    )
+    @JsonKey(fromJson: parseTextToTags, toJson: _joinList)
     List<String> title,
     @Default(<String>[])
-    @JsonKey(
-      fromJson: parseTextToTags,
-      toJson: _joinList,
-    )
+    @JsonKey(fromJson: parseTextToTags, toJson: _joinList)
     List<String> body,
-    @Default(['public']) List<String> tags,
-    @Default(0) int likes,
-    @Default(0) int dislikes,
-    @Default(0) int commentCount,
-    @JsonKey(name: 'time') required String createdAt,
+    @Default(0) @JsonKey(name: 'like_count') int likes,
+    @Default(0) @JsonKey(name: 'dislike_count') int dislikes,
+    @Default(0) @JsonKey(name: 'comment_count') int commentCount,
+    @JsonKey(name: 'created_at') required String createdAt,
     List<String>? pollOptions,
     Map<String, int>? pollVoteCounts,
-    String? repostId,
+    @JsonKey(name: 'ekoed_id') int? ekoedId,
+    @Default(false) @JsonKey(name: 'is_eko') bool isEko,
   }) = _PostModel;
 
   factory PostModel.fromJson(Map<String, dynamic> json) =>

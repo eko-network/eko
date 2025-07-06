@@ -33,7 +33,7 @@ class OtherProfile extends ConsumerWidget {
 
     //FIXME
     // Check if the user is blocked
-    final isBlockedByMe = false; 
+    final isBlockedByMe = false;
     // userAsync.when(
     //   data: (profileUser) => currentUser.blockedUsers.contains(profileUser.uid),
     //   loading: () => false,
@@ -136,9 +136,10 @@ class OtherProfile extends ConsumerWidget {
                   ),
                 );
               }
-              return InfiniteScrolly<String, String>(
+              return InfiniteScrolly<int, String>(
                 getter: (data) async {
-                  return await otherProfilePageGetter(data, ref, uid);
+                  // return await otherProfilePageGetter(data, ref, uid) as dynamic;
+                  return null as dynamic;
                 },
                 widget: otherProfilePostCardBuilder,
                 onRefresh: onRefresh,
@@ -276,7 +277,7 @@ class _Header extends ConsumerWidget {
 
   Future<void> _onFollowPressed(WidgetRef ref) async {
     final isFollowing = false;
-        // ref.watch(currentUserProvider).user.following.contains(user.uid);
+    // ref.watch(currentUserProvider).user.following.contains(user.uid);
 
     if (isFollowing) {
       await ref.read(currentUserProvider.notifier).removeFollower(user.uid);
@@ -290,7 +291,7 @@ class _Header extends ConsumerWidget {
     final width = c.widthGetter(context);
     final currentUser = ref.watch(currentUserProvider);
     //FIXME
-    final isFollowing = false;//currentUser.user.following.contains(user.uid);
+    final isFollowing = false; //currentUser.user.following.contains(user.uid);
 
     return Column(
       children: [

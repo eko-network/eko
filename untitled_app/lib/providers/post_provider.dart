@@ -15,7 +15,7 @@ class Post extends _$Post {
   bool _isLiking = false;
   bool _isVoting = false;
   @override
-  FutureOr<PostModel> build(String id) {
+  FutureOr<PostModel> build(int id) {
     // *** This block is for lifecycle management *** //
     // Keep provider alive
     final link = ref.keepAlive();
@@ -43,77 +43,77 @@ class Post extends _$Post {
     return _fetchPostModel(id);
   }
 
-  Future<PostModel> _fetchPostModel(String id) async {
-    final postsRef = FirebaseFirestore.instance.collection('posts');
-    final data = await Future.wait([postsRef.doc(id).get(), countComments(id)]);
-    final postData = data[0] as DocumentSnapshot<Map<String, dynamic>>;
-    final commentCount = data[1] as int;
+  Future<PostModel> _fetchPostModel(int id) async {
+    // final postsRef = FirebaseFirestore.instance.collection('posts');
+    // final data = await Future.wait([postsRef.doc(id).get(), countComments(id)]);
+    // final postData = data[0] as DocumentSnapshot<Map<String, dynamic>>;
+    // final commentCount = data[1] as int;
+    //
+    // if (postData.data() == null) {
+    //   throw Exception('Failed to load');
+    // }
+    //
+    // final json = postData.data()!;
+    // json['id'] = id;
+    // json['commentCount'] = commentCount;
 
-    if (postData.data() == null) {
-      throw Exception('Failed to load');
-    }
-
-    final json = postData.data()!;
-    json['id'] = id;
-    json['commentCount'] = commentCount;
-
-    return PostModel.fromJson(json);
+    return null as PostModel;
   }
 
-  Future<void> _addLikeToDb(String id) async {
-    final firestore = FirebaseFirestore.instance;
-    final uid = ref.read(currentUserProvider).uid;
-    await Future.wait([
-      firestore.collection('users').doc(uid).update({
-        'profileData.likedPosts': FieldValue.arrayUnion([id])
-      }),
-      firestore
-          .collection('posts')
-          .doc(id)
-          .update({'likes': FieldValue.increment(1)})
-    ]);
+  Future<void> _addLikeToDb(int id) async {
+    // final firestore = FirebaseFirestore.instance;
+    // final uid = ref.read(currentUserProvider).uid;
+    // await Future.wait([
+    //   firestore.collection('users').doc(uid).update({
+    //     'profileData.likedPosts': FieldValue.arrayUnion([id])
+    //   }),
+    //   firestore
+    //       .collection('posts')
+    //       .doc(id)
+    //       .update({'likes': FieldValue.increment(1)})
+    // ]);
   }
 
-  Future<void> _removeLikeFromDb(String id) async {
-    final firestore = FirebaseFirestore.instance;
-    final uid = ref.read(currentUserProvider).uid;
-    await Future.wait([
-      firestore.collection('users').doc(uid).update({
-        'profileData.likedPosts': FieldValue.arrayRemove([id])
-      }),
-      firestore
-          .collection('posts')
-          .doc(id)
-          .update({'likes': FieldValue.increment(-1)}),
-    ]);
+  Future<void> _removeLikeFromDb(int id) async {
+    // final firestore = FirebaseFirestore.instance;
+    // final uid = ref.read(currentUserProvider).uid;
+    // await Future.wait([
+    //   firestore.collection('users').doc(uid).update({
+    //     'profileData.likedPosts': FieldValue.arrayRemove([id])
+    //   }),
+    //   firestore
+    //       .collection('posts')
+    //       .doc(id)
+    //       .update({'likes': FieldValue.increment(-1)}),
+    // ]);
   }
 
-  Future<void> _addDislikeToDb(String id) async {
-    final firestore = FirebaseFirestore.instance;
-    final uid = ref.read(currentUserProvider).uid;
-    await Future.wait([
-      firestore.collection('users').doc(uid).update({
-        'profileData.dislikedPosts': FieldValue.arrayUnion([id])
-      }),
-      firestore
-          .collection('posts')
-          .doc(id)
-          .update({'dislikes': FieldValue.increment(1)})
-    ]);
+  Future<void> _addDislikeToDb(int id) async {
+    // final firestore = FirebaseFirestore.instance;
+    // final uid = ref.read(currentUserProvider).uid;
+    // await Future.wait([
+    //   firestore.collection('users').doc(uid).update({
+    //     'profileData.dislikedPosts': FieldValue.arrayUnion([id])
+    //   }),
+    //   firestore
+    //       .collection('posts')
+    //       .doc(id)
+    //       .update({'dislikes': FieldValue.increment(1)})
+    // ]);
   }
 
-  Future<void> _removeDisikeFromDb(String id) async {
-    final firestore = FirebaseFirestore.instance;
-    final uid = ref.read(currentUserProvider).uid;
-    await Future.wait([
-      firestore.collection('users').doc(uid).update({
-        'profileData.dislikedPosts': FieldValue.arrayRemove([id])
-      }),
-      firestore
-          .collection('posts')
-          .doc(id)
-          .update({'dislikes': FieldValue.increment(-1)}),
-    ]);
+  Future<void> _removeDisikeFromDb(int id) async {
+    // final firestore = FirebaseFirestore.instance;
+    // final uid = ref.read(currentUserProvider).uid;
+    // await Future.wait([
+    //   firestore.collection('users').doc(uid).update({
+    //     'profileData.dislikedPosts': FieldValue.arrayRemove([id])
+    //   }),
+    //   firestore
+    //       .collection('posts')
+    //       .doc(id)
+    //       .update({'dislikes': FieldValue.increment(-1)}),
+    // ]);
   }
 
   Future<void> likePostToggle() async {

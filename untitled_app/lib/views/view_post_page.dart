@@ -21,7 +21,7 @@ import '../widgets/comment_card.dart';
 import '../widgets/infinite_scrolly.dart';
 
 class ViewPostPage extends ConsumerStatefulWidget {
-  final String id;
+  final int id;
   const ViewPostPage({super.key, required this.id});
 
   @override
@@ -177,7 +177,7 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
         comment = CommentModel(
           uid: ref.watch(currentUserProvider).uid,
           id: '',
-          postId: widget.id,
+          postId: widget.id as String,
           createdAt: DateTime.now().toUtc().toIso8601String(),
           body: parseTextToTags(body),
         );
@@ -186,7 +186,7 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
       comment = CommentModel(
         uid: ref.watch(currentUserProvider).uid,
         id: '',
-        postId: widget.id,
+        postId: widget.id as String,
         createdAt: DateTime.now().toUtc().toIso8601String(),
         gifUrl: gif,
       );
@@ -199,7 +199,7 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
     // Add comment to the comment list
     ref.read(commentPoolProvider).putAll([completeComment]);
     ref
-        .read(commentListProvider(widget.id).notifier)
+        .read(commentListProvider(widget.id as String).notifier)
         .addToBack(completeComment);
 
     // Increment comment count
@@ -237,12 +237,12 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
     final height = MediaQuery.sizeOf(context).height;
     final width = c.widthGetter(context);
     final asyncPost = ref.watch(postProvider(widget.id));
-    final provider = ref.watch(commentListProvider(widget.id));
+    final provider = ref.watch(commentListProvider(widget.id as String));
 
     Future<void> onRefresh() async {
       await Future.wait([
         ref.read(currentUserProvider.notifier).reload(),
-        ref.read(commentListProvider(widget.id).notifier).refresh(),
+        ref.read(commentListProvider(widget.id as String).notifier).refresh(),
       ]);
       ref.invalidate(postProvider(widget.id));
     }
@@ -324,8 +324,9 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
                         list: provider.$1,
                         header: PostCard(id: widget.id, isPostPage: true),
                         getter: () => ref
-                            .read(commentListProvider(widget.id).notifier)
-                            .getter(widget.id),
+                            .read(commentListProvider(widget.id as String)
+                                .notifier)
+                            .getter(widget.id as String),
                         onRefresh: onRefresh,
                         widget: commentCardBuilder,
                         controller: commentsScrollController,

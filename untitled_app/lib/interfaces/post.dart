@@ -90,12 +90,13 @@ Future<String> uploadPost(PostModel post, WidgetRef ref) async {
   final List<Future<void>> activityFutures = [];
 
   late final Set<String>? members;
-  if (post.tags.contains('public')) {
-    members = null;
-  } else {
-    final group = await ref.read(groupProvider(post.tags.first).future);
-    members = Set<String>.from(group.members);
-  }
+  members = null;
+  // if (post.tags.contains('public')) {
+  //   members = null;
+  // } else {
+  //   final group = await ref.read(groupProvider(post.tags.first).future);
+  //   members = Set<String>.from(group.members);
+  // }
 
   for (final user in taggedUsers) {
     if (user == null) {
@@ -127,7 +128,7 @@ Future<String> uploadPost(PostModel post, WidgetRef ref) async {
 Future<String> uploadComment(CommentModel comment, WidgetRef ref) async {
   final firestore = FirebaseFirestore.instance;
   final json = comment.toJson();
-  final post = await ref.read(postProvider(comment.postId).future);
+  final post = await ref.read(postProvider(comment.postId as int).future);
 
   //don't put these in firebase
   json.remove('id');

@@ -6,12 +6,12 @@ part of '../../providers/following_feed_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$followingFeedHash() => r'f4f6ca64d61a4758530abfe9bbf8a2a575d6d811';
+String _$followingFeedHash() => r'a82c6bba53fa98181a2c9839a877d697472c09fc';
 
 /// See also [FollowingFeed].
 @ProviderFor(FollowingFeed)
 final followingFeedProvider =
-    AutoDisposeNotifierProvider<FollowingFeed, (List<String>, bool)>.internal(
+    AutoDisposeNotifierProvider<FollowingFeed, (List<int>, bool)>.internal(
   FollowingFeed.new,
   name: r'followingFeedProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -21,6 +21,6 @@ final followingFeedProvider =
   allTransitiveDependencies: null,
 );
 
-typedef _$FollowingFeed = AutoDisposeNotifier<(List<String>, bool)>;
+typedef _$FollowingFeed = AutoDisposeNotifier<(List<int>, bool)>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

@@ -13,7 +13,7 @@ import 'package:untitled_app/widgets/time_stamp.dart';
 import 'package:untitled_app/widgets/user_tag.dart';
 
 class RepostCard extends ConsumerWidget {
-  final String postId;
+  final int postId;
   final bool isLoggedIn;
   final bool isPreview;
   const RepostCard(
@@ -87,7 +87,6 @@ class RepostCard extends ConsumerWidget {
                                             if (post.uid !=
                                                 ref
                                                     .read(currentUserProvider)
-                                                    
                                                     .uid) {
                                               context.push(
                                                   '/feed/sub_profile/${post.uid}');

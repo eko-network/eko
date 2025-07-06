@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/current_user_provider.dart';
 import '../providers/post_provider.dart';
 
-Future<void> addReport(WidgetRef ref, String id, String message) async {
+Future<void> addReport(WidgetRef ref, int id, String message) async {
   final firestore = FirebaseFirestore.instance;
   final uid = ref.read(currentUserProvider).uid;
   final post = await ref.read(postProvider(id).future);

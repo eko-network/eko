@@ -7,9 +7,9 @@ part of '../../types/post.dart';
 // **************************************************************************
 
 _PostModel _$PostModelFromJson(Map<String, dynamic> json) => _PostModel(
-      uid: json['author'] as String,
-      id: json['id'] as String,
-      gifUrl: json['gifUrl'] as String?,
+      uid: json['author_uid'] as String,
+      id: (json['id'] as num).toInt(),
+      gifUrl: json['gif'] as String?,
       imageString: _asciiImageFromString(json['image'] as String?),
       title: json['title'] == null
           ? const <String>[]
@@ -17,36 +17,34 @@ _PostModel _$PostModelFromJson(Map<String, dynamic> json) => _PostModel(
       body: json['body'] == null
           ? const <String>[]
           : parseTextToTags(json['body'] as String?),
-      tags:
-          (json['tags'] as List<dynamic>?)?.map((e) => e as String).toList() ??
-              const ['public'],
-      likes: (json['likes'] as num?)?.toInt() ?? 0,
-      dislikes: (json['dislikes'] as num?)?.toInt() ?? 0,
-      commentCount: (json['commentCount'] as num?)?.toInt() ?? 0,
-      createdAt: json['time'] as String,
+      likes: (json['like_count'] as num?)?.toInt() ?? 0,
+      dislikes: (json['dislike_count'] as num?)?.toInt() ?? 0,
+      commentCount: (json['comment_count'] as num?)?.toInt() ?? 0,
+      createdAt: json['created_at'] as String,
       pollOptions: (json['pollOptions'] as List<dynamic>?)
           ?.map((e) => e as String)
           .toList(),
       pollVoteCounts: (json['pollVoteCounts'] as Map<String, dynamic>?)?.map(
         (k, e) => MapEntry(k, (e as num).toInt()),
       ),
-      repostId: json['repostId'] as String?,
+      ekoedId: (json['ekoed_id'] as num?)?.toInt(),
+      isEko: json['is_eko'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$PostModelToJson(_PostModel instance) =>
     <String, dynamic>{
-      'author': instance.uid,
+      'author_uid': instance.uid,
       'id': instance.id,
-      'gifUrl': instance.gifUrl,
+      'gif': instance.gifUrl,
       'image': _asciiImageToString(instance.imageString),
       'title': _joinList(instance.title),
       'body': _joinList(instance.body),
-      'tags': instance.tags,
-      'likes': instance.likes,
-      'dislikes': instance.dislikes,
-      'commentCount': instance.commentCount,
-      'time': instance.createdAt,
+      'like_count': instance.likes,
+      'dislike_count': instance.dislikes,
+      'comment_count': instance.commentCount,
+      'created_at': instance.createdAt,
       'pollOptions': instance.pollOptions,
       'pollVoteCounts': instance.pollVoteCounts,
-      'repostId': instance.repostId,
+      'ekoed_id': instance.ekoedId,
+      'is_eko': instance.isEko,
     };
