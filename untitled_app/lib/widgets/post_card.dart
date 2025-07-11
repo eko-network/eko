@@ -244,6 +244,7 @@ class PostCardFromPost extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    print(post.createdAt);
     final width = c.widthGetter(context);
     return Padding(
       padding: const EdgeInsets.only(top: 5, bottom: 0, right: 0),
@@ -333,12 +334,12 @@ class PostCardFromPost extends ConsumerWidget {
                           Padding(
                               padding: EdgeInsets.only(bottom: 6),
                               child: GifWidget(url: post.gifUrl!)),
-                        if (post.imageString != null)
+                        if (post.image != null)
                           Padding(
                               padding:
                                   const EdgeInsets.only(right: 50, bottom: 6),
                               child: ImageWidget(
-                                ascii: post.imageString!,
+                                ascii: post.image!,
                               )),
                         if (post.pollOptions != null)
                           Padding(

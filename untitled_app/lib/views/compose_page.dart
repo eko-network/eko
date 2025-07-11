@@ -279,7 +279,7 @@ class _ComposePageState extends ConsumerState<ComposePage> {
       commentCount: 0,
       createdAt: DateTime.now().toUtc().toIso8601String(),
       pollOptions: isPoll ? pollOptions : null,
-      imageString: image,
+      image: image,
       gifUrl: gif,
       ekoedId: repostId as int,
       title: parseTextToTags(title),

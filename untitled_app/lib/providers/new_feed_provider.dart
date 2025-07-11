@@ -16,10 +16,13 @@ class NewFeed extends _$NewFeed {
   }
 
   Future<void> getter() async {
-    final postList = (await supabase.rpc('paginated_new_posts',
-            params: {'p_limit': c.postsOnRefresh, 'p_offset': _page++}))
-        .map((data) => PostModel.fromJson(data))
-        .toList();
+    final List<dynamic> request = await supabase.rpc('paginated_new_posts',
+        params: {'p_limit': c.postsOnRefresh, 'p_offset': _page++});
+
+    final postList = request.map((data) {
+      final post = PostModel.fromJson(data);
+      return post;
+    });
 
     ref.read(postPoolProvider).putAll(postList);
     final newList = [...state.$1];

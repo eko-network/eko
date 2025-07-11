@@ -10,7 +10,7 @@ _PostModel _$PostModelFromJson(Map<String, dynamic> json) => _PostModel(
       uid: json['author_uid'] as String,
       id: (json['id'] as num).toInt(),
       gifUrl: json['gif'] as String?,
-      imageString: _asciiImageFromString(json['image'] as String?),
+      image: _asciiImageFromString(json['image'] as String?),
       title: json['title'] == null
           ? const <String>[]
           : parseTextToTags(json['title'] as String?),
@@ -36,7 +36,7 @@ Map<String, dynamic> _$PostModelToJson(_PostModel instance) =>
       'author_uid': instance.uid,
       'id': instance.id,
       'gif': instance.gifUrl,
-      'image': _asciiImageToString(instance.imageString),
+      'image': _asciiImageToString(instance.image),
       'title': _joinList(instance.title),
       'body': _joinList(instance.body),
       'like_count': instance.likes,

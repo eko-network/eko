@@ -119,12 +119,12 @@ class RepostCard extends ConsumerWidget {
                                     Padding(
                                         padding: EdgeInsets.only(bottom: 6),
                                         child: GifWidget(url: post.gifUrl!)),
-                                  if (post.imageString != null)
+                                  if (post.image != null)
                                     Padding(
                                         padding: const EdgeInsets.only(
                                             right: 50, bottom: 6),
                                         child: ImageWidget(
-                                          ascii: post.imageString!,
+                                          ascii: post.image!,
                                         )),
                                   if (post.pollOptions != null)
                                     Padding(

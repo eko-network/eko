@@ -34,7 +34,7 @@ abstract class PostModel with _$PostModel {
         name: 'image',
         fromJson: _asciiImageFromString,
         toJson: _asciiImageToString)
-    AsciiImage? imageString,
+    AsciiImage? image,
     @Default(<String>[])
     @JsonKey(fromJson: parseTextToTags, toJson: _joinList)
     List<String> title,

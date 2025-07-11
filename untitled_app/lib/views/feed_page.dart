@@ -329,21 +329,22 @@ class __FollowingTabState extends ConsumerState<_FollowingTab>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    final provider = ref.watch(followingFeedProvider);
-    return InfiniteScrollyShell<int>(
-      isEnd: provider.$2,
-      list: provider.$1,
-      header: SizedBox(
-        height: appBarHeight,
-      ),
-      getter: ref.read(followingFeedProvider.notifier).getter,
-      onRefresh: ref.read(followingFeedProvider.notifier).refresh,
-      initialLoadingWidget: PostLoader(
-        length: 3,
-      ),
-      widget: postCardBuilder,
-      controller: widget.controller,
-    );
+    return SizedBox();
+    // final provider = ref.watch(followingFeedProvider);
+    // return InfiniteScrollyShell<int>(
+    //   isEnd: provider.$2,
+    //   list: provider.$1,
+    //   header: SizedBox(
+    //     height: appBarHeight,
+    //   ),
+    //   getter: ref.read(followingFeedProvider.notifier).getter,
+    //   onRefresh: ref.read(followingFeedProvider.notifier).refresh,
+    //   initialLoadingWidget: PostLoader(
+    //     length: 3,
+    //   ),
+    //   widget: postCardBuilder,
+    //   controller: widget.controller,
+    // );
   }
 }
 
@@ -397,19 +398,21 @@ class __PopTabState extends ConsumerState<_PopTab>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return InfiniteScrolly<int, int>(
-      header: SizedBox(
-        height: appBarHeight,
-      ),
-      getter: (data) async {
-        // return await popGetter(data, ref);
-        return null as dynamic;
-      },
-      initialLoadingWidget: PostLoader(
-        length: 3,
-      ),
-      widget: postCardBuilder,
-      controller: widget.controller,
-    );
+    return SizedBox();
+
+    // return InfiniteScrolly<int, int>(
+    //   header: SizedBox(
+    //     height: appBarHeight,
+    //   ),
+    //   getter: (data) async {
+    //     // return await popGetter(data, ref);
+    //     return null as dynamic;
+    //   },
+    //   initialLoadingWidget: PostLoader(
+    //     length: 3,
+    //   ),
+    //   widget: postCardBuilder,
+    //   controller: widget.controller,
+    // );
   }
 }

@@ -24,7 +24,7 @@ mixin _$PostModel implements DiagnosticableTreeMixin {
       name: 'image',
       fromJson: _asciiImageFromString,
       toJson: _asciiImageToString)
-  AsciiImage? get imageString;
+  AsciiImage? get image;
   @JsonKey(fromJson: parseTextToTags, toJson: _joinList)
   List<String> get title;
   @JsonKey(fromJson: parseTextToTags, toJson: _joinList)
@@ -61,7 +61,7 @@ mixin _$PostModel implements DiagnosticableTreeMixin {
       ..add(DiagnosticsProperty('uid', uid))
       ..add(DiagnosticsProperty('id', id))
       ..add(DiagnosticsProperty('gifUrl', gifUrl))
-      ..add(DiagnosticsProperty('imageString', imageString))
+      ..add(DiagnosticsProperty('image', image))
       ..add(DiagnosticsProperty('title', title))
       ..add(DiagnosticsProperty('body', body))
       ..add(DiagnosticsProperty('likes', likes))
@@ -82,8 +82,7 @@ mixin _$PostModel implements DiagnosticableTreeMixin {
             (identical(other.uid, uid) || other.uid == uid) &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.gifUrl, gifUrl) || other.gifUrl == gifUrl) &&
-            (identical(other.imageString, imageString) ||
-                other.imageString == imageString) &&
+            (identical(other.image, image) || other.image == image) &&
             const DeepCollectionEquality().equals(other.title, title) &&
             const DeepCollectionEquality().equals(other.body, body) &&
             (identical(other.likes, likes) || other.likes == likes) &&
@@ -108,7 +107,7 @@ mixin _$PostModel implements DiagnosticableTreeMixin {
       uid,
       id,
       gifUrl,
-      imageString,
+      image,
       const DeepCollectionEquality().hash(title),
       const DeepCollectionEquality().hash(body),
       likes,
@@ -122,7 +121,7 @@ mixin _$PostModel implements DiagnosticableTreeMixin {
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'PostModel(uid: $uid, id: $id, gifUrl: $gifUrl, imageString: $imageString, title: $title, body: $body, likes: $likes, dislikes: $dislikes, commentCount: $commentCount, createdAt: $createdAt, pollOptions: $pollOptions, pollVoteCounts: $pollVoteCounts, ekoedId: $ekoedId, isEko: $isEko)';
+    return 'PostModel(uid: $uid, id: $id, gifUrl: $gifUrl, image: $image, title: $title, body: $body, likes: $likes, dislikes: $dislikes, commentCount: $commentCount, createdAt: $createdAt, pollOptions: $pollOptions, pollVoteCounts: $pollVoteCounts, ekoedId: $ekoedId, isEko: $isEko)';
   }
 }
 
@@ -139,7 +138,7 @@ abstract mixin class $PostModelCopyWith<$Res> {
           name: 'image',
           fromJson: _asciiImageFromString,
           toJson: _asciiImageToString)
-      AsciiImage? imageString,
+      AsciiImage? image,
       @JsonKey(fromJson: parseTextToTags, toJson: _joinList) List<String> title,
       @JsonKey(fromJson: parseTextToTags, toJson: _joinList) List<String> body,
       @JsonKey(name: 'like_count') int likes,
@@ -167,7 +166,7 @@ class _$PostModelCopyWithImpl<$Res> implements $PostModelCopyWith<$Res> {
     Object? uid = null,
     Object? id = null,
     Object? gifUrl = freezed,
-    Object? imageString = freezed,
+    Object? image = freezed,
     Object? title = null,
     Object? body = null,
     Object? likes = null,
@@ -192,9 +191,9 @@ class _$PostModelCopyWithImpl<$Res> implements $PostModelCopyWith<$Res> {
           ? _self.gifUrl
           : gifUrl // ignore: cast_nullable_to_non_nullable
               as String?,
-      imageString: freezed == imageString
-          ? _self.imageString
-          : imageString // ignore: cast_nullable_to_non_nullable
+      image: freezed == image
+          ? _self.image
+          : image // ignore: cast_nullable_to_non_nullable
               as AsciiImage?,
       title: null == title
           ? _self.title
@@ -251,7 +250,7 @@ class _PostModel extends PostModel with DiagnosticableTreeMixin {
           name: 'image',
           fromJson: _asciiImageFromString,
           toJson: _asciiImageToString)
-      this.imageString,
+      this.image,
       @JsonKey(fromJson: parseTextToTags, toJson: _joinList)
       final List<String> title = const <String>[],
       @JsonKey(fromJson: parseTextToTags, toJson: _joinList)
@@ -285,7 +284,7 @@ class _PostModel extends PostModel with DiagnosticableTreeMixin {
       name: 'image',
       fromJson: _asciiImageFromString,
       toJson: _asciiImageToString)
-  final AsciiImage? imageString;
+  final AsciiImage? image;
   final List<String> _title;
   @override
   @JsonKey(fromJson: parseTextToTags, toJson: _joinList)
@@ -365,7 +364,7 @@ class _PostModel extends PostModel with DiagnosticableTreeMixin {
       ..add(DiagnosticsProperty('uid', uid))
       ..add(DiagnosticsProperty('id', id))
       ..add(DiagnosticsProperty('gifUrl', gifUrl))
-      ..add(DiagnosticsProperty('imageString', imageString))
+      ..add(DiagnosticsProperty('image', image))
       ..add(DiagnosticsProperty('title', title))
       ..add(DiagnosticsProperty('body', body))
       ..add(DiagnosticsProperty('likes', likes))
@@ -386,8 +385,7 @@ class _PostModel extends PostModel with DiagnosticableTreeMixin {
             (identical(other.uid, uid) || other.uid == uid) &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.gifUrl, gifUrl) || other.gifUrl == gifUrl) &&
-            (identical(other.imageString, imageString) ||
-                other.imageString == imageString) &&
+            (identical(other.image, image) || other.image == image) &&
             const DeepCollectionEquality().equals(other._title, _title) &&
             const DeepCollectionEquality().equals(other._body, _body) &&
             (identical(other.likes, likes) || other.likes == likes) &&
@@ -412,7 +410,7 @@ class _PostModel extends PostModel with DiagnosticableTreeMixin {
       uid,
       id,
       gifUrl,
-      imageString,
+      image,
       const DeepCollectionEquality().hash(_title),
       const DeepCollectionEquality().hash(_body),
       likes,
@@ -426,7 +424,7 @@ class _PostModel extends PostModel with DiagnosticableTreeMixin {
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'PostModel(uid: $uid, id: $id, gifUrl: $gifUrl, imageString: $imageString, title: $title, body: $body, likes: $likes, dislikes: $dislikes, commentCount: $commentCount, createdAt: $createdAt, pollOptions: $pollOptions, pollVoteCounts: $pollVoteCounts, ekoedId: $ekoedId, isEko: $isEko)';
+    return 'PostModel(uid: $uid, id: $id, gifUrl: $gifUrl, image: $image, title: $title, body: $body, likes: $likes, dislikes: $dislikes, commentCount: $commentCount, createdAt: $createdAt, pollOptions: $pollOptions, pollVoteCounts: $pollVoteCounts, ekoedId: $ekoedId, isEko: $isEko)';
   }
 }
 
@@ -446,7 +444,7 @@ abstract mixin class _$PostModelCopyWith<$Res>
           name: 'image',
           fromJson: _asciiImageFromString,
           toJson: _asciiImageToString)
-      AsciiImage? imageString,
+      AsciiImage? image,
       @JsonKey(fromJson: parseTextToTags, toJson: _joinList) List<String> title,
       @JsonKey(fromJson: parseTextToTags, toJson: _joinList) List<String> body,
       @JsonKey(name: 'like_count') int likes,
@@ -474,7 +472,7 @@ class __$PostModelCopyWithImpl<$Res> implements _$PostModelCopyWith<$Res> {
     Object? uid = null,
     Object? id = null,
     Object? gifUrl = freezed,
-    Object? imageString = freezed,
+    Object? image = freezed,
     Object? title = null,
     Object? body = null,
     Object? likes = null,
@@ -499,9 +497,9 @@ class __$PostModelCopyWithImpl<$Res> implements _$PostModelCopyWith<$Res> {
           ? _self.gifUrl
           : gifUrl // ignore: cast_nullable_to_non_nullable
               as String?,
-      imageString: freezed == imageString
-          ? _self.imageString
-          : imageString // ignore: cast_nullable_to_non_nullable
+      image: freezed == image
+          ? _self.image
+          : image // ignore: cast_nullable_to_non_nullable
               as AsciiImage?,
       title: null == title
           ? _self._title
