@@ -18,7 +18,7 @@ mixin _$UserModel {
   String get name;
   String get username;
   @JsonKey(
-      name: 'profilePicture',
+      name: 'profile_picture',
       defaultValue:
           'https://firebasestorage.googleapis.com/v0/b/untitled-2832f.appspot.com/o/profile_pictures%2Fdefault%2Fprofile.jpg?alt=media&token=2543c4eb-f991-468f-9ce8-68c576ffca7c')
   String get profilePicture;
@@ -79,7 +79,7 @@ abstract mixin class $UserModelCopyWith<$Res> {
       {String name,
       String username,
       @JsonKey(
-          name: 'profilePicture',
+          name: 'profile_picture',
           defaultValue:
               'https://firebasestorage.googleapis.com/v0/b/untitled-2832f.appspot.com/o/profile_pictures%2Fdefault%2Fprofile.jpg?alt=media&token=2543c4eb-f991-468f-9ce8-68c576ffca7c')
       String profilePicture,
@@ -151,7 +151,7 @@ class _UserModel implements UserModel {
       {required this.name,
       required this.username,
       @JsonKey(
-          name: 'profilePicture',
+          name: 'profile_picture',
           defaultValue:
               'https://firebasestorage.googleapis.com/v0/b/untitled-2832f.appspot.com/o/profile_pictures%2Fdefault%2Fprofile.jpg?alt=media&token=2543c4eb-f991-468f-9ce8-68c576ffca7c')
       required this.profilePicture,
@@ -170,7 +170,7 @@ class _UserModel implements UserModel {
   final String username;
   @override
   @JsonKey(
-      name: 'profilePicture',
+      name: 'profile_picture',
       defaultValue:
           'https://firebasestorage.googleapis.com/v0/b/untitled-2832f.appspot.com/o/profile_pictures%2Fdefault%2Fprofile.jpg?alt=media&token=2543c4eb-f991-468f-9ce8-68c576ffca7c')
   final String profilePicture;
@@ -243,7 +243,7 @@ abstract mixin class _$UserModelCopyWith<$Res>
       {String name,
       String username,
       @JsonKey(
-          name: 'profilePicture',
+          name: 'profile_picture',
           defaultValue:
               'https://firebasestorage.googleapis.com/v0/b/untitled-2832f.appspot.com/o/profile_pictures%2Fdefault%2Fprofile.jpg?alt=media&token=2543c4eb-f991-468f-9ce8-68c576ffca7c')
       String profilePicture,

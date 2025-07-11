@@ -56,9 +56,10 @@ class ProfilePicture extends ConsumerWidget {
                               imageUrl: user.profilePicture,
                               placeholder: (context, url) =>
                                   const LoadingProfileImage(),
-                              errorWidget: (context, url, error) =>
-                                  const LoadingProfileImage(),
-                            );
+                              errorWidget: (context, url, error) {
+                                debugPrint(error.toString());
+                                return const LoadingProfileImage();
+                              });
                     },
                     error: (_, __) {
                       return const Text('Error');

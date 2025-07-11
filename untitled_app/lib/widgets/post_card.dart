@@ -11,6 +11,7 @@ import 'package:untitled_app/providers/group_provider.dart';
 // import 'package:untitled_app/interfaces/user.dart';
 // import 'package:untitled_app/providers/current_user_provider.dart';
 import 'package:untitled_app/providers/post_provider.dart';
+import 'package:untitled_app/providers/user_provider.dart';
 import 'package:untitled_app/types/post.dart';
 import 'package:untitled_app/widgets/divider.dart';
 import 'package:untitled_app/widgets/icons.dart' as icons;
@@ -244,7 +245,6 @@ class PostCardFromPost extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    print(post.createdAt);
     final width = c.widthGetter(context);
     return Padding(
       padding: const EdgeInsets.only(top: 5, bottom: 0, right: 0),
