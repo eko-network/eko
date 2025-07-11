@@ -148,7 +148,7 @@ class _$UserModelCopyWithImpl<$Res> implements $UserModelCopyWith<$Res> {
 @JsonSerializable(explicitToJson: true)
 class _UserModel implements UserModel {
   const _UserModel(
-      {required this.name,
+      {this.name = '',
       required this.username,
       @JsonKey(
           name: 'profile_picture',
@@ -165,6 +165,7 @@ class _UserModel implements UserModel {
       _$UserModelFromJson(json);
 
   @override
+  @JsonKey()
   final String name;
   @override
   final String username;

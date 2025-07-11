@@ -6,6 +6,7 @@ import 'package:untitled_app/interfaces/post.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
 import 'package:untitled_app/providers/pool_providers.dart';
 import 'package:untitled_app/types/post.dart';
+import 'package:untitled_app/utilities/supabase_ref.dart';
 // Necessary for code-generation to work
 part '../generated/providers/post_provider.g.dart';
 
@@ -44,6 +45,9 @@ class Post extends _$Post {
   }
 
   Future<PostModel> _fetchPostModel(int id) async {
+    final List response =
+        await supabase.rpc('get_post_by_id', params: {'p_id': id});
+    return PostModel.fromJson(response.first);
     // final postsRef = FirebaseFirestore.instance.collection('posts');
     // final data = await Future.wait([postsRef.doc(id).get(), countComments(id)]);
     // final postData = data[0] as DocumentSnapshot<Map<String, dynamic>>;

@@ -61,7 +61,8 @@ class ProfilePicture extends ConsumerWidget {
                                 return const LoadingProfileImage();
                               });
                     },
-                    error: (_, __) {
+                    error: (error, __) {
+                      debugPrint(error.toString());
                       return const Text('Error');
                     },
                     loading: () => LoadingProfileImage(),

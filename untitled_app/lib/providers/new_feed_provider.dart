@@ -7,8 +7,8 @@ part '../generated/providers/new_feed_provider.g.dart';
 
 @riverpod
 class NewFeed extends _$NewFeed {
-  int _page = 0;
   final Set<int> _set = {};
+  (String, int)? _last;
 
   @override
   (List<int>, bool) build() {
@@ -17,12 +17,21 @@ class NewFeed extends _$NewFeed {
 
   Future<void> getter() async {
     final List<dynamic> request = await supabase.rpc('paginated_new_posts',
-        params: {'p_limit': c.postsOnRefresh, 'p_offset': _page++});
+        params: {
+          'p_limit': c.postsOnRefresh,
+          'p_last_time': _last?.$1,
+          'p_last_id': _last?.$2
+        });
 
     final postList = request.map((data) {
       final post = PostModel.fromJson(data);
       return post;
     });
+
+    if (postList.isNotEmpty) {
+      final lastPost = postList.last;
+      _last = (lastPost.createdAt, lastPost.id);
+    }
 
     ref.read(postPoolProvider).putAll(postList);
     final newList = [...state.$1];
@@ -36,7 +45,7 @@ class NewFeed extends _$NewFeed {
 
   Future<void> refresh() async {
     _set.clear();
-    _page = 0;
+    _last = null;
     state = ([], false);
     await getter();
   }

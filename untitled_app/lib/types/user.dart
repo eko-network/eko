@@ -7,7 +7,7 @@ part '../generated/types/user.g.dart';
 abstract class UserModel with _$UserModel {
   @JsonSerializable(explicitToJson: true)
   const factory UserModel({
-    required String name,
+    @Default('') String name,
     required String username,
     @JsonKey(
         name: 'profile_picture',

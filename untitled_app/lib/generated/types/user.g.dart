@@ -7,7 +7,7 @@ part of '../../types/user.dart';
 // **************************************************************************
 
 _UserModel _$UserModelFromJson(Map<String, dynamic> json) => _UserModel(
-      name: json['name'] as String,
+      name: json['name'] as String? ?? '',
       username: json['username'] as String,
       profilePicture: json['profile_picture'] as String? ??
           'https://firebasestorage.googleapis.com/v0/b/untitled-2832f.appspot.com/o/profile_pictures%2Fdefault%2Fprofile.jpg?alt=media&token=2543c4eb-f991-468f-9ce8-68c576ffca7c',
