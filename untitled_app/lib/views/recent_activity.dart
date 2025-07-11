@@ -14,8 +14,8 @@ import 'package:untitled_app/widgets/shimmer_loaders.dart';
 class RecentActivity extends ConsumerWidget {
   const RecentActivity({super.key});
 
-  Future<(List<MapEntry<String, String>>, bool)> getter(
-      List<MapEntry<String, String>> list, WidgetRef ref) async {
+  Future<(List<(String, String)>, bool)> getter(
+      List<(String, String)> list, WidgetRef ref) async {
     final uid = ref.read(currentUserProvider).uid;
     final baseQuery = FirebaseFirestore.instance
         .collection('users')
@@ -26,13 +26,13 @@ class RecentActivity extends ConsumerWidget {
             whereIn: const ['comment', 'follow', 'tag']) //update for new types
         .limit(c.activitiesPerRequest);
     final query =
-        list.isEmpty ? baseQuery : baseQuery.startAfter([list.last.value]);
+        list.isEmpty ? baseQuery : baseQuery.startAfter([list.last.$2]);
 
     final activityList = await query.get().then(
         (data) => data.docs.map((doc) => ActivityModel.fromFirestoreDoc(doc)));
     ref.read(activityPoolProvider).putAll(activityList);
     final retList =
-        activityList.map((item) => MapEntry(item.id, item.createdAt)).toList();
+        activityList.map((item) => (item.id, item.createdAt)).toList();
     return (retList, retList.length < c.postsOnRefresh);
   }
 

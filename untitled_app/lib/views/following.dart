@@ -16,15 +16,15 @@ class Following extends ConsumerStatefulWidget {
 }
 
 class _FollowingState extends ConsumerState<Following> {
-  Future<(List<MapEntry<String, Never?>>, bool)> getter(
-      List<MapEntry<String, Never?>> data, List<String> fullFollowing) async {
+  Future<(List<(String, Never?)>, bool)> getter(
+      List<(String, Never?)> data, List<String> fullFollowing) async {
     // // value form constants
     const chunkSize = c.usersOnSearch;
     // // this is just to put queries in while they are waiting to finish
     final List<Future<dynamic>> futures = [];
     // // list of uids to render next
-    final List<MapEntry<String, Never?>> returnData = [];
-    final currentDataSet = data.map((item) => item.key).toSet();
+    final List<(String, Never?)> returnData = [];
+    final currentDataSet = data.map((item) => item.$1).toSet();
     var unfetchedFollowing =
         fullFollowing.where((e) => !currentDataSet.contains(e)).toList();
     final end = unfetchedFollowing.length < chunkSize
@@ -32,7 +32,7 @@ class _FollowingState extends ConsumerState<Following> {
         : chunkSize;
     for (int i = 0; i < end; i++) {
       final future = ref.read(userProvider(unfetchedFollowing[i]).future);
-      returnData.add(MapEntry(unfetchedFollowing[i], null));
+      returnData.add((unfetchedFollowing[i], null));
       futures.add(future);
     }
     await Future.wait(futures);

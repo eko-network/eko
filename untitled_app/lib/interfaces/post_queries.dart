@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:untitled_app/providers/pool_providers.dart';
 import 'package:untitled_app/types/comment.dart';
+import 'package:untitled_app/utilities/supabase_ref.dart';
 import '../utilities/constants.dart' as c;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
@@ -58,21 +59,19 @@ Future<(List<MapEntry<String, String>>, bool)> otherProfilePageGetter(
   return ([] as List<MapEntry<String, String>>, true);
 }
 
-Future<(List<MapEntry<String, int>>, bool)> popGetter(
-    List<MapEntry<String, int>> list, WidgetRef ref) async {
-  // final baseQuery = FirebaseFirestore.instance
-  //     .collection('posts')
-  //     .where('tags', arrayContains: 'public')
-  //     .orderBy('likes', descending: true)
-  //     .limit(c.postsOnRefresh);
-  // final query =
-  //     list.isEmpty ? baseQuery : baseQuery.startAfter([list.last.value]);
-  // final postList = await getPosts(query);
-  // ref.read(postPoolProvider).putAll(postList);
-  // final retList =
-  //     postList.map((item) => MapEntry(item.id, item.likes)).toList();
-  // return (retList, retList.length < c.postsOnRefresh);
-  return ([] as List<MapEntry<String, int>>, true);
+Future<(List<(int, int)>, bool)> popGetter(
+    List<(int, int)> list, WidgetRef ref) async {
+  final last = list.isNotEmpty ? list.last : null;
+  final List<dynamic> response = await supabase.rpc('paginated_popular_posts',
+      params: {
+        'p_limit': c.postsOnRefresh,
+        'p_last_likes': last?.$2,
+        'p_last_id': last?.$1
+      });
+  final postList = response.map((post) => PostModel.fromJson(post));
+  ref.read(postPoolProvider).putAll(postList);
+  final retList = postList.map((post) => (post.id, post.likes)).toList();
+  return (retList, retList.length < c.postsOnRefresh);
 }
 
 Future<(List<MapEntry<String, String>>, bool)> getGroupPosts(

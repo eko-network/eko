@@ -15,17 +15,15 @@ class EditGroup extends ConsumerWidget {
   const EditGroup({required this.id, super.key});
 
 // FIXME change variable names
-  Future<(List<MapEntry<String, Never?>>, bool)> getter(
-      List<MapEntry<String, Never?>> data,
-      List<String> fullFollowers,
-      WidgetRef ref) async {
+  Future<(List<(String, Never?)>, bool)> getter(List<(String, Never?)> data,
+      List<String> fullFollowers, WidgetRef ref) async {
     // // value form constants
     const chunkSize = c.usersOnSearch;
     // // this is just to put queries in while they are waiting to finish
     final List<Future<dynamic>> futures = [];
     // // list of uids to render next
-    final List<MapEntry<String, Never?>> returnData = [];
-    final currentDataSet = data.map((item) => item.key).toSet();
+    final List<(String, Never?)> returnData = [];
+    final currentDataSet = data.map((item) => item.$1).toSet();
     var unfetchedFollowers =
         fullFollowers.where((e) => !currentDataSet.contains(e)).toList();
     final end = unfetchedFollowers.length < chunkSize
@@ -33,7 +31,7 @@ class EditGroup extends ConsumerWidget {
         : chunkSize;
     for (int i = 0; i < end; i++) {
       final future = ref.read(userProvider(unfetchedFollowers[i]).future);
-      returnData.add(MapEntry(unfetchedFollowers[i], null));
+      returnData.add((unfetchedFollowers[i], null));
       futures.add(future);
     }
     await Future.wait(futures);

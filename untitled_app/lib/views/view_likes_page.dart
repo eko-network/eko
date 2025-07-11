@@ -15,8 +15,8 @@ class ViewLikesPage extends ConsumerWidget {
   final bool dislikes;
   const ViewLikesPage({super.key, required this.postId, this.dislikes = false});
 
-  Future<(List<MapEntry<String, Never?>>, bool)> getter(
-      List<MapEntry<String, Never?>> list, WidgetRef ref) async {
+  Future<(List<(String, Never?)>, bool)> getter(
+      List<(String, Never?)> list, WidgetRef ref) async {
     final baseQuery = FirebaseFirestore.instance
         .collection('users')
         .where('profileData.${dislikes ? 'dislikedPosts' : 'likedPosts'}',
@@ -28,7 +28,7 @@ class ViewLikesPage extends ConsumerWidget {
     final userList = snapshot.docs.map((doc) => UserModel.fromJson(doc.data()));
     ref.read(userPoolProvider).putAll(userList);
     return ((
-      userList.map((item) => MapEntry(item.uid, null)).toList(),
+      userList.map((item) => (item.uid, null)).toList(),
       userList.length < c.usersOnSearch
     ));
   }

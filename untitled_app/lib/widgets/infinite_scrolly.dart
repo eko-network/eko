@@ -33,8 +33,7 @@ class InfiniteScrolly<K, V> extends StatefulWidget {
   /// Function that receives the current list of items and returns the next chunk. The getter
   ///		must treat the list it recives as read only. The data may get out of date, but that is ok.
   ///   Also must return bool to signifiy if this is the last chunk
-  final Future<(List<MapEntry<K, V>>, bool)> Function(List<MapEntry<K, V>>)
-      getter;
+  final Future<(List<(K, V)>, bool)> Function(List<(K, V)>) getter;
 
   /// Builder function that takes a key and returns a widget to display it.
   final Widget Function(K) widget;
@@ -77,7 +76,7 @@ class InfiniteScrolly<K, V> extends StatefulWidget {
 }
 
 class _InfiniteScrollyState<K, V> extends State<InfiniteScrolly<K, V>> {
-  List<MapEntry<K, V>> objectPairs = [];
+  List<(K, V)> objectPairs = [];
   bool isEnd = false;
   bool isLoading = false;
 
@@ -112,7 +111,7 @@ class _InfiniteScrollyState<K, V> extends State<InfiniteScrolly<K, V>> {
       onRefresh: onRefresh,
       getter: onScroll,
       widget: widget.widget,
-      list: objectPairs.map((item) => item.key).toList(),
+      list: objectPairs.map((item) => item.$1).toList(),
       isEnd: isEnd,
       controller: widget.controller,
       loadingWidget: widget.loadingWidget,

@@ -4,7 +4,11 @@ import 'package:go_router/go_router.dart';
 import 'package:untitled_app/interfaces/post_queries.dart';
 import 'package:untitled_app/providers/following_feed_provider.dart';
 import 'package:untitled_app/providers/new_feed_provider.dart';
+import 'package:untitled_app/providers/pool_providers.dart';
+import 'package:untitled_app/types/post.dart';
+import 'package:untitled_app/utilities/constants.dart' as c;
 import 'package:untitled_app/utilities/shared_pref_service.dart';
+import 'package:untitled_app/utilities/supabase_ref.dart';
 
 import 'package:untitled_app/widgets/icons.dart';
 import 'package:untitled_app/widgets/infinite_scrolly.dart';
@@ -398,21 +402,18 @@ class __PopTabState extends ConsumerState<_PopTab>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return SizedBox();
-
-    // return InfiniteScrolly<int, int>(
-    //   header: SizedBox(
-    //     height: appBarHeight,
-    //   ),
-    //   getter: (data) async {
-    //     // return await popGetter(data, ref);
-    //     return null as dynamic;
-    //   },
-    //   initialLoadingWidget: PostLoader(
-    //     length: 3,
-    //   ),
-    //   widget: postCardBuilder,
-    //   controller: widget.controller,
-    // );
+    return InfiniteScrolly<int, int>(
+      header: SizedBox(
+        height: appBarHeight,
+      ),
+      getter: (data) async {
+        return await popGetter(data, ref);
+      },
+      initialLoadingWidget: PostLoader(
+        length: 3,
+      ),
+      widget: postCardBuilder,
+      controller: widget.controller,
+    );
   }
 }
