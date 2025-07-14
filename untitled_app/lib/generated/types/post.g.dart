@@ -29,6 +29,7 @@ _PostModel _$PostModelFromJson(Map<String, dynamic> json) => _PostModel(
       ),
       ekoedId: (json['ekoed_id'] as num?)?.toInt(),
       isEko: json['is_eko'] as bool? ?? false,
+      chamberId: json['chamber_id'] as String?,
     );
 
 Map<String, dynamic> _$PostModelToJson(_PostModel instance) =>
@@ -47,4 +48,5 @@ Map<String, dynamic> _$PostModelToJson(_PostModel instance) =>
       'pollVoteCounts': instance.pollVoteCounts,
       'ekoed_id': instance.ekoedId,
       'is_eko': instance.isEko,
+      'chamber_id': instance.chamberId,
     };

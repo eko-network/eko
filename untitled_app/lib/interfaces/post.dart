@@ -128,65 +128,66 @@ Future<String> uploadPost(PostModel post, WidgetRef ref) async {
 Future<String> uploadComment(CommentModel comment, WidgetRef ref) async {
   final firestore = FirebaseFirestore.instance;
   final json = comment.toJson();
-  final post = await ref.read(postProvider(comment.postId as int).future);
+  final post = await ref.read(postProvider(comment.parentId).future);
 
   //don't put these in firebase
   json.remove('id');
   json.remove('postId');
+  return '';
 
   // upload
-  final commentId = await firestore
-      .collection('posts')
-      .doc(comment.postId)
-      .collection('comments')
-      .add(json)
-      .then((documentSnapshot) => documentSnapshot.id);
-
-  if (ref.watch(currentUserProvider).uid != post.uid) {
-    final activity = ActivityModel(
-        id: '',
-        createdAt: comment.createdAt,
-        type: 'comment',
-        content: json['body'] ?? 'Click to see gif',
-        path: comment.postId,
-        sourceUid: comment.uid);
-
-    uploadActivity(activity, post.uid);
-  }
+  // final commentId = await firestore
+  //     .collection('posts')
+  //     .doc(comment.parentId)
+  //     .collection('comments')
+  //     .add(json)
+  //     .then((documentSnapshot) => documentSnapshot.id);
+  //
+  // if (ref.watch(currentUserProvider).uid != post.uid) {
+  //   final activity = ActivityModel(
+  //       id: '',
+  //       createdAt: comment.createdAt,
+  //       type: 'comment',
+  //       content: json['body'] ?? 'Click to see gif',
+  //       path: comment.postId,
+  //       sourceUid: comment.uid);
+  //
+  //   uploadActivity(activity, post.uid);
+  // }
 
   // get users tagged in the comment
-  final List<Future<String?>> idFutures = [];
-  for (int i = 1; i < comment.body.length; i += 2) {
-    idFutures.add(getUidFromUsername(comment.body[i].substring(1)));
-  }
+  // final List<Future<String?>> idFutures = [];
+  // for (int i = 1; i < comment.body.length; i += 2) {
+  //   idFutures.add(getUidFromUsername(comment.body[i].substring(1)));
+  // }
+  //
+  // // activity content
+  // final String content = json['body'];
+  //
+  // final taggedUsers = await Future.wait(idFutures);
+  //
+  // // make sure not to notify yourself
+  // final Set<String> sentActivites = {ref.watch(currentUserProvider).uid};
+  // final List<Future<void>> activityFutures = [];
+  //
+  // for (final user in taggedUsers) {
+  //   if (user == null) {
+  //     continue;
+  //   }
+  //   if (sentActivites.contains(user)) {
+  //     continue;
+  //   }
+  //   sentActivites.add(user);
+  //
+  //   final activity = ActivityModel(
+  //       id: '',
+  //       createdAt: comment.createdAt,
+  //       type: 'tag',
+  //       content: content,
+  //       path: comment.postId,
+  //       sourceUid: comment.uid);
+  //   activityFutures.add(uploadActivity(activity, user));
+  // }
 
-  // activity content
-  final String content = json['body'];
-
-  final taggedUsers = await Future.wait(idFutures);
-
-  // make sure not to notify yourself
-  final Set<String> sentActivites = {ref.watch(currentUserProvider).uid};
-  final List<Future<void>> activityFutures = [];
-
-  for (final user in taggedUsers) {
-    if (user == null) {
-      continue;
-    }
-    if (sentActivites.contains(user)) {
-      continue;
-    }
-    sentActivites.add(user);
-
-    final activity = ActivityModel(
-        id: '',
-        createdAt: comment.createdAt,
-        type: 'tag',
-        content: content,
-        path: comment.postId,
-        sourceUid: comment.uid);
-    activityFutures.add(uploadActivity(activity, user));
-  }
-
-  return commentId;
+  // return commentId;
 }

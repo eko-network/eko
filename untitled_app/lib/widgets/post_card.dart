@@ -201,13 +201,6 @@ class _PostCardState extends ConsumerState<PostCard> {
     final asyncPost = ref.watch(postProvider(widget.id));
 
     return asyncPost.when(data: (post) {
-      final currentUser = ref.watch(currentUserProvider);
-      //FIXME
-      // if (currentUser.blockedUsers.contains(post.uid) ||
-      //     currentUser.blockedBy.contains(post.uid)) {
-      //   return SizedBox.shrink();
-      // }
-
       return PostCardFromPost(
           isOnProfile: widget.isOnProfile,
           sharePressed: sharePressed,
@@ -250,9 +243,7 @@ class PostCardFromPost extends ConsumerWidget {
       padding: const EdgeInsets.only(top: 5, bottom: 0, right: 0),
       child: InkWell(
         onTap: () => (!isPreview && !isPostPage && isLoggedIn)
-            ? context
-                .push('/feed/post/${post.id}', extra: post)
-                .then((v) async {})
+            ? context.push('/feed/post/${post.id}')
             : null,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -379,8 +370,7 @@ class PostCardFromPost extends ConsumerWidget {
                           onTap: () {
                             if (isLoggedIn) {
                               if (!isPreview && !isPostPage) {
-                                context.push('/feed/post/${post.id}',
-                                    extra: post);
+                                context.push('/feed/post/${post.id}');
                               }
                             }
                           },
@@ -398,8 +388,7 @@ class PostCardFromPost extends ConsumerWidget {
                           onTap: () {
                             if (isLoggedIn) {
                               if (!isPreview && !isPostPage) {
-                                context.push('/feed/post/${post.id}',
-                                    extra: post);
+                                context.push('/feed/post/${post.id}');
                               }
                             }
                           },
@@ -414,11 +403,9 @@ class PostCardFromPost extends ConsumerWidget {
                               queryParameters['timestamp'] = DateTime.now()
                                   .millisecondsSinceEpoch
                                   .toString();
-                              //FIXME
-                              // if (post.tags.isNotEmpty &&
-                              //     post.tags.first != 'public') {
-                              //   queryParameters['id'] = post.tags.first;
-                              // }
+                              if (post.chamberId != null) {
+                                queryParameters['id'] = post.chamberId;
+                              }
                               context.goNamed('compose',
                                   queryParameters: queryParameters);
                             }

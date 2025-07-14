@@ -39,7 +39,7 @@ class SearchPage extends ConsumerStatefulWidget {
 
 class _SearchPageState extends ConsumerState<SearchPage> {
   final controller = TextEditingController();
-  List<MapEntry<String, int>> data = [];
+  List<(String, double)> data = [];
   bool isEnd = false;
   Timer? debounce;
   String lastVal = '';
@@ -91,7 +91,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
               isEnd = res.$2;
             });
           },
-          list: data.map((item) => item.key).toList(),
+          list: data.map((item) => item.$1).toList(),
           isEnd: isEnd,
           getter: () async {
             final res =

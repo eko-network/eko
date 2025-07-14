@@ -31,22 +31,6 @@ class OtherProfile extends ConsumerWidget {
       });
     }
 
-    //FIXME
-    // Check if the user is blocked
-    final isBlockedByMe = false;
-    // userAsync.when(
-    //   data: (profileUser) => currentUser.blockedUsers.contains(profileUser.uid),
-    //   loading: () => false,
-    //   error: (_, __) => false,
-    // );
-
-    final blocksMe = false;
-    // userAsync.when(
-    //   data: (profileUser) => currentUser.blockedBy.contains(profileUser.uid),
-    //   loading: () => false,
-    //   error: (_, __) => false,
-    // );
-
     void popDialog() {
       Navigator.of(context, rootNavigator: true).pop();
     }
@@ -82,64 +66,54 @@ class OtherProfile extends ConsumerWidget {
     return PopScope(
         canPop: true,
         child: Scaffold(
-          appBar: userAsync.when(
-            data: (profileUser) => (isBlockedByMe || blocksMe)
-                ? AppBar(
-                    backgroundColor: Theme.of(context).colorScheme.surface,
-                    surfaceTintColor: Colors.transparent,
-                    automaticallyImplyLeading: false,
-                    leading: IconButton(
-                      icon: Icon(
-                        Icons.arrow_back_ios_rounded,
-                        color: Theme.of(context).colorScheme.onSurface,
-                        size: 20,
-                      ),
-                      onPressed: () => context.pop(),
-                    ),
-                  )
-                : null,
-            loading: () => AppBar(
-              backgroundColor: Theme.of(context).colorScheme.surface,
-              surfaceTintColor: Colors.transparent,
-              automaticallyImplyLeading: false,
-              leading: IconButton(
-                icon: Icon(
-                  Icons.arrow_back_ios_rounded,
-                  color: Theme.of(context).colorScheme.onSurface,
-                  size: 20,
-                ),
-                onPressed: () => context.pop(),
-              ),
-            ),
-            error: (_, __) => AppBar(
-              backgroundColor: Theme.of(context).colorScheme.surface,
-              surfaceTintColor: Colors.transparent,
-              automaticallyImplyLeading: false,
-              leading: IconButton(
-                icon: Icon(
-                  Icons.arrow_back_ios_rounded,
-                  color: Theme.of(context).colorScheme.onSurface,
-                  size: 20,
-                ),
-                onPressed: () => context.pop(),
-              ),
-            ),
-          ),
+          // appBar: userAsync.when(
+          //   data: (profileUser) => (isBlockedByMe || blocksMe)
+          //       ? AppBar(
+          //           backgroundColor: Theme.of(context).colorScheme.surface,
+          //           surfaceTintColor: Colors.transparent,
+          //           automaticallyImplyLeading: false,
+          //           leading: IconButton(
+          //             icon: Icon(
+          //               Icons.arrow_back_ios_rounded,
+          //               color: Theme.of(context).colorScheme.onSurface,
+          //               size: 20,
+          //             ),
+          //             onPressed: () => context.pop(),
+          //           ),
+          //         )
+          //       : null,
+          //   loading: () => AppBar(
+          //     backgroundColor: Theme.of(context).colorScheme.surface,
+          //     surfaceTintColor: Colors.transparent,
+          //     automaticallyImplyLeading: false,
+          //     leading: IconButton(
+          //       icon: Icon(
+          //         Icons.arrow_back_ios_rounded,
+          //         color: Theme.of(context).colorScheme.onSurface,
+          //         size: 20,
+          //       ),
+          //       onPressed: () => context.pop(),
+          //     ),
+          //   ),
+          //   error: (_, __) => AppBar(
+          //     backgroundColor: Theme.of(context).colorScheme.surface,
+          //     surfaceTintColor: Colors.transparent,
+          //     automaticallyImplyLeading: false,
+          //     leading: IconButton(
+          //       icon: Icon(
+          //         Icons.arrow_back_ios_rounded,
+          //         color: Theme.of(context).colorScheme.onSurface,
+          //         size: 20,
+          //       ),
+          //       onPressed: () => context.pop(),
+          //     ),
+          //   ),
+          // ),
           body: userAsync.when(
             data: (profileUser) {
-              if (isBlockedByMe || blocksMe) {
-                return Center(
-                  child: SizedBox(
-                    width: width * 0.7,
-                    child: Text(
-                        AppLocalizations.of(context)!.blockedByUserMessage),
-                  ),
-                );
-              }
               return InfiniteScrolly<int, String>(
                 getter: (data) async {
-                  // return await otherProfilePageGetter(data, ref, uid) as dynamic;
-                  return null as dynamic;
+                  return await profilePageGetter(data, ref, uid) as dynamic;
                 },
                 widget: otherProfilePostCardBuilder,
                 onRefresh: onRefresh,

@@ -20,7 +20,7 @@ import '../utilities/constants.dart' as c;
 import 'package:flutter/cupertino.dart';
 
 class CommentCard extends ConsumerStatefulWidget {
-  final String id;
+  final int id;
   final Function(String username) onReply;
 
   const CommentCard({super.key, required this.id, required this.onReply});
@@ -132,11 +132,6 @@ class _CommentCardState extends ConsumerState<CommentCard> {
 
     return asyncComment.when(
       data: (comment) {
-        //FIXME
-        // if (currentUser.blockedUsers.contains(comment.uid) ||
-        //     currentUser.blockedBy.contains(comment.uid)) {
-        //   return SizedBox.shrink();
-        // }
         return TapRegion(
           onTapOutside: (v) => scrollToStart(),
           child: NotificationListener<ScrollEndNotification>(

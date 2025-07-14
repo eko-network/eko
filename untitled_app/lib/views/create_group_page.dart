@@ -298,7 +298,7 @@ class AddPeople extends ConsumerStatefulWidget {
 
 class _AddPeopleState extends ConsumerState<AddPeople> {
   Timer? debounce;
-  List<MapEntry<String, int>> data = [];
+  List<(String, double)> data = [];
   bool isEnd = false;
   String selectedToDelete = '';
   final searchTextController = TextEditingController();
@@ -397,7 +397,7 @@ class _AddPeopleState extends ConsumerState<AddPeople> {
                     isEnd = res.$2;
                   });
                 },
-                list: data.map((item) => item.key).toList(),
+                list: data.map((item) => item.$1).toList(),
                 isEnd: isEnd,
                 getter: () async {
                   final res = await SearchInterface.getter(

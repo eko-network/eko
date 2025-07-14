@@ -41,8 +41,8 @@ PoolService<int, PostModel> postPool(Ref ref) {
 }
 
 @Riverpod(keepAlive: true)
-PoolService<String, CommentModel> commentPool(Ref ref) {
-  return PoolService<String, CommentModel>(
+PoolService<int, CommentModel> commentPool(Ref ref) {
+  return PoolService<int, CommentModel>(
     onInsert: (id) {
       if (ref.exists(commentProvider(id))) {
         ref.invalidate(commentProvider(id));

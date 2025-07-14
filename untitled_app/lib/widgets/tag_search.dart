@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:untitled_app/interfaces/search.dart';
+import 'package:untitled_app/providers/pool_providers.dart';
 import 'package:untitled_app/widgets/user_card.dart';
 
 bool _isSeparator(String char) {
@@ -58,32 +60,40 @@ String? searchText(TextEditingController controller) {
   return null;
 }
 
-Future<List<String>> _userSearch(String s) async {
-  final hits = await SearchInterface.hitsQuery(s, page: 0);
-  return hits.map((item) => item.key).toList();
-}
-
-class TagSearch extends StatefulWidget {
+class TagSearch extends ConsumerStatefulWidget {
   final String searchText;
-  final Future<List<String>> Function(String) getter;
+  final Future<List<String>> Function(String)? getter;
   final void Function()? onLoad;
   final double? height;
   final void Function(String) onCardTap;
   const TagSearch(
       {super.key,
       required this.searchText,
-      this.getter = _userSearch,
+      this.getter,
       this.onLoad,
       this.height,
       required this.onCardTap});
 
   @override
-  State<TagSearch> createState() => _TagSearchState();
+  ConsumerState<TagSearch> createState() => _TagSearchState();
 }
 
-class _TagSearchState extends State<TagSearch> {
+class _TagSearchState extends ConsumerState<TagSearch> {
+  Future<List<String>> userSearch(String s) async {
+    final hits =
+        await SearchInterface.hitsQuery(s, similarity: null, uid: null);
+    final List<String> retList = [];
+    for (final hit in hits) {
+      ref.read(userPoolProvider).put(hit.$1);
+      retList.add(hit.$1.uid);
+    }
+    return retList;
+  }
+
   Future<List<String>> future() async {
-    final data = await widget.getter(widget.searchText);
+    final data = widget.getter == null
+        ? await userSearch(widget.searchText)
+        : await widget.getter!(widget.searchText);
     if (widget.onLoad != null) widget.onLoad!();
     return data;
   }

@@ -6,7 +6,7 @@ part of '../../providers/comment_list_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$commentListHash() => r'c9fa99b3c09fffdbca615d2eb303cf47151d758a';
+String _$commentListHash() => r'd98475df1411e18859665a362ed8b4779136c922';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -30,11 +30,11 @@ class _SystemHash {
 }
 
 abstract class _$CommentList
-    extends BuildlessAutoDisposeNotifier<(List<String>, bool)> {
-  late final String postId;
+    extends BuildlessAutoDisposeNotifier<(List<int>, bool)> {
+  late final int postId;
 
-  (List<String>, bool) build(
-    String postId,
+  (List<int>, bool) build(
+    int postId,
   );
 }
 
@@ -43,13 +43,13 @@ abstract class _$CommentList
 const commentListProvider = CommentListFamily();
 
 /// See also [CommentList].
-class CommentListFamily extends Family<(List<String>, bool)> {
+class CommentListFamily extends Family<(List<int>, bool)> {
   /// See also [CommentList].
   const CommentListFamily();
 
   /// See also [CommentList].
   CommentListProvider call(
-    String postId,
+    int postId,
   ) {
     return CommentListProvider(
       postId,
@@ -82,10 +82,10 @@ class CommentListFamily extends Family<(List<String>, bool)> {
 
 /// See also [CommentList].
 class CommentListProvider
-    extends AutoDisposeNotifierProviderImpl<CommentList, (List<String>, bool)> {
+    extends AutoDisposeNotifierProviderImpl<CommentList, (List<int>, bool)> {
   /// See also [CommentList].
   CommentListProvider(
-    String postId,
+    int postId,
   ) : this._internal(
           () => CommentList()..postId = postId,
           from: commentListProvider,
@@ -110,10 +110,10 @@ class CommentListProvider
     required this.postId,
   }) : super.internal();
 
-  final String postId;
+  final int postId;
 
   @override
-  (List<String>, bool) runNotifierBuild(
+  (List<int>, bool) runNotifierBuild(
     covariant CommentList notifier,
   ) {
     return notifier.build(
@@ -138,7 +138,7 @@ class CommentListProvider
   }
 
   @override
-  AutoDisposeNotifierProviderElement<CommentList, (List<String>, bool)>
+  AutoDisposeNotifierProviderElement<CommentList, (List<int>, bool)>
       createElement() {
     return _CommentListProviderElement(this);
   }
@@ -159,17 +159,18 @@ class CommentListProvider
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-mixin CommentListRef on AutoDisposeNotifierProviderRef<(List<String>, bool)> {
+mixin CommentListRef on AutoDisposeNotifierProviderRef<(List<int>, bool)> {
   /// The parameter `postId` of this provider.
-  String get postId;
+  int get postId;
 }
 
-class _CommentListProviderElement extends AutoDisposeNotifierProviderElement<
-    CommentList, (List<String>, bool)> with CommentListRef {
+class _CommentListProviderElement
+    extends AutoDisposeNotifierProviderElement<CommentList, (List<int>, bool)>
+    with CommentListRef {
   _CommentListProviderElement(super.provider);
 
   @override
-  String get postId => (origin as CommentListProvider).postId;
+  int get postId => (origin as CommentListProvider).postId;
 }
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

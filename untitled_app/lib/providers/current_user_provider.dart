@@ -137,6 +137,7 @@ class CurrentUser extends _$CurrentUser {
   // END LIKES //
 
   Future<void> signOut() async {
+    await supabase.auth.signOut();
     // await removeFCM(state.user.uid);
     // await FirebaseAuth.instance.signOut();
   }

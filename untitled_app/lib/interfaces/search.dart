@@ -1,58 +1,37 @@
-import 'dart:convert';
-
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:http/http.dart' as http;
-import 'package:untitled_app/providers/current_user_provider.dart';
-import 'package:untitled_app/providers/user_provider.dart';
+import 'package:untitled_app/providers/pool_providers.dart';
 import 'package:untitled_app/types/user.dart';
 import 'package:untitled_app/utilities/constants.dart' as c;
+import 'package:untitled_app/utilities/supabase_ref.dart';
 
 class SearchInterface {
-  static Future<List<MapEntry<String, int>>> hitsQuery(String query,
-      {required int page}) async {
-    final response = await http.post(
-      Uri.parse(
-          'https://${dotenv.env["ALGOLIA_APP_ID"]!}-dsn.algolia.net/1/indexes/users/query'),
-      headers: <String, String>{
-        'X-Algolia-API-Key': dotenv.env['SEARCH_API_KEY']!,
-        'X-Algolia-Application-Id': dotenv.env['ALGOLIA_APP_ID']!,
-      },
-      body: jsonEncode(<String, String>{
-        'params': 'query=$query&hitsPerPage=${c.usersOnSearch}&page=$page',
-      }),
-    );
-
-    if (response.statusCode == 200) {
-      return (json.decode(response.body)['hits'] as List)
-          .map<MapEntry<String, int>>(
-              (item) => MapEntry(UserModel.fromJson(item).uid, page))
-          .toList();
-    } else {
-      return [];
-    }
+  static Future<Iterable<(UserModel, double)>> hitsQuery(String query,
+      {required double? similarity,
+      required String? uid,
+      bool excludeCurrent = false}) async {
+    final List<dynamic> response = await supabase.rpc('search_users', params: {
+      'p_limit': c.usersOnSearch,
+      'p_last_uid': uid,
+      'p_last_similarity': similarity,
+      'p_search': query,
+      'p_exclude_current_user': excludeCurrent
+    });
+    return response
+        .map((map) => (UserModel.fromJson(map), 1.0 * map['similarity']));
   }
 
-  static Future<(List<MapEntry<String, int>>, bool)> getter(
-      List<MapEntry<String, int>> list, WidgetRef ref, String query,
+  static Future<(List<(String, double)>, bool)> getter(
+      List<(String, double)> list, WidgetRef ref, String query,
       {excludeCurrent = false}) async {
-    final hits =
-        await hitsQuery(query, page: list.isEmpty ? 0 : list.last.value + 1);
-    final List<Future<UserModel>> asyncUsers = [];
-    List<MapEntry<String, int>> filteredHits = [];
-    if (excludeCurrent) {
-      for (final obj in hits) {
-        if (obj.key != ref.watch(currentUserProvider).uid) {
-          filteredHits.add(obj);
-          asyncUsers.add(ref.read(userProvider(obj.key).future));
-        }
-      }
-    } else {
-      filteredHits = hits;
-      asyncUsers
-          .addAll(hits.map((obj) => ref.read(userProvider(obj.key).future)));
+    final last = list.isEmpty ? null : list.last;
+    final hits = await hitsQuery(query,
+        similarity: last?.$2, uid: last?.$1, excludeCurrent: excludeCurrent);
+    final List<(String, double)> retList = [];
+    for (final hit in hits) {
+      ref.read(userPoolProvider).put(hit.$1);
+      retList.add((hit.$1.uid, hit.$2));
     }
-    await Future.wait(asyncUsers);
-    return (filteredHits, hits.length < c.usersOnSearch);
+
+    return (retList, hits.length < c.usersOnSearch);
   }
 }

@@ -151,81 +151,81 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
     String? url = await context.pushNamed('gif');
     if (url != null) {
       gif = url;
-      postCommentPressed();
+      // postCommentPressed();
     }
   }
 
-  Future<void> postCommentPressed() async {
-    CommentModel? comment;
-
-    if (gif == null) {
-      commentField.text = commentField.text.trim();
-      if (commentField.text.length > c.maxCommentChars) {
-        showSnackBar(
-            text: AppLocalizations.of(context)!.tooManyChar, context: context);
-        return;
-      } else if (commentField.text == '') {
-        commentFieldFocus.requestFocus();
-        showSnackBar(
-            text: AppLocalizations.of(context)!.emptyFieldError,
-            context: context);
-        return;
-      } else {
-        String body = commentField.text;
-        commentField.text = '';
-        FocusManager.instance.primaryFocus?.unfocus();
-        comment = CommentModel(
-          uid: ref.watch(currentUserProvider).uid,
-          id: '',
-          postId: widget.id as String,
-          createdAt: DateTime.now().toUtc().toIso8601String(),
-          body: parseTextToTags(body),
-        );
-      }
-    } else {
-      comment = CommentModel(
-        uid: ref.watch(currentUserProvider).uid,
-        id: '',
-        postId: widget.id as String,
-        createdAt: DateTime.now().toUtc().toIso8601String(),
-        gifUrl: gif,
-      );
-      gif = null;
-    }
-
-    final id = await uploadComment(comment, ref);
-    final completeComment = comment.copyWith(id: id);
-
-    // Add comment to the comment list
-    ref.read(commentPoolProvider).putAll([completeComment]);
-    ref
-        .read(commentListProvider(widget.id as String).notifier)
-        .addToBack(completeComment);
-
-    // Increment comment count
-    final post = ref.read(postProvider(widget.id)).value;
-    if (post != null) {
-      final updatedPost = post.copyWith(commentCount: post.commentCount + 1);
-      ref.read(postPoolProvider).putAll([updatedPost]);
-    }
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (commentsScrollController.hasClients) {
-        commentsScrollController.animateTo(
-          commentsScrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOut,
-        );
-      }
-    });
-  }
+  // Future<void> postCommentPressed() async {
+  //   CommentModel? comment;
+  //
+  //   if (gif == null) {
+  //     commentField.text = commentField.text.trim();
+  //     if (commentField.text.length > c.maxCommentChars) {
+  //       showSnackBar(
+  //           text: AppLocalizations.of(context)!.tooManyChar, context: context);
+  //       return;
+  //     } else if (commentField.text == '') {
+  //       commentFieldFocus.requestFocus();
+  //       showSnackBar(
+  //           text: AppLocalizations.of(context)!.emptyFieldError,
+  //           context: context);
+  //       return;
+  //     } else {
+  //       String body = commentField.text;
+  //       commentField.text = '';
+  //       FocusManager.instance.primaryFocus?.unfocus();
+  //       comment = CommentModel(
+  //         uid: ref.watch(currentUserProvider).uid,
+  //         id: '',
+  //         postId: widget.id,
+  //         createdAt: DateTime.now().toUtc().toIso8601String(),
+  //         body: parseTextToTags(body),
+  //       );
+  //     }
+  //   } else {
+  //     comment = CommentModel(
+  //       uid: ref.watch(currentUserProvider).uid,
+  //       id: '',
+  //       postId: widget.id,
+  //       createdAt: DateTime.now().toUtc().toIso8601String(),
+  //       gifUrl: gif,
+  //     );
+  //     gif = null;
+  //   }
+  //
+  //   final id = await uploadComment(comment, ref);
+  //   final completeComment = comment.copyWith(id: id);
+  //
+  //   // Add comment to the comment list
+  //   ref.read(commentPoolProvider).putAll([completeComment]);
+  //   ref
+  //       .read(commentListProvider(widget.id).notifier)
+  //       .addToBack(completeComment);
+  //
+  //   // Increment comment count
+  //   final post = ref.read(postProvider(widget.id)).value;
+  //   if (post != null) {
+  //     final updatedPost = post.copyWith(commentCount: post.commentCount + 1);
+  //     ref.read(postPoolProvider).putAll([updatedPost]);
+  //   }
+  //
+  //   WidgetsBinding.instance.addPostFrameCallback((_) {
+  //     if (commentsScrollController.hasClients) {
+  //       commentsScrollController.animateTo(
+  //         commentsScrollController.position.maxScrollExtent,
+  //         duration: const Duration(milliseconds: 300),
+  //         curve: Curves.easeOut,
+  //       );
+  //     }
+  //   });
+  // }
 
   void replyPressed(String username) {
     commentFieldFocus.requestFocus();
     commentField.text = '@$username ';
   }
 
-  Widget commentCardBuilder(String id) {
+  Widget commentCardBuilder(int id) {
     return CommentCard(
       id: id,
       onReply: (username) => replyPressed(username),
@@ -237,29 +237,17 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
     final height = MediaQuery.sizeOf(context).height;
     final width = c.widthGetter(context);
     final asyncPost = ref.watch(postProvider(widget.id));
-    final provider = ref.watch(commentListProvider(widget.id as String));
+    final provider = ref.watch(commentListProvider(widget.id));
 
     Future<void> onRefresh() async {
       await Future.wait([
-        ref.read(currentUserProvider.notifier).reload(),
-        ref.read(commentListProvider(widget.id as String).notifier).refresh(),
+        ref.read(commentListProvider(widget.id).notifier).refresh(),
       ]);
       ref.invalidate(postProvider(widget.id));
     }
 
     return asyncPost.when(
       data: (post) {
-        final currentUser = ref.watch(currentUserProvider);
-        //FIXME
-        // if (currentUser.blockedUsers.contains(post.uid) ||
-        //     currentUser.blockedBy.contains(post.uid)) {
-        //   return Center(
-        //     child: SizedBox(
-        //       width: width * 0.7,
-        //       child: Text(AppLocalizations.of(context)!.blockedByUserMessage),
-        //     ),
-        //   );
-        // }
         return GestureDetector(
           onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
           child: Scaffold(
@@ -319,14 +307,13 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
                 Expanded(
                   child: Stack(
                     children: [
-                      InfiniteScrollyShell<String>(
+                      InfiniteScrollyShell<int>(
                         isEnd: provider.$2,
                         list: provider.$1,
                         header: PostCard(id: widget.id, isPostPage: true),
                         getter: () => ref
-                            .read(commentListProvider(widget.id as String)
-                                .notifier)
-                            .getter(widget.id as String),
+                            .read(commentListProvider(widget.id).notifier)
+                            .getter(widget.id),
                         onRefresh: onRefresh,
                         widget: commentCardBuilder,
                         controller: commentsScrollController,
@@ -382,7 +369,8 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
                                   icon: const Icon(Icons.gif_box_outlined),
                                 ),
                                 IconButton(
-                                  onPressed: () => postCommentPressed(),
+                                  onPressed: () {},
+                                  // onPressed: () => postCommentPressed(),
                                   icon: const Icon(Icons.send),
                                 )
                               ],

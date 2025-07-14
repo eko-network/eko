@@ -22,41 +22,22 @@ Future<List<PostModel>> getPosts(
   return postList;
 }
 
-Future<(List<MapEntry<String, String>>, bool)> profilePageGetter(
-    List<MapEntry<String, String>> list, WidgetRef ref) async {
-  // final uid = ref.read(currentUserProvider).uid;
-  // final baseQuery = FirebaseFirestore.instance
-  //     .collection('posts')
-  //     .where('author', isEqualTo: uid)
-  //     .orderBy('time', descending: true)
-  //     .limit(c.postsOnRefresh);
-  // final query =
-  //     list.isEmpty ? baseQuery : baseQuery.startAfter([list.last.value]);
-  //
-  // final postList = await getPosts(query);
-  // ref.read(postPoolProvider).putAll(postList);
-  // final retList =
-  //     postList.map((item) => MapEntry(item.id, item.createdAt)).toList();
-  // return (retList, retList.length < c.postsOnRefresh);
-  return ([] as List<MapEntry<String, String>>, true);
-}
-
-Future<(List<MapEntry<String, String>>, bool)> otherProfilePageGetter(
-    List<MapEntry<String, String>> list, WidgetRef ref, String uid) async {
-  // final baseQuery = FirebaseFirestore.instance
-  //     .collection('posts')
-  //     .where('tags', arrayContains: 'public')
-  //     .where('author', isEqualTo: uid)
-  //     .orderBy('time', descending: true)
-  //     .limit(c.postsOnRefresh);
-  // final query =
-  //     list.isEmpty ? baseQuery : baseQuery.startAfter([list.last.value]);
-  // final postList = await getPosts(query);
-  // ref.read(postPoolProvider).putAll(postList);
-  // final retList =
-  //     postList.map((item) => MapEntry(item.id, item.createdAt)).toList();
-  // return (retList, retList.length < c.postsOnRefresh);
-  return ([] as List<MapEntry<String, String>>, true);
+Future<(List<(int, String)>, bool)> profilePageGetter(
+    List<(int, String)> list, WidgetRef ref, String uid) async {
+  final last = list.isEmpty ? null : list.last;
+  final response = await supabase.rpc('paginated_user_posts', params: {
+    'p_limit': c.postsOnRefresh,
+    'p_last_time': last?.$2,
+    'p_last_id': last?.$1,
+    'p_user_uid': uid
+  });
+  final List<(int, String)> retList = [];
+  for (final map in response) {
+    final post = PostModel.fromJson(map);
+    ref.read(postPoolProvider).put(post);
+    retList.add((post.id, post.createdAt));
+  }
+  return (retList, retList.length < c.postsOnRefresh);
 }
 
 Future<(List<(int, int)>, bool)> popGetter(
@@ -68,9 +49,12 @@ Future<(List<(int, int)>, bool)> popGetter(
         'p_last_likes': last?.$2,
         'p_last_id': last?.$1
       });
-  final postList = response.map((post) => PostModel.fromJson(post));
-  ref.read(postPoolProvider).putAll(postList);
-  final retList = postList.map((post) => (post.id, post.likes)).toList();
+  final List<(int, int)> retList = [];
+  for (final map in response) {
+    final post = PostModel.fromJson(map);
+    ref.read(postPoolProvider).put(post);
+    retList.add((post.id, post.likes));
+  }
   return (retList, retList.length < c.postsOnRefresh);
 }
 

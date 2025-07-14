@@ -38,12 +38,11 @@ final postPoolProvider = Provider<PoolService<int, PostModel>>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef PostPoolRef = ProviderRef<PoolService<int, PostModel>>;
-String _$commentPoolHash() => r'309842aeb745ed586e7025a26f6ce7f99128c6b7';
+String _$commentPoolHash() => r'bf78ef70287c275192c6f85efa26e8de0aa46711';
 
 /// See also [commentPool].
 @ProviderFor(commentPool)
-final commentPoolProvider =
-    Provider<PoolService<String, CommentModel>>.internal(
+final commentPoolProvider = Provider<PoolService<int, CommentModel>>.internal(
   commentPool,
   name: r'commentPoolProvider',
   debugGetCreateSourceHash:
@@ -54,7 +53,7 @@ final commentPoolProvider =
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-typedef CommentPoolRef = ProviderRef<PoolService<String, CommentModel>>;
+typedef CommentPoolRef = ProviderRef<PoolService<int, CommentModel>>;
 String _$userPoolHash() => r'd2192c4d2d1147ff1e22b49c71cedea584753fd4';
 
 /// See also [userPool].
