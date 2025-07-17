@@ -15,8 +15,8 @@ import 'package:untitled_app/utilities/cache_service.dart';
 part '../generated/providers/pool_providers.g.dart';
 
 @Riverpod(keepAlive: true)
-PoolService<String, GroupModel> groupPool(Ref ref) {
-  return PoolService<String, GroupModel>(
+PoolService<int, GroupModel> groupPool(Ref ref) {
+  return PoolService<int, GroupModel>(
     onInsert: (id) {
       if (ref.exists(groupProvider(id))) {
         ref.invalidate(groupProvider(id));

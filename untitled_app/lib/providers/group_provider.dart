@@ -7,6 +7,7 @@ import 'package:untitled_app/providers/current_user_provider.dart';
 import 'package:untitled_app/providers/group_list_provider.dart';
 import 'package:untitled_app/providers/pool_providers.dart';
 import 'package:untitled_app/types/group.dart';
+import 'package:untitled_app/utilities/supabase_ref.dart';
 // Necessary for code-generation to work
 part '../generated/providers/group_provider.g.dart';
 
@@ -14,7 +15,7 @@ part '../generated/providers/group_provider.g.dart';
 class Group extends _$Group {
   Timer? _disposeTimer;
   @override
-  Future<GroupModel> build(String id) async {
+  Future<GroupModel> build(int id) async {
     // *** This block is for lifecycle management *** //
     // Keep provider alive
     final link = ref.keepAlive();
@@ -40,41 +41,37 @@ class Group extends _$Group {
     return _fetchGroupModel(id);
   }
 
-  Future<GroupModel> _fetchGroupModel(String id) async {
-    final data =
-        await FirebaseFirestore.instance.collection('groups').doc(id).get();
-    final postData = data.data();
-    if (postData == null) {
-      throw Exception('Failed to load');
-    }
-    return GroupModel.fromFirestore(postData, data.id);
+  Future<GroupModel> _fetchGroupModel(int id) async {
+    final List response =
+        await supabase.rpc('get_chamber_by_id', params: {'p_id': id});
+    return GroupModel.fromJson(response.first);
   }
 
   Future<void> updateGroupMembers(List<String> members) async {
-    await setGroupMembers(id, members);
-    final previousState = await future;
-    state = AsyncData(previousState.copyWith(members: members));
+    // await setGroupMembers(id, members);
+    // final previousState = await future;
+    // state = AsyncData(previousState.copyWith(members: members));
   }
 
   Future<void> leaveGroup(String id, List<String> members) async {
-    final updatedMembers = List<String>.from(members);
-    updatedMembers.remove(ref.read(currentUserProvider).uid);
-
-    final previousState = await future;
-    await setGroupMembers(id, updatedMembers);
-    state = AsyncData(previousState.copyWith(members: updatedMembers));
-    ref.read(groupListProvider.notifier).removeGroupById(id);
+    // final updatedMembers = List<String>.from(members);
+    // updatedMembers.remove(ref.read(currentUserProvider).uid);
+    //
+    // final previousState = await future;
+    // await setGroupMembers(id, updatedMembers);
+    // state = AsyncData(previousState.copyWith(members: updatedMembers));
+    // ref.read(groupListProvider.notifier).removeGroupById(id);
   }
 
   Future<void> toggleUnread(String id, bool toggle) async {
-    removeFromNotSeenGroup(id, ref.read(currentUserProvider).uid);
-    if (toggle == false) {
-      state.whenData((group) {
-        final newNotSeen = List<String>.from(group.notSeen)
-          ..remove(ref.read(currentUserProvider).uid);
-        state = AsyncData(group.copyWith(notSeen: newNotSeen));
-      });
-    }
+    // removeFromNotSeenGroup(id, ref.read(currentUserProvider).uid);
+    // if (toggle == false) {
+    //   state.whenData((group) {
+    //     final newNotSeen = List<String>.from(group.notSeen)
+    //       ..remove(ref.read(currentUserProvider).uid);
+    //     state = AsyncData(group.copyWith(notSeen: newNotSeen));
+    //   });
+    // }
   }
 
   Future<GroupModel?> getGroupFromId(String id) async {

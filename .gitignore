@@ -48,3 +48,4 @@ app.*.map.json
 /untitled_app/android/app/release
 
 firbaseHosting/**/*.js
+node_modules

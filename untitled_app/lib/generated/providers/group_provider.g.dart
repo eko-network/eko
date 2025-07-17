@@ -6,7 +6,7 @@ part of '../../providers/group_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$groupHash() => r'aaefd4746b673c6aa7d951b73ec57c9a45ec4e06';
+String _$groupHash() => r'217790eb37d5004a1fb482f1f38e1ae0d0d3ddc8';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -30,10 +30,10 @@ class _SystemHash {
 }
 
 abstract class _$Group extends BuildlessAutoDisposeAsyncNotifier<GroupModel> {
-  late final String id;
+  late final int id;
 
   FutureOr<GroupModel> build(
-    String id,
+    int id,
   );
 }
 
@@ -48,7 +48,7 @@ class GroupFamily extends Family<AsyncValue<GroupModel>> {
 
   /// See also [Group].
   GroupProvider call(
-    String id,
+    int id,
   ) {
     return GroupProvider(
       id,
@@ -84,7 +84,7 @@ class GroupProvider
     extends AutoDisposeAsyncNotifierProviderImpl<Group, GroupModel> {
   /// See also [Group].
   GroupProvider(
-    String id,
+    int id,
   ) : this._internal(
           () => Group()..id = id,
           from: groupProvider,
@@ -108,7 +108,7 @@ class GroupProvider
     required this.id,
   }) : super.internal();
 
-  final String id;
+  final int id;
 
   @override
   FutureOr<GroupModel> runNotifierBuild(
@@ -158,7 +158,7 @@ class GroupProvider
 // ignore: unused_element
 mixin GroupRef on AutoDisposeAsyncNotifierProviderRef<GroupModel> {
   /// The parameter `id` of this provider.
-  String get id;
+  int get id;
 }
 
 class _GroupProviderElement
@@ -167,7 +167,7 @@ class _GroupProviderElement
   _GroupProviderElement(super.provider);
 
   @override
-  String get id => (origin as GroupProvider).id;
+  int get id => (origin as GroupProvider).id;
 }
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

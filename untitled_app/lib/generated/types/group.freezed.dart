@@ -15,14 +15,12 @@ T _$identity<T>(T value) => value;
 
 /// @nodoc
 mixin _$GroupModel implements DiagnosticableTreeMixin {
-  String get id;
+  int get id;
   String get name;
-  String get description;
-  String get lastActivity;
-  String get createdOn;
-  String get icon;
-  List<String> get members;
-  List<String> get notSeen;
+  String? get description;
+  @JsonKey(name: 'latest_post_time')
+  String? get lastActivity;
+  String? get icon;
 
   /// Create a copy of GroupModel
   /// with the given fields replaced by the non-null parameter values.
@@ -42,10 +40,7 @@ mixin _$GroupModel implements DiagnosticableTreeMixin {
       ..add(DiagnosticsProperty('name', name))
       ..add(DiagnosticsProperty('description', description))
       ..add(DiagnosticsProperty('lastActivity', lastActivity))
-      ..add(DiagnosticsProperty('createdOn', createdOn))
-      ..add(DiagnosticsProperty('icon', icon))
-      ..add(DiagnosticsProperty('members', members))
-      ..add(DiagnosticsProperty('notSeen', notSeen));
+      ..add(DiagnosticsProperty('icon', icon));
   }
 
   @override
@@ -59,29 +54,17 @@ mixin _$GroupModel implements DiagnosticableTreeMixin {
                 other.description == description) &&
             (identical(other.lastActivity, lastActivity) ||
                 other.lastActivity == lastActivity) &&
-            (identical(other.createdOn, createdOn) ||
-                other.createdOn == createdOn) &&
-            (identical(other.icon, icon) || other.icon == icon) &&
-            const DeepCollectionEquality().equals(other.members, members) &&
-            const DeepCollectionEquality().equals(other.notSeen, notSeen));
+            (identical(other.icon, icon) || other.icon == icon));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      id,
-      name,
-      description,
-      lastActivity,
-      createdOn,
-      icon,
-      const DeepCollectionEquality().hash(members),
-      const DeepCollectionEquality().hash(notSeen));
+  int get hashCode =>
+      Object.hash(runtimeType, id, name, description, lastActivity, icon);
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'GroupModel(id: $id, name: $name, description: $description, lastActivity: $lastActivity, createdOn: $createdOn, icon: $icon, members: $members, notSeen: $notSeen)';
+    return 'GroupModel(id: $id, name: $name, description: $description, lastActivity: $lastActivity, icon: $icon)';
   }
 }
 
@@ -92,14 +75,11 @@ abstract mixin class $GroupModelCopyWith<$Res> {
       _$GroupModelCopyWithImpl;
   @useResult
   $Res call(
-      {String id,
+      {int id,
       String name,
-      String description,
-      String lastActivity,
-      String createdOn,
-      String icon,
-      List<String> members,
-      List<String> notSeen});
+      String? description,
+      @JsonKey(name: 'latest_post_time') String? lastActivity,
+      String? icon});
 }
 
 /// @nodoc
@@ -116,46 +96,31 @@ class _$GroupModelCopyWithImpl<$Res> implements $GroupModelCopyWith<$Res> {
   $Res call({
     Object? id = null,
     Object? name = null,
-    Object? description = null,
-    Object? lastActivity = null,
-    Object? createdOn = null,
-    Object? icon = null,
-    Object? members = null,
-    Object? notSeen = null,
+    Object? description = freezed,
+    Object? lastActivity = freezed,
+    Object? icon = freezed,
   }) {
     return _then(_self.copyWith(
       id: null == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
-              as String,
+              as int,
       name: null == name
           ? _self.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
-      description: null == description
+      description: freezed == description
           ? _self.description
           : description // ignore: cast_nullable_to_non_nullable
-              as String,
-      lastActivity: null == lastActivity
+              as String?,
+      lastActivity: freezed == lastActivity
           ? _self.lastActivity
           : lastActivity // ignore: cast_nullable_to_non_nullable
-              as String,
-      createdOn: null == createdOn
-          ? _self.createdOn
-          : createdOn // ignore: cast_nullable_to_non_nullable
-              as String,
-      icon: null == icon
+              as String?,
+      icon: freezed == icon
           ? _self.icon
           : icon // ignore: cast_nullable_to_non_nullable
-              as String,
-      members: null == members
-          ? _self.members
-          : members // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-      notSeen: null == notSeen
-          ? _self.notSeen
-          : notSeen // ignore: cast_nullable_to_non_nullable
-              as List<String>,
+              as String?,
     ));
   }
 }
@@ -165,48 +130,25 @@ class _$GroupModelCopyWithImpl<$Res> implements $GroupModelCopyWith<$Res> {
 @JsonSerializable(explicitToJson: true)
 class _GroupModel with DiagnosticableTreeMixin implements GroupModel {
   const _GroupModel(
-      {this.id = '',
+      {required this.id,
       required this.name,
-      required this.description,
-      required this.lastActivity,
-      required this.createdOn,
-      required this.icon,
-      required final List<String> members,
-      final List<String> notSeen = const []})
-      : _members = members,
-        _notSeen = notSeen;
+      this.description,
+      @JsonKey(name: 'latest_post_time') this.lastActivity,
+      this.icon});
   factory _GroupModel.fromJson(Map<String, dynamic> json) =>
       _$GroupModelFromJson(json);
 
   @override
-  @JsonKey()
-  final String id;
+  final int id;
   @override
   final String name;
   @override
-  final String description;
+  final String? description;
   @override
-  final String lastActivity;
+  @JsonKey(name: 'latest_post_time')
+  final String? lastActivity;
   @override
-  final String createdOn;
-  @override
-  final String icon;
-  final List<String> _members;
-  @override
-  List<String> get members {
-    if (_members is EqualUnmodifiableListView) return _members;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_members);
-  }
-
-  final List<String> _notSeen;
-  @override
-  @JsonKey()
-  List<String> get notSeen {
-    if (_notSeen is EqualUnmodifiableListView) return _notSeen;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_notSeen);
-  }
+  final String? icon;
 
   /// Create a copy of GroupModel
   /// with the given fields replaced by the non-null parameter values.
@@ -231,10 +173,7 @@ class _GroupModel with DiagnosticableTreeMixin implements GroupModel {
       ..add(DiagnosticsProperty('name', name))
       ..add(DiagnosticsProperty('description', description))
       ..add(DiagnosticsProperty('lastActivity', lastActivity))
-      ..add(DiagnosticsProperty('createdOn', createdOn))
-      ..add(DiagnosticsProperty('icon', icon))
-      ..add(DiagnosticsProperty('members', members))
-      ..add(DiagnosticsProperty('notSeen', notSeen));
+      ..add(DiagnosticsProperty('icon', icon));
   }
 
   @override
@@ -248,29 +187,17 @@ class _GroupModel with DiagnosticableTreeMixin implements GroupModel {
                 other.description == description) &&
             (identical(other.lastActivity, lastActivity) ||
                 other.lastActivity == lastActivity) &&
-            (identical(other.createdOn, createdOn) ||
-                other.createdOn == createdOn) &&
-            (identical(other.icon, icon) || other.icon == icon) &&
-            const DeepCollectionEquality().equals(other._members, _members) &&
-            const DeepCollectionEquality().equals(other._notSeen, _notSeen));
+            (identical(other.icon, icon) || other.icon == icon));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      id,
-      name,
-      description,
-      lastActivity,
-      createdOn,
-      icon,
-      const DeepCollectionEquality().hash(_members),
-      const DeepCollectionEquality().hash(_notSeen));
+  int get hashCode =>
+      Object.hash(runtimeType, id, name, description, lastActivity, icon);
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'GroupModel(id: $id, name: $name, description: $description, lastActivity: $lastActivity, createdOn: $createdOn, icon: $icon, members: $members, notSeen: $notSeen)';
+    return 'GroupModel(id: $id, name: $name, description: $description, lastActivity: $lastActivity, icon: $icon)';
   }
 }
 
@@ -283,14 +210,11 @@ abstract mixin class _$GroupModelCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {String id,
+      {int id,
       String name,
-      String description,
-      String lastActivity,
-      String createdOn,
-      String icon,
-      List<String> members,
-      List<String> notSeen});
+      String? description,
+      @JsonKey(name: 'latest_post_time') String? lastActivity,
+      String? icon});
 }
 
 /// @nodoc
@@ -307,46 +231,31 @@ class __$GroupModelCopyWithImpl<$Res> implements _$GroupModelCopyWith<$Res> {
   $Res call({
     Object? id = null,
     Object? name = null,
-    Object? description = null,
-    Object? lastActivity = null,
-    Object? createdOn = null,
-    Object? icon = null,
-    Object? members = null,
-    Object? notSeen = null,
+    Object? description = freezed,
+    Object? lastActivity = freezed,
+    Object? icon = freezed,
   }) {
     return _then(_GroupModel(
       id: null == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
-              as String,
+              as int,
       name: null == name
           ? _self.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
-      description: null == description
+      description: freezed == description
           ? _self.description
           : description // ignore: cast_nullable_to_non_nullable
-              as String,
-      lastActivity: null == lastActivity
+              as String?,
+      lastActivity: freezed == lastActivity
           ? _self.lastActivity
           : lastActivity // ignore: cast_nullable_to_non_nullable
-              as String,
-      createdOn: null == createdOn
-          ? _self.createdOn
-          : createdOn // ignore: cast_nullable_to_non_nullable
-              as String,
-      icon: null == icon
+              as String?,
+      icon: freezed == icon
           ? _self.icon
           : icon // ignore: cast_nullable_to_non_nullable
-              as String,
-      members: null == members
-          ? _self._members
-          : members // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-      notSeen: null == notSeen
-          ? _self._notSeen
-          : notSeen // ignore: cast_nullable_to_non_nullable
-              as List<String>,
+              as String?,
     ));
   }
 }
