@@ -10,9 +10,9 @@ _GroupModel _$GroupModelFromJson(Map<String, dynamic> json) => _GroupModel(
       id: (json['id'] as num).toInt(),
       name: json['name'] as String,
       description: json['description'] as String?,
-      lastActivity: json['latest_post_time'] as String?,
+      lastActivity: json['latest_post_time'] as String,
       icon: json['icon'] as String?,
-      createdAt: json['created_at'],
+      createdAt: json['created_at'] as String,
     );
 
 Map<String, dynamic> _$GroupModelToJson(_GroupModel instance) =>

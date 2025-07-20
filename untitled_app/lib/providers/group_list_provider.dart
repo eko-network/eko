@@ -9,7 +9,7 @@ part '../generated/providers/group_list_provider.g.dart';
 @riverpod
 class GroupList extends _$GroupList {
   final Set<int> _set = {};
-  (String?, int)? _last;
+  (String, int)? _last;
   Timer? _disposeTimer;
   @override
   (List<int>, bool) build() {
@@ -36,12 +36,12 @@ class GroupList extends _$GroupList {
   }
 
   Future<void> getter() async {
-    final List<dynamic> request =
-        await supabase.rpc('paginated_chambers', params: {
-      'p_limit': c.postsOnRefresh + 10,
-      'p_last_time': _last?.$1,
-      'p_last_id': _last?.$2
-    });
+    final List<dynamic> request = await supabase.rpc('paginated_chambers',
+        params: {
+          'p_limit': c.postsOnRefresh,
+          'p_last_time': _last?.$1,
+          'p_last_id': _last?.$2
+        });
 
     final groupList = request.map((data) {
       final group = GroupModel.fromJson(data);

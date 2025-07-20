@@ -19,10 +19,10 @@ mixin _$GroupModel implements DiagnosticableTreeMixin {
   String get name;
   String? get description;
   @JsonKey(name: 'latest_post_time')
-  String? get lastActivity;
+  String get lastActivity;
   String? get icon;
   @JsonKey(name: 'created_at')
-  dynamic get createdAt;
+  String get createdAt;
 
   /// Create a copy of GroupModel
   /// with the given fields replaced by the non-null parameter values.
@@ -58,13 +58,14 @@ mixin _$GroupModel implements DiagnosticableTreeMixin {
             (identical(other.lastActivity, lastActivity) ||
                 other.lastActivity == lastActivity) &&
             (identical(other.icon, icon) || other.icon == icon) &&
-            const DeepCollectionEquality().equals(other.createdAt, createdAt));
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, name, description,
-      lastActivity, icon, const DeepCollectionEquality().hash(createdAt));
+  int get hashCode => Object.hash(
+      runtimeType, id, name, description, lastActivity, icon, createdAt);
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
@@ -82,9 +83,9 @@ abstract mixin class $GroupModelCopyWith<$Res> {
       {int id,
       String name,
       String? description,
-      @JsonKey(name: 'latest_post_time') String? lastActivity,
+      @JsonKey(name: 'latest_post_time') String lastActivity,
       String? icon,
-      @JsonKey(name: 'created_at') dynamic createdAt});
+      @JsonKey(name: 'created_at') String createdAt});
 }
 
 /// @nodoc
@@ -102,9 +103,9 @@ class _$GroupModelCopyWithImpl<$Res> implements $GroupModelCopyWith<$Res> {
     Object? id = null,
     Object? name = null,
     Object? description = freezed,
-    Object? lastActivity = freezed,
+    Object? lastActivity = null,
     Object? icon = freezed,
-    Object? createdAt = freezed,
+    Object? createdAt = null,
   }) {
     return _then(_self.copyWith(
       id: null == id
@@ -119,18 +120,18 @@ class _$GroupModelCopyWithImpl<$Res> implements $GroupModelCopyWith<$Res> {
           ? _self.description
           : description // ignore: cast_nullable_to_non_nullable
               as String?,
-      lastActivity: freezed == lastActivity
+      lastActivity: null == lastActivity
           ? _self.lastActivity
           : lastActivity // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as String,
       icon: freezed == icon
           ? _self.icon
           : icon // ignore: cast_nullable_to_non_nullable
               as String?,
-      createdAt: freezed == createdAt
+      createdAt: null == createdAt
           ? _self.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
-              as dynamic,
+              as String,
     ));
   }
 }
@@ -142,9 +143,9 @@ class _GroupModel extends GroupModel with DiagnosticableTreeMixin {
       {required this.id,
       required this.name,
       this.description,
-      @JsonKey(name: 'latest_post_time') this.lastActivity,
+      @JsonKey(name: 'latest_post_time') required this.lastActivity,
       this.icon,
-      @JsonKey(name: 'created_at') this.createdAt})
+      @JsonKey(name: 'created_at') required this.createdAt})
       : super._();
   factory _GroupModel.fromJson(Map<String, dynamic> json) =>
       _$GroupModelFromJson(json);
@@ -157,12 +158,12 @@ class _GroupModel extends GroupModel with DiagnosticableTreeMixin {
   final String? description;
   @override
   @JsonKey(name: 'latest_post_time')
-  final String? lastActivity;
+  final String lastActivity;
   @override
   final String? icon;
   @override
   @JsonKey(name: 'created_at')
-  final dynamic createdAt;
+  final String createdAt;
 
   /// Create a copy of GroupModel
   /// with the given fields replaced by the non-null parameter values.
@@ -203,13 +204,14 @@ class _GroupModel extends GroupModel with DiagnosticableTreeMixin {
             (identical(other.lastActivity, lastActivity) ||
                 other.lastActivity == lastActivity) &&
             (identical(other.icon, icon) || other.icon == icon) &&
-            const DeepCollectionEquality().equals(other.createdAt, createdAt));
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, name, description,
-      lastActivity, icon, const DeepCollectionEquality().hash(createdAt));
+  int get hashCode => Object.hash(
+      runtimeType, id, name, description, lastActivity, icon, createdAt);
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
@@ -229,9 +231,9 @@ abstract mixin class _$GroupModelCopyWith<$Res>
       {int id,
       String name,
       String? description,
-      @JsonKey(name: 'latest_post_time') String? lastActivity,
+      @JsonKey(name: 'latest_post_time') String lastActivity,
       String? icon,
-      @JsonKey(name: 'created_at') dynamic createdAt});
+      @JsonKey(name: 'created_at') String createdAt});
 }
 
 /// @nodoc
@@ -249,9 +251,9 @@ class __$GroupModelCopyWithImpl<$Res> implements _$GroupModelCopyWith<$Res> {
     Object? id = null,
     Object? name = null,
     Object? description = freezed,
-    Object? lastActivity = freezed,
+    Object? lastActivity = null,
     Object? icon = freezed,
-    Object? createdAt = freezed,
+    Object? createdAt = null,
   }) {
     return _then(_GroupModel(
       id: null == id
@@ -266,18 +268,18 @@ class __$GroupModelCopyWithImpl<$Res> implements _$GroupModelCopyWith<$Res> {
           ? _self.description
           : description // ignore: cast_nullable_to_non_nullable
               as String?,
-      lastActivity: freezed == lastActivity
+      lastActivity: null == lastActivity
           ? _self.lastActivity
           : lastActivity // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as String,
       icon: freezed == icon
           ? _self.icon
           : icon // ignore: cast_nullable_to_non_nullable
               as String?,
-      createdAt: freezed == createdAt
+      createdAt: null == createdAt
           ? _self.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
-              as dynamic,
+              as String,
     ));
   }
 }

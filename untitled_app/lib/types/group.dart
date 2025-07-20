@@ -13,9 +13,9 @@ abstract class GroupModel with _$GroupModel {
     required int id,
     required String name,
     String? description,
-    @JsonKey(name: 'latest_post_time') String? lastActivity,
+    @JsonKey(name: 'latest_post_time') required String lastActivity,
     String? icon,
-    @JsonKey(name: 'created_at') createdAt,
+    @JsonKey(name: 'created_at') required String createdAt,
   }) = _GroupModel;
 
   factory GroupModel.fromJson(Map<String, dynamic> json) =>
