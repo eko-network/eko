@@ -294,7 +294,7 @@ class _ComposePageState extends ConsumerState<ComposePage> {
           return AlertDialog(
             backgroundColor: Theme.of(context).colorScheme.outlineVariant,
             title: Text(
-                'Post to ${audiance == null ? AppLocalizations.of(context)!.public : ref.watch(groupProvider(audiance!)).when(data: (group) => group.name, loading: () => '--', error: (_, __) => '--')}?'),
+                'Post to ${audiance == null ? AppLocalizations.of(context)!.public : ref.watch(groupProvider(audiance! as int)).when(data: (group) => group.name, loading: () => '--', error: (_, __) => '--')}?'),
             content: SingleChildScrollView(
               child: PostCardFromPost(post: post, isPreview: true),
             ),
@@ -486,7 +486,7 @@ class _ComposePageState extends ConsumerState<ComposePage> {
                     onPressed: () => _audianceButtonPressed(
                         context,
                         (id) => setState(() {
-                              audiance = id;
+                              audiance = id as String;
                             })),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -687,7 +687,7 @@ class _AudianceText extends ConsumerWidget {
       return Text(AppLocalizations.of(context)!.public,
           style: TextStyle(color: Theme.of(context).colorScheme.onSurface));
     }
-    final asyncGroup = ref.watch(groupProvider(id!));
+    final asyncGroup = ref.watch(groupProvider(id! as int));
     return asyncGroup.when(
         data: (group) => Text(group.name,
             style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
@@ -757,13 +757,13 @@ class _GroupListHeader extends StatelessWidget {
 }
 
 class _GroupList extends ConsumerWidget {
-  final void Function(String?) onItemPressed;
+  final void Function(int?) onItemPressed;
   const _GroupList({required this.onItemPressed});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final groupsData = ref.watch(groupListProvider);
-    return InfiniteScrollyShell<String>(
+    return InfiniteScrollyShell<int>(
         header: _GroupListHeader(
           onPopularPressed: () {
             onItemPressed(null);
@@ -784,7 +784,7 @@ class _GroupList extends ConsumerWidget {
 }
 
 void _audianceButtonPressed(
-    BuildContext context, void Function(String?) onItemPressed) {
+    BuildContext context, void Function(int?) onItemPressed) {
   showModalBottomSheet(
     showDragHandle: true,
     backgroundColor: Theme.of(context).colorScheme.outlineVariant,

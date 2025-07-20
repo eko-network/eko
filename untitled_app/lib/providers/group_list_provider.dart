@@ -1,19 +1,18 @@
 import 'dart:async';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:untitled_app/providers/pool_providers.dart';
 import 'package:untitled_app/types/group.dart';
+import 'package:untitled_app/utilities/supabase_ref.dart';
 import '../utilities/constants.dart' as c;
 part '../generated/providers/group_list_provider.g.dart';
 
 @riverpod
 class GroupList extends _$GroupList {
-  final List<String> _timestamps = [];
+  final Set<int> _set = {};
+  (String?, int)? _last;
   Timer? _disposeTimer;
   @override
-  (List<String>, bool) build() {
+  (List<int>, bool) build() {
     // keeping this alive for a little make the compose page feel better
     // *** This block is for lifecycle management *** //
     // Keep provider alive
@@ -37,46 +36,51 @@ class GroupList extends _$GroupList {
   }
 
   Future<void> getter() async {
-    final user = FirebaseAuth.instance.currentUser!.uid;
-    final baseQuery = FirebaseFirestore.instance
-        .collection('groups')
-        .where('members', arrayContains: user)
-        .orderBy('lastActivity', descending: true)
-        .limit(c.postsOnRefresh);
-    final query =
-        state.$1.isEmpty ? baseQuery : baseQuery.startAfter([_timestamps.last]);
+    final List<dynamic> request =
+        await supabase.rpc('paginated_chambers', params: {
+      'p_limit': c.postsOnRefresh + 10,
+      'p_last_time': _last?.$1,
+      'p_last_id': _last?.$2
+    });
 
-    final groupList = (await query.get()).docs.map(
-      (doc) {
-        return GroupModel.fromFirestoreDoc(doc);
-      },
-    );
+    final groupList = request.map((data) {
+      final group = GroupModel.fromJson(data);
+      return group;
+    });
+
+    if (groupList.isNotEmpty) {
+      final lastGroup = groupList.last;
+      _last = (lastGroup.lastActivity, lastGroup.id);
+    }
 
     ref.read(groupPoolProvider).putAll(groupList);
     final newList = [...state.$1];
     for (final group in groupList) {
-      newList.add(group.id);
-      _timestamps.add(group.createdOn);
+      if (_set.add(group.id)) {
+        newList.add(group.id);
+      }
     }
     state = (newList, groupList.length < c.postsOnRefresh);
   }
 
   Future<void> refresh() async {
-    _timestamps.clear();
+    _set.clear();
+    _last = null;
     state = ([], false);
     await getter();
   }
 
-  void removeGroupById(String id) async {
+  void removeGroupById(int id) async {
     final newList = [...state.$1];
     newList.remove(id);
+    _set.remove(id);
     state = (newList, state.$2);
   }
 
-  void insertAtIndex(int index, GroupModel group) {
-    final newList = [...state.$1];
-    newList.insert(index, group.id);
-    _timestamps.insert(index, group.createdOn);
-    state = (newList, state.$2);
-  }
+  // void insertAtIndex(int index, GroupModel group) {
+  //   final newList = [...state.$1];
+  //   newList.insert(index, group.id);
+  //   _timestamps.insert(index, group.createdOn);
+  //   state = (newList, state.$2);
+  // }
 }

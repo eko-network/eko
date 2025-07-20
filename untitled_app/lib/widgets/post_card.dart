@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:untitled_app/custom_widgets/error_snack_bar.dart';
 import 'package:untitled_app/custom_widgets/gif_widget.dart';
@@ -8,10 +7,7 @@ import 'package:untitled_app/custom_widgets/image_widget.dart';
 import 'package:untitled_app/custom_widgets/poll_widget.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
 import 'package:untitled_app/providers/group_provider.dart';
-// import 'package:untitled_app/interfaces/user.dart';
-// import 'package:untitled_app/providers/current_user_provider.dart';
 import 'package:untitled_app/providers/post_provider.dart';
-import 'package:untitled_app/providers/user_provider.dart';
 import 'package:untitled_app/types/post.dart';
 import 'package:untitled_app/widgets/divider.dart';
 import 'package:untitled_app/widgets/icons.dart' as icons;
@@ -23,7 +19,6 @@ import 'package:untitled_app/widgets/text_with_tags.dart';
 import 'package:untitled_app/widgets/time_stamp.dart';
 import 'package:untitled_app/widgets/user_tag.dart';
 import '../utilities/constants.dart' as c;
-import 'dart:io' show Platform;
 import 'package:untitled_app/custom_widgets/warning_dialog.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:flutter/foundation.dart';
@@ -45,7 +40,7 @@ Widget postCardBuilder(int id) {
 }
 
 class GroupBadge extends ConsumerWidget {
-  final String groupId;
+  final int groupId;
   const GroupBadge({super.key, required this.groupId});
 
   @override
@@ -60,13 +55,7 @@ class GroupBadge extends ConsumerWidget {
           if (group == null) {
             return;
           }
-          if (group.members.contains(ref.watch(currentUserProvider).uid)) {
-            context.push('/groups/sub_group/${group.id}', extra: group);
-          } else {
-            showMyDialog(AppLocalizations.of(context)!.notInGroup, '',
-                [AppLocalizations.of(context)!.ok], [context.pop], context,
-                dismissable: true);
-          }
+          context.push('/groups/sub_group/${group.id}', extra: group);
         },
         child: Container(
           padding: const EdgeInsets.only(left: 6, right: 6),

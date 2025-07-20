@@ -12,6 +12,7 @@ _GroupModel _$GroupModelFromJson(Map<String, dynamic> json) => _GroupModel(
       description: json['description'] as String?,
       lastActivity: json['latest_post_time'] as String?,
       icon: json['icon'] as String?,
+      createdAt: json['created_at'],
     );
 
 Map<String, dynamic> _$GroupModelToJson(_GroupModel instance) =>
@@ -21,4 +22,5 @@ Map<String, dynamic> _$GroupModelToJson(_GroupModel instance) =>
       'description': instance.description,
       'latest_post_time': instance.lastActivity,
       'icon': instance.icon,
+      'created_at': instance.createdAt,
     };

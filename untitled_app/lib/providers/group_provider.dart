@@ -73,14 +73,4 @@ class Group extends _$Group {
     //   });
     // }
   }
-
-  Future<GroupModel?> getGroupFromId(String id) async {
-    final data =
-        await FirebaseFirestore.instance.collection('groups').doc(id).get();
-    final postData = data.data();
-    if (postData == null) {
-      return null;
-    }
-    return GroupModel.fromFirestore(postData, data.id);
-  }
 }

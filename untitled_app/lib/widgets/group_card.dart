@@ -6,15 +6,15 @@ import 'package:untitled_app/providers/group_provider.dart';
 import '../custom_widgets/time_stamp.dart';
 import '../utilities/constants.dart' as c;
 
-Widget groupCardBuilder(String groupId) {
+Widget groupCardBuilder(int groupId) {
   return GroupCard(
     groupId: groupId,
   );
 }
 
 class GroupCard extends ConsumerWidget {
-  final String groupId;
-  final void Function(String)? onPressed;
+  final int groupId;
+  final void Function(int)? onPressed;
   const GroupCard({super.key, required this.groupId, this.onPressed});
 
   @override
@@ -22,22 +22,22 @@ class GroupCard extends ConsumerWidget {
     final double width = c.widthGetter(context);
     final group = ref.watch(groupProvider(groupId));
     final uid = ref.read(currentUserProvider).uid;
-    bool unseen = group.when(
-        data: (data) => (data.notSeen.contains(uid)),
-        error: (_, __) => false,
-        loading: () => false);
+    // bool unseen = group.when(
+    //     data: (data) => (data.notSeen.contains(uid)),
+    //     error: (_, __) => false,
+    //     loading: () => false);
     return group.when(
         data: (group) => InkWell(
               onTap: () async {
                 if (onPressed == null) {
-                  if (unseen) {
-                    ref
-                        .read(currentUserProvider.notifier)
-                        .setUnreadGroup(false);
-                    ref
-                        .read(groupProvider(groupId).notifier)
-                        .toggleUnread(group.id, false);
-                  }
+                  // if (unseen) {
+                  //   ref
+                  //       .read(currentUserProvider.notifier)
+                  //       .setUnreadGroup(false);
+                  //   ref
+                  //       .read(groupProvider(groupId).notifier)
+                  //       .toggleUnread(group.id, false);
+                  // }
                   context.push('/groups/sub_group/$groupId', extra: group);
                 } else {
                   //if in compose page
@@ -59,7 +59,7 @@ class GroupCard extends ConsumerWidget {
                                 height: width * 0.17,
                                 child: FittedBox(
                                     fit: BoxFit.contain,
-                                    child: Text(group.icon,
+                                    child: Text(group.getIcon(),
                                         style:
                                             TextStyle(fontSize: width * 0.15))),
                               )
@@ -96,34 +96,23 @@ class GroupCard extends ConsumerWidget {
                                     group.name,
                                     style: TextStyle(
                                       fontSize: 17,
-                                      fontWeight: unseen
-                                          ? FontWeight.bold
-                                          : FontWeight.normal,
+                                      fontWeight: FontWeight.normal,
                                     ),
                                   ),
                                   Text(
-                                    group.description,
+                                    group.description ?? '',
                                     style: TextStyle(
                                         fontSize: 13,
-                                        fontWeight: unseen
-                                            ? FontWeight.bold
-                                            : FontWeight.w300),
+                                        fontWeight: FontWeight.w300),
                                   ),
                                 ])),
                         const Spacer(),
-                        unseen
-                            ? const Icon(
-                                Icons.circle,
-                                size: 10,
-                                color: Color(0xFF0095f6),
-                              )
-                            : Container(),
                         SizedBox(
                           width: width * 0.02,
                         ),
                         if (onPressed == null)
                           TimeStamp(
-                            time: group.lastActivity,
+                            time: group.lastActivity ?? group.createdAt,
                           ),
                         SizedBox(
                           width: width * 0.05,

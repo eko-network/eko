@@ -90,7 +90,7 @@ SliverAppBar _appBar(BuildContext context, GroupModel group) {
             child: FittedBox(
               fit: BoxFit.contain,
               child: Text(
-                group.icon,
+                group.icon ?? group.name[0],
               ),
             ),
           ),
@@ -112,7 +112,7 @@ SliverAppBar _appBar(BuildContext context, GroupModel group) {
 }
 
 class SubGroupPage extends ConsumerWidget {
-  final String id;
+  final int id;
   const SubGroupPage({super.key, required this.id});
 
   @override
@@ -137,20 +137,17 @@ class SubGroupPage extends ConsumerWidget {
         ),
       ),
       body: asyncGroup.when(
-        data: (group) => group.members
-                .contains(ref.watch(currentUserProvider).uid)
-            ? InfiniteScrolly<int, String>(
-                appBar: _appBar(context, group),
-                getter: (data) async {
-                  // return await getGroupPosts(data, ref, group.id);
-                  return null as dynamic;
-                },
-                widget: postCardBuilder,
-                initialLoadingWidget: PostLoader(
-                  length: 4,
-                ),
-              )
-            : _ErrorMessage(message: AppLocalizations.of(context)!.notInGroup),
+        data: (group) => InfiniteScrolly<int, String>(
+          appBar: _appBar(context, group),
+          getter: (data) async {
+            // return await getGroupPosts(data, ref, group.id);
+            return null as dynamic;
+          },
+          widget: postCardBuilder,
+          initialLoadingWidget: PostLoader(
+            length: 4,
+          ),
+        ),
         loading: () => Center(child: LoadingSpinner()),
         error: (_, __) =>
             _ErrorMessage(message: AppLocalizations.of(context)!.groupNotFound),

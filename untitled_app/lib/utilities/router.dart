@@ -203,48 +203,48 @@ final goRouter = GoRouter(
                     path: 'sub_group/:id',
                     name: 'sub_group',
                     builder: (context, state) {
-                      String id = state.pathParameters['id']!;
+                      int id = int.parse(state.pathParameters['id']!);
                       return SubGroupPage(id: id);
                     },
                     routes: [
-                      GoRoute(
-                          path: 'edit_group',
-                          name: 'edit_group',
-                          pageBuilder: (context, state) {
-                            String id = state.pathParameters['id']!;
-                            return NoTransitionPage(
-                              child: EditGroup(id: id),
-                            );
-                          },
-                          routes: [
-                            GoRoute(
-                                path: 'add_people',
-                                name: 'add_people',
-                                pageBuilder: (context, state) {
-                                  String id = state.pathParameters['id']!;
-                                  return NoTransitionPage(
-                                    child: AddPeoplePage(id: id),
-                                  );
-                                })
-                          ]),
+                      // GoRoute(
+                      //     path: 'edit_group',
+                      //     name: 'edit_group',
+                      //     pageBuilder: (context, state) {
+                      //       String id = state.pathParameters['id']!;
+                      //       return NoTransitionPage(
+                      //         child: EditGroup(id: id),
+                      //       );
+                      //     },
+                      //     routes: [
+                      //       GoRoute(
+                      //           path: 'add_people',
+                      //           name: 'add_people',
+                      //           pageBuilder: (context, state) {
+                      //             String id = state.pathParameters['id']!;
+                      //             return NoTransitionPage(
+                      //               child: AddPeoplePage(id: id),
+                      //             );
+                      //           })
+                      //     ]),
                     ]),
-                GoRoute(
-                  path: 'create_group',
-                  name: 'create_group',
-                  builder: (context, state) => const CreateGroup(),
-                  routes: [
-                    GoRoute(
-                      path: 'pick_emoji',
-                      name: 'pick_emoji',
-                      pageBuilder: (context, state) {
-                        return NoTransitionPage(
-                          child: EmojiSelector(),
-                        );
-                      },
-                      //builder: (context, state) => EmojiSelector(onPressed: state.extra! as void Function(String)),
-                    )
-                  ],
-                ),
+                // GoRoute(
+                //   path: 'create_group',
+                //   name: 'create_group',
+                //   builder: (context, state) => const CreateGroup(),
+                //   routes: [
+                //     GoRoute(
+                //       path: 'pick_emoji',
+                //       name: 'pick_emoji',
+                //       pageBuilder: (context, state) {
+                //         return NoTransitionPage(
+                //           child: EmojiSelector(),
+                //         );
+                //       },
+                //       //builder: (context, state) => EmojiSelector(onPressed: state.extra! as void Function(String)),
+                //     )
+                //   ],
+                // ),
               ],
             ),
           ],
