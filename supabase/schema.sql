@@ -3,7 +3,6 @@
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
-SET transaction_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
@@ -59,6 +58,56 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA "extensions";
 
 
 
+CREATE OR REPLACE FUNCTION "public"."change_comment_likes"("p_id" bigint, "p_is_liking" boolean, "p_is_dislike" boolean) RETURNS "void"
+    LANGUAGE "plpgsql"
+    SET "search_path" TO ''
+    AS $$
+DECLARE
+  v_uid UUID := auth.uid();
+BEGIN
+  IF p_is_liking THEN
+    -- Try to update the row
+INSERT INTO public.comment_likes (user_uid, comment_id, is_dislike)
+    VALUES (v_uid, p_id, p_is_dislike)
+    ON CONFLICT (user_uid, comment_id)
+    DO UPDATE SET is_dislike = EXCLUDED.is_dislike;
+  ELSE
+    -- Delete the like if unliking
+    DELETE FROM public.comment_likes AS p
+    WHERE p.comment_id = p_id AND p.user_uid = v_uid;
+  END IF;
+END;
+$$;
+
+
+ALTER FUNCTION "public"."change_comment_likes"("p_id" bigint, "p_is_liking" boolean, "p_is_dislike" boolean) OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "public"."change_post_likes"("p_id" bigint, "p_is_liking" boolean, "p_is_dislike" boolean) RETURNS "void"
+    LANGUAGE "plpgsql"
+    SET "search_path" TO ''
+    AS $$
+DECLARE
+  v_uid UUID := auth.uid();
+BEGIN
+  IF p_is_liking THEN
+    -- Try to update the row
+INSERT INTO public.post_likes (user_uid, post_id, is_dislike)
+    VALUES (v_uid, p_id, p_is_dislike)
+    ON CONFLICT (user_uid, post_id)
+    DO UPDATE SET is_dislike = EXCLUDED.is_dislike;
+  ELSE
+    -- Delete the like if unliking
+    DELETE FROM public.post_likes AS p
+    WHERE p.post_id = p_id AND p.user_uid = v_uid;
+  END IF;
+END;
+$$;
+
+
+ALTER FUNCTION "public"."change_post_likes"("p_id" bigint, "p_is_liking" boolean, "p_is_dislike" boolean) OWNER TO "postgres";
+
+
 CREATE OR REPLACE FUNCTION "public"."get_chamber_by_id"("p_uid" bigint) RETURNS TABLE("id" bigint, "name" "text", "description" "text", "icon" "text", "latest_post_time" timestamp with time zone)
     LANGUAGE "plpgsql"
     SET "search_path" TO ''
@@ -76,7 +125,7 @@ $$;
 ALTER FUNCTION "public"."get_chamber_by_id"("p_uid" bigint) OWNER TO "postgres";
 
 
-CREATE OR REPLACE FUNCTION "public"."get_comment_by_id"("p_id" bigint) RETURNS TABLE("id" bigint, "author_uid" "uuid", "created_at" timestamp with time zone, "body" "text", "gif" "text", "like_count" bigint, "dislike_count" bigint, "parent_post_id" bigint)
+CREATE OR REPLACE FUNCTION "public"."get_comment_by_id"("p_id" bigint) RETURNS TABLE("id" bigint, "author_uid" "uuid", "created_at" timestamp with time zone, "body" "text", "gif" "text", "like_count" bigint, "dislike_count" bigint, "parent_post_id" bigint, "is_liked" boolean, "is_disliked" boolean)
     LANGUAGE "plpgsql"
     SET "search_path" TO ''
     AS $$
@@ -93,7 +142,7 @@ $$;
 ALTER FUNCTION "public"."get_comment_by_id"("p_id" bigint) OWNER TO "postgres";
 
 
-CREATE OR REPLACE FUNCTION "public"."get_post_by_id"("p_id" bigint) RETURNS TABLE("id" bigint, "author_uid" "uuid", "created_at" timestamp with time zone, "title" "text", "body" "text", "gif" "text", "image" "text", "ekoed_id" bigint, "is_eko" boolean, "like_count" bigint, "dislike_count" bigint, "comment_count" bigint, "chamber_id" bigint)
+CREATE OR REPLACE FUNCTION "public"."get_post_by_id"("p_id" bigint) RETURNS TABLE("id" bigint, "author_uid" "uuid", "created_at" timestamp with time zone, "title" "text", "body" "text", "gif" "text", "image" "text", "ekoed_id" bigint, "is_eko" boolean, "like_count" bigint, "dislike_count" bigint, "comment_count" bigint, "chamber_id" bigint, "is_liked" boolean, "is_disliked" boolean)
     LANGUAGE "plpgsql"
     SET "search_path" TO ''
     AS $$
@@ -227,7 +276,46 @@ $$;
 ALTER FUNCTION "public"."is_username_available"("p_username" "text") OWNER TO "postgres";
 
 
-CREATE OR REPLACE FUNCTION "public"."paginated_comments"("p_limit" integer, "p_parent_post_id" bigint, "p_last_time" timestamp with time zone DEFAULT NULL::timestamp with time zone, "p_last_id" bigint DEFAULT NULL::bigint) RETURNS TABLE("id" bigint, "author_uid" "uuid", "created_at" timestamp with time zone, "body" "text", "gif" "text", "like_count" bigint, "dislike_count" bigint, "parent_post_id" bigint)
+CREATE OR REPLACE FUNCTION "public"."paginated_chamber_posts"("p_limit" integer, "p_last_time" timestamp with time zone, "p_last_id" bigint, "p_chamber_id" bigint) RETURNS TABLE("id" bigint, "author_uid" "uuid", "created_at" timestamp with time zone, "title" "text", "body" "text", "gif" "text", "image" "text", "ekoed_id" bigint, "is_eko" boolean, "like_count" bigint, "dislike_count" bigint, "comment_count" bigint, "chamber_id" bigint, "is_liked" boolean, "is_disliked" boolean)
+    LANGUAGE "plpgsql"
+    SET "search_path" TO ''
+    AS $$
+BEGIN
+    RETURN QUERY
+    SELECT *
+    FROM public.full_post_info as p
+    WHERE 
+        p.chamber_id = p_chamber_id
+    --paging
+        AND (p_last_time IS NULL OR (p.created_at, p.id) < (p_last_time, p_last_id))
+    ORDER BY p.created_at DESC, p.id DESC
+    LIMIT p_limit;
+END;
+$$;
+
+
+ALTER FUNCTION "public"."paginated_chamber_posts"("p_limit" integer, "p_last_time" timestamp with time zone, "p_last_id" bigint, "p_chamber_id" bigint) OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "public"."paginated_chambers"("p_limit" integer, "p_last_time" timestamp with time zone DEFAULT NULL::timestamp with time zone, "p_last_id" bigint DEFAULT NULL::bigint) RETURNS TABLE("id" bigint, "created_at" timestamp with time zone, "name" "text", "description" "text", "icon" "text", "latest_post_time" timestamp with time zone)
+    LANGUAGE "plpgsql"
+    SET "search_path" TO ''
+    AS $$
+BEGIN
+    RETURN QUERY
+    SELECT *
+    FROM public.full_chamber_info as c
+    WHERE (p_last_id IS NULL OR (c.latest_post_time, c.id) < (p_last_time, p_last_id))
+    ORDER BY c.latest_post_time DESC, c.id DESC
+    LIMIT p_limit;
+END;
+$$;
+
+
+ALTER FUNCTION "public"."paginated_chambers"("p_limit" integer, "p_last_time" timestamp with time zone, "p_last_id" bigint) OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "public"."paginated_comments"("p_limit" integer, "p_parent_post_id" bigint, "p_last_time" timestamp with time zone DEFAULT NULL::timestamp with time zone, "p_last_id" bigint DEFAULT NULL::bigint) RETURNS TABLE("id" bigint, "author_uid" "uuid", "created_at" timestamp with time zone, "body" "text", "gif" "text", "like_count" bigint, "dislike_count" bigint, "parent_post_id" bigint, "is_liked" boolean, "is_disliked" boolean)
     LANGUAGE "plpgsql"
     SET "search_path" TO ''
     AS $$
@@ -248,37 +336,39 @@ $$;
 ALTER FUNCTION "public"."paginated_comments"("p_limit" integer, "p_parent_post_id" bigint, "p_last_time" timestamp with time zone, "p_last_id" bigint) OWNER TO "postgres";
 
 
-CREATE OR REPLACE FUNCTION "public"."paginated_following_posts"("p_limit" integer, "p_last_time" timestamp with time zone DEFAULT NULL::timestamp with time zone, "p_last_id" bigint DEFAULT NULL::bigint) RETURNS TABLE("id" bigint, "author_uid" "uuid", "created_at" timestamp with time zone, "title" "text", "body" "text", "gif" "text", "image" "text", "ekoed_id" bigint, "is_eko" boolean, "like_count" bigint, "dislike_count" bigint, "comment_count" bigint, "chamber_id" bigint)
+CREATE OR REPLACE FUNCTION "public"."paginated_following_posts"("p_limit" integer, "p_last_time" timestamp with time zone DEFAULT NULL::timestamp with time zone, "p_last_id" bigint DEFAULT NULL::bigint) RETURNS TABLE("id" bigint, "author_uid" "uuid", "created_at" timestamp with time zone, "title" "text", "body" "text", "gif" "text", "image" "text", "ekoed_id" bigint, "is_eko" boolean, "like_count" bigint, "dislike_count" bigint, "comment_count" bigint, "chamber_id" bigint, "is_liked" boolean, "is_disliked" boolean)
     LANGUAGE "plpgsql"
     SET "search_path" TO ''
     AS $$
+DECLARE
+  v_uid UUID := auth.uid();
 BEGIN
-    RETURN QUERY
-    SELECT 
-      p.id,
-        p.author_uid,
-        p.created_at,
-        p.title,
-        p.body,
-        p.gif,
-        p.image,
-        p.ekoed_id,
-        p.is_eko,
-        p.like_count,
-        p.dislike_count,
-        p.comment_count,
-        p.chamber_id
-    FROM public.full_post_info as p
-    JOIN public.following as f ON p.author_uid = f.target_uid
-    WHERE 
-    --public
-        p.chamber_id is NULL
-    --following
-        AND f.source_uid = auth.uid()
-    --paging
-        AND (p_last_time IS NULL OR (p.created_at, p.id) < (p_last_time, p_last_id))
-    ORDER BY p.created_at DESC, p.id DESC
-    LIMIT p_limit;
+  RETURN QUERY
+  WITH followed AS (
+    SELECT target_uid FROM public.following WHERE source_uid = v_uid
+  ),
+  filtered_posts AS (
+    SELECT * FROM public.full_post_info p
+    WHERE (p_last_time IS NULL OR (p.created_at, p.id) < (p_last_time, p_last_id))
+  ),
+  from_followed AS (
+    SELECT p.*
+    FROM filtered_posts p
+    JOIN followed f ON p.author_uid = f.target_uid
+  ),
+  from_chambers AS (
+    SELECT p.*
+    FROM filtered_posts p
+    LEFT JOIN followed f ON p.author_uid = f.target_uid
+    WHERE p.chamber_id IS NOT NULL AND f.target_uid IS NULL
+  )
+  SELECT * FROM (
+    SELECT * FROM from_followed
+    UNION ALL
+    SELECT * FROM from_chambers
+  ) AS combined
+  ORDER BY created_at DESC, id DESC
+  LIMIT p_limit;
 END;
 $$;
 
@@ -286,7 +376,7 @@ $$;
 ALTER FUNCTION "public"."paginated_following_posts"("p_limit" integer, "p_last_time" timestamp with time zone, "p_last_id" bigint) OWNER TO "postgres";
 
 
-CREATE OR REPLACE FUNCTION "public"."paginated_new_posts"("p_limit" integer, "p_last_time" timestamp with time zone DEFAULT NULL::timestamp with time zone, "p_last_id" bigint DEFAULT NULL::bigint) RETURNS TABLE("id" bigint, "author_uid" "uuid", "created_at" timestamp with time zone, "title" "text", "body" "text", "gif" "text", "image" "text", "ekoed_id" bigint, "is_eko" boolean, "like_count" bigint, "dislike_count" bigint, "comment_count" bigint, "chamber_id" bigint)
+CREATE OR REPLACE FUNCTION "public"."paginated_new_posts"("p_limit" integer, "p_last_time" timestamp with time zone DEFAULT NULL::timestamp with time zone, "p_last_id" bigint DEFAULT NULL::bigint) RETURNS TABLE("id" bigint, "author_uid" "uuid", "created_at" timestamp with time zone, "title" "text", "body" "text", "gif" "text", "image" "text", "ekoed_id" bigint, "is_eko" boolean, "like_count" bigint, "dislike_count" bigint, "comment_count" bigint, "chamber_id" bigint, "is_liked" boolean, "is_disliked" boolean)
     LANGUAGE "plpgsql"
     SET "search_path" TO ''
     AS $$
@@ -308,7 +398,7 @@ $$;
 ALTER FUNCTION "public"."paginated_new_posts"("p_limit" integer, "p_last_time" timestamp with time zone, "p_last_id" bigint) OWNER TO "postgres";
 
 
-CREATE OR REPLACE FUNCTION "public"."paginated_popular_posts"("p_limit" integer, "p_last_likes" bigint DEFAULT NULL::bigint, "p_last_id" bigint DEFAULT NULL::bigint) RETURNS TABLE("id" bigint, "author_uid" "uuid", "created_at" timestamp with time zone, "title" "text", "body" "text", "gif" "text", "image" "text", "ekoed_id" bigint, "is_eko" boolean, "like_count" bigint, "dislike_count" bigint, "comment_count" bigint, "chamber_id" bigint)
+CREATE OR REPLACE FUNCTION "public"."paginated_popular_posts"("p_limit" integer, "p_last_likes" bigint DEFAULT NULL::bigint, "p_last_id" bigint DEFAULT NULL::bigint) RETURNS TABLE("id" bigint, "author_uid" "uuid", "created_at" timestamp with time zone, "title" "text", "body" "text", "gif" "text", "image" "text", "ekoed_id" bigint, "is_eko" boolean, "like_count" bigint, "dislike_count" bigint, "comment_count" bigint, "chamber_id" bigint, "is_liked" boolean, "is_disliked" boolean)
     LANGUAGE "plpgsql"
     SET "search_path" TO ''
     AS $$
@@ -326,7 +416,7 @@ $$;
 ALTER FUNCTION "public"."paginated_popular_posts"("p_limit" integer, "p_last_likes" bigint, "p_last_id" bigint) OWNER TO "postgres";
 
 
-CREATE OR REPLACE FUNCTION "public"."paginated_user_posts"("p_limit" integer, "p_last_time" timestamp with time zone, "p_last_id" bigint, "p_user_uid" "uuid") RETURNS TABLE("id" bigint, "author_uid" "uuid", "created_at" timestamp with time zone, "title" "text", "body" "text", "gif" "text", "image" "text", "ekoed_id" bigint, "is_eko" boolean, "like_count" bigint, "dislike_count" bigint, "comment_count" bigint, "chamber_id" bigint)
+CREATE OR REPLACE FUNCTION "public"."paginated_user_posts"("p_limit" integer, "p_last_time" timestamp with time zone, "p_last_id" bigint, "p_user_uid" "uuid") RETURNS TABLE("id" bigint, "author_uid" "uuid", "created_at" timestamp with time zone, "title" "text", "body" "text", "gif" "text", "image" "text", "ekoed_id" bigint, "is_eko" boolean, "like_count" bigint, "dislike_count" bigint, "comment_count" bigint, "chamber_id" bigint, "is_liked" boolean, "is_disliked" boolean)
     LANGUAGE "plpgsql"
     SET "search_path" TO ''
     AS $$
@@ -527,36 +617,16 @@ ALTER TABLE "public"."posts" OWNER TO "postgres";
 CREATE OR REPLACE VIEW "public"."full_chamber_info" WITH ("security_invoker"='on') AS
  SELECT "id",
     "created_at",
-    "firebase_uid",
     "name",
     "description",
     "icon",
-    ( SELECT "max"("p"."created_at") AS "max"
+    COALESCE(( SELECT "max"("p"."created_at") AS "max"
            FROM "public"."posts" "p"
-          WHERE ("p"."chamber_id" = "g"."id")) AS "latest_post_time"
+          WHERE ("p"."chamber_id" = "g"."id")), "created_at") AS "latest_post_time"
    FROM "public"."chambers" "g";
 
 
 ALTER VIEW "public"."full_chamber_info" OWNER TO "postgres";
-
-
-CREATE OR REPLACE VIEW "public"."full_comment_info" WITH ("security_invoker"='on') AS
- SELECT "id",
-    "author_uid",
-    "created_at",
-    "body",
-    "gif",
-    ( SELECT "count"(*) AS "count"
-           FROM "public"."comment_likes" "l"
-          WHERE (("l"."comment_id" = "p"."id") AND ("l"."is_dislike" = false))) AS "like_count",
-    ( SELECT "count"(*) AS "count"
-           FROM "public"."comment_likes" "l"
-          WHERE (("l"."comment_id" = "p"."id") AND ("l"."is_dislike" = true))) AS "dislike_count",
-    "parent_post_id"
-   FROM "public"."comments" "p";
-
-
-ALTER VIEW "public"."full_comment_info" OWNER TO "postgres";
 
 
 CREATE TABLE IF NOT EXISTS "public"."post_likes" (
@@ -569,17 +639,43 @@ CREATE TABLE IF NOT EXISTS "public"."post_likes" (
 ALTER TABLE "public"."post_likes" OWNER TO "postgres";
 
 
+CREATE OR REPLACE VIEW "public"."full_comment_info" WITH ("security_invoker"='on') AS
+ SELECT "p"."id",
+    "p"."author_uid",
+    "p"."created_at",
+    "p"."body",
+    "p"."gif",
+    ( SELECT "count"(*) AS "count"
+           FROM "public"."comment_likes" "l"
+          WHERE (("l"."comment_id" = "p"."id") AND ("l"."is_dislike" = false))) AS "like_count",
+    ( SELECT "count"(*) AS "count"
+           FROM "public"."comment_likes" "l"
+          WHERE (("l"."comment_id" = "p"."id") AND ("l"."is_dislike" = true))) AS "dislike_count",
+    "p"."parent_post_id",
+    (EXISTS ( SELECT 1
+           FROM "public"."post_likes" "l"
+          WHERE (("l"."post_id" = "p"."id") AND ("l"."user_uid" = "u"."uid") AND ("l"."is_dislike" = false)))) AS "is_liked",
+    (EXISTS ( SELECT 1
+           FROM "public"."post_likes" "l"
+          WHERE (("l"."post_id" = "p"."id") AND ("l"."user_uid" = "u"."uid") AND ("l"."is_dislike" = true)))) AS "is_disliked"
+   FROM "public"."comments" "p",
+    LATERAL ( SELECT "auth"."uid"() AS "uid") "u";
+
+
+ALTER VIEW "public"."full_comment_info" OWNER TO "postgres";
+
+
 CREATE OR REPLACE VIEW "public"."full_post_info" WITH ("security_invoker"='on') AS
- SELECT "id",
-    "author_uid",
-    "created_at",
-    "title",
-    "body",
-    "gif",
-    "regexp_replace"("encode"("image", 'base64'::"text"), '
+ SELECT "p"."id",
+    "p"."author_uid",
+    "p"."created_at",
+    "p"."title",
+    "p"."body",
+    "p"."gif",
+    "regexp_replace"("encode"("p"."image", 'base64'::"text"), '
 '::"text", ''::"text", 'g'::"text") AS "image",
-    "ekoed_id",
-    "is_eko",
+    "p"."ekoed_id",
+    "p"."is_eko",
     ( SELECT "count"(*) AS "count"
            FROM "public"."post_likes" "l"
           WHERE (("l"."post_id" = "p"."id") AND ("l"."is_dislike" = false))) AS "like_count",
@@ -589,8 +685,15 @@ CREATE OR REPLACE VIEW "public"."full_post_info" WITH ("security_invoker"='on') 
     ( SELECT "count"(*) AS "count"
            FROM "public"."comments" "c"
           WHERE ("c"."parent_post_id" = "p"."id")) AS "comment_count",
-    "chamber_id"
-   FROM "public"."posts" "p";
+    "p"."chamber_id",
+    (EXISTS ( SELECT 1
+           FROM "public"."post_likes" "l"
+          WHERE (("l"."post_id" = "p"."id") AND ("l"."user_uid" = "u"."uid") AND ("l"."is_dislike" = false)))) AS "is_liked",
+    (EXISTS ( SELECT 1
+           FROM "public"."post_likes" "l"
+          WHERE (("l"."post_id" = "p"."id") AND ("l"."user_uid" = "u"."uid") AND ("l"."is_dislike" = true)))) AS "is_disliked"
+   FROM "public"."posts" "p",
+    LATERAL ( SELECT "auth"."uid"() AS "uid") "u";
 
 
 ALTER VIEW "public"."full_post_info" OWNER TO "postgres";
@@ -629,6 +732,15 @@ ALTER TABLE "public"."reports" ALTER COLUMN "id" ADD GENERATED BY DEFAULT AS IDE
     CACHE 1
 );
 
+
+
+CREATE OR REPLACE VIEW "public"."user_group_ids" AS
+ SELECT DISTINCT "group_id"
+   FROM "public"."chamber_members"
+  WHERE ("user_uid" = ( SELECT "auth"."uid"() AS "uid"));
+
+
+ALTER VIEW "public"."user_group_ids" OWNER TO "postgres";
 
 
 CREATE TABLE IF NOT EXISTS "public"."usernames" (
@@ -747,6 +859,10 @@ ALTER TABLE ONLY "public"."users"
 
 ALTER TABLE ONLY "public"."utilities"
     ADD CONSTRAINT "utilities_pkey" PRIMARY KEY ("platform");
+
+
+
+CREATE INDEX "posts_created_at_id_desc_idx" ON "public"."posts" USING "btree" ("created_at" DESC, "id" DESC);
 
 
 
@@ -940,18 +1056,29 @@ CREATE POLICY "Enable read to authenticated when not blocked and in group" ON "p
 
 
 
+CREATE POLICY "Enable update for users based on uid" ON "public"."post_likes" FOR UPDATE USING ((( SELECT "auth"."uid"() AS "uid") = "user_uid")) WITH CHECK ((( SELECT "auth"."uid"() AS "uid") = "user_uid"));
+
+
+
+CREATE POLICY "FIXME: view who is in groups you are in" ON "public"."chamber_members" FOR SELECT TO "authenticated" USING (("group_id" IN ( SELECT "user_group_ids"."group_id"
+   FROM "public"."user_group_ids")));
+
+
+
 ALTER TABLE "public"."activity" ENABLE ROW LEVEL SECURITY;
 
 
-CREATE POLICY "allow read when not blocked and in group" ON "public"."comments" FOR SELECT TO "authenticated" USING (((NOT (EXISTS ( SELECT 1
+CREATE POLICY "allow ead comments if they can read post" ON "public"."comments" FOR SELECT TO "authenticated" USING ((EXISTS ( SELECT 1
+   FROM "public"."posts" "p"
+  WHERE ("p"."id" = "comments"."parent_post_id"))));
+
+
+
+CREATE POLICY "block filter" ON "public"."following" FOR SELECT TO "authenticated" USING (((NOT (EXISTS ( SELECT 1
    FROM "public"."blocked" "b"
-  WHERE ((("b"."source_uid" = ( SELECT "auth"."uid"() AS "uid")) AND ("b"."target_uid" = "comments"."author_uid")) OR (("b"."source_uid" = "comments"."author_uid") AND ("b"."target_uid" = ( SELECT "auth"."uid"() AS "uid"))))))) AND ((( SELECT "posts"."chamber_id"
-   FROM "public"."posts"
-  WHERE ("posts"."id" = "comments"."parent_post_id")) IS NULL) OR (EXISTS ( SELECT 1
-   FROM "public"."chamber_members" "c"
-  WHERE (("c"."group_id" = ( SELECT "posts"."chamber_id"
-           FROM "public"."posts"
-          WHERE ("posts"."id" = "comments"."parent_post_id"))) AND ("c"."user_uid" = ( SELECT "auth"."uid"() AS "uid"))))))));
+  WHERE (("b"."target_uid" = ( SELECT "auth"."uid"() AS "uid")) AND (("b"."source_uid" = "following"."source_uid") OR ("b"."source_uid" = "following"."target_uid")))))) AND (NOT (EXISTS ( SELECT 1
+   FROM "public"."blocked" "b"
+  WHERE (("b"."source_uid" = ( SELECT "auth"."uid"() AS "uid")) AND (("b"."target_uid" = "following"."source_uid") OR ("b"."target_uid" = "following"."target_uid"))))))));
 
 
 
@@ -961,17 +1088,40 @@ ALTER TABLE "public"."blocked" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "public"."chamber_members" ENABLE ROW LEVEL SECURITY;
 
 
+ALTER TABLE "public"."chambers" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."comment_likes" ENABLE ROW LEVEL SECURITY;
+
+
 ALTER TABLE "public"."comments" ENABLE ROW LEVEL SECURITY;
 
 
-CREATE POLICY "enable read for all authenticated users" ON "public"."post_likes" FOR SELECT TO "authenticated" USING (true);
+CREATE POLICY "delete based on uid" ON "public"."comment_likes" FOR DELETE TO "authenticated" USING (("user_uid" = ( SELECT "auth"."uid"() AS "uid")));
 
 
 
 ALTER TABLE "public"."fcm_tockens" ENABLE ROW LEVEL SECURITY;
 
 
+ALTER TABLE "public"."following" ENABLE ROW LEVEL SECURITY;
+
+
+CREATE POLICY "insert comment likes" ON "public"."comment_likes" FOR INSERT TO "authenticated" WITH CHECK (("user_uid" = ( SELECT "auth"."uid"() AS "uid")));
+
+
+
+CREATE POLICY "insert follows where you are source" ON "public"."following" FOR INSERT TO "authenticated" WITH CHECK ((( SELECT "auth"."uid"() AS "uid") = "source_uid"));
+
+
+
 CREATE POLICY "only have access to you own tokens" ON "public"."fcm_tockens" TO "authenticated" USING ((( SELECT "auth"."uid"() AS "uid") = "user_uid"));
+
+
+
+CREATE POLICY "only view groups you are in" ON "public"."chambers" FOR SELECT TO "authenticated" USING ((EXISTS ( SELECT 1
+   FROM "public"."chamber_members" "c"
+  WHERE (("c"."group_id" = "chambers"."id") AND ("c"."user_uid" = ( SELECT "auth"."uid"() AS "uid"))))));
 
 
 
@@ -979,6 +1129,16 @@ ALTER TABLE "public"."post_likes" ENABLE ROW LEVEL SECURITY;
 
 
 ALTER TABLE "public"."posts" ENABLE ROW LEVEL SECURITY;
+
+
+CREATE POLICY "read comment likes if you can read comment" ON "public"."comment_likes" FOR SELECT TO "authenticated" USING ((EXISTS ( SELECT 1
+   FROM "public"."comments" "c"
+  WHERE ("c"."id" = "comment_likes"."comment_id"))));
+
+
+
+CREATE POLICY "removed anything related to you" ON "public"."following" FOR DELETE TO "authenticated" USING (((( SELECT "auth"."uid"() AS "uid") = "source_uid") OR (( SELECT "auth"."uid"() AS "uid") = "target_uid")));
+
 
 
 ALTER TABLE "public"."reports" ENABLE ROW LEVEL SECURITY;
@@ -989,6 +1149,16 @@ CREATE POLICY "see who you have blocked" ON "public"."blocked" FOR SELECT TO "au
 
 
 CREATE POLICY "unblock people" ON "public"."blocked" FOR DELETE TO "authenticated" USING ((( SELECT "auth"."uid"() AS "uid") = "source_uid"));
+
+
+
+CREATE POLICY "update based on uid" ON "public"."comment_likes" FOR UPDATE TO "authenticated" USING (("user_uid" = ( SELECT "auth"."uid"() AS "uid"))) WITH CHECK (("user_uid" = ( SELECT "auth"."uid"() AS "uid")));
+
+
+
+CREATE POLICY "user can read like if they can read post" ON "public"."post_likes" FOR SELECT TO "authenticated" USING ((EXISTS ( SELECT 1
+   FROM "public"."posts" "p"
+  WHERE ("p"."id" = "post_likes"."post_id"))));
 
 
 
@@ -1256,6 +1426,18 @@ GRANT USAGE ON SCHEMA "public" TO "service_role";
 
 
 
+GRANT ALL ON FUNCTION "public"."change_comment_likes"("p_id" bigint, "p_is_liking" boolean, "p_is_dislike" boolean) TO "anon";
+GRANT ALL ON FUNCTION "public"."change_comment_likes"("p_id" bigint, "p_is_liking" boolean, "p_is_dislike" boolean) TO "authenticated";
+GRANT ALL ON FUNCTION "public"."change_comment_likes"("p_id" bigint, "p_is_liking" boolean, "p_is_dislike" boolean) TO "service_role";
+
+
+
+GRANT ALL ON FUNCTION "public"."change_post_likes"("p_id" bigint, "p_is_liking" boolean, "p_is_dislike" boolean) TO "anon";
+GRANT ALL ON FUNCTION "public"."change_post_likes"("p_id" bigint, "p_is_liking" boolean, "p_is_dislike" boolean) TO "authenticated";
+GRANT ALL ON FUNCTION "public"."change_post_likes"("p_id" bigint, "p_is_liking" boolean, "p_is_dislike" boolean) TO "service_role";
+
+
+
 GRANT ALL ON FUNCTION "public"."get_chamber_by_id"("p_uid" bigint) TO "anon";
 GRANT ALL ON FUNCTION "public"."get_chamber_by_id"("p_uid" bigint) TO "authenticated";
 GRANT ALL ON FUNCTION "public"."get_chamber_by_id"("p_uid" bigint) TO "service_role";
@@ -1301,6 +1483,18 @@ GRANT ALL ON FUNCTION "public"."insert_post"("p_created_at" timestamp with time 
 GRANT ALL ON FUNCTION "public"."is_username_available"("p_username" "text") TO "anon";
 GRANT ALL ON FUNCTION "public"."is_username_available"("p_username" "text") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."is_username_available"("p_username" "text") TO "service_role";
+
+
+
+GRANT ALL ON FUNCTION "public"."paginated_chamber_posts"("p_limit" integer, "p_last_time" timestamp with time zone, "p_last_id" bigint, "p_chamber_id" bigint) TO "anon";
+GRANT ALL ON FUNCTION "public"."paginated_chamber_posts"("p_limit" integer, "p_last_time" timestamp with time zone, "p_last_id" bigint, "p_chamber_id" bigint) TO "authenticated";
+GRANT ALL ON FUNCTION "public"."paginated_chamber_posts"("p_limit" integer, "p_last_time" timestamp with time zone, "p_last_id" bigint, "p_chamber_id" bigint) TO "service_role";
+
+
+
+GRANT ALL ON FUNCTION "public"."paginated_chambers"("p_limit" integer, "p_last_time" timestamp with time zone, "p_last_id" bigint) TO "anon";
+GRANT ALL ON FUNCTION "public"."paginated_chambers"("p_limit" integer, "p_last_time" timestamp with time zone, "p_last_id" bigint) TO "authenticated";
+GRANT ALL ON FUNCTION "public"."paginated_chambers"("p_limit" integer, "p_last_time" timestamp with time zone, "p_last_id" bigint) TO "service_role";
 
 
 
@@ -1433,15 +1627,15 @@ GRANT ALL ON TABLE "public"."full_chamber_info" TO "service_role";
 
 
 
-GRANT ALL ON TABLE "public"."full_comment_info" TO "anon";
-GRANT ALL ON TABLE "public"."full_comment_info" TO "authenticated";
-GRANT ALL ON TABLE "public"."full_comment_info" TO "service_role";
-
-
-
 GRANT ALL ON TABLE "public"."post_likes" TO "anon";
 GRANT ALL ON TABLE "public"."post_likes" TO "authenticated";
 GRANT ALL ON TABLE "public"."post_likes" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."full_comment_info" TO "anon";
+GRANT ALL ON TABLE "public"."full_comment_info" TO "authenticated";
+GRANT ALL ON TABLE "public"."full_comment_info" TO "service_role";
 
 
 
@@ -1466,6 +1660,12 @@ GRANT ALL ON TABLE "public"."reports" TO "service_role";
 GRANT ALL ON SEQUENCE "public"."reports_id_seq" TO "anon";
 GRANT ALL ON SEQUENCE "public"."reports_id_seq" TO "authenticated";
 GRANT ALL ON SEQUENCE "public"."reports_id_seq" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."user_group_ids" TO "anon";
+GRANT ALL ON TABLE "public"."user_group_ids" TO "authenticated";
+GRANT ALL ON TABLE "public"."user_group_ids" TO "service_role";
 
 
 
