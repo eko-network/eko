@@ -1,24 +1,61 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:untitled_app/interfaces/post.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
 import 'package:untitled_app/providers/pool_providers.dart';
+import 'package:untitled_app/types/likeable.dart';
 import 'package:untitled_app/types/post.dart';
 import 'package:untitled_app/utilities/like_state.dart';
 import 'package:untitled_app/utilities/supabase_ref.dart';
 part '../generated/providers/post_provider.g.dart';
 
 @riverpod
-class Post extends _$Post {
+class Post extends _$Post with Likeable {
   Timer? _disposeTimer;
-  bool _isLiking = false;
   bool _isVoting = false;
+
+  @protected
+  @override
+  int get contentId => state.valueOrNull?.id ?? 0;
+
+  @protected
+  @override
+  String get rpcName => 'change_post_likes';
+
+  @protected
+  @override
+  int get likes => state.valueOrNull?.likes ?? 0;
+
+  @protected
+  @override
+  int get dislikes => state.valueOrNull?.dislikes ?? 0;
+
+  @protected
+  @override
+  LikeState get likeState => state.valueOrNull?.likeState ?? LikeState.none;
+
+  @override
+  @protected
+  void copyForLikeable(
+      {required LikeState likeState, int? likes, int? dislikes}) {
+    final current = state.valueOrNull;
+    if (current == null) return;
+
+    state = AsyncData(
+      current.copyWith(
+        likeState: likeState,
+        likes: likes ?? current.likes,
+        dislikes: dislikes ?? current.dislikes,
+      ),
+    );
+  }
+
   @override
   FutureOr<PostModel> build(int id) {
     // *** This block is for lifecycle management *** //
-    // Keep provider alive
+    // K()ep provider alive
     final link = ref.keepAlive();
     ref.onCancel(() {
       // Start a 3-minute countdown when the last listener goes away
@@ -48,69 +85,6 @@ class Post extends _$Post {
     final List response =
         await supabase.rpc('get_post_by_id', params: {'p_id': id});
     return PostModel.fromJson(response.first);
-  }
-
-  Future<void> likePostToggle() async {
-    print('${ref.read(currentUserProvider).uid} ${(await future).id}');
-    if (_isLiking) return;
-    _isLiking = true;
-    final prev = await future;
-    if (prev.likeState == LikeState.liked) {
-      state = AsyncData(
-          prev.copyWith(likeState: LikeState.none, likes: prev.likes - 1));
-      await supabase.rpc('change_post_likes', params: {
-        'p_id': prev.id,
-        'p_is_liking': false,
-        'p_is_dislike': false,
-      });
-    } else {
-      if (prev.likeState == LikeState.disliked) {
-        state = AsyncData(prev.copyWith(
-            likeState: LikeState.liked,
-            likes: prev.likes + 1,
-            dislikes: prev.dislikes - 1));
-      } else {
-        state = AsyncData(
-            prev.copyWith(likeState: LikeState.liked, likes: prev.likes + 1));
-      }
-      await supabase.rpc('change_post_likes', params: {
-        'p_id': prev.id,
-        'p_is_liking': true,
-        'p_is_dislike': false,
-      });
-    }
-    _isLiking = false;
-  }
-
-  Future<void> dislikePostToggle() async {
-    if (_isLiking) return;
-    _isLiking = true;
-    final prev = await future;
-    if (prev.likeState == LikeState.disliked) {
-      state = AsyncData(prev.copyWith(
-          likeState: LikeState.none, dislikes: prev.dislikes - 1));
-      await supabase.rpc('change_post_likes', params: {
-        'p_id': prev.id,
-        'p_is_liking': false,
-        'p_is_dislike': true,
-      });
-    } else {
-      if (prev.likeState == LikeState.liked) {
-        state = AsyncData(prev.copyWith(
-            likeState: LikeState.disliked,
-            likes: prev.likes - 1,
-            dislikes: prev.dislikes + 1));
-      } else {
-        state = AsyncData(prev.copyWith(
-            likeState: LikeState.disliked, dislikes: prev.dislikes + 1));
-      }
-      await supabase.rpc('change_post_likes', params: {
-        'p_id': prev.id,
-        'p_is_liking': true,
-        'p_is_dislike': true,
-      });
-    }
-    _isLiking = false;
   }
 
   Future<void> _addVoteToDb(String id, int optionIndex) async {

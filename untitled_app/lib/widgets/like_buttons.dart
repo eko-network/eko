@@ -66,7 +66,7 @@ class LikeButtons extends ConsumerWidget {
             },
             onTap: (isLiked) async {
               if (!disabled) {
-                ref.read(postProvider(post.id).notifier).likePostToggle();
+                ref.read(postProvider(post.id).notifier).likeToggle();
                 return !isLiked;
               }
               return isLiked;
@@ -104,7 +104,7 @@ class LikeButtons extends ConsumerWidget {
             },
             onTap: (isDisliked) async {
               if (!disabled) {
-                ref.read(postProvider(post.id).notifier).dislikePostToggle();
+                ref.read(postProvider(post.id).notifier).dislikeToggle();
                 return !isDisliked;
               }
               return isDisliked;
