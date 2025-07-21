@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 
 /// @nodoc
 mixin _$PostModel implements DiagnosticableTreeMixin {
-  @JsonKey(name: 'author_uid')
+  @JsonKey(name: 'author_uid', includeToJson: false)
   String get uid;
   int get id;
   @JsonKey(name: 'gif')
@@ -29,13 +29,13 @@ mixin _$PostModel implements DiagnosticableTreeMixin {
   List<String> get title;
   @JsonKey(fromJson: parseTextToTags, toJson: _joinList)
   List<String> get body;
-  @JsonKey(name: 'like_count')
+  @JsonKey(name: 'like_count', includeToJson: false)
   int get likes;
-  @JsonKey(name: 'dislike_count')
+  @JsonKey(name: 'dislike_count', includeToJson: false)
   int get dislikes;
-  @JsonKey(name: 'comment_count')
+  @JsonKey(name: 'comment_count', includeToJson: false)
   int get commentCount;
-  @JsonKey(name: 'created_at')
+  @JsonKey(name: 'created_at', includeToJson: false)
   String get createdAt;
   List<String>? get pollOptions;
   Map<String, int>? get pollVoteCounts;
@@ -43,8 +43,10 @@ mixin _$PostModel implements DiagnosticableTreeMixin {
   int? get ekoedId;
   @JsonKey(name: 'is_eko')
   bool get isEko;
+  @LikeStateConverter()
+  LikeState get likeState;
   @JsonKey(name: 'chamber_id')
-  String? get chamberId;
+  int? get chamberId;
 
   /// Create a copy of PostModel
   /// with the given fields replaced by the non-null parameter values.
@@ -74,6 +76,7 @@ mixin _$PostModel implements DiagnosticableTreeMixin {
       ..add(DiagnosticsProperty('pollVoteCounts', pollVoteCounts))
       ..add(DiagnosticsProperty('ekoedId', ekoedId))
       ..add(DiagnosticsProperty('isEko', isEko))
+      ..add(DiagnosticsProperty('likeState', likeState))
       ..add(DiagnosticsProperty('chamberId', chamberId));
   }
 
@@ -101,6 +104,8 @@ mixin _$PostModel implements DiagnosticableTreeMixin {
                 .equals(other.pollVoteCounts, pollVoteCounts) &&
             (identical(other.ekoedId, ekoedId) || other.ekoedId == ekoedId) &&
             (identical(other.isEko, isEko) || other.isEko == isEko) &&
+            (identical(other.likeState, likeState) ||
+                other.likeState == likeState) &&
             (identical(other.chamberId, chamberId) ||
                 other.chamberId == chamberId));
   }
@@ -123,11 +128,12 @@ mixin _$PostModel implements DiagnosticableTreeMixin {
       const DeepCollectionEquality().hash(pollVoteCounts),
       ekoedId,
       isEko,
+      likeState,
       chamberId);
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'PostModel(uid: $uid, id: $id, gifUrl: $gifUrl, image: $image, title: $title, body: $body, likes: $likes, dislikes: $dislikes, commentCount: $commentCount, createdAt: $createdAt, pollOptions: $pollOptions, pollVoteCounts: $pollVoteCounts, ekoedId: $ekoedId, isEko: $isEko, chamberId: $chamberId)';
+    return 'PostModel(uid: $uid, id: $id, gifUrl: $gifUrl, image: $image, title: $title, body: $body, likes: $likes, dislikes: $dislikes, commentCount: $commentCount, createdAt: $createdAt, pollOptions: $pollOptions, pollVoteCounts: $pollVoteCounts, ekoedId: $ekoedId, isEko: $isEko, likeState: $likeState, chamberId: $chamberId)';
   }
 }
 
@@ -137,7 +143,7 @@ abstract mixin class $PostModelCopyWith<$Res> {
       _$PostModelCopyWithImpl;
   @useResult
   $Res call(
-      {@JsonKey(name: 'author_uid') String uid,
+      {@JsonKey(name: 'author_uid', includeToJson: false) String uid,
       int id,
       @JsonKey(name: 'gif') String? gifUrl,
       @JsonKey(
@@ -147,15 +153,16 @@ abstract mixin class $PostModelCopyWith<$Res> {
       AsciiImage? image,
       @JsonKey(fromJson: parseTextToTags, toJson: _joinList) List<String> title,
       @JsonKey(fromJson: parseTextToTags, toJson: _joinList) List<String> body,
-      @JsonKey(name: 'like_count') int likes,
-      @JsonKey(name: 'dislike_count') int dislikes,
-      @JsonKey(name: 'comment_count') int commentCount,
-      @JsonKey(name: 'created_at') String createdAt,
+      @JsonKey(name: 'like_count', includeToJson: false) int likes,
+      @JsonKey(name: 'dislike_count', includeToJson: false) int dislikes,
+      @JsonKey(name: 'comment_count', includeToJson: false) int commentCount,
+      @JsonKey(name: 'created_at', includeToJson: false) String createdAt,
       List<String>? pollOptions,
       Map<String, int>? pollVoteCounts,
       @JsonKey(name: 'ekoed_id') int? ekoedId,
       @JsonKey(name: 'is_eko') bool isEko,
-      @JsonKey(name: 'chamber_id') String? chamberId});
+      @LikeStateConverter() LikeState likeState,
+      @JsonKey(name: 'chamber_id') int? chamberId});
 }
 
 /// @nodoc
@@ -184,6 +191,7 @@ class _$PostModelCopyWithImpl<$Res> implements $PostModelCopyWith<$Res> {
     Object? pollVoteCounts = freezed,
     Object? ekoedId = freezed,
     Object? isEko = null,
+    Object? likeState = null,
     Object? chamberId = freezed,
   }) {
     return _then(_self.copyWith(
@@ -243,10 +251,14 @@ class _$PostModelCopyWithImpl<$Res> implements $PostModelCopyWith<$Res> {
           ? _self.isEko
           : isEko // ignore: cast_nullable_to_non_nullable
               as bool,
+      likeState: null == likeState
+          ? _self.likeState
+          : likeState // ignore: cast_nullable_to_non_nullable
+              as LikeState,
       chamberId: freezed == chamberId
           ? _self.chamberId
           : chamberId // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as int?,
     ));
   }
 }
@@ -255,7 +267,7 @@ class _$PostModelCopyWithImpl<$Res> implements $PostModelCopyWith<$Res> {
 @JsonSerializable()
 class _PostModel extends PostModel with DiagnosticableTreeMixin {
   const _PostModel(
-      {@JsonKey(name: 'author_uid') required this.uid,
+      {@JsonKey(name: 'author_uid', includeToJson: false) required this.uid,
       required this.id,
       @JsonKey(name: 'gif') this.gifUrl,
       @JsonKey(
@@ -267,14 +279,17 @@ class _PostModel extends PostModel with DiagnosticableTreeMixin {
       final List<String> title = const <String>[],
       @JsonKey(fromJson: parseTextToTags, toJson: _joinList)
       final List<String> body = const <String>[],
-      @JsonKey(name: 'like_count') this.likes = 0,
-      @JsonKey(name: 'dislike_count') this.dislikes = 0,
-      @JsonKey(name: 'comment_count') this.commentCount = 0,
-      @JsonKey(name: 'created_at') required this.createdAt,
+      @JsonKey(name: 'like_count', includeToJson: false) this.likes = 0,
+      @JsonKey(name: 'dislike_count', includeToJson: false) this.dislikes = 0,
+      @JsonKey(name: 'comment_count', includeToJson: false)
+      this.commentCount = 0,
+      @JsonKey(name: 'created_at', includeToJson: false)
+      required this.createdAt,
       final List<String>? pollOptions,
       final Map<String, int>? pollVoteCounts,
       @JsonKey(name: 'ekoed_id') this.ekoedId,
       @JsonKey(name: 'is_eko') this.isEko = false,
+      @LikeStateConverter() this.likeState = LikeState.none,
       @JsonKey(name: 'chamber_id') this.chamberId})
       : _title = title,
         _body = body,
@@ -285,7 +300,7 @@ class _PostModel extends PostModel with DiagnosticableTreeMixin {
       _$PostModelFromJson(json);
 
   @override
-  @JsonKey(name: 'author_uid')
+  @JsonKey(name: 'author_uid', includeToJson: false)
   final String uid;
   @override
   final int id;
@@ -317,16 +332,16 @@ class _PostModel extends PostModel with DiagnosticableTreeMixin {
   }
 
   @override
-  @JsonKey(name: 'like_count')
+  @JsonKey(name: 'like_count', includeToJson: false)
   final int likes;
   @override
-  @JsonKey(name: 'dislike_count')
+  @JsonKey(name: 'dislike_count', includeToJson: false)
   final int dislikes;
   @override
-  @JsonKey(name: 'comment_count')
+  @JsonKey(name: 'comment_count', includeToJson: false)
   final int commentCount;
   @override
-  @JsonKey(name: 'created_at')
+  @JsonKey(name: 'created_at', includeToJson: false)
   final String createdAt;
   final List<String>? _pollOptions;
   @override
@@ -355,8 +370,12 @@ class _PostModel extends PostModel with DiagnosticableTreeMixin {
   @JsonKey(name: 'is_eko')
   final bool isEko;
   @override
+  @JsonKey()
+  @LikeStateConverter()
+  final LikeState likeState;
+  @override
   @JsonKey(name: 'chamber_id')
-  final String? chamberId;
+  final int? chamberId;
 
   /// Create a copy of PostModel
   /// with the given fields replaced by the non-null parameter values.
@@ -391,6 +410,7 @@ class _PostModel extends PostModel with DiagnosticableTreeMixin {
       ..add(DiagnosticsProperty('pollVoteCounts', pollVoteCounts))
       ..add(DiagnosticsProperty('ekoedId', ekoedId))
       ..add(DiagnosticsProperty('isEko', isEko))
+      ..add(DiagnosticsProperty('likeState', likeState))
       ..add(DiagnosticsProperty('chamberId', chamberId));
   }
 
@@ -418,6 +438,8 @@ class _PostModel extends PostModel with DiagnosticableTreeMixin {
                 .equals(other._pollVoteCounts, _pollVoteCounts) &&
             (identical(other.ekoedId, ekoedId) || other.ekoedId == ekoedId) &&
             (identical(other.isEko, isEko) || other.isEko == isEko) &&
+            (identical(other.likeState, likeState) ||
+                other.likeState == likeState) &&
             (identical(other.chamberId, chamberId) ||
                 other.chamberId == chamberId));
   }
@@ -440,11 +462,12 @@ class _PostModel extends PostModel with DiagnosticableTreeMixin {
       const DeepCollectionEquality().hash(_pollVoteCounts),
       ekoedId,
       isEko,
+      likeState,
       chamberId);
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'PostModel(uid: $uid, id: $id, gifUrl: $gifUrl, image: $image, title: $title, body: $body, likes: $likes, dislikes: $dislikes, commentCount: $commentCount, createdAt: $createdAt, pollOptions: $pollOptions, pollVoteCounts: $pollVoteCounts, ekoedId: $ekoedId, isEko: $isEko, chamberId: $chamberId)';
+    return 'PostModel(uid: $uid, id: $id, gifUrl: $gifUrl, image: $image, title: $title, body: $body, likes: $likes, dislikes: $dislikes, commentCount: $commentCount, createdAt: $createdAt, pollOptions: $pollOptions, pollVoteCounts: $pollVoteCounts, ekoedId: $ekoedId, isEko: $isEko, likeState: $likeState, chamberId: $chamberId)';
   }
 }
 
@@ -457,7 +480,7 @@ abstract mixin class _$PostModelCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {@JsonKey(name: 'author_uid') String uid,
+      {@JsonKey(name: 'author_uid', includeToJson: false) String uid,
       int id,
       @JsonKey(name: 'gif') String? gifUrl,
       @JsonKey(
@@ -467,15 +490,16 @@ abstract mixin class _$PostModelCopyWith<$Res>
       AsciiImage? image,
       @JsonKey(fromJson: parseTextToTags, toJson: _joinList) List<String> title,
       @JsonKey(fromJson: parseTextToTags, toJson: _joinList) List<String> body,
-      @JsonKey(name: 'like_count') int likes,
-      @JsonKey(name: 'dislike_count') int dislikes,
-      @JsonKey(name: 'comment_count') int commentCount,
-      @JsonKey(name: 'created_at') String createdAt,
+      @JsonKey(name: 'like_count', includeToJson: false) int likes,
+      @JsonKey(name: 'dislike_count', includeToJson: false) int dislikes,
+      @JsonKey(name: 'comment_count', includeToJson: false) int commentCount,
+      @JsonKey(name: 'created_at', includeToJson: false) String createdAt,
       List<String>? pollOptions,
       Map<String, int>? pollVoteCounts,
       @JsonKey(name: 'ekoed_id') int? ekoedId,
       @JsonKey(name: 'is_eko') bool isEko,
-      @JsonKey(name: 'chamber_id') String? chamberId});
+      @LikeStateConverter() LikeState likeState,
+      @JsonKey(name: 'chamber_id') int? chamberId});
 }
 
 /// @nodoc
@@ -504,6 +528,7 @@ class __$PostModelCopyWithImpl<$Res> implements _$PostModelCopyWith<$Res> {
     Object? pollVoteCounts = freezed,
     Object? ekoedId = freezed,
     Object? isEko = null,
+    Object? likeState = null,
     Object? chamberId = freezed,
   }) {
     return _then(_PostModel(
@@ -563,10 +588,14 @@ class __$PostModelCopyWithImpl<$Res> implements _$PostModelCopyWith<$Res> {
           ? _self.isEko
           : isEko // ignore: cast_nullable_to_non_nullable
               as bool,
+      likeState: null == likeState
+          ? _self.likeState
+          : likeState // ignore: cast_nullable_to_non_nullable
+              as LikeState,
       chamberId: freezed == chamberId
           ? _self.chamberId
           : chamberId // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as int?,
     ));
   }
 }

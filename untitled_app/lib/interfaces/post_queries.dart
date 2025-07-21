@@ -58,20 +58,23 @@ Future<(List<(int, int)>, bool)> popGetter(
   return (retList, retList.length < c.postsOnRefresh);
 }
 
-Future<(List<MapEntry<String, String>>, bool)> getGroupPosts(
-    List<MapEntry<String, String>> list, WidgetRef ref, String groupId) async {
-  // final baseQuery = FirebaseFirestore.instance
-  //     .collection('posts')
-  //     .where('tags', arrayContains: groupId)
-  //     .orderBy('time', descending: true)
-  //     .limit(c.postsOnRefresh);
-  // final query =
-  //     list.isEmpty ? baseQuery : baseQuery.startAfter([list.last.value]);
-  // final postList = await getPosts(query);
-  // ref.read(postPoolProvider).putAll(postList);
-  // final retList =
-  //     postList.map((item) => MapEntry(item.id, item.createdAt)).toList();
-  return ([] as List<MapEntry<String, String>>, true);
+Future<(List<(int, String)>, bool)> getGroupPosts(
+    List<(int, String)> list, WidgetRef ref, int groupId) async {
+  final last = list.isNotEmpty ? list.last : null;
+  final List<dynamic> response =
+      await supabase.rpc('paginated_chamber_posts', params: {
+    'p_limit': c.postsOnRefresh,
+    'p_last_time': last?.$2,
+    'p_last_id': last?.$1,
+    'p_chamber_id': groupId,
+  });
+  final List<(int, String)> retList = [];
+  for (final map in response) {
+    final post = PostModel.fromJson(map);
+    ref.read(postPoolProvider).put(post);
+    retList.add((post.id, post.createdAt));
+  }
+  return (retList, retList.length < c.postsOnRefresh);
 }
 
 Future<List<CommentModel>> getComments(

@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:like_button/like_button.dart';
-import 'package:untitled_app/providers/current_user_provider.dart';
 import 'package:untitled_app/providers/post_provider.dart';
 import 'package:untitled_app/types/post.dart';
+import 'package:untitled_app/utilities/like_state.dart';
 import 'package:untitled_app/widgets/icons.dart' as icons;
 import '../utilities/constants.dart' as c;
 
@@ -47,13 +46,15 @@ class LikeButtons extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final fillColor = Color(0xFFFF3040);
-    final user = ref.watch(currentUserProvider);
     return Row(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           LikeButton(
-            isLiked: false, //!disabled && user.likedPosts.contains(post.id),
+            isLiked: !disabled &&
+                post.likeState ==
+                    LikeState
+                        .liked, //!disabled && user.likedPosts.contains(post.id),
             likeBuilder: (isLiked) {
               return icons.Like(
                 size: c.postIconSize,
@@ -91,8 +92,7 @@ class LikeButtons extends ConsumerWidget {
                   },
           ),
           LikeButton(
-            isLiked: false,
-                // !disabled && user.dislikedPosts.contains(post.id), //dislike
+            isLiked: !disabled && post.likeState == LikeState.disliked,
             likeBuilder: (isDisliked) {
               return icons.Dislike(
                 size: c.postIconSize,

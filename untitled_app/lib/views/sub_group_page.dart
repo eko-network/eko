@@ -140,8 +140,7 @@ class SubGroupPage extends ConsumerWidget {
         data: (group) => InfiniteScrolly<int, String>(
           appBar: _appBar(context, group),
           getter: (data) async {
-            // return await getGroupPosts(data, ref, group.id);
-            return null as dynamic;
+            return await getGroupPosts(data, ref, group.id);
           },
           widget: postCardBuilder,
           initialLoadingWidget: PostLoader(

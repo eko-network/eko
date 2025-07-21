@@ -29,24 +29,24 @@ _PostModel _$PostModelFromJson(Map<String, dynamic> json) => _PostModel(
       ),
       ekoedId: (json['ekoed_id'] as num?)?.toInt(),
       isEko: json['is_eko'] as bool? ?? false,
-      chamberId: json['chamber_id'] as String?,
+      likeState: json['likeState'] == null
+          ? LikeState.none
+          : const LikeStateConverter()
+              .fromJson(json['likeState'] as Map<String, dynamic>),
+      chamberId: (json['chamber_id'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$PostModelToJson(_PostModel instance) =>
     <String, dynamic>{
-      'author_uid': instance.uid,
       'id': instance.id,
       'gif': instance.gifUrl,
       'image': _asciiImageToString(instance.image),
       'title': _joinList(instance.title),
       'body': _joinList(instance.body),
-      'like_count': instance.likes,
-      'dislike_count': instance.dislikes,
-      'comment_count': instance.commentCount,
-      'created_at': instance.createdAt,
       'pollOptions': instance.pollOptions,
       'pollVoteCounts': instance.pollVoteCounts,
       'ekoed_id': instance.ekoedId,
       'is_eko': instance.isEko,
+      'likeState': const LikeStateConverter().toJson(instance.likeState),
       'chamber_id': instance.chamberId,
     };
