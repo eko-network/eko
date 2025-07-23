@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
+import 'package:untitled_app/providers/follow_info_provider.dart';
 import 'package:untitled_app/types/user.dart';
 import 'package:untitled_app/widgets/profile_picture.dart';
 import '../utilities/constants.dart' as c;
@@ -36,38 +38,8 @@ class ProfileHeader extends StatelessWidget {
                       uid: user.uid, size: c.widthGetter(context) * 0.24)),
               Flexible(
                 child: Padding(
-                  padding: const EdgeInsets.only(left: 10),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          _ProfilePageTopNumberDisplay(
-                            // number: user.followers.length,
-                            number: 0,
-                            label: AppLocalizations.of(context)!.followers,
-                            onPressed: () {
-                              if (loggedIn) {
-                                context.push('/profile/followers', extra: user);
-                              }
-                            },
-                          ),
-                          _ProfilePageTopNumberDisplay(
-                            // number: user.following.length,
-                            number: 0,
-                            label: AppLocalizations.of(context)!.following,
-                            onPressed: () {
-                              if (loggedIn) {
-                                context.push('/profile/following', extra: user);
-                              }
-                            },
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
+                    padding: const EdgeInsets.only(left: 10),
+                    child: _FollowCountsDisplay(uid: user.uid)),
               ),
             ],
           ),
@@ -93,6 +65,43 @@ class ProfileHeader extends StatelessWidget {
             ],
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _FollowCountsDisplay extends ConsumerWidget {
+  final String uid;
+  const _FollowCountsDisplay({required this.uid});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final asyncFollowInfo = ref.watch(FollowInfoProvider(uid));
+    return asyncFollowInfo.when(
+      data: (followInfo) => Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          _ProfilePageTopNumberDisplay(
+            // number: user.followers.length,
+            number: followInfo.followers,
+            label: AppLocalizations.of(context)!.followers,
+            onPressed: () {
+              context.push('/profile/followers');
+            },
+          ),
+          _ProfilePageTopNumberDisplay(
+            // number: user.following.length,
+            number: followInfo.following,
+            label: AppLocalizations.of(context)!.following,
+            onPressed: () {
+              context.push('/profile/following');
+            },
+          ),
+        ],
+      ),
+      loading: () => SizedBox(),
+      error: (_, __) => Center(
+        child: Text('An Error Occured'),
       ),
     );
   }

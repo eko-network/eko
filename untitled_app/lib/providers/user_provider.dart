@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:untitled_app/providers/auth_provider.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
@@ -49,11 +48,5 @@ class User extends _$User {
     final List response =
         await supabase.rpc('get_user_by_id', params: {'p_uid': uid});
     return UserModel.fromJson(response.first);
-  }
-
-  void updateFollowers(List<String> newFollowers) {
-    // state.whenData((user) {
-    //   state = AsyncData(user.copyWith(followers: newFollowers));
-    // });
   }
 }

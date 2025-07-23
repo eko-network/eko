@@ -22,7 +22,6 @@ class LikeStateConverter
 
   @override
   LikeState fromJson(Map<String, dynamic> json) {
-    print(json);
     return LikeState.fromJson(json);
   }
 

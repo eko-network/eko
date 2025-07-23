@@ -1,12 +1,12 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of '../../providers/user_provider.dart';
+part of '../../providers/follow_info_provider.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$userHash() => r'5efa896b8de24c6d9cb7e22d981d8333a8c65025';
+String _$followInfoHash() => r'a41d1261e10f3eea530b0f22ee24eba0f8c40bf4';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -29,35 +29,36 @@ class _SystemHash {
   }
 }
 
-abstract class _$User extends BuildlessAutoDisposeAsyncNotifier<UserModel> {
+abstract class _$FollowInfo
+    extends BuildlessAutoDisposeAsyncNotifier<FollowInfoModel> {
   late final String uid;
 
-  FutureOr<UserModel> build(
+  FutureOr<FollowInfoModel> build(
     String uid,
   );
 }
 
-/// See also [User].
-@ProviderFor(User)
-const userProvider = UserFamily();
+/// See also [FollowInfo].
+@ProviderFor(FollowInfo)
+const followInfoProvider = FollowInfoFamily();
 
-/// See also [User].
-class UserFamily extends Family<AsyncValue<UserModel>> {
-  /// See also [User].
-  const UserFamily();
+/// See also [FollowInfo].
+class FollowInfoFamily extends Family<AsyncValue<FollowInfoModel>> {
+  /// See also [FollowInfo].
+  const FollowInfoFamily();
 
-  /// See also [User].
-  UserProvider call(
+  /// See also [FollowInfo].
+  FollowInfoProvider call(
     String uid,
   ) {
-    return UserProvider(
+    return FollowInfoProvider(
       uid,
     );
   }
 
   @override
-  UserProvider getProviderOverride(
-    covariant UserProvider provider,
+  FollowInfoProvider getProviderOverride(
+    covariant FollowInfoProvider provider,
   ) {
     return call(
       provider.uid,
@@ -76,27 +77,30 @@ class UserFamily extends Family<AsyncValue<UserModel>> {
       _allTransitiveDependencies;
 
   @override
-  String? get name => r'userProvider';
+  String? get name => r'followInfoProvider';
 }
 
-/// See also [User].
-class UserProvider
-    extends AutoDisposeAsyncNotifierProviderImpl<User, UserModel> {
-  /// See also [User].
-  UserProvider(
+/// See also [FollowInfo].
+class FollowInfoProvider
+    extends AutoDisposeAsyncNotifierProviderImpl<FollowInfo, FollowInfoModel> {
+  /// See also [FollowInfo].
+  FollowInfoProvider(
     String uid,
   ) : this._internal(
-          () => User()..uid = uid,
-          from: userProvider,
-          name: r'userProvider',
+          () => FollowInfo()..uid = uid,
+          from: followInfoProvider,
+          name: r'followInfoProvider',
           debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product') ? null : _$userHash,
-          dependencies: UserFamily._dependencies,
-          allTransitiveDependencies: UserFamily._allTransitiveDependencies,
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$followInfoHash,
+          dependencies: FollowInfoFamily._dependencies,
+          allTransitiveDependencies:
+              FollowInfoFamily._allTransitiveDependencies,
           uid: uid,
         );
 
-  UserProvider._internal(
+  FollowInfoProvider._internal(
     super._createNotifier, {
     required super.name,
     required super.dependencies,
@@ -109,8 +113,8 @@ class UserProvider
   final String uid;
 
   @override
-  FutureOr<UserModel> runNotifierBuild(
-    covariant User notifier,
+  FutureOr<FollowInfoModel> runNotifierBuild(
+    covariant FollowInfo notifier,
   ) {
     return notifier.build(
       uid,
@@ -118,10 +122,10 @@ class UserProvider
   }
 
   @override
-  Override overrideWith(User Function() create) {
+  Override overrideWith(FollowInfo Function() create) {
     return ProviderOverride(
       origin: this,
-      override: UserProvider._internal(
+      override: FollowInfoProvider._internal(
         () => create()..uid = uid,
         from: from,
         name: null,
@@ -134,13 +138,14 @@ class UserProvider
   }
 
   @override
-  AutoDisposeAsyncNotifierProviderElement<User, UserModel> createElement() {
-    return _UserProviderElement(this);
+  AutoDisposeAsyncNotifierProviderElement<FollowInfo, FollowInfoModel>
+      createElement() {
+    return _FollowInfoProviderElement(this);
   }
 
   @override
   bool operator ==(Object other) {
-    return other is UserProvider && other.uid == uid;
+    return other is FollowInfoProvider && other.uid == uid;
   }
 
   @override
@@ -154,18 +159,18 @@ class UserProvider
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-mixin UserRef on AutoDisposeAsyncNotifierProviderRef<UserModel> {
+mixin FollowInfoRef on AutoDisposeAsyncNotifierProviderRef<FollowInfoModel> {
   /// The parameter `uid` of this provider.
   String get uid;
 }
 
-class _UserProviderElement
-    extends AutoDisposeAsyncNotifierProviderElement<User, UserModel>
-    with UserRef {
-  _UserProviderElement(super.provider);
+class _FollowInfoProviderElement
+    extends AutoDisposeAsyncNotifierProviderElement<FollowInfo, FollowInfoModel>
+    with FollowInfoRef {
+  _FollowInfoProviderElement(super.provider);
 
   @override
-  String get uid => (origin as UserProvider).uid;
+  String get uid => (origin as FollowInfoProvider).uid;
 }
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
