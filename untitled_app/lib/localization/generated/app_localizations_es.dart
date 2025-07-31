@@ -24,49 +24,49 @@ class AppLocalizationsEs extends AppLocalizations {
   String get logIn => 'Iniciar sesión';
 
   @override
-  String get option => 'Option';
+  String get option => 'Opción';
 
   @override
-  String get addOption => 'Add option';
+  String get addOption => 'Añadir opción';
 
   @override
-  String get needTwoOptions => 'You need at least two poll options';
+  String get needTwoOptions =>
+      'Tiene que añadir dos opciones del poll por lo menos';
 
   @override
-  String get votes => 'votes';
+  String get votes => 'votos';
 
   @override
-  String get removeVote => 'Remove vote';
+  String get removeVote => 'Quitar el voto';
 
   @override
-  String get invalidUserName => 'Nombre de usuario no cumple los requisitos';
+  String get invalidUserName => 'Nombre de usario no cumple con los requisitos';
 
   @override
   String get available => 'Disponible';
 
   @override
-  String get usernameInUse => 'Nombre de usuario no disponible';
+  String get usernameInUse => 'Nombre de usario no disponible';
 
   @override
-  String get usernameTakenTitle => 'Este nombre de usuario ha sido tomado.';
+  String get usernameTakenTitle => 'Este nombre de usario ha sido tomado';
 
   @override
-  String get usernameTakenBody =>
-      'Por favor escoja un nombre de usuario diferente.';
+  String get usernameTakenBody => 'Por favor escoja otro nombre de usario';
 
   @override
-  String get invalidEmailTittle => 'Formato de correo electrónico invalido';
+  String get invalidEmailTittle => 'Formato de correo electrónico no es válido';
 
   @override
   String get invalidEmailBody =>
-      'Por favor revise su correo electrónico y vuelva a intentar.';
+      'Por favor revise su correo electrónico y vuelva a intentar';
 
   @override
   String get userNotFoundTitle => 'No hemos encontrado esta cuenta';
 
   @override
   String get userNotFoundBody =>
-      'No hemos encontado una cuenta con este correo electrónico. Intente otro correo electrónico o cree una cuenta.';
+      'No hemos encontrado una cuenta con este correo electrónico. Intente otro correo electrónico o cree una cuenta.';
 
   @override
   String get wrongPasswordTittle => 'Contraseña incorrecta';
@@ -107,7 +107,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get forgotPasswordBody =>
-      'Intenta usar el link que mandamos a tu correo electrónico.';
+      'Intenta usar el link que mandamos a tu correo electrónico';
 
   @override
   String get exitCreateAccountTitle =>
@@ -118,17 +118,17 @@ class AppLocalizationsEs extends AppLocalizations {
       'Estas seguro de que quieres regresar a la página de inicio? Tu informacion será borrada.';
 
   @override
-  String get exitCreateGroupTitle => 'Return to group page?';
+  String get exitCreateGroupTitle => 'Quieres regresar a la página de grupo';
 
   @override
   String get exitCreateGroupBody =>
-      'Are you sure you want to go back? Your group information will be deleted.';
+      'Estas seguro de que quieres regresar? Tu informacion del grupo será borrada.';
 
   @override
   String get exitEditProfileTitle => 'Estas seguro de que quieres salir?';
 
   @override
-  String get exitEditProfileBody => 'Todos los cambios serán borrados.';
+  String get exitEditProfileBody => 'Todos los cambios serán borrados';
 
   @override
   String get stay => 'Permanecer en esta página';
@@ -140,16 +140,16 @@ class AppLocalizationsEs extends AppLocalizations {
   String get goBack => 'Volver';
 
   @override
-  String get tryAgain => 'Intentelo de nuevo';
+  String get tryAgain => 'Intentarlo de nuevo';
 
   @override
   String get signUp => 'Crear cuenta';
 
   @override
-  String get signIn => 'Sign In';
+  String get signIn => 'Iniciar sesión';
 
   @override
-  String get signInToComment => 'Sign in to comment...';
+  String get signInToComment => 'Iniciar sesión para comentar';
 
   @override
   String get forgotPassword => 'Contraseña olvidada?';
@@ -176,7 +176,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get close => 'Cerrar';
 
   @override
-  String get likes => 'Likes';
+  String get likes => 'Up-Ekos';
 
   @override
   String get dislikes => 'Down-Ekos';
@@ -188,10 +188,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get dislike => 'Dislike';
 
   @override
-  String get comments => 'Comments';
+  String get comments => 'Comentarios';
 
   @override
-  String get comment => 'Comment';
+  String get comment => 'Añadir comentario';
 
   @override
   String get follow => 'Seguir';
@@ -203,13 +203,13 @@ class AppLocalizationsEs extends AppLocalizations {
   String get following => 'Siguiendo';
 
   @override
-  String get editProfile => 'Editar perfil';
+  String get editProfile => 'Editar Perfil';
 
   @override
   String get name => 'Nombre';
 
   @override
-  String get userName => 'Nombre de usuario';
+  String get userName => 'Nombre de usario';
 
   @override
   String get previous => 'Regresar';
@@ -239,31 +239,32 @@ class AppLocalizationsEs extends AppLocalizations {
   String get characters => 'Caracteres';
 
   @override
-  String get addText => 'Add text...';
+  String get addText => 'Añadir texto...';
 
   @override
-  String get addTitle => 'Add title...';
+  String get addTitle => 'Añadir título...';
 
   @override
-  String get create => 'Create';
+  String get create => 'Crear';
 
   @override
-  String get createNewPost => 'Create new post';
+  String get createNewPost => 'Crear publicación nuevo';
 
   @override
-  String get postButton => 'PUBLICAR';
+  String get postButton => 'Publicar';
 
   @override
-  String get clear => 'Clear';
+  String get clear => 'Limpiar';
 
   @override
   String get tooManyChar => 'Demasiados caracteres.';
 
   @override
-  String get tooManyLine => 'Demasiadas lineas nuevas.';
+  String get tooManyLine => 'Demasiadas lineas nuevas';
 
   @override
-  String get emptyFieldError => 'Make sure all feilds are filled.';
+  String get emptyFieldError =>
+      'Asegúrese de que todos los campos están llenos.';
 
   @override
   String get bioTitle => 'Biografía';
@@ -278,312 +279,315 @@ class AppLocalizationsEs extends AppLocalizations {
   String get darkMode => 'Modo oscuro';
 
   @override
-  String get addComment => 'Añadir comentario';
+  String get addComment => 'Añadir comentario...';
 
   @override
-  String get settings => 'Settings';
+  String get settings => 'Ajustes';
 
   @override
-  String get welcome => 'Welcome';
+  String get welcome => 'Bienvenido';
 
   @override
-  String get welcomeBack => 'Welcome Back';
+  String get welcomeBack => 'Bienvenido de vuelta';
 
   @override
-  String get createAccount => 'Create Account';
+  String get createAccount => 'Crear cuenta';
 
   @override
-  String get createAnAccount => 'Create an Account';
+  String get createAnAccount => 'Crear una cuenta';
 
   @override
-  String get cont => 'Continue';
+  String get cont => 'Continuar';
 
   @override
-  String get dateOfBirth => 'Date of Birth';
+  String get dateOfBirth => 'Fecha de nacimiento';
 
   @override
-  String get createAPassword => 'Create a Password';
+  String get createAPassword => 'Crear una contraseña';
 
   @override
   String get deleteAcountTitle =>
-      'Are you sure you want to delete your account?';
+      'Estas seguro de que quieres borrar tu cuenta?';
 
   @override
   String get deleteAcountBody =>
-      'All account data will be deleted. This action cannot be undone. Press \"Go Back\" to cancel';
+      'Todos los datos de cuenta será borrado. Esta acción no se puede deshacer. Hacer clic en \"Volver\" para cancelar';
 
   @override
-  String get delete => 'Delete';
+  String get delete => 'Borrar';
 
   @override
-  String get report => 'Report';
+  String get report => 'Reportar';
 
   @override
-  String get save => 'Save';
+  String get save => 'Guardar';
 
   @override
-  String get searchUsername => 'Search users...';
+  String get searchUsername => 'Buscar usarios...';
 
   @override
-  String get search => 'Search';
+  String get search => 'Buscar';
 
   @override
-  String get noResultsFound => 'No results found.';
+  String get noResultsFound => 'No se han encontrado resultados.';
 
   @override
-  String get confirmation => 'Confirmation';
+  String get confirmation => 'Confirmación';
 
   @override
-  String get cancel => 'Cancel';
+  String get cancel => 'Cancelar';
 
   @override
-  String get resetPassword => 'Reset Password';
+  String get resetPassword => 'Volver a poner contraseña';
 
   @override
-  String get sendResetLink => 'Send reset link';
+  String get sendResetLink => 'Mandar link para volver a poner contraseña';
 
   @override
   String get ok => 'Ok';
 
   @override
-  String get recentActivity => 'Recent Activity';
+  String get recentActivity => 'Actividad Reciente';
 
   @override
-  String get nothingToSeeHere => 'Nothing to see here!';
+  String get nothingToSeeHere => 'No hay nada que ver aquí!';
 
   @override
-  String get someone => 'Someone';
+  String get someone => 'Alguien';
 
   @override
-  String get commentText => 'commented on your post';
+  String get commentText => 'ha comentado en tu publicación';
 
   @override
   String get crossGroupRepost =>
-      'You may not eko chamber posts in public or in another group.';
+      'No puedes hacer publicaciónes de eko chamber en público o en otros groupos.';
 
   @override
-  String get groups => 'Groups';
+  String get groups => 'Grupos';
 
   @override
-  String get next => 'Next';
+  String get next => 'Luego';
 
   @override
-  String get description => 'Description(Optional)';
+  String get description => 'Descripción(Opcional)';
 
   @override
-  String get skip => 'Skip';
+  String get skip => 'Saltar';
 
   @override
-  String get done => 'Done';
+  String get done => 'Listo';
 
   @override
-  String get public => 'Public';
+  String get public => 'Público';
 
   @override
-  String get selectAudience => 'Select Audience:';
+  String get selectAudience => 'Seleccionar Grupo:';
 
   @override
-  String get myGroups => 'My groups';
+  String get myGroups => 'Mis grupos';
 
   @override
-  String get reply => 'Reply';
+  String get reply => 'Responder';
 
   @override
-  String get userNotFound => 'User Not Found';
+  String get userNotFound => 'Usuario no encontrado';
 
   @override
   String get usernameReqs =>
-      'Usernames must be between 3 and 24 characters. Usernames can only contain lowercase letters, numbers, and underscores.';
+      'Nombres de usario deben estar entre 3 y 24 caracteres. Nombres de usario solo pueden contener letras minúsculas, números y guiones bajos.';
 
   @override
-  String get followText => 'started following you';
+  String get followText => 'ha empezado a seguirte';
 
   @override
-  String get taggedText => 'tagged you:';
+  String get taggedText => 'te ha etiquetado:';
 
   @override
   String get badAuthState =>
-      'Request is invalid or has expired. Please try again.';
+      'Solicitud no es válida o ha caducado. Por favor inténtelo de nuevo.';
 
   @override
-  String get resetPasswordPromt => 'Reset password for:';
+  String get resetPasswordPromt => 'Cambiar la contraseña para:';
 
   @override
-  String get passwordResetTitle => 'Password Reset Successfully';
+  String get passwordResetTitle =>
+      'Restablecimiento de contraseña correctamente';
 
   @override
-  String get passwordResetBody => 'Please continue to login.';
+  String get passwordResetBody => 'Por favor continúe iniciando sesión.';
 
   @override
-  String get setPassword => 'Set Password';
+  String get setPassword => 'Establecer contraseña';
 
   @override
-  String get coppiedToClipboard => 'Copied to Clipboard';
+  String get coppiedToClipboard => 'Copiado al portapapeles';
 
   @override
-  String get download => 'Download';
+  String get download => 'Descargar';
 
   @override
-  String get getTheApp => 'Get the App';
+  String get getTheApp => 'Obtener la aplicación';
 
   @override
-  String get gifLoadingError => 'Failed to load';
+  String get gifLoadingError => 'No se pudo cargar';
 
   @override
-  String get viewLikes => 'See Up-Ekos';
+  String get viewLikes => 'Ver Up-Ekos';
 
   @override
-  String get viewDislikes => 'See Down-Ekos';
+  String get viewDislikes => 'Ver Down-Ekos';
 
   @override
-  String get updateRequiredTitle => 'Update Required';
+  String get updateRequiredTitle => 'Actualización necesaria';
 
   @override
   String get updateRequiredBody =>
-      'Please download the latest update to continue.';
+      'Descargue la actualización mas reciente para continuar.';
 
   @override
-  String get updateAvailable => 'Update Available';
+  String get updateAvailable => 'Actualización disponible';
 
   @override
-  String get update => 'Update';
+  String get update => 'Actualizar';
 
   @override
-  String get postNotFound => 'Post Not Found';
+  String get postNotFound => 'Publicación no encontrada';
 
   @override
-  String get groupNotFound => 'Group Not Found';
+  String get groupNotFound => 'Grupo no encontrado';
 
   @override
   String get leaveGroupWarningTitle =>
-      'Are you sure you want to leave the group?';
+      'Estas seguro de que quieres dejar el grupo?';
 
   @override
   String get leaveGroupWarningBody =>
-      'A group member will need to re-add you should you want to join again.';
+      'Un miembro del group tendrá que volver a añadirte si quieres unirte de nuevo.';
 
   @override
-  String get share => 'Share';
+  String get share => 'Compartir';
 
   @override
-  String get copyLink => 'Copy Link';
+  String get copyLink => 'Copiar vínculo';
 
   @override
-  String get copied => 'Copied';
+  String get copied => 'Copiado';
 
   @override
-  String get shareProfile => 'Share Profile';
+  String get shareProfile => 'Compartir Perfil';
 
   @override
   String get deleteAcountReAuthWarning =>
-      'Please enter your password to confirm you wish to delete your account. This Action cannot be undone. Upon clicking the button below, your account will be deleted.';
+      'Ingrese tu contraseña para confirmar que deseas eliminar tu cuenta. Esta acción no se puede deshacer. Al hacer clic en el botón de abajo, tu cuenta será eliminada.';
 
   @override
-  String get logIntoApp => 'Login required';
+  String get logIntoApp => 'Login requerido';
 
   @override
-  String get logInRequired => 'Please log in to access all features of Eko.';
+  String get logInRequired =>
+      'Inicie sesión para acceder a todas las funciones de eko.';
 
   @override
-  String get notInGroup => 'You are no longer a member of this group.';
+  String get notInGroup => 'Ya no eres miembro de este grupo.';
 
   @override
-  String get send => 'Send';
+  String get send => 'Mandar';
 
   @override
   String get reportDetails =>
-      'Please provide information on why you are reporting this post.';
+      'Por favor produzcas información sobre por qué está denunciando esta publicación.';
 
   @override
-  String get commentRequired => 'Comment Required';
+  String get commentRequired => 'Comentario requerido';
 
   @override
-  String get tooEarlyDeleteTitle => 'Please Wait';
+  String get tooEarlyDeleteTitle => 'Por favor espera';
 
   @override
   String get tooEarlyDeleteBody =>
-      'Posts/comments may only be deleted 48 hours after they are posted.';
+      'Publicaciones/comentarios solo se pueden eliminar 48 horas después de haber sido publicados.';
 
   @override
-  String get deletePostWarningTitle => 'Delete Post';
+  String get deletePostWarningTitle => 'Eliminar publicación';
 
   @override
-  String get deleteCommentWarningTitle => 'Delete Comment';
+  String get deleteCommentWarningTitle => 'Eliminar comentario';
 
   @override
   String get deletePostWarningBody =>
-      'Are you sure you wish to proceed? This action cannot be undone.';
+      'Estas seguro de que quieres continuar? Esta acción no se puede deshacer.';
 
   @override
   String get invalidSession =>
-      'This Eko account is being used on another device. Press below to continue on this device.';
+      'Esta cuenta de eko se está utilizando en otro dispositivo. Hacer clic debajo para continuar en este dispositivo.';
 
   @override
-  String get birthday => 'Birthday';
+  String get birthday => 'El cumpleaños';
 
   @override
-  String get month => 'Month';
+  String get month => 'Mes';
 
   @override
-  String get day => 'Day';
+  String get day => 'Día';
 
   @override
-  String get year => 'Year';
+  String get year => 'Año';
 
   @override
-  String get invalidBirthdayTitle => 'Invalid Birthday';
+  String get invalidBirthdayTitle => 'El cumpleaños no es válido';
 
   @override
-  String get invalidBirthdayBody => 'Please select a valid birthday.';
+  String get invalidBirthdayBody =>
+      'Por favor escoja una fecha de nacimiento válida.';
 
   @override
-  String get tooYoungTitle => 'You are too young';
+  String get tooYoungTitle => 'Eres demasiado joven';
 
   @override
-  String get tooYoungBody => 'You must be 13 years old to make an account';
+  String get tooYoungBody => 'Debes tener 13 años para crear una cuenta';
 
   @override
-  String get bySigningUp => 'By signing up, you agree to our ';
+  String get bySigningUp => 'Al inscribirse aceptas nuestros ';
 
   @override
-  String get termsAndConditions => 'Terms and Conditions';
+  String get termsAndConditions => 'Términos y Condiciones';
 
   @override
-  String get block => 'Block';
+  String get block => 'Bloquear';
 
   @override
-  String get unblock => 'Unblock';
+  String get unblock => 'Desbloquear';
 
   @override
-  String get blockTitle => 'Block User';
+  String get blockTitle => 'Bloquear usario';
 
   @override
   String get blockBody =>
-      'This will hide content the user posts and prevent them from viewing your profile.';
+      'Esto ocultará el contenido que publique el usuario y evitará que vea tu perfil.';
 
   @override
-  String get blockedAccounts => 'Blocked Accounts';
+  String get blockedAccounts => 'Cuentas bloqueadas';
 
   @override
-  String get newActivityNotifications => 'New Activity Notifications';
+  String get newActivityNotifications => 'Notificaciones de nueva actividad';
 
   @override
-  String get shareOnlineStatus => 'Share Online Status';
+  String get shareOnlineStatus => 'Compartir estado en línea';
 
   @override
   String get blockedByUserMessage =>
-      'You do not currently have permission to view this content.';
+      'Actualmente no tienes permiso para ver este contenido.';
 
   @override
   String get birthdayExplanation =>
-      'We use this to ensure you are old enough to use the app.';
+      'Usamos esto para asegurarnos de que tengas la edad suficiente para usar la aplicación.';
 
   @override
-  String get noImageSelected => 'No image selected';
+  String get noImageSelected => 'Ninguna imagen seleccionada';
 
   @override
-  String get changeImage => 'Change Image';
+  String get changeImage => 'Cambiar imagen';
 
   @override
-  String get pickImage => 'Pick Image';
+  String get pickImage => 'Escoger imagen';
 }
