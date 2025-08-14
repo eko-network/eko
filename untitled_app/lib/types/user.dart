@@ -17,12 +17,17 @@ abstract class UserModel with _$UserModel {
     @JsonKey(defaultValue: '') required String bio,
     @JsonKey(name: 'id') required String uid,
     @JsonKey(name: 'is_verified', defaultValue: false) required bool isVerified,
+    @JsonKey(name: 'is_following', defaultValue: false)
+    required bool isFollowing,
+    @JsonKey(name: 'is_follower', defaultValue: false) required bool isFollower,
     @JsonKey(name: 'share_online_status', defaultValue: true)
     required bool shareOnlineStatus,
   }) = _UserModel;
 
   factory UserModel.userNotFound() {
     return UserModel(
+      isFollower: false,
+      isFollowing: false,
       isVerified: false,
       username: '',
       name: '',

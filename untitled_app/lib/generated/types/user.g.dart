@@ -14,6 +14,8 @@ _UserModel _$UserModelFromJson(Map<String, dynamic> json) => _UserModel(
       bio: json['bio'] as String? ?? '',
       uid: json['id'] as String,
       isVerified: json['is_verified'] as bool? ?? false,
+      isFollowing: json['is_following'] as bool? ?? false,
+      isFollower: json['is_follower'] as bool? ?? false,
       shareOnlineStatus: json['share_online_status'] as bool? ?? true,
     );
 
@@ -25,5 +27,7 @@ Map<String, dynamic> _$UserModelToJson(_UserModel instance) =>
       'bio': instance.bio,
       'id': instance.uid,
       'is_verified': instance.isVerified,
+      'is_following': instance.isFollowing,
+      'is_follower': instance.isFollower,
       'share_online_status': instance.shareOnlineStatus,
     };

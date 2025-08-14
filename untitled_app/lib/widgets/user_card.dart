@@ -20,14 +20,7 @@ class FollowButton extends ConsumerWidget {
   const FollowButton({super.key, required this.user});
 
   Future<void> onFollowPressed(WidgetRef ref, UserModel user) async {
-    final isFollowing = false;
-    //FIXME
-        // ref.watch(currentUserProvider).user.following.contains(user.uid);
-    if (isFollowing) {
-      await ref.read(currentUserProvider.notifier).removeFollower(user.uid);
-    } else {
-      await ref.read(currentUserProvider.notifier).addFollower(user.uid);
-    }
+    await ref.read(UserProvider(user.uid).notifier).toggleFollow();
   }
 
   @override
@@ -45,17 +38,14 @@ class FollowButton extends ConsumerWidget {
         alignment: Alignment.center,
         decoration: BoxDecoration(
           borderRadius: const BorderRadius.all(Radius.circular(10)),
-          color:
-          //  currentUser.user.following.contains(user.uid)
-          //     ? Theme.of(context).colorScheme.outlineVariant
-          //     : 
-              Theme.of(context).colorScheme.primaryContainer,
+          color: user.isFollowing
+              ? Theme.of(context).colorScheme.outlineVariant
+              : Theme.of(context).colorScheme.primaryContainer,
         ),
         child: Text(
-          // currentUser.user.following.contains(user.uid)
-          //     ? AppLocalizations.of(context)!.following
-          //     : 
-              AppLocalizations.of(context)!.follow,
+          user.isFollowing
+              ? AppLocalizations.of(context)!.following
+              : AppLocalizations.of(context)!.follow,
           maxLines: 1,
           style: TextStyle(
             fontSize: 13,

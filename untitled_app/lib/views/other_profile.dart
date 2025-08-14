@@ -250,23 +250,12 @@ class _Header extends ConsumerWidget {
   const _Header({required this.user});
 
   Future<void> _onFollowPressed(WidgetRef ref) async {
-    final isFollowing = false;
-    // ref.watch(currentUserProvider).user.following.contains(user.uid);
-
-    if (isFollowing) {
-      await ref.read(currentUserProvider.notifier).removeFollower(user.uid);
-    } else {
-      await ref.read(currentUserProvider.notifier).addFollower(user.uid);
-    }
+    await ref.read(UserProvider(user.uid).notifier).toggleFollow();
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final width = c.widthGetter(context);
-    final currentUser = ref.watch(currentUserProvider);
-    //FIXME
-    final isFollowing = false; //currentUser.user.following.contains(user.uid);
-
     return Column(
       children: [
         ProfileHeader(
@@ -284,12 +273,12 @@ class _Header extends ConsumerWidget {
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
                     borderRadius: const BorderRadius.all(Radius.circular(10)),
-                    color: isFollowing
+                    color: user.isFollowing
                         ? Theme.of(context).colorScheme.surfaceContainer
                         : Theme.of(context).colorScheme.primaryContainer,
                   ),
                   child: Text(
-                    isFollowing
+                    user.isFollowing
                         ? AppLocalizations.of(context)!.following
                         : AppLocalizations.of(context)!.follow,
                     style: TextStyle(

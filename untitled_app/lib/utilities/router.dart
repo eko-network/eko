@@ -164,7 +164,7 @@ final goRouter = GoRouter(
                       path: 'likes',
                       name: 'likes',
                       builder: (context, state) {
-                        String postId = state.extra as String;
+                        final postId = state.extra as int;
                         return ViewLikesPage(
                           postId: postId,
                         );
@@ -174,7 +174,7 @@ final goRouter = GoRouter(
                       path: 'dislikes',
                       name: 'dislikes',
                       builder: (context, state) {
-                        String postId = state.extra as String;
+                        final postId = state.extra as int;
                         return ViewLikesPage(
                           postId: postId,
                           dislikes: true,

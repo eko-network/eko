@@ -6,31 +6,33 @@ import 'package:go_router/go_router.dart';
 import 'package:untitled_app/providers/pool_providers.dart';
 import 'package:untitled_app/types/user.dart';
 import 'package:untitled_app/utilities/constants.dart' as c;
+import 'package:untitled_app/utilities/supabase_ref.dart';
 import 'package:untitled_app/widgets/infinite_scrolly.dart';
 import 'package:untitled_app/widgets/shimmer_loaders.dart';
 import '../widgets/user_card.dart';
 
 class ViewLikesPage extends ConsumerWidget {
-  final String postId;
+  final int postId;
   final bool dislikes;
   const ViewLikesPage({super.key, required this.postId, this.dislikes = false});
 
   Future<(List<(String, Never?)>, bool)> getter(
       List<(String, Never?)> list, WidgetRef ref) async {
-    final baseQuery = FirebaseFirestore.instance
-        .collection('users')
-        .where('profileData.${dislikes ? 'dislikedPosts' : 'likedPosts'}',
-            arrayContains: postId)
-        .limit(c.usersOnSearch);
-    final query = list.isEmpty ? baseQuery : baseQuery.startAfter([list.last]);
-    final snapshot = await query.get();
-
-    final userList = snapshot.docs.map((doc) => UserModel.fromJson(doc.data()));
-    ref.read(userPoolProvider).putAll(userList);
-    return ((
-      userList.map((item) => (item.uid, null)).toList(),
-      userList.length < c.usersOnSearch
-    ));
+    final last = list.isNotEmpty ? list.last : null;
+    final List<dynamic> response =
+        await supabase.rpc('paginated_post_likes', params: {
+      'p_limit': c.usersOnSearch,
+      'p_id': postId,
+      'p_last_uid': last?.$1,
+      'p_dislikes': dislikes,
+    });
+    final List<(String, Never?)> retList = [];
+    for (final map in response) {
+      final user = UserModel.fromJson(map);
+      ref.read(userPoolProvider).put(user);
+      retList.add((user.uid, null));
+    }
+    return (retList, retList.length < c.usersOnSearch);
   }
 
   @override

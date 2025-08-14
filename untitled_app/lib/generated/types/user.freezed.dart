@@ -28,6 +28,10 @@ mixin _$UserModel {
   String get uid;
   @JsonKey(name: 'is_verified', defaultValue: false)
   bool get isVerified;
+  @JsonKey(name: 'is_following', defaultValue: false)
+  bool get isFollowing;
+  @JsonKey(name: 'is_follower', defaultValue: false)
+  bool get isFollower;
   @JsonKey(name: 'share_online_status', defaultValue: true)
   bool get shareOnlineStatus;
 
@@ -55,6 +59,10 @@ mixin _$UserModel {
             (identical(other.uid, uid) || other.uid == uid) &&
             (identical(other.isVerified, isVerified) ||
                 other.isVerified == isVerified) &&
+            (identical(other.isFollowing, isFollowing) ||
+                other.isFollowing == isFollowing) &&
+            (identical(other.isFollower, isFollower) ||
+                other.isFollower == isFollower) &&
             (identical(other.shareOnlineStatus, shareOnlineStatus) ||
                 other.shareOnlineStatus == shareOnlineStatus));
   }
@@ -62,11 +70,11 @@ mixin _$UserModel {
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, name, username, profilePicture,
-      bio, uid, isVerified, shareOnlineStatus);
+      bio, uid, isVerified, isFollowing, isFollower, shareOnlineStatus);
 
   @override
   String toString() {
-    return 'UserModel(name: $name, username: $username, profilePicture: $profilePicture, bio: $bio, uid: $uid, isVerified: $isVerified, shareOnlineStatus: $shareOnlineStatus)';
+    return 'UserModel(name: $name, username: $username, profilePicture: $profilePicture, bio: $bio, uid: $uid, isVerified: $isVerified, isFollowing: $isFollowing, isFollower: $isFollower, shareOnlineStatus: $shareOnlineStatus)';
   }
 }
 
@@ -86,6 +94,8 @@ abstract mixin class $UserModelCopyWith<$Res> {
       @JsonKey(defaultValue: '') String bio,
       @JsonKey(name: 'id') String uid,
       @JsonKey(name: 'is_verified', defaultValue: false) bool isVerified,
+      @JsonKey(name: 'is_following', defaultValue: false) bool isFollowing,
+      @JsonKey(name: 'is_follower', defaultValue: false) bool isFollower,
       @JsonKey(name: 'share_online_status', defaultValue: true)
       bool shareOnlineStatus});
 }
@@ -108,6 +118,8 @@ class _$UserModelCopyWithImpl<$Res> implements $UserModelCopyWith<$Res> {
     Object? bio = null,
     Object? uid = null,
     Object? isVerified = null,
+    Object? isFollowing = null,
+    Object? isFollower = null,
     Object? shareOnlineStatus = null,
   }) {
     return _then(_self.copyWith(
@@ -135,6 +147,14 @@ class _$UserModelCopyWithImpl<$Res> implements $UserModelCopyWith<$Res> {
           ? _self.isVerified
           : isVerified // ignore: cast_nullable_to_non_nullable
               as bool,
+      isFollowing: null == isFollowing
+          ? _self.isFollowing
+          : isFollowing // ignore: cast_nullable_to_non_nullable
+              as bool,
+      isFollower: null == isFollower
+          ? _self.isFollower
+          : isFollower // ignore: cast_nullable_to_non_nullable
+              as bool,
       shareOnlineStatus: null == shareOnlineStatus
           ? _self.shareOnlineStatus
           : shareOnlineStatus // ignore: cast_nullable_to_non_nullable
@@ -159,6 +179,10 @@ class _UserModel implements UserModel {
       @JsonKey(name: 'id') required this.uid,
       @JsonKey(name: 'is_verified', defaultValue: false)
       required this.isVerified,
+      @JsonKey(name: 'is_following', defaultValue: false)
+      required this.isFollowing,
+      @JsonKey(name: 'is_follower', defaultValue: false)
+      required this.isFollower,
       @JsonKey(name: 'share_online_status', defaultValue: true)
       required this.shareOnlineStatus});
   factory _UserModel.fromJson(Map<String, dynamic> json) =>
@@ -184,6 +208,12 @@ class _UserModel implements UserModel {
   @override
   @JsonKey(name: 'is_verified', defaultValue: false)
   final bool isVerified;
+  @override
+  @JsonKey(name: 'is_following', defaultValue: false)
+  final bool isFollowing;
+  @override
+  @JsonKey(name: 'is_follower', defaultValue: false)
+  final bool isFollower;
   @override
   @JsonKey(name: 'share_online_status', defaultValue: true)
   final bool shareOnlineStatus;
@@ -217,6 +247,10 @@ class _UserModel implements UserModel {
             (identical(other.uid, uid) || other.uid == uid) &&
             (identical(other.isVerified, isVerified) ||
                 other.isVerified == isVerified) &&
+            (identical(other.isFollowing, isFollowing) ||
+                other.isFollowing == isFollowing) &&
+            (identical(other.isFollower, isFollower) ||
+                other.isFollower == isFollower) &&
             (identical(other.shareOnlineStatus, shareOnlineStatus) ||
                 other.shareOnlineStatus == shareOnlineStatus));
   }
@@ -224,11 +258,11 @@ class _UserModel implements UserModel {
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, name, username, profilePicture,
-      bio, uid, isVerified, shareOnlineStatus);
+      bio, uid, isVerified, isFollowing, isFollower, shareOnlineStatus);
 
   @override
   String toString() {
-    return 'UserModel(name: $name, username: $username, profilePicture: $profilePicture, bio: $bio, uid: $uid, isVerified: $isVerified, shareOnlineStatus: $shareOnlineStatus)';
+    return 'UserModel(name: $name, username: $username, profilePicture: $profilePicture, bio: $bio, uid: $uid, isVerified: $isVerified, isFollowing: $isFollowing, isFollower: $isFollower, shareOnlineStatus: $shareOnlineStatus)';
   }
 }
 
@@ -251,6 +285,8 @@ abstract mixin class _$UserModelCopyWith<$Res>
       @JsonKey(defaultValue: '') String bio,
       @JsonKey(name: 'id') String uid,
       @JsonKey(name: 'is_verified', defaultValue: false) bool isVerified,
+      @JsonKey(name: 'is_following', defaultValue: false) bool isFollowing,
+      @JsonKey(name: 'is_follower', defaultValue: false) bool isFollower,
       @JsonKey(name: 'share_online_status', defaultValue: true)
       bool shareOnlineStatus});
 }
@@ -273,6 +309,8 @@ class __$UserModelCopyWithImpl<$Res> implements _$UserModelCopyWith<$Res> {
     Object? bio = null,
     Object? uid = null,
     Object? isVerified = null,
+    Object? isFollowing = null,
+    Object? isFollower = null,
     Object? shareOnlineStatus = null,
   }) {
     return _then(_UserModel(
@@ -299,6 +337,14 @@ class __$UserModelCopyWithImpl<$Res> implements _$UserModelCopyWith<$Res> {
       isVerified: null == isVerified
           ? _self.isVerified
           : isVerified // ignore: cast_nullable_to_non_nullable
+              as bool,
+      isFollowing: null == isFollowing
+          ? _self.isFollowing
+          : isFollowing // ignore: cast_nullable_to_non_nullable
+              as bool,
+      isFollower: null == isFollower
+          ? _self.isFollower
+          : isFollower // ignore: cast_nullable_to_non_nullable
               as bool,
       shareOnlineStatus: null == shareOnlineStatus
           ? _self.shareOnlineStatus
