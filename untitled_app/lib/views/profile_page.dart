@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
+import '../custom_widgets/streak_widget.dart';
 import 'package:untitled_app/providers/nav_bar_provider.dart';
 import 'package:untitled_app/types/current_user.dart';
 import 'package:untitled_app/widgets/divider.dart';
@@ -46,6 +47,9 @@ class _Header extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final width = c.widthGetter(context);
+    final isVerified = currentUser.user.isVerified;
+    final username = currentUser.user.username;
+
     return Column(
       children: [
         Column(
@@ -54,15 +58,18 @@ class _Header extends ConsumerWidget {
               padding: const EdgeInsets.only(left: 15, right: 15, top: 5),
               child: Row(
                 children: [
-                  Text(
-                    '@${currentUser.user.username}',
-                    style: TextStyle(
+                  Expanded(
+                    child: Text(
+                      '@$username',
+                      style: TextStyle(
                         color: Theme.of(context).colorScheme.onSurface,
                         fontWeight: FontWeight.bold,
-                        fontSize: 22),
-                    overflow: TextOverflow.ellipsis,
+                        fontSize: 22,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
-                  if (currentUser.user.isVerified)
+                  if (isVerified)
                     Padding(
                       padding: const EdgeInsets.only(left: 6),
                       child: Icon(
@@ -76,7 +83,8 @@ class _Header extends ConsumerWidget {
                     onTap: () {
                       ref.read(navBarProvider.notifier).disable();
                       context.push('/profile/user_settings').then(
-                          (_) => ref.read(navBarProvider.notifier).enable());
+                        (_) => ref.read(navBarProvider.notifier).enable(),
+                      );
                     },
                     child: Icon(
                       Icons.settings_outlined,
@@ -98,13 +106,13 @@ class _Header extends ConsumerWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              //the username chager doesn't work on web i think could be firebase outage
               if (!kIsWeb)
                 InkWell(
                   onTap: () {
                     ref.read(navBarProvider.notifier).disable();
                     context.push('/profile/edit_profile').then(
-                        (_) => ref.read(navBarProvider.notifier).enable());
+                      (_) => ref.read(navBarProvider.notifier).enable(),
+                    );
                   },
                   child: Container(
                     width: width * 0.45,
@@ -127,9 +135,9 @@ class _Header extends ConsumerWidget {
               InkWell(
                 onTap: () {
                   ref.read(navBarProvider.notifier).disable();
-                  context
-                      .push('/profile/share_profile')
-                      .then((_) => ref.read(navBarProvider.notifier).enable());
+                  context.push('/profile/share_profile').then(
+                    (_) => ref.read(navBarProvider.notifier).enable(),
+                  );
                 },
                 child: Container(
                   width: width * 0.45,
