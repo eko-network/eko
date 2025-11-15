@@ -6,7 +6,7 @@
 	<string>development</string>
 	<key>com.apple.developer.associated-domains</key>
 	<array>
-		<string>applinks:www.eko-app.com</string>
+		<string>applinks:app.eko-app.com</string>
 	</array>
 </dict>
 </plist>
