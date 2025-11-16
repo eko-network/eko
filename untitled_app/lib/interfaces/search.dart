@@ -13,10 +13,10 @@ class SearchInterface {
       {required int page}) async {
     final response = await http.post(
       Uri.parse(
-          'https://${dotenv.env["ALGOLIA_APP_ID"]!}-dsn.algolia.net/1/indexes/users/query'),
+          'https://${const String.fromEnvironment("ALGOLIA_APP_ID")}-dsn.algolia.net/1/indexes/users/query'),
       headers: <String, String>{
-        'X-Algolia-API-Key': dotenv.env['SEARCH_API_KEY']!,
-        'X-Algolia-Application-Id': dotenv.env['ALGOLIA_APP_ID']!,
+        'X-Algolia-API-Key': const String.fromEnvironment('SEARCH_API_KEY'),
+        'X-Algolia-Application-Id': const String.fromEnvironment('ALGOLIA_APP_ID'),
       },
       body: jsonEncode(<String, String>{
         'params': 'query=$query&hitsPerPage=${c.usersOnSearch}&page=$page',

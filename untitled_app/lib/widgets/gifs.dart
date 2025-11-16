@@ -65,7 +65,7 @@ class _GifSearchSectionState extends State<GifSearchSection> {
 
     final uri = Uri.https('tenor.googleapis.com', '/v2/autocomplete', {
       'q': query,
-      'key': dotenv.env['TENOR_API_KEY'],
+      'key': const String.fromEnvironment('TENOR_API_KEY'),
     });
 
     try {
@@ -95,7 +95,7 @@ class _GifSearchSectionState extends State<GifSearchSection> {
 
     final path = query.isEmpty ? '/v2/featured' : '/v2/search';
     final params = {
-      'key': dotenv.env['TENOR_API_KEY'],
+      'key': const String.fromEnvironment('TENOR_API_KEY'),
       'limit': '20',
       if (query.isNotEmpty) 'q': query,
       if (_nextPos.isNotEmpty) 'pos': _nextPos,
