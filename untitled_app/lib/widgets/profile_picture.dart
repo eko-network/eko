@@ -37,28 +37,14 @@ class ProfilePicture extends ConsumerWidget {
                 ClipOval(
                   child: asyncUser.when(
                     data: (user) {
-                      return kIsWeb
-                          ? Image.network(
-                              user.profilePicture,
-                              fit: BoxFit.fill,
-                              loadingBuilder:
-                                  (context, child, loadingProgress) {
-                                if (loadingProgress == null) {
-                                  return child;
-                                }
-                                return const LoadingProfileImage();
-                              },
-                              errorBuilder: (context, _, __) =>
-                                  Image.asset('images/default.jpg'),
-                            )
-                          : CachedNetworkImage(
-                              fit: BoxFit.fill,
-                              imageUrl: user.profilePicture,
-                              placeholder: (context, url) =>
-                                  const LoadingProfileImage(),
-                              errorWidget: (context, url, error) =>
-                                  const LoadingProfileImage(),
-                            );
+                      return CachedNetworkImage(
+                        fit: BoxFit.fill,
+                        imageUrl: user.profilePicture,
+                        placeholder: (context, url) =>
+                            const LoadingProfileImage(),
+                        errorWidget: (context, url, error) =>
+                            Image.asset('images/default.jpg'),
+                      );
                     },
                     error: (_, __) {
                       return const Text('Error');
