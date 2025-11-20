@@ -248,7 +248,7 @@
     "bySigningUp":"Al inscribirse aceptas nuestros ",
     "termsAndConditions":"Términos y Condiciones",
 
-
+    "verificationExp": "Añade el enlace de tu perfil de Eko a otra plataforma que tenga soporte para RelMeAuth. Puede tardar hasta 24 horas en verificarse. Los sitios potenciales incluyen Threads, Mastadon y GitHub. Incluye aquí la URL completa del otro sitio. Ejemplo: www.threads.com/@user",
     "block":"Bloquear",
     "unblock":"Desbloquear",
 
@@ -265,5 +265,7 @@
     "birthdayExplanation":"Usamos esto para asegurarnos de que tengas la edad suficiente para usar la aplicación.",
     "noImageSelected":"Ninguna imagen seleccionada",
     "changeImage":"Cambiar imagen",
-    "pickImage":"Escoger imagen"
+    "pickImage":"Escoger imagen",
+    "verification":"Verificación",
+    "verificationUrl":"Verification Url"
 }

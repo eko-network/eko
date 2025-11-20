@@ -15,6 +15,7 @@ abstract class UserModel with _$UserModel {
     required List<String> following,
     required String uid,
     required bool isVerified,
+    String? verificationUrl,
     @JsonKey(name: 'share_online_status') required bool shareOnlineStatus,
   }) = _UserModel;
 
@@ -50,6 +51,7 @@ abstract class UserModel with _$UserModel {
       uid: json['uid'] ?? '',
       isVerified: json['isVerified'] ?? false,
       shareOnlineStatus: json['share_online_status'] ?? true,
+      verificationUrl: json['verificationUrl'],
     );
   }
 }

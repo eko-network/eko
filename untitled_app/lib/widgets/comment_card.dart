@@ -214,9 +214,14 @@ class _Card extends ConsumerWidget {
   avatarPressed(
       BuildContext context, WidgetRef ref, CommentModel comment) async {
     if (comment.uid == ref.watch(currentUserProvider).user.uid) {
-      await context.push('/feed/sub_profile/${comment.uid}');
-    } else {
       context.go('/profile');
+    } else {
+      final user = ref.read(userProvider(comment.uid)).value;
+      if (user != null) {
+        await context.push('/users/${user.username}?uid=${user.uid}');
+      } else {
+        await context.push('/users/_?uid=${comment.uid}');
+      }
     }
   }
 
@@ -240,7 +245,7 @@ class _Card extends ConsumerWidget {
                 ProfilePicture(
                   onPressed: () {
                     if (comment.uid != ref.read(currentUserProvider).user.uid) {
-                      context.push('/feed/sub_profile/${comment.uid}');
+                      context.push('/users/${comment.uid}');
                     } else {
                       context.go('/profile');
                     }
@@ -260,8 +265,7 @@ class _Card extends ConsumerWidget {
                             onPressed: () {
                               if (comment.uid !=
                                   ref.read(currentUserProvider).user.uid) {
-                                context
-                                    .push('/feed/sub_profile/${comment.uid}');
+                                context.push('/users/${comment.uid}');
                               } else {
                                 context.go('/profile');
                               }

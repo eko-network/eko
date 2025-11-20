@@ -23,6 +23,7 @@ mixin _$UserModel {
   List<String> get following;
   String get uid;
   bool get isVerified;
+  String? get verificationUrl;
   @JsonKey(name: 'share_online_status')
   bool get shareOnlineStatus;
 
@@ -49,6 +50,8 @@ mixin _$UserModel {
             (identical(other.uid, uid) || other.uid == uid) &&
             (identical(other.isVerified, isVerified) ||
                 other.isVerified == isVerified) &&
+            (identical(other.verificationUrl, verificationUrl) ||
+                other.verificationUrl == verificationUrl) &&
             (identical(other.shareOnlineStatus, shareOnlineStatus) ||
                 other.shareOnlineStatus == shareOnlineStatus));
   }
@@ -64,11 +67,12 @@ mixin _$UserModel {
       const DeepCollectionEquality().hash(following),
       uid,
       isVerified,
+      verificationUrl,
       shareOnlineStatus);
 
   @override
   String toString() {
-    return 'UserModel(name: $name, username: $username, profilePicture: $profilePicture, bio: $bio, followers: $followers, following: $following, uid: $uid, isVerified: $isVerified, shareOnlineStatus: $shareOnlineStatus)';
+    return 'UserModel(name: $name, username: $username, profilePicture: $profilePicture, bio: $bio, followers: $followers, following: $following, uid: $uid, isVerified: $isVerified, verificationUrl: $verificationUrl, shareOnlineStatus: $shareOnlineStatus)';
   }
 }
 
@@ -86,6 +90,7 @@ abstract mixin class $UserModelCopyWith<$Res> {
       List<String> following,
       String uid,
       bool isVerified,
+      String? verificationUrl,
       @JsonKey(name: 'share_online_status') bool shareOnlineStatus});
 }
 
@@ -109,6 +114,7 @@ class _$UserModelCopyWithImpl<$Res> implements $UserModelCopyWith<$Res> {
     Object? following = null,
     Object? uid = null,
     Object? isVerified = null,
+    Object? verificationUrl = freezed,
     Object? shareOnlineStatus = null,
   }) {
     return _then(_self.copyWith(
@@ -144,6 +150,10 @@ class _$UserModelCopyWithImpl<$Res> implements $UserModelCopyWith<$Res> {
           ? _self.isVerified
           : isVerified // ignore: cast_nullable_to_non_nullable
               as bool,
+      verificationUrl: freezed == verificationUrl
+          ? _self.verificationUrl
+          : verificationUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
       shareOnlineStatus: null == shareOnlineStatus
           ? _self.shareOnlineStatus
           : shareOnlineStatus // ignore: cast_nullable_to_non_nullable
@@ -165,6 +175,7 @@ class _UserModel implements UserModel {
       required final List<String> following,
       required this.uid,
       required this.isVerified,
+      this.verificationUrl,
       @JsonKey(name: 'share_online_status') required this.shareOnlineStatus})
       : _followers = followers,
         _following = following;
@@ -198,6 +209,8 @@ class _UserModel implements UserModel {
   @override
   final bool isVerified;
   @override
+  final String? verificationUrl;
+  @override
   @JsonKey(name: 'share_online_status')
   final bool shareOnlineStatus;
 
@@ -227,6 +240,8 @@ class _UserModel implements UserModel {
             (identical(other.uid, uid) || other.uid == uid) &&
             (identical(other.isVerified, isVerified) ||
                 other.isVerified == isVerified) &&
+            (identical(other.verificationUrl, verificationUrl) ||
+                other.verificationUrl == verificationUrl) &&
             (identical(other.shareOnlineStatus, shareOnlineStatus) ||
                 other.shareOnlineStatus == shareOnlineStatus));
   }
@@ -242,11 +257,12 @@ class _UserModel implements UserModel {
       const DeepCollectionEquality().hash(_following),
       uid,
       isVerified,
+      verificationUrl,
       shareOnlineStatus);
 
   @override
   String toString() {
-    return 'UserModel(name: $name, username: $username, profilePicture: $profilePicture, bio: $bio, followers: $followers, following: $following, uid: $uid, isVerified: $isVerified, shareOnlineStatus: $shareOnlineStatus)';
+    return 'UserModel(name: $name, username: $username, profilePicture: $profilePicture, bio: $bio, followers: $followers, following: $following, uid: $uid, isVerified: $isVerified, verificationUrl: $verificationUrl, shareOnlineStatus: $shareOnlineStatus)';
   }
 }
 
@@ -267,6 +283,7 @@ abstract mixin class _$UserModelCopyWith<$Res>
       List<String> following,
       String uid,
       bool isVerified,
+      String? verificationUrl,
       @JsonKey(name: 'share_online_status') bool shareOnlineStatus});
 }
 
@@ -290,6 +307,7 @@ class __$UserModelCopyWithImpl<$Res> implements _$UserModelCopyWith<$Res> {
     Object? following = null,
     Object? uid = null,
     Object? isVerified = null,
+    Object? verificationUrl = freezed,
     Object? shareOnlineStatus = null,
   }) {
     return _then(_UserModel(
@@ -325,6 +343,10 @@ class __$UserModelCopyWithImpl<$Res> implements _$UserModelCopyWith<$Res> {
           ? _self.isVerified
           : isVerified // ignore: cast_nullable_to_non_nullable
               as bool,
+      verificationUrl: freezed == verificationUrl
+          ? _self.verificationUrl
+          : verificationUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
       shareOnlineStatus: null == shareOnlineStatus
           ? _self.shareOnlineStatus
           : shareOnlineStatus // ignore: cast_nullable_to_non_nullable

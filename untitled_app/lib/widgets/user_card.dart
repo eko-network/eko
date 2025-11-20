@@ -7,6 +7,7 @@ import 'package:untitled_app/providers/user_provider.dart';
 import 'package:untitled_app/types/user.dart';
 import 'package:untitled_app/widgets/profile_picture.dart';
 import 'package:untitled_app/widgets/shimmer_loaders.dart';
+import 'package:untitled_app/widgets/verification_badge.dart';
 import '../utilities/constants.dart' as c;
 
 Widget userCardBuilder(String uid) {
@@ -100,7 +101,7 @@ class UserCard extends ConsumerWidget {
             if (onCardPressed != null) {
               onCardPressed!(user);
             } else {
-              context.push('/feed/sub_profile/${user.uid}');
+              context.push('/users/${user.username}?uid=${user.uid}');
             }
           },
           child: Padding(
@@ -132,16 +133,9 @@ class UserCard extends ConsumerWidget {
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                   if (user.isVerified)
-                                    Padding(
-                                      padding: const EdgeInsets.only(left: 6),
-                                      child: Icon(
-                                        Icons.verified_rounded,
-                                        size: c.verifiedIconSize,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .surfaceTint,
-                                      ),
-                                    ),
+                                    VerificationBadge(
+                                      uid: uid,
+                                    )
                                 ],
                               ),
                             Text('@${user.username}',

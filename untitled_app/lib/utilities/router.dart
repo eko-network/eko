@@ -111,6 +111,29 @@ final goRouter = GoRouter(
             },
           ),
         ]),
+    GoRoute(
+      path: '/users',
+      redirect: (context, state) {
+        if (state.pathParameters['username'] == null) {
+          return '/feed';
+        }
+        return null;
+      },
+      routes: [
+        GoRoute(
+          path: ':username',
+          name: 'user_profile',
+          builder: (context, state) {
+            final username = state.pathParameters['username']!;
+            final uid = state.uri.queryParameters['uid'];
+            return OtherProfile(
+              username: username,
+              uid: uid,
+            );
+          },
+        ),
+      ],
+    ),
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) {
         return PopScope(
@@ -140,12 +163,6 @@ final goRouter = GoRouter(
                 );
               },
               routes: [
-                GoRoute(
-                  path: 'sub_profile/:id',
-                  name: 'sub_profile',
-                  builder: (context, state) =>
-                      OtherProfile(uid: state.pathParameters['id']!),
-                ),
                 GoRoute(
                   path: 'recent',
                   name: 'recent',

@@ -59,7 +59,7 @@ class NotificationHelper {
           });
           break;
         case 'follow':
-          context.push('/feed/sub_profile/$path');
+          context.push('/users/_?uid=$path');
           break;
       }
     }

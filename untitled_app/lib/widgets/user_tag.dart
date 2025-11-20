@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:untitled_app/providers/user_provider.dart';
-import 'package:untitled_app/utilities/constants.dart' as c;
+import 'package:untitled_app/types/user.dart';
+import 'package:untitled_app/widgets/verification_badge.dart';
 
 class UserTag extends ConsumerWidget {
   final void Function()? onPressed;
+  final void Function(UserModel)? onPressedWithUser;
   final TextStyle? style;
   final String uid;
-  const UserTag({required this.uid, this.style, this.onPressed, super.key});
+  const UserTag(
+      {required this.uid,
+      this.style,
+      this.onPressed,
+      this.onPressedWithUser,
+      super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -16,7 +23,10 @@ class UserTag extends ConsumerWidget {
     return asyncUser.when(
       data: (user) {
         return InkWell(
-          onTap: onPressed,
+          onTap: onPressed ??
+              (onPressedWithUser != null
+                  ? () => onPressedWithUser!(user)
+                  : null),
           child: Row(
             children: [
               Text(
@@ -29,14 +39,9 @@ class UserTag extends ConsumerWidget {
                 overflow: TextOverflow.ellipsis,
               ),
               if (user.isVerified)
-                Padding(
-                  padding: const EdgeInsets.only(left: 6),
-                  child: Icon(
-                    Icons.verified_rounded,
-                    size: c.verifiedIconSize,
-                    color: Theme.of(context).colorScheme.surfaceTint,
-                  ),
-                ),
+                VerificationBadge(
+                  uid: user.uid,
+                )
             ],
           ),
         );

@@ -477,6 +477,13 @@ class AppLocalizationsEs extends AppLocalizations {
   String get shareProfile => 'Compartir Perfil';
 
   @override
+  String get verificationExp =>
+      'Añade el enlace de tu perfil de Eko a otra plataforma que tenga soporte para RelMeAuth. Puede tardar hasta 24 horas en verificarse. Los sitios potenciales incluyen Threads, Mastadon y GitHub. Incluye aquí la URL completa del otro sitio. Ejemplo: www.threads.com/@user';
+
+  @override
+  String get copyProfileLink => 'Copy Profile Link';
+
+  @override
   String get deleteAcountReAuthWarning =>
       'Ingrese tu contraseña para confirmar que deseas eliminar tu cuenta. Esta acción no se puede deshacer. Al hacer clic en el botón de abajo, tu cuenta será eliminada.';
 
@@ -590,4 +597,10 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get pickImage => 'Escoger imagen';
+
+  @override
+  String get verification => 'Verificación';
+
+  @override
+  String get verificationUrl => 'Verification Url';
 }

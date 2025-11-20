@@ -992,6 +992,18 @@ abstract class AppLocalizations {
   /// **'Share Profile'**
   String get shareProfile;
 
+  /// No description provided for @verificationExp.
+  ///
+  /// In en, this message translates to:
+  /// **'Add your Eko profile link to another platform that has RelMeAuth support. It may take up to 24 hours to get verified. Potential sites include Threads, Mastadon, and GitHub. Include the full url of the other site here. Example: www.threads.com/@user'**
+  String get verificationExp;
+
+  /// No description provided for @copyProfileLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy Profile Link'**
+  String get copyProfileLink;
+
   /// No description provided for @deleteAcountReAuthWarning.
   ///
   /// In en, this message translates to:
@@ -1201,6 +1213,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Pick Image'**
   String get pickImage;
+
+  /// No description provided for @verification.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification'**
+  String get verification;
+
+  /// No description provided for @verificationUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification Url'**
+  String get verificationUrl;
 }
 
 class _AppLocalizationsDelegate

@@ -2,7 +2,6 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:untitled_app/interfaces/user.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
 
 Future<void> defaultTagPressed(
@@ -10,9 +9,7 @@ Future<void> defaultTagPressed(
   if (ref.watch(currentUserProvider).user.username == username) {
     context.go('/profile');
   } else {
-    String? uid = await getUidFromUsername(username);
-    if (!context.mounted) return;
-    context.push('/feed/sub_profile/$uid');
+    context.push('/users/$username');
   }
 }
 
@@ -41,8 +38,7 @@ class _TextWithTagsState extends ConsumerState<TextWithTags> {
         style: widget.baseTextStyle ??
             TextStyle(
               color: Theme.of(context).colorScheme.onSurface,
-              fontFamily:
-                  DefaultTextStyle.of(context).style.fontFamily,
+              fontFamily: DefaultTextStyle.of(context).style.fontFamily,
             ),
         children: widget.text.map((chunk) {
           if (chunk.startsWith('@')) {

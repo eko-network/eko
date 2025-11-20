@@ -32,7 +32,7 @@ class ActivityCardWidget extends ConsumerWidget {
               if (activity.type == 'comment' || activity.type == 'tag') {
                 context.push('/feed/post/${activity.path}');
               } else if (activity.type == 'follow') {
-                context.push('/feed/sub_profile/${activity.path}');
+                context.push('/users/${activity.path}');
               }
             },
             child: Padding(

@@ -31,7 +31,8 @@ class CurrentUser extends _$CurrentUser {
       {String? name,
       String? bio,
       String? username,
-      File? profilePicture}) async {
+      File? profilePicture,
+      String? verificationUrl}) async {
     final prev = state.user;
     state = state.copyWith(
         user:
@@ -56,6 +57,10 @@ class CurrentUser extends _$CurrentUser {
       final Map<String, dynamic> json = {};
       if (name != null) {
         json['name'] = name;
+      }
+      if (verificationUrl != null) {
+        json['verificationUrl'] = verificationUrl;
+        json['isVerified'] = null;
       }
       if (bio != null) {
         json['profileData.bio'] = bio;

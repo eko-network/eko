@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart'; // Added for Clipboard
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_cropper/image_cropper.dart';
@@ -27,10 +28,23 @@ class _EditProfileState extends ConsumerState<EditProfile> {
   late final TextEditingController nameController;
   late final TextEditingController bioController;
   late final TextEditingController usernameController;
+  late final TextEditingController verificationUrlController;
   final usernameFocus = FocusNode();
   File? newProfileImage;
   bool isLoading = false;
-  bool usernameValid = false;
+  bool linkCopied = false; // New state variable
+
+  void _copyProfileLink(String url) {
+    Clipboard.setData(ClipboardData(text: url));
+    setState(() {
+      linkCopied = true;
+    });
+    Timer(const Duration(seconds: 2), () {
+      setState(() {
+        linkCopied = false;
+      });
+    });
+  }
 
   @override
   void initState() {
@@ -38,6 +52,8 @@ class _EditProfileState extends ConsumerState<EditProfile> {
     nameController = TextEditingController(text: user.name);
     bioController = TextEditingController(text: user.bio);
     usernameController = TextEditingController(text: user.username);
+    verificationUrlController =
+        TextEditingController(text: user.verificationUrl);
     super.initState();
   }
 
@@ -46,15 +62,16 @@ class _EditProfileState extends ConsumerState<EditProfile> {
     nameController.dispose();
     bioController.dispose();
     usernameController.dispose();
+    verificationUrlController.dispose();
     usernameFocus.dispose();
     super.dispose();
   }
 
-  Future<bool> _validateUsername(String s) async {
-    if (!isUsernameValid(s)) return false;
-    // really shouldn't be null. if it is just let the next check deal with it
-    return usernameValid;
-  }
+  // Future<bool> _validateUsername(String s) async {
+  //   if (!isUsernameValid(s)) return false;
+  //   // really shouldn't be null. if it is just let the next check deal with it
+  //   return usernameValid;
+  // }
 
   void _savePressed(UserModel user) async {
     if (isLoading) return;
@@ -62,9 +79,23 @@ class _EditProfileState extends ConsumerState<EditProfile> {
     final usernameTrimmed = usernameController.text.trim();
     final username = usernameTrimmed != user.username ? usernameTrimmed : null;
     if (username != null) {
-      if (!await _validateUsername(username)) {
+      if (!isUsernameValid(username)) {
         usernameFocus.requestFocus();
         isLoading = false;
+        if (mounted) {
+          showMyDialog(AppLocalizations.of(context)!.usernameReqs, '',
+              [AppLocalizations.of(context)!.close], [context.pop], context);
+        }
+
+        return;
+      }
+      if (!await isUsernameAvailable(username)) {
+        usernameFocus.requestFocus();
+        isLoading = false;
+        if (mounted) {
+          showMyDialog(AppLocalizations.of(context)!.usernameInUse, '',
+              [AppLocalizations.of(context)!.close], [context.pop], context);
+        }
         return;
       }
     }
@@ -74,7 +105,8 @@ class _EditProfileState extends ConsumerState<EditProfile> {
         name: name,
         bio: bio,
         profilePicture: newProfileImage,
-        username: username);
+        username: username,
+        verificationUrl: verificationUrlController.text.trim());
     isLoading = false;
     if (mounted) context.pop();
   }
@@ -135,7 +167,13 @@ class _EditProfileState extends ConsumerState<EditProfile> {
     final nameChanged = nameController.text != user.name;
     final profilePicChanged = newProfileImage != null;
     final usernameChanged = usernameController.text.trim() != user.username;
-    return bioChanged || nameChanged || profilePicChanged || usernameChanged;
+    final instagramChanged =
+        verificationUrlController.text.trim() != user.verificationUrl;
+    return bioChanged ||
+        nameChanged ||
+        profilePicChanged ||
+        usernameChanged ||
+        instagramChanged;
   }
 
   @override
@@ -177,8 +215,12 @@ class _EditProfileState extends ConsumerState<EditProfile> {
             scrolledUnderElevation: 0.0,
             actions: [
               AnimatedBuilder(
-                animation: Listenable.merge(
-                    [bioController, nameController, usernameController]),
+                animation: Listenable.merge([
+                  bioController,
+                  nameController,
+                  usernameController,
+                  verificationUrlController
+                ]),
                 builder: (context, _) {
                   if (_shouldShowSave(user)) {
                     return TextButton(
@@ -266,14 +308,44 @@ class _EditProfileState extends ConsumerState<EditProfile> {
                   label: AppLocalizations.of(context)!.userName,
                   controller: usernameController,
                   inputType: TextInputType.text,
-                  //maxLength: c.maxUsernameChars,
                 ),
-                UsernameCheckDisplay(
-                  controller: usernameController,
-                  focus: usernameFocus,
-                  onValidate: (v) => setState(() {
-                    usernameValid = v;
-                  }),
+                SizedBox(height: height * 0.03),
+                Text(
+                  AppLocalizations.of(context)!.verification,
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
+                SizedBox(height: height * 0.01),
+                ProfileInputField(
+                  label: AppLocalizations.of(context)!.verificationUrl,
+                  controller: verificationUrlController,
+                  inputType: TextInputType.text,
+                ),
+                SizedBox(height: height * 0.02),
+                Text(
+                  AppLocalizations.of(context)!.verificationExp,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withOpacity(0.7),
+                  ),
+                ),
+                SizedBox(height: height * 0.01),
+                ElevatedButton(
+                  onPressed: () {
+                    final shareUrl = '${c.appURL}/users/${user.username}';
+                    _copyProfileLink(shareUrl);
+                  },
+                  child: Text(
+                    linkCopied
+                        ? AppLocalizations.of(context)!.copied
+                        : AppLocalizations.of(context)!.copyProfileLink,
+                  ),
                 ),
               ],
             ),

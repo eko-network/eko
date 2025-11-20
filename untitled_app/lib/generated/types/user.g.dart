@@ -17,6 +17,7 @@ _UserModel _$UserModelFromJson(Map<String, dynamic> json) => _UserModel(
           (json['following'] as List<dynamic>).map((e) => e as String).toList(),
       uid: json['uid'] as String,
       isVerified: json['isVerified'] as bool,
+      verificationUrl: json['verificationUrl'] as String?,
       shareOnlineStatus: json['share_online_status'] as bool,
     );
 
@@ -30,5 +31,6 @@ Map<String, dynamic> _$UserModelToJson(_UserModel instance) =>
       'following': instance.following,
       'uid': instance.uid,
       'isVerified': instance.isVerified,
+      'verificationUrl': instance.verificationUrl,
       'share_online_status': instance.shareOnlineStatus,
     };

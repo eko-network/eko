@@ -9,6 +9,7 @@ import 'package:untitled_app/types/current_user.dart';
 import 'package:untitled_app/widgets/divider.dart';
 import 'package:untitled_app/widgets/infinite_scrolly.dart';
 import 'package:untitled_app/widgets/shimmer_loaders.dart';
+import 'package:untitled_app/widgets/verification_badge.dart';
 import '../custom_widgets/profile_page_header.dart';
 import '../utilities/constants.dart' as c;
 import '../widgets/post_card.dart';
@@ -62,15 +63,7 @@ class _Header extends ConsumerWidget {
                         fontSize: 22),
                     overflow: TextOverflow.ellipsis,
                   ),
-                  if (currentUser.user.isVerified)
-                    Padding(
-                      padding: const EdgeInsets.only(left: 6),
-                      child: Icon(
-                        Icons.verified_rounded,
-                        size: c.verifiedIconSize,
-                        color: Theme.of(context).colorScheme.surfaceTint,
-                      ),
-                    ),
+                  if (currentUser.user.isVerified) VerificationBadge(uid: currentUser.user.uid,),
                   const Spacer(),
                   InkWell(
                     onTap: () {

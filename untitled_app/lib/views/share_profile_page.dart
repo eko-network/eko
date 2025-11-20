@@ -62,7 +62,7 @@ class _ShareProfileState extends ConsumerState<ShareProfile> {
   @override
   Widget build(BuildContext context) {
     final String shareUrl =
-        '${c.appURL}/feed/sub_profile/${ref.read(currentUserProvider).user.uid}';
+        '${c.appURL}/users/${ref.read(currentUserProvider).user.username}';
     final width = c.widthGetter(context);
     final icon = kIsWeb
         ? CupertinoIcons.arrowshape_turn_up_right

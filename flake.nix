@@ -24,9 +24,6 @@
         ndkVersions = ["27.0.12077973"];
         includeCmake = true;
         cmakeVersions = ["3.22.1"];
-        includeEmulator = false;
-        includeSystemImages = true;
-        systemImageTypes = ["google_apis"];
       };
       androidSdk = androidComposition.androidsdk;
     in {
@@ -40,6 +37,9 @@
             jdk
             ninja
             unzip
+            firebase-tools
+            go
+            google-cloud-sdk
           ];
         };
     });

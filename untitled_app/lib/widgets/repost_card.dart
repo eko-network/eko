@@ -6,6 +6,7 @@ import 'package:untitled_app/custom_widgets/image_widget.dart';
 import 'package:untitled_app/custom_widgets/poll_widget.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
 import 'package:untitled_app/providers/post_provider.dart';
+import 'package:untitled_app/providers/user_provider.dart';
 import 'package:untitled_app/utilities/constants.dart' as c;
 import 'package:untitled_app/widgets/profile_picture.dart';
 import 'package:untitled_app/widgets/text_with_tags.dart';
@@ -60,8 +61,14 @@ class RepostCard extends ConsumerWidget {
                                 if (!isPreview) {
                                   if (post.uid !=
                                       ref.read(currentUserProvider).user.uid) {
-                                    context
-                                        .push('/feed/sub_profile/${post.uid}');
+                                    final user =
+                                        ref.read(userProvider(post.uid)).value;
+                                    if (user != null) {
+                                      context.push(
+                                          '/users/${user.username}?uid=${user.uid}');
+                                    } else {
+                                      context.push('/users/_?uid=${post.uid}');
+                                    }
                                   } else {
                                     context.go('/profile');
                                   }
@@ -82,7 +89,8 @@ class RepostCard extends ConsumerWidget {
                                     children: [
                                       Expanded(
                                           child: UserTag(
-                                        onPressed: () {
+                                        uid: post.uid,
+                                        onPressedWithUser: (user) {
                                           if (!isPreview) {
                                             if (post.uid !=
                                                 ref
@@ -90,13 +98,12 @@ class RepostCard extends ConsumerWidget {
                                                     .user
                                                     .uid) {
                                               context.push(
-                                                  '/feed/sub_profile/${post.uid}');
+                                                  '/users/${user.username}?uid=${user.uid}');
                                             } else {
                                               context.go('/profile');
                                             }
                                           }
                                         },
-                                        uid: post.uid,
                                       )),
                                       TimeStamp(time: post.getDateTime()),
                                     ],

@@ -472,6 +472,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get shareProfile => 'Share Profile';
 
   @override
+  String get verificationExp =>
+      'Add your Eko profile link to another platform that has RelMeAuth support. It may take up to 24 hours to get verified. Potential sites include Threads, Mastadon, and GitHub. Include the full url of the other site here. Example: www.threads.com/@user';
+
+  @override
+  String get copyProfileLink => 'Copy Profile Link';
+
+  @override
   String get deleteAcountReAuthWarning =>
       'Please enter your password to confirm you wish to delete your account. This Action cannot be undone. Upon clicking the button below, your account will be deleted.';
 
@@ -583,4 +590,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get pickImage => 'Pick Image';
+
+  @override
+  String get verification => 'Verification';
+
+  @override
+  String get verificationUrl => 'Verification Url';
 }

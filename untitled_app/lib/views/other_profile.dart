@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:untitled_app/custom_widgets/warning_dialog.dart';
 import 'package:untitled_app/interfaces/post_queries.dart';
+import 'package:untitled_app/interfaces/user.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
 import 'package:untitled_app/providers/user_provider.dart';
 import 'package:untitled_app/types/user.dart';
@@ -11,15 +12,110 @@ import 'package:untitled_app/widgets/loading_spinner.dart';
 import 'package:untitled_app/custom_widgets/profile_page_header.dart';
 import 'package:untitled_app/widgets/shimmer_loaders.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
+import 'package:untitled_app/widgets/verification_badge.dart';
 import '../utilities/constants.dart' as c;
 import '../widgets/post_card.dart';
 
-class OtherProfile extends ConsumerWidget {
-  final String uid;
-  const OtherProfile({super.key, required this.uid});
+class OtherProfile extends ConsumerStatefulWidget {
+  final String username;
+  final String? uid;
+  const OtherProfile({super.key, required this.username, this.uid});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<OtherProfile> createState() => _OtherProfileState();
+}
+
+class _OtherProfileState extends ConsumerState<OtherProfile> {
+  String? _resolvedUid;
+  bool _isLoading = false;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _resolveUid();
+  }
+
+  Future<void> _resolveUid() async {
+    // If uid is provided, use it directly (happy path)
+    if (widget.uid != null) {
+      setState(() {
+        _resolvedUid = widget.uid;
+      });
+      return;
+    }
+
+    // Otherwise, fetch uid from username
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final uid = await getUidFromUsername(widget.username);
+      if (mounted) {
+        setState(() {
+          _resolvedUid = uid;
+          _isLoading = false;
+          if (uid == null) {
+            _error = 'User not found';
+          }
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _error = 'Error loading user';
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Handle loading state while resolving UID
+    if (_isLoading) {
+      return Scaffold(
+        appBar: AppBar(
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          surfaceTintColor: Colors.transparent,
+          automaticallyImplyLeading: false,
+          leading: IconButton(
+            icon: Icon(
+              Icons.arrow_back_ios_rounded,
+              color: Theme.of(context).colorScheme.onSurface,
+              size: 20,
+            ),
+            onPressed: () => context.pop(),
+          ),
+        ),
+        body: const Center(child: LoadingSpinner()),
+      );
+    }
+
+    // Handle error state
+    if (_error != null || _resolvedUid == null) {
+      return Scaffold(
+        appBar: AppBar(
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          surfaceTintColor: Colors.transparent,
+          automaticallyImplyLeading: false,
+          leading: IconButton(
+            icon: Icon(
+              Icons.arrow_back_ios_rounded,
+              color: Theme.of(context).colorScheme.onSurface,
+              size: 20,
+            ),
+            onPressed: () => context.pop(),
+          ),
+        ),
+        body: Center(
+          child: Text(_error ?? AppLocalizations.of(context)!.userNotFound),
+        ),
+      );
+    }
+
+    final uid = _resolvedUid!;
     final width = c.widthGetter(context);
     final userAsync = ref.watch(userProvider(uid));
     final currentUser = ref.watch(currentUserProvider);
@@ -188,14 +284,9 @@ class OtherProfile extends ConsumerWidget {
                         ),
                       ),
                       if (profileUser.isVerified)
-                        Padding(
-                          padding: const EdgeInsets.only(left: 6),
-                          child: Icon(
-                            Icons.verified_rounded,
-                            size: c.verifiedIconSize,
-                            color: Theme.of(context).colorScheme.surfaceTint,
-                          ),
-                        ),
+                        VerificationBadge(
+                          uid: uid,
+                        )
                     ],
                   ),
                   // ref.read(authProvider).uid != null

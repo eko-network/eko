@@ -11,6 +11,7 @@ import 'package:untitled_app/providers/group_provider.dart';
 // import 'package:untitled_app/interfaces/user.dart';
 // import 'package:untitled_app/providers/current_user_provider.dart';
 import 'package:untitled_app/providers/post_provider.dart';
+import 'package:untitled_app/providers/user_provider.dart';
 import 'package:untitled_app/types/post.dart';
 import 'package:untitled_app/widgets/divider.dart';
 import 'package:untitled_app/widgets/icons.dart' as icons;
@@ -272,7 +273,14 @@ class PostCardFromPost extends ConsumerWidget {
                       if (!isPreview && !isOnProfile) {
                         if (post.uid !=
                             ref.read(currentUserProvider).user.uid) {
-                          context.push('/feed/sub_profile/${post.uid}');
+                          final user = ref.read(userProvider(post.uid)).value;
+                          if (user != null) {
+                            context.push(
+                                '/users/${user.username}?uid=${user.uid}');
+                          } else {
+                            // Fallback to just uid if user data not available
+                            context.push('/users/_?uid=${post.uid}');
+                          }
                         } else {
                           context.go('/profile');
                         }
@@ -293,18 +301,18 @@ class PostCardFromPost extends ConsumerWidget {
                           children: [
                             Expanded(
                                 child: UserTag(
-                              onPressed: () {
+                              uid: post.uid,
+                              onPressedWithUser: (user) {
                                 if (!isPreview && !isOnProfile) {
                                   if (post.uid !=
                                       ref.read(currentUserProvider).user.uid) {
-                                    context
-                                        .push('/feed/sub_profile/${post.uid}');
+                                    context.push(
+                                        '/users/${user.username}?uid=${user.uid}');
                                   } else {
                                     context.go('/profile');
                                   }
                                 }
                               },
-                              uid: post.uid,
                             )),
                             if (!isPreview) TimeStamp(time: post.getDateTime()),
                           ],
