@@ -244,8 +244,15 @@ class _Card extends ConsumerWidget {
               children: [
                 ProfilePicture(
                   onPressed: () {
-                    if (comment.uid != ref.read(currentUserProvider).user.uid) {
-                      context.push('/users/${comment.uid}');
+                    if (comment.uid !=
+                        ref.read(currentUserProvider).user.uid) {
+                      final user = ref.read(userProvider(comment.uid)).value;
+                      if (user != null) {
+                        context
+                            .push('/users/${user.username}?uid=${user.uid}');
+                      } else {
+                        context.push('/users/_?uid=${comment.uid}');
+                      }
                     } else {
                       context.go('/profile');
                     }
@@ -265,7 +272,14 @@ class _Card extends ConsumerWidget {
                             onPressed: () {
                               if (comment.uid !=
                                   ref.read(currentUserProvider).user.uid) {
-                                context.push('/users/${comment.uid}');
+                                final user =
+                                    ref.read(userProvider(comment.uid)).value;
+                                if (user != null) {
+                                  context.push(
+                                      '/users/${user.username}?uid=${user.uid}');
+                                } else {
+                                  context.push('/users/_?uid=${comment.uid}');
+                                }
                               } else {
                                 context.go('/profile');
                               }

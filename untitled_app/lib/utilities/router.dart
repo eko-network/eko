@@ -20,7 +20,6 @@ import 'package:untitled_app/views/user_settings.dart';
 import 'package:untitled_app/views/compose_page.dart';
 import 'package:untitled_app/views/feed_page.dart';
 import 'package:untitled_app/views/search_page.dart';
-import 'package:untitled_app/views/profile_page.dart';
 import 'package:untitled_app/views/edit_profile.dart';
 import 'package:untitled_app/views/navigation_bar.dart';
 import 'package:untitled_app/views/other_profile.dart';
@@ -40,6 +39,7 @@ import 'package:untitled_app/views/view_likes_page.dart';
 import 'package:untitled_app/widgets/gifs.dart';
 import 'package:untitled_app/widgets/require_auth.dart';
 import 'package:untitled_app/widgets/require_no_auth.dart';
+import 'package:untitled_app/views/profile_redirect_page.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorFeedKey = GlobalKey<NavigatorState>(debugLabel: 'Feed');
@@ -111,29 +111,6 @@ final goRouter = GoRouter(
             },
           ),
         ]),
-    GoRoute(
-      path: '/users',
-      redirect: (context, state) {
-        if (state.pathParameters['username'] == null) {
-          return '/feed';
-        }
-        return null;
-      },
-      routes: [
-        GoRoute(
-          path: ':username',
-          name: 'user_profile',
-          builder: (context, state) {
-            final username = state.pathParameters['username']!;
-            final uid = state.uri.queryParameters['uid'];
-            return OtherProfile(
-              username: username,
-              uid: uid,
-            );
-          },
-        ),
-      ],
-    ),
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) {
         return PopScope(
@@ -350,8 +327,20 @@ final goRouter = GoRouter(
               path: '/profile',
               name: 'profile',
               pageBuilder: (context, state) => const NoTransitionPage(
-                child: ProfilePage(),
+                child: ProfileRedirect(),
               ),
+            ),
+            GoRoute(
+              path: '/users/:username',
+              name: 'user_profile',
+              builder: (context, state) {
+                final username = state.pathParameters['username']!;
+                final uid = state.uri.queryParameters['uid'];
+                return OtherProfile(
+                  username: username,
+                  uid: uid,
+                );
+              },
               routes: [
                 GoRoute(
                   path: 'share_profile',

@@ -48,7 +48,8 @@ class ProfileHeader extends StatelessWidget {
                             label: AppLocalizations.of(context)!.followers,
                             onPressed: () {
                               if (loggedIn) {
-                                context.push('/profile/followers', extra: user);
+                                context.push('/users/${user.username}/followers',
+                                    extra: user);
                               }
                             },
                           ),
@@ -57,7 +58,8 @@ class ProfileHeader extends StatelessWidget {
                             label: AppLocalizations.of(context)!.following,
                             onPressed: () {
                               if (loggedIn) {
-                                context.push('/profile/following', extra: user);
+                                context.push('/users/${user.username}/following',
+                                    extra: user);
                               }
                             },
                           ),

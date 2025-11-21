@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -73,6 +74,30 @@ class _OtherProfileState extends ConsumerState<OtherProfile> {
 
   @override
   Widget build(BuildContext context) {
+    final currentUserId = ref.watch(currentUserProvider).user.uid;
+    final currentUsername = ref.watch(currentUserProvider).user.username;
+
+    final bool isMyOwnProfile =
+        (widget.uid != null && widget.uid == currentUserId) ||
+            (widget.uid == null && widget.username == currentUsername);
+
+    // Helper function to build the leading widget (back button)
+    Widget? buildLeadingWidget(BuildContext context, bool isMyProfile) {
+      if (isMyProfile) {
+        return SizedBox(
+          width: 20,
+        ); // No back button for current user's own profile
+      }
+      return IconButton(
+        icon: Icon(
+          Icons.arrow_back_ios_rounded,
+          color: Theme.of(context).colorScheme.onSurface,
+          size: 20,
+        ),
+        onPressed: () => context.pop(),
+      );
+    }
+
     // Handle loading state while resolving UID
     if (_isLoading) {
       return Scaffold(
@@ -80,14 +105,7 @@ class _OtherProfileState extends ConsumerState<OtherProfile> {
           backgroundColor: Theme.of(context).colorScheme.surface,
           surfaceTintColor: Colors.transparent,
           automaticallyImplyLeading: false,
-          leading: IconButton(
-            icon: Icon(
-              Icons.arrow_back_ios_rounded,
-              color: Theme.of(context).colorScheme.onSurface,
-              size: 20,
-            ),
-            onPressed: () => context.pop(),
-          ),
+          leading: buildLeadingWidget(context, isMyOwnProfile),
         ),
         body: const Center(child: LoadingSpinner()),
       );
@@ -100,14 +118,7 @@ class _OtherProfileState extends ConsumerState<OtherProfile> {
           backgroundColor: Theme.of(context).colorScheme.surface,
           surfaceTintColor: Colors.transparent,
           automaticallyImplyLeading: false,
-          leading: IconButton(
-            icon: Icon(
-              Icons.arrow_back_ios_rounded,
-              color: Theme.of(context).colorScheme.onSurface,
-              size: 20,
-            ),
-            onPressed: () => context.pop(),
-          ),
+          leading: buildLeadingWidget(context, isMyOwnProfile),
         ),
         body: Center(
           child: Text(_error ?? AppLocalizations.of(context)!.userNotFound),
@@ -119,15 +130,6 @@ class _OtherProfileState extends ConsumerState<OtherProfile> {
     final width = c.widthGetter(context);
     final userAsync = ref.watch(userProvider(uid));
     final currentUser = ref.watch(currentUserProvider);
-
-    // Check if we're viewing our own profile
-    if (currentUser.user.uid == uid) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.go('/profile');
-      });
-    }
-
-    // Check if the user is blocked
     final isBlockedByMe = userAsync.when(
       data: (profileUser) => currentUser.blockedUsers.contains(profileUser.uid),
       loading: () => false,
@@ -139,6 +141,7 @@ class _OtherProfileState extends ConsumerState<OtherProfile> {
       loading: () => false,
       error: (_, __) => false,
     );
+    final bool isCurrentUser = currentUser.user.uid == uid;
 
     void popDialog() {
       Navigator.of(context, rootNavigator: true).pop();
@@ -181,41 +184,20 @@ class _OtherProfileState extends ConsumerState<OtherProfile> {
                     backgroundColor: Theme.of(context).colorScheme.surface,
                     surfaceTintColor: Colors.transparent,
                     automaticallyImplyLeading: false,
-                    leading: IconButton(
-                      icon: Icon(
-                        Icons.arrow_back_ios_rounded,
-                        color: Theme.of(context).colorScheme.onSurface,
-                        size: 20,
-                      ),
-                      onPressed: () => context.pop(),
-                    ),
+                    leading: buildLeadingWidget(context, isCurrentUser),
                   )
                 : null,
             loading: () => AppBar(
               backgroundColor: Theme.of(context).colorScheme.surface,
               surfaceTintColor: Colors.transparent,
               automaticallyImplyLeading: false,
-              leading: IconButton(
-                icon: Icon(
-                  Icons.arrow_back_ios_rounded,
-                  color: Theme.of(context).colorScheme.onSurface,
-                  size: 20,
-                ),
-                onPressed: () => context.pop(),
-              ),
+              leading: buildLeadingWidget(context, isCurrentUser),
             ),
             error: (_, __) => AppBar(
               backgroundColor: Theme.of(context).colorScheme.surface,
               surfaceTintColor: Colors.transparent,
               automaticallyImplyLeading: false,
-              leading: IconButton(
-                icon: Icon(
-                  Icons.arrow_back_ios_rounded,
-                  color: Theme.of(context).colorScheme.onSurface,
-                  size: 20,
-                ),
-                onPressed: () => context.pop(),
-              ),
+              leading: buildLeadingWidget(context, isCurrentUser),
             ),
           ),
           body: userAsync.when(
@@ -231,14 +213,21 @@ class _OtherProfileState extends ConsumerState<OtherProfile> {
               }
               return InfiniteScrolly<String, String>(
                 getter: (data) async {
-                  return await otherProfilePageGetter(data, ref, uid);
+                  if (isCurrentUser) {
+                    return await profilePageGetter(data, ref);
+                  } else {
+                    return await otherProfilePageGetter(data, ref, uid);
+                  }
                 },
                 widget: otherProfilePostCardBuilder,
                 onRefresh: onRefresh,
                 initialLoadingWidget: PostLoader(
                   length: 3,
                 ),
-                header: _Header(user: profileUser),
+                header: _Header(
+                  user: profileUser,
+                  isCurrentUser: isCurrentUser,
+                ),
                 appBar: SliverAppBar(
                   floating: true,
                   pinned: false,
@@ -246,27 +235,15 @@ class _OtherProfileState extends ConsumerState<OtherProfile> {
                   centerTitle: false,
                   leadingWidth:
                       null, //ref.read(authProvider).uid == null ? 100 : null,
-                  leading: IconButton(
-                      icon: Icon(
-                        Icons.arrow_back_ios_rounded,
-                        color: Theme.of(context).colorScheme.onSurface,
-                        size: 20,
-                      ),
-                      onPressed: () => context.pop('popped')),
-
-                  // ref.read(authProvider).uid != null
-                  //              ? IconButton(
-                  //                  icon: Icon(
-                  //                    Icons.arrow_back_ios_rounded,
-                  //                    color: Theme.of(context).colorScheme.onSurface,
-                  //                    size: 20,
-                  //                  ),
-                  //                  onPressed: () => context.pop('popped'))
-                  //              : TextButton(
-                  //                  onPressed: () {
-                  //                    context.go('/');
-                  //                  },
-                  //                  child: Text(AppLocalizations.of(context)!.signIn)),
+                  leading: isCurrentUser
+                      ? null
+                      : IconButton(
+                          icon: Icon(
+                            Icons.arrow_back_ios_rounded,
+                            color: Theme.of(context).colorScheme.onSurface,
+                            size: 20,
+                          ),
+                          onPressed: () => context.pop('popped')),
                   backgroundColor: Theme.of(context).colorScheme.surface,
                   title: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -289,53 +266,48 @@ class _OtherProfileState extends ConsumerState<OtherProfile> {
                         )
                     ],
                   ),
-                  // ref.read(authProvider).uid != null
-                  //              ? Row(
-                  //                  mainAxisAlignment: MainAxisAlignment.center,
-                  //                  children: [
-                  //                    Text(
-                  //                      '@${profileUser.username}',
-                  //                      style: TextStyle(
-                  //                        fontWeight: FontWeight.bold,
-                  //                        fontSize: 20,
-                  //                        color: Theme.of(context).colorScheme.onSurface,
-                  //                      ),
-                  //                    ),
-                  //                    if (profileUser.isVerified)
-                  //                      Padding(
-                  //                        padding: const EdgeInsets.only(left: 6),
-                  //                        child: Icon(
-                  //                          Icons.verified_rounded,
-                  //                          size: c.verifiedIconSize,
-                  //                          color:
-                  //                              Theme.of(context).colorScheme.surfaceTint,
-                  //                        ),
-                  //                      ),
-                  //                  ],
-                  //                )
-                  //              : null,
                   actions: [
-                    Padding(
-                      padding: EdgeInsets.only(left: 16, right: 16),
-                      child: PopupMenuButton<void Function()>(
-                        itemBuilder: (context) {
-                          return [
-                            PopupMenuItem(
-                              height: 25,
-                              value: () => showBlockDialog(),
-                              child: Text(AppLocalizations.of(context)!.block),
-                            )
-                          ];
+                    if (isCurrentUser)
+                      InkWell(
+                        onTap: () {
+                          //ref.read(navBarProvider.notifier).disable();
+                          context
+                              .push(
+                                  '/users/${profileUser.username}/user_settings')
+                              .then((_) =>
+                                  {} /*ref.read(navBarProvider.notifier).enable()*/);
                         },
-                        onSelected: (fn) => fn(),
-                        color: Theme.of(context).colorScheme.outlineVariant,
                         child: Icon(
-                          Icons.more_vert,
-                          size: 20,
+                          Icons.settings_outlined,
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          size: 25,
+                          weight: 10,
                         ),
-                      ),
-                    )
+                      )
+                    else
+                      Padding(
+                        padding: EdgeInsets.only(left: 16, right: 16),
+                        child: PopupMenuButton<void Function()>(
+                          itemBuilder: (context) {
+                            return [
+                              PopupMenuItem(
+                                height: 25,
+                                value: () => showBlockDialog(),
+                                child:
+                                    Text(AppLocalizations.of(context)!.block),
+                              )
+                            ];
+                          },
+                          onSelected: (fn) => fn(),
+                          color: Theme.of(context).colorScheme.outlineVariant,
+                          child: Icon(
+                            Icons.more_vert,
+                            size: 20,
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      )
                   ],
                   bottom: PreferredSize(
                     preferredSize: const Size.fromHeight(3),
@@ -360,7 +332,8 @@ class _OtherProfileState extends ConsumerState<OtherProfile> {
 
 class _Header extends ConsumerWidget {
   final UserModel user;
-  const _Header({required this.user});
+  final bool isCurrentUser;
+  const _Header({required this.user, required this.isCurrentUser});
 
   Future<void> _onFollowPressed(WidgetRef ref) async {
     final isFollowing =
@@ -386,32 +359,96 @@ class _Header extends ConsumerWidget {
           loggedIn: true, //authState.uid != null,
         ),
         Padding(
-            padding: const EdgeInsets.symmetric(vertical: 15),
-            child: Center(
-              child: InkWell(
-                onTap: () => _onFollowPressed(ref),
-                child: Container(
-                  width: width * 0.45,
-                  height: width * 0.09,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.all(Radius.circular(10)),
-                    color: isFollowing
-                        ? Theme.of(context).colorScheme.surfaceContainer
-                        : Theme.of(context).colorScheme.primaryContainer,
-                  ),
-                  child: Text(
-                    isFollowing
-                        ? AppLocalizations.of(context)!.following
-                        : AppLocalizations.of(context)!.follow,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Theme.of(context).colorScheme.onSurface,
+          padding: const EdgeInsets.symmetric(vertical: 15),
+          child: isCurrentUser
+              ? Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    //the username chager doesn't work on web i think could be firebase outage
+                    if (!kIsWeb)
+                      InkWell(
+                        onTap: () {
+                          //ref.read(navBarProvider.notifier).disable();
+                          context
+                              .push('/users/${user.username}/edit_profile')
+                              .then((_) =>
+                                  {} /*ref.read(navBarProvider.notifier).enable()*/);
+                        },
+                        child: Container(
+                          width: width * 0.45,
+                          height: width * 0.09,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(10)),
+                            color:
+                                Theme.of(context).colorScheme.surfaceContainer,
+                          ),
+                          child: Text(
+                            AppLocalizations.of(context)!.editProfile,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
+                          ),
+                        ),
+                      ),
+                    if (!kIsWeb) SizedBox(width: width * 0.02),
+                    InkWell(
+                      onTap: () {
+                        //ref.read(navBarProvider.notifier).disable();
+                        context
+                            .push('/users/${user.username}/share_profile')
+                            .then((_) =>
+                                {} /*ref.read(navBarProvider.notifier).enable()*/);
+                      },
+                      child: Container(
+                        width: width * 0.45,
+                        height: width * 0.09,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(10)),
+                          color: Theme.of(context).colorScheme.surfaceContainer,
+                        ),
+                        child: Text(
+                          AppLocalizations.of(context)!.shareProfile,
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+              : Center(
+                  child: InkWell(
+                    onTap: () => _onFollowPressed(ref),
+                    child: Container(
+                      width: width * 0.45,
+                      height: width * 0.09,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(10)),
+                        color: isFollowing
+                            ? Theme.of(context).colorScheme.surfaceContainer
+                            : Theme.of(context).colorScheme.primaryContainer,
+                      ),
+                      child: Text(
+                        isFollowing
+                            ? AppLocalizations.of(context)!.following
+                            : AppLocalizations.of(context)!.follow,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ),
-            )),
+        ),
         Divider(
           color: Theme.of(context).colorScheme.outline,
           height: c.dividerWidth,

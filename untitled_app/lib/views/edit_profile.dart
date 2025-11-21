@@ -310,15 +310,6 @@ class _EditProfileState extends ConsumerState<EditProfile> {
                   inputType: TextInputType.text,
                 ),
                 SizedBox(height: height * 0.03),
-                Text(
-                  AppLocalizations.of(context)!.verification,
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-                ),
-                SizedBox(height: height * 0.01),
                 ProfileInputField(
                   label: AppLocalizations.of(context)!.verificationUrl,
                   controller: verificationUrlController,
@@ -328,12 +319,8 @@ class _EditProfileState extends ConsumerState<EditProfile> {
                 Text(
                   AppLocalizations.of(context)!.verificationExp,
                   style: TextStyle(
-                    fontSize: 16,
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withOpacity(0.7),
-                  ),
+                      fontSize: 16,
+                      color: Theme.of(context).colorScheme.onSurface),
                 ),
                 SizedBox(height: height * 0.01),
                 ElevatedButton(
