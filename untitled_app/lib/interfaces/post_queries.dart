@@ -56,19 +56,22 @@ Future<(List<MapEntry<String, String>>, bool)> otherProfilePageGetter(
   return (retList, retList.length < c.postsOnRefresh);
 }
 
-Future<(List<MapEntry<String, int>>, bool)> popGetter(
-    List<MapEntry<String, int>> list, WidgetRef ref) async {
+Future<(List<MapEntry<String, (int, String)>>, bool)> popGetter(
+    List<MapEntry<String, (int, String)>> list, WidgetRef ref) async {
   final baseQuery = FirebaseFirestore.instance
       .collection('posts')
       .where('tags', arrayContains: 'public')
       .orderBy('likes', descending: true)
+      .orderBy('time')
       .limit(c.postsOnRefresh);
-  final query =
-      list.isEmpty ? baseQuery : baseQuery.startAfter([list.last.value]);
+  final query = list.isEmpty
+      ? baseQuery
+      : baseQuery.startAfter([list.last.value.$1, list.last.value.$2]);
   final postList = await getPosts(query);
   ref.read(postPoolProvider).putAll(postList);
-  final retList =
-      postList.map((item) => MapEntry(item.id, item.likes)).toList();
+  final retList = postList
+      .map((item) => MapEntry(item.id, (item.likes, item.createdAt)))
+      .toList();
   return (retList, retList.length < c.postsOnRefresh);
 }
 

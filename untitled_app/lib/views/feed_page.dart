@@ -397,7 +397,7 @@ class __PopTabState extends ConsumerState<_PopTab>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return InfiniteScrolly<String, int>(
+    return InfiniteScrolly<String, (int, String)>(
       header: SizedBox(
         height: appBarHeight,
       ),
