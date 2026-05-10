@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:eko_app/localization/generated/app_localizations.dart';
 import 'package:eko_app/widgets/errors/snack_bar.dart';
 import 'package:flutter/cupertino.dart';
@@ -18,11 +21,77 @@ part '../generated/providers/auth_provider.g.dart';
 
 Future<void>? _registerNotificationsInFlight;
 
+Map<String, dynamic>? decodeJwtPayloadMap(String? accessToken) {
+  if (accessToken == null || accessToken.isEmpty) return null;
+  final parts = accessToken.split('.');
+  if (parts.length != 3) return null;
+  try {
+    var normalized = parts[1].replaceAll('-', '+').replaceAll('_', '/');
+    final pad = normalized.length % 4;
+    if (pad == 1) return null;
+    if (pad != 0) {
+      normalized = normalized.padRight(normalized.length + (4 - pad), '=');
+    }
+    final decoded = jsonDecode(utf8.decode(base64Decode(normalized)));
+    if (decoded is! Map) return null;
+    return Map<String, dynamic>.from(decoded);
+  } catch (_) {
+    return null;
+  }
+}
+
+void _debugPrintJwtPayload(String accessToken) {
+  if (!kDebugMode) return;
+  final map = decodeJwtPayloadMap(accessToken);
+  if (map == null) {
+    debugPrint('JWT debug: decode failed or invalid token');
+    return;
+  }
+  debugPrint('JWT debug: full payload JSON: ${jsonEncode(map)}');
+  debugPrint(
+    'JWT debug: app_metadata=${map['app_metadata']} user_metadata keys=${map['user_metadata'] is Map ? (map['user_metadata'] as Map).keys.toList() : map['user_metadata']}',
+  );
+}
+
+String? _didFromDynamic(Object? v) {
+  if (v is String && v.isNotEmpty) return v;
+  return null;
+}
+
+String? didFromAccessTokenClaims(String? accessToken) {
+  final map = decodeJwtPayloadMap(accessToken);
+  if (map == null) return null;
+  final app = map['app_metadata'];
+  if (app is Map) {
+    final nested = _didFromDynamic(app['did']);
+    if (nested != null) return nested;
+  }
+  return _didFromDynamic(map['did']);
+}
+
+String? didFromSession(Session session) {
+  final fromSdk = didFromUserAppMetadata(session.user);
+  if (fromSdk != null) return fromSdk;
+  return didFromAccessTokenClaims(session.accessToken);
+}
+
 void _debugPrintSupabaseBearer(Session? session) {
   if (!kDebugMode) return;
   final token = session?.accessToken;
   if (token == null || token.isEmpty) return;
   debugPrint('Supabase Bearer JWT: Bearer $token');
+  _debugPrintJwtPayload(token);
+  if (session != null) {
+    debugPrint(
+      'JWT debug: SDK session.user.appMetadata=${session.user.appMetadata}',
+    );
+  }
+}
+
+String? didFromUserAppMetadata(User user) {
+  final v = user.appMetadata['did'];
+  if (v is String && v.isNotEmpty) return v;
+  return null;
 }
 
 class SignUpOutcome {
@@ -90,6 +159,7 @@ class Auth extends _$Auth {
         email: user.email,
         emailVerified: user.emailConfirmedAt != null,
         creationTime: DateTime.tryParse(user.createdAt),
+        did: didFromSession(currentSession),
       );
     }
 
@@ -109,6 +179,7 @@ class Auth extends _$Auth {
               emailVerified: user.emailConfirmedAt != null,
               creationTime: DateTime.tryParse(user.createdAt),
               pendingPasswordRecovery: true,
+              did: didFromSession(session),
             );
           } else {
             final user = session.user;
@@ -119,6 +190,7 @@ class Auth extends _$Auth {
               emailVerified: user.emailConfirmedAt != null,
               creationTime: DateTime.tryParse(user.createdAt),
               pendingPasswordRecovery: false,
+              did: didFromSession(session),
             );
             if (data.event == AuthChangeEvent.signedIn) {
               // This throws on linux but appears to have to affect on android
@@ -144,6 +216,12 @@ class Auth extends _$Auth {
 
   void clearPasswordRecovery() {
     state = state.copyWith(pendingPasswordRecovery: false);
+  }
+
+  void syncDeviceIdFromJwt() {
+    final session = supabase.auth.currentSession;
+    if (session == null) return;
+    state = state.copyWith(did: didFromSession(session));
   }
 
   Future<void> signIn({required String email, required String password}) async {
@@ -228,10 +306,14 @@ class Auth extends _$Auth {
 
   Future<void> refreshEmailVerification() async {
     try {
-      final response = await supabase.auth.refreshSession();
-      final user = response.user;
-      if (user != null) {
-        state = state.copyWith(emailVerified: user.emailConfirmedAt != null);
+      await supabase.auth.refreshSession();
+      final session = supabase.auth.currentSession;
+      final user = session?.user;
+      if (user != null && session != null) {
+        state = state.copyWith(
+          emailVerified: user.emailConfirmedAt != null,
+          did: didFromSession(session),
+        );
       }
     } catch (e) {
       debugPrint('Error refreshing email verification: $e');
@@ -318,6 +400,7 @@ class Auth extends _$Auth {
     }
   }
 
+  Future<void> registerDeviceIfNeeded() async {}
   Future<void> registerNotificationsIfNeeded() async {
     final uid = state.uid;
     if (uid == null || uid.isEmpty) return;

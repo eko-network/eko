@@ -4,6 +4,7 @@ part '../generated/types/auth.freezed.dart';
 @freezed
 abstract class AuthModel with _$AuthModel {
   const factory AuthModel({
+    String? did,
     String? uid,
     String? email,
     required bool isLoading,

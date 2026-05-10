@@ -14,6 +14,7 @@ T _$identity<T>(T value) => value;
 
 /// @nodoc
 mixin _$AuthModel {
+  String? get did;
   String? get uid;
   String? get email;
   bool get isLoading;
@@ -33,6 +34,7 @@ mixin _$AuthModel {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is AuthModel &&
+            (identical(other.did, did) || other.did == did) &&
             (identical(other.uid, uid) || other.uid == uid) &&
             (identical(other.email, email) || other.email == email) &&
             (identical(other.isLoading, isLoading) ||
@@ -47,12 +49,12 @@ mixin _$AuthModel {
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, uid, email, isLoading,
+  int get hashCode => Object.hash(runtimeType, did, uid, email, isLoading,
       emailVerified, creationTime, pendingPasswordRecovery);
 
   @override
   String toString() {
-    return 'AuthModel(uid: $uid, email: $email, isLoading: $isLoading, emailVerified: $emailVerified, creationTime: $creationTime, pendingPasswordRecovery: $pendingPasswordRecovery)';
+    return 'AuthModel(did: $did, uid: $uid, email: $email, isLoading: $isLoading, emailVerified: $emailVerified, creationTime: $creationTime, pendingPasswordRecovery: $pendingPasswordRecovery)';
   }
 }
 
@@ -62,7 +64,8 @@ abstract mixin class $AuthModelCopyWith<$Res> {
       _$AuthModelCopyWithImpl;
   @useResult
   $Res call(
-      {String? uid,
+      {String? did,
+      String? uid,
       String? email,
       bool isLoading,
       bool? emailVerified,
@@ -82,6 +85,7 @@ class _$AuthModelCopyWithImpl<$Res> implements $AuthModelCopyWith<$Res> {
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? did = freezed,
     Object? uid = freezed,
     Object? email = freezed,
     Object? isLoading = null,
@@ -90,6 +94,10 @@ class _$AuthModelCopyWithImpl<$Res> implements $AuthModelCopyWith<$Res> {
     Object? pendingPasswordRecovery = null,
   }) {
     return _then(_self.copyWith(
+      did: freezed == did
+          ? _self.did
+          : did // ignore: cast_nullable_to_non_nullable
+              as String?,
       uid: freezed == uid
           ? _self.uid
           : uid // ignore: cast_nullable_to_non_nullable
@@ -212,6 +220,7 @@ extension AuthModelPatterns on AuthModel {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
     TResult Function(
+            String? did,
             String? uid,
             String? email,
             bool isLoading,
@@ -225,6 +234,7 @@ extension AuthModelPatterns on AuthModel {
     switch (_that) {
       case _AuthModel() when $default != null:
         return $default(
+            _that.did,
             _that.uid,
             _that.email,
             _that.isLoading,
@@ -252,6 +262,7 @@ extension AuthModelPatterns on AuthModel {
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
     TResult Function(
+            String? did,
             String? uid,
             String? email,
             bool isLoading,
@@ -264,6 +275,7 @@ extension AuthModelPatterns on AuthModel {
     switch (_that) {
       case _AuthModel():
         return $default(
+            _that.did,
             _that.uid,
             _that.email,
             _that.isLoading,
@@ -290,6 +302,7 @@ extension AuthModelPatterns on AuthModel {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
     TResult? Function(
+            String? did,
             String? uid,
             String? email,
             bool isLoading,
@@ -302,6 +315,7 @@ extension AuthModelPatterns on AuthModel {
     switch (_that) {
       case _AuthModel() when $default != null:
         return $default(
+            _that.did,
             _that.uid,
             _that.email,
             _that.isLoading,
@@ -318,13 +332,16 @@ extension AuthModelPatterns on AuthModel {
 
 class _AuthModel implements AuthModel {
   const _AuthModel(
-      {this.uid,
+      {this.did,
+      this.uid,
       this.email,
       required this.isLoading,
       this.emailVerified,
       this.creationTime,
       this.pendingPasswordRecovery = false});
 
+  @override
+  final String? did;
   @override
   final String? uid;
   @override
@@ -352,6 +369,7 @@ class _AuthModel implements AuthModel {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _AuthModel &&
+            (identical(other.did, did) || other.did == did) &&
             (identical(other.uid, uid) || other.uid == uid) &&
             (identical(other.email, email) || other.email == email) &&
             (identical(other.isLoading, isLoading) ||
@@ -366,12 +384,12 @@ class _AuthModel implements AuthModel {
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, uid, email, isLoading,
+  int get hashCode => Object.hash(runtimeType, did, uid, email, isLoading,
       emailVerified, creationTime, pendingPasswordRecovery);
 
   @override
   String toString() {
-    return 'AuthModel(uid: $uid, email: $email, isLoading: $isLoading, emailVerified: $emailVerified, creationTime: $creationTime, pendingPasswordRecovery: $pendingPasswordRecovery)';
+    return 'AuthModel(did: $did, uid: $uid, email: $email, isLoading: $isLoading, emailVerified: $emailVerified, creationTime: $creationTime, pendingPasswordRecovery: $pendingPasswordRecovery)';
   }
 }
 
@@ -384,7 +402,8 @@ abstract mixin class _$AuthModelCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {String? uid,
+      {String? did,
+      String? uid,
       String? email,
       bool isLoading,
       bool? emailVerified,
@@ -404,6 +423,7 @@ class __$AuthModelCopyWithImpl<$Res> implements _$AuthModelCopyWith<$Res> {
   @override
   @pragma('vm:prefer-inline')
   $Res call({
+    Object? did = freezed,
     Object? uid = freezed,
     Object? email = freezed,
     Object? isLoading = null,
@@ -412,6 +432,10 @@ class __$AuthModelCopyWithImpl<$Res> implements _$AuthModelCopyWith<$Res> {
     Object? pendingPasswordRecovery = null,
   }) {
     return _then(_AuthModel(
+      did: freezed == did
+          ? _self.did
+          : did // ignore: cast_nullable_to_non_nullable
+              as String?,
       uid: freezed == uid
           ? _self.uid
           : uid // ignore: cast_nullable_to_non_nullable
