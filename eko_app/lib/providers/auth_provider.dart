@@ -1,7 +1,8 @@
 import 'dart:convert';
-import 'dart:io';
-
+import 'dart:typed_data';
 import 'package:eko_app/localization/generated/app_localizations.dart';
+import 'package:eko_app/utilities/device_uid_service.dart';
+import 'package:eko_app/utilities/ecp_ref.dart';
 import 'package:eko_app/widgets/errors/snack_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart' show debugPrint, kDebugMode;
@@ -161,6 +162,7 @@ class Auth extends _$Auth {
         creationTime: DateTime.tryParse(user.createdAt),
         did: didFromSession(currentSession),
       );
+      registerDeviceIfNeeded();
     }
 
     supabase.auth.onAuthStateChange.listen(
@@ -193,6 +195,7 @@ class Auth extends _$Auth {
               did: didFromSession(session),
             );
             if (data.event == AuthChangeEvent.signedIn) {
+              registerDeviceIfNeeded();
               // This throws on linux but appears to have to affect on android
               if (!platform.isLinux) {
                 // ios typically opens an in-app web view, so it doesnt get dismissed otherwise
@@ -400,7 +403,42 @@ class Auth extends _$Auth {
     }
   }
 
-  Future<void> registerDeviceIfNeeded() async {}
+  Future<void> registerDeviceIfNeeded() async {
+    final uid = state.uid;
+    if (uid == null || uid.isEmpty) return;
+    if (state.did != null) return;
+
+    try {
+      final deviceUid = DeviceUidService.getOrCreate();
+      final credentialIdentity = Uint8List.fromList(utf8.encode(deviceUid));
+
+      final identity = await ecp.initializeIdentity(
+        credentialIdentity: credentialIdentity,
+      );
+
+      await supabase.rpc('register_device', params: {
+        'p_did': deviceUid,
+        'p_credential_identity': base64Encode(identity.credentialIdentity),
+        'p_signer_public_key': base64Encode(identity.signerPublicKey),
+      });
+
+      if (identity.keyPackages.isNotEmpty) {
+        await supabase.rpc('add_key_packages', params: {
+          'p_did': deviceUid,
+          'p_key_packages': identity.keyPackages.map(base64Encode).toList(),
+        });
+      }
+
+      await supabase.auth.refreshSession();
+      final session = supabase.auth.currentSession;
+      if (session != null) {
+        state = state.copyWith(did: didFromSession(session));
+      }
+    } catch (e) {
+      debugPrint('Error registering device: $e');
+    }
+  }
+
   Future<void> registerNotificationsIfNeeded() async {
     final uid = state.uid;
     if (uid == null || uid.isEmpty) return;

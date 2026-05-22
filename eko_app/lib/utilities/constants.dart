@@ -135,6 +135,7 @@ const double navBarHeight = navBarIconSize + 20;
 const double postIconSize = 23;
 const double commentIconSize = 17;
 const String userNameReqs = r'^[a-z0-9_]{3,24}$';
+const String appInstanceId = 'eko_app';
 const double dividerWidth = 0.5;
 const double indealAppWidth = 650;
 

@@ -7,6 +7,10 @@ FLUTTER_COMMAND="flutter run \
 
 if [ "$1" == "web" ]; then
   FLUTTER_COMMAND="$FLUTTER_COMMAND -d web-server --web-hostname localhost --web-port 3000"
+elif [ "$1" == "linux" ]; then
+  FLUTTER_COMMAND="$FLUTTER_COMMAND -d linux"
+elif [ -n "$1" ]; then
+  FLUTTER_COMMAND="$FLUTTER_COMMAND -d $1"
 fi
 
 eval "$FLUTTER_COMMAND"

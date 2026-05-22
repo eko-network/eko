@@ -72,6 +72,14 @@ dependencies:
   unifiedpush_storage_shared_preferences: ^1.0.0
   flutter_local_notifications: ^21.0.0
   webcrypto: ^0.6.0
+  drift: ^2.20.2
+  sqlcipher_flutter_libs: ^0.6.3
+  sqlite3: ^2.5.0
+  flutter_secure_storage: ^9.2.4
+  path: ^1.9.1
+  ecp:
+     path: ../../ecp-dart-sdk
+
 dependency_overrides:
   webcrypto:
     git:
@@ -96,6 +104,7 @@ dev_dependencies:
   remove_unused_localizations_keys: ^0.0.40
   riverpod_generator: ^2.6.5
   riverpod_lint: ^2.6.5
+  drift_dev: ^2.20.2
 flutter:
   generate: true
   # The following line ensures that the Material Icons font is

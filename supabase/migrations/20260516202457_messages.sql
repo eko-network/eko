@@ -2,7 +2,15 @@ create table "public"."devices" (
   "id" uuid not null default gen_random_uuid(),
   "created_at" timestamp with time zone not null default now(),
   "uid" uuid default gen_random_uuid(),
-  "session_id" uuid default gen_random_uuid()
+  "session_id" uuid default gen_random_uuid(),
+  "credential_identity" bytea not null,
+  "signer_public_key" bytea not null
+);
+
+create table "public"."key_packages" (
+  "id" uuid not null default gen_random_uuid(),
+  "device_id" uuid not null,
+  "key_package" bytea not null
 );
 
 CREATE OR REPLACE FUNCTION public.custom_access_token_hook (event jsonb) RETURNS jsonb LANGUAGE plpgsql SECURITY DEFINER
@@ -30,7 +38,11 @@ BEGIN
 END;
 $$;
 
-CREATE OR REPLACE FUNCTION public.register_device (p_did UUID) RETURNS UUID LANGUAGE plpgsql SECURITY DEFINER
+CREATE OR REPLACE FUNCTION public.register_device (
+  p_did UUID,
+  p_credential_identity BYTEA DEFAULT NULL,
+  p_signer_public_key BYTEA DEFAULT NULL
+) RETURNS UUID LANGUAGE plpgsql SECURITY DEFINER
 SET
   search_path = '' AS $$
 DECLARE
@@ -41,11 +53,13 @@ BEGIN
     RAISE EXCEPTION 'Not authenticated';
   END IF;
 
-  INSERT INTO public.devices (id, uid, session_id)
-  VALUES (p_did, v_uid, v_session_id)
+  INSERT INTO public.devices (id, uid, session_id, credential_identity, signer_public_key)
+  VALUES (p_did, v_uid, v_session_id, p_credential_identity, p_signer_public_key)
   ON CONFLICT (id) DO UPDATE
-    SET session_id = EXCLUDED.session_id,
-        created_at  = now()
+    SET session_id          = EXCLUDED.session_id,
+        credential_identity = COALESCE(EXCLUDED.credential_identity, public.devices.credential_identity),
+        signer_public_key   = COALESCE(EXCLUDED.signer_public_key, public.devices.signer_public_key),
+        created_at          = now()
   WHERE public.devices.uid = v_uid;
 
   IF NOT FOUND THEN
@@ -53,6 +67,54 @@ BEGIN
   END IF;
 
   RETURN p_did;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION public.add_key_packages (p_did UUID, p_key_packages BYTEA[]) RETURNS VOID LANGUAGE plpgsql SECURITY DEFINER
+SET
+  search_path = '' AS $$
+DECLARE
+  v_uid UUID := auth.uid();
+  pkg   BYTEA;
+BEGIN
+  IF v_uid IS NULL THEN
+    RAISE EXCEPTION 'Not authenticated';
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM public.devices WHERE id = p_did AND uid = v_uid
+  ) THEN
+    RAISE EXCEPTION 'Device % does not belong to the authenticated user', p_did;
+  END IF;
+
+  FOREACH pkg IN ARRAY p_key_packages LOOP
+    INSERT INTO public.key_packages (device_id, key_package)
+    VALUES (p_did, pkg);
+  END LOOP;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION public.take_key_package (p_device_id UUID) RETURNS BYTEA LANGUAGE plpgsql SECURITY DEFINER
+SET
+  search_path = '' AS $$
+DECLARE
+  v_row_id  UUID;
+  v_package BYTEA;
+BEGIN
+  SELECT id, key_package
+  INTO v_row_id, v_package
+  FROM public.key_packages
+  WHERE device_id = p_device_id
+  LIMIT 1
+  FOR UPDATE SKIP LOCKED;
+
+  IF v_row_id IS NULL THEN
+    RAISE EXCEPTION 'No key packages available for device %', p_device_id;
+  END IF;
+
+  DELETE FROM public.key_packages WHERE id = v_row_id;
+
+  RETURN v_package;
 END;
 $$;
 
@@ -124,3 +186,53 @@ truncate on table "public"."devices" to "service_role";
 
 grant
 update on table "public"."devices" to "service_role";
+
+alter table "public"."key_packages" enable row level security;
+
+CREATE UNIQUE INDEX key_packages_pkey ON public.key_packages USING btree (id);
+
+CREATE INDEX key_packages_device_id_idx ON public.key_packages USING btree (device_id);
+
+alter table "public"."key_packages"
+add constraint "key_packages_pkey" PRIMARY KEY using index "key_packages_pkey";
+
+alter table "public"."key_packages"
+add constraint "key_packages_device_id_fkey" FOREIGN KEY (device_id) REFERENCES public.devices (id) ON UPDATE CASCADE ON DELETE CASCADE not valid;
+
+alter table "public"."key_packages" validate constraint "key_packages_device_id_fkey";
+
+grant delete on table "public"."key_packages" to "authenticated";
+
+grant insert on table "public"."key_packages" to "authenticated";
+
+grant references on table "public"."key_packages" to "authenticated";
+
+grant
+select
+  on table "public"."key_packages" to "authenticated";
+
+grant trigger on table "public"."key_packages" to "authenticated";
+
+grant
+truncate on table "public"."key_packages" to "authenticated";
+
+grant
+update on table "public"."key_packages" to "authenticated";
+
+grant delete on table "public"."key_packages" to "service_role";
+
+grant insert on table "public"."key_packages" to "service_role";
+
+grant references on table "public"."key_packages" to "service_role";
+
+grant
+select
+  on table "public"."key_packages" to "service_role";
+
+grant trigger on table "public"."key_packages" to "service_role";
+
+grant
+truncate on table "public"."key_packages" to "service_role";
+
+grant
+update on table "public"."key_packages" to "service_role";

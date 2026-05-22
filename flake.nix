@@ -15,7 +15,6 @@
       perSystem = {
         system,
         pkgs,
-        lib,
         ...
       }: let
         pname = "eko";
@@ -25,20 +24,15 @@
           inherit gitRev;
           inherit pname;
         };
-        commonPackages = with pkgs;
-          [
-            gcc
-            jdk
-            ninja
-            unzip
-            supabase-cli
-            sops
-            age
-          ]
-          ++ lib.optionals (!pkgs.stdenv.isDarwin) [
-            ungoogled-chromium
-            yq-go
-          ];
+        commonPackages = with pkgs; [
+          gcc
+          jdk
+          ninja
+          unzip
+          supabase-cli
+          sops
+          age
+        ];
         commonShellHook = ''
           git config core.hooksPath scripts/git-hooks
         '';
@@ -114,13 +108,34 @@
             };
             androidSdk = androidComposition.androidsdk;
             sdkPath = "${androidSdk}/libexec/android-sdk";
+            cmakeToolchain = pkgs.writeText "nix-toolchain.cmake" ''
+              set(OPENSSL_SSL_LIBRARY "${pkgs.openssl.out}/lib/libssl.so" CACHE FILEPATH "OpenSSL SSL library" FORCE)
+              set(CMAKE_PREFIX_PATH "${pkgs.openssl.out};${pkgs.openssl.dev};''${CMAKE_PREFIX_PATH}" CACHE STRING "CMake prefix path" FORCE)
+              set(OPENSSL_CRYPTO_LIBRARY "${pkgs.openssl.out}/lib/libcrypto.so" CACHE FILEPATH "OpenSSL crypto library" FORCE)
+            '';
           in
             pkgs.mkShellNoCC {
               ANDROID_SDK_ROOT = sdkPath;
               ANDROID_HOME = sdkPath;
-              nativeBuildInputs = commonPackages ++ [flutterPkg androidSdk];
+              nativeBuildInputs =
+                commonPackages
+                ++ (with pkgs; [
+                  ungoogled-chromium
+                  yq-go
+                  libsecret.dev
+                  openssl.dev
+                  clang
+                  openssl.out
+                  cmake
+                  pkg-config
+                ])
+                ++ [
+                  flutterPkg
+                  androidSdk
+                ];
               shellHook =
                 ''
+                  export CMAKE_TOOLCHAIN_FILE="${cmakeToolchain}"
                   export LD_LIBRARY_PATH="$PWD/eko_app/build/native_assets/linux:$LD_LIBRARY_PATH"
                   export CHROME_EXECUTABLE=$(which chromium)
                 ''
