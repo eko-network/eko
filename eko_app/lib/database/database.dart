@@ -78,7 +78,7 @@ Uint8List _generateRandomBytes(int length) {
 
 Future<String> _getDbPassword() async {
   final FlutterSecureStorage storage = const FlutterSecureStorage();
-  final key = '${c.appInstanceId}_db_key';
+  final key = c.dbKey;
   final stored = await storage.read(key: key);
   if (stored != null) {
     return stored;
@@ -96,7 +96,7 @@ LazyDatabase _openConnection() {
 
     final password = await _getDbPassword();
     final dbFolder = await getApplicationSupportDirectory();
-    final file = File(p.join(dbFolder.path, '${c.appInstanceId}.db'));
+    final file = File(p.join(dbFolder.path, c.db));
 
     // Open with SQLCipher
     final rawDb = sqlite3.open(file.path, uri: false);
@@ -113,14 +113,14 @@ LazyDatabase _openConnection() {
 /// Clear the database encryption key from secure storage
 Future<void> clearDatabaseEncryptionKey() async {
   final FlutterSecureStorage storage = const FlutterSecureStorage();
-  final key = '${c.appInstanceId}_db_key';
+  final key = c.dbKey;
   await storage.delete(key: key);
 }
 
 /// Delete the database file from disk
 Future<void> deleteDatabaseFile() async {
   final dbFolder = await getApplicationSupportDirectory();
-  final file = File(p.join(dbFolder.path, '${c.appInstanceId}.db'));
+  final file = File(p.join(dbFolder.path, c.db));
   if (await file.exists()) {
     await file.delete();
   }

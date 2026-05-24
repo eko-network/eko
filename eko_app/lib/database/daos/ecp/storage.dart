@@ -6,11 +6,10 @@ import 'package:ecp/ecp.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
-import 'package:eko_app/utilities/constants.dart' as c;
 import '../../database.dart';
 
 class _DriftMlsEngineConfigStore implements MlsEngineConfigStore {
-  static const _keyName = '${c.appInstanceId}_mls_engine_key';
+  static const _keyName = 'mls_engine_key';
 
   @override
   Future<MlsEngineConfig> getConfig() async {
@@ -26,7 +25,7 @@ class _DriftMlsEngineConfigStore implements MlsEngineConfigStore {
       await secureStorage.write(key: _keyName, value: storedKey);
     }
     final dbFolder = await getApplicationSupportDirectory();
-    final dbPath = p.join(dbFolder.path, '${c.appInstanceId}_mls.db');
+    final dbPath = p.join(dbFolder.path, 'mls.db');
     return MlsEngineConfig(
       dbPath: dbPath,
       encryptionKey: Uint8List.fromList(base64Decode(storedKey)),

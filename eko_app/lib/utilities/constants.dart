@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 double widthGetter(BuildContext context) {
@@ -135,7 +136,6 @@ const double navBarHeight = navBarIconSize + 20;
 const double postIconSize = 23;
 const double commentIconSize = 17;
 const String userNameReqs = r'^[a-z0-9_]{3,24}$';
-const String appInstanceId = 'eko_app';
 const double dividerWidth = 0.5;
 const double indealAppWidth = 650;
 
@@ -153,3 +153,5 @@ const String appStoreURL =
     'https://apps.apple.com/us/app/eko/id6470772031?platform=iphone';
 const String termsUrl = 'https://eko-app.com/privacy-policy';
 const String finance = 'https://finance.yahoo.com/quote/';
+const String db = 'ecp.db';
+const String dbKey = 'db_key';
