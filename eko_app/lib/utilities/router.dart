@@ -20,7 +20,7 @@ import 'package:eko_app/views/sign_up.dart';
 import 'package:eko_app/views/user_settings.dart';
 import 'package:eko_app/views/compose_page.dart';
 import 'package:eko_app/views/feed_page.dart';
-import 'package:eko_app/views/messages_page.dart';
+import 'package:eko_app/views/messenger/adaptive_chat_layout.dart';
 import 'package:eko_app/views/search_page.dart';
 import 'package:eko_app/views/edit_profile.dart';
 import 'package:eko_app/widgets/scaffolds/navigation_bar.dart';
@@ -257,7 +257,22 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                 path: '/messages',
                 name: 'messages',
                 pageBuilder: (context, state) =>
-                    const NoTransitionPage(child: MessagesPage()),
+                    NoTransitionPage(child: AdaptiveChat()),
+                routes: [
+                  GoRoute(
+                    path: ':id',
+                    name: 'message_thread',
+                    pageBuilder: (context, state) {
+                      final id = int.tryParse(state.pathParameters['id'] ?? '');
+                      if (id == null) {
+                        return NoTransitionPage(child: AdaptiveChat());
+                      }
+                      return NoTransitionPage(
+                        child: AdaptiveChat(selectedConversationId: id),
+                      );
+                    },
+                  ),
+                ],
               ),
             ],
           ),

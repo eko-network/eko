@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:eko_app/localization/generated/app_localizations.dart';
 import 'package:eko_app/utilities/device_uid_service.dart';
+import 'package:eko_app/database/messenger_clear.dart';
 import 'package:eko_app/utilities/ecp_ref.dart';
 import 'package:eko_app/widgets/errors/snack_bar.dart';
 import 'package:flutter/cupertino.dart';
@@ -169,6 +170,7 @@ class Auth extends _$Auth {
       (data) {
         final session = data.session;
         if (session == null) {
+          clearMessengerLocalData();
           state = AuthModel.signedOut();
         } else {
           _debugPrintSupabaseBearer(session);

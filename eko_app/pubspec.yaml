@@ -47,6 +47,8 @@ dependencies:
   go_router: ^15.1.2
   shimmer: ^3.0.0
   collection: ^1.17.1
+  characters: ^1.4.0
+  klipy_dart: ^0.0.2
   shared_preferences: ^2.5.3
   eraser: ^3.0.0
   extended_image: ^10.0.1

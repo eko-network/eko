@@ -234,7 +234,7 @@ packages:
     source: hosted
     version: "2.2.0"
   characters:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: characters
       sha256: faf38497bda5ead2a8c7615f4f7939df04333478bf32e4173fcb06d428b5716b
@@ -996,6 +996,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.3.1"
+  klipy_dart:
+    dependency: "direct main"
+    description:
+      name: klipy_dart
+      sha256: e175946111ded69374b9d13d14d7dae2738b0a4751307a28ea989311ba9ca367
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.2"
   leak_tracker:
     dependency: transitive
     description:
