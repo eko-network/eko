@@ -410,7 +410,7 @@ class Auth extends _$Auth {
 
     try {
       final deviceUid = DeviceUidService.getOrCreate();
-      final credentialIdentity = Uint8List.fromList(utf8.encode(deviceUid));
+      final credentialIdentity = Uint8List.fromList(utf8.encode(uid));
 
       final identity = await ecp.initializeIdentity(
         credentialIdentity: credentialIdentity,
@@ -418,7 +418,6 @@ class Auth extends _$Auth {
 
       await supabase.rpc('register_device', params: {
         'p_did': deviceUid,
-        'p_credential_identity': base64Encode(identity.credentialIdentity),
         'p_signer_public_key': base64Encode(identity.signerPublicKey),
       });
 

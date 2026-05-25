@@ -3,7 +3,6 @@ create table "public"."devices" (
   "created_at" timestamp with time zone not null default now(),
   "uid" uuid default gen_random_uuid(),
   "session_id" uuid default gen_random_uuid(),
-  "credential_identity" bytea not null,
   "signer_public_key" bytea not null
 );
 
@@ -40,7 +39,6 @@ $$;
 
 CREATE OR REPLACE FUNCTION public.register_device (
   p_did UUID,
-  p_credential_identity BYTEA DEFAULT NULL,
   p_signer_public_key BYTEA DEFAULT NULL
 ) RETURNS UUID LANGUAGE plpgsql SECURITY DEFINER
 SET
@@ -53,11 +51,10 @@ BEGIN
     RAISE EXCEPTION 'Not authenticated';
   END IF;
 
-  INSERT INTO public.devices (id, uid, session_id, credential_identity, signer_public_key)
-  VALUES (p_did, v_uid, v_session_id, p_credential_identity, p_signer_public_key)
+  INSERT INTO public.devices (id, uid, session_id, signer_public_key)
+  VALUES (p_did, v_uid, v_session_id,  p_signer_public_key)
   ON CONFLICT (id) DO UPDATE
     SET session_id          = EXCLUDED.session_id,
-        credential_identity = COALESCE(EXCLUDED.credential_identity, public.devices.credential_identity),
         signer_public_key   = COALESCE(EXCLUDED.signer_public_key, public.devices.signer_public_key),
         created_at          = now()
   WHERE public.devices.uid = v_uid;
@@ -98,23 +95,28 @@ CREATE OR REPLACE FUNCTION public.take_key_package (p_device_id UUID) RETURNS BY
 SET
   search_path = '' AS $$
 DECLARE
-  v_row_id  UUID;
-  v_package BYTEA;
+    v_ids UUID[];
+    v_packages BYTEA[];
 BEGIN
-  SELECT id, key_package
-  INTO v_row_id, v_package
-  FROM public.key_packages
-  WHERE device_id = p_device_id
-  LIMIT 1
-  FOR UPDATE SKIP LOCKED;
+    SELECT array_agg(id), array_agg(key_package)
+    INTO v_ids, v_packages
+    FROM (
+        SELECT id, key_package
+        FROM public.key_packages
+        WHERE device_id = p_device_id
+        LIMIT 2
+        FOR UPDATE
+    ) locked_rows;
 
-  IF v_row_id IS NULL THEN
-    RAISE EXCEPTION 'No key packages available for device %', p_device_id;
-  END IF;
+    IF v_ids IS NULL THEN
+        RAISE EXCEPTION 'No key packages available for device %', p_device_id;
+    END IF;
 
-  DELETE FROM public.key_packages WHERE id = v_row_id;
+    IF array_length(v_ids, 1) > 1 THEN
+        DELETE FROM public.key_packages WHERE id = v_ids[1];
+    END IF;
 
-  RETURN v_package;
+    RETURN v_packages[1];
 END;
 $$;
 
