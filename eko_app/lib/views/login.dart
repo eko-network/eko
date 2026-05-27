@@ -49,6 +49,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     try {
       await ref.read(authProvider.notifier).signInWithGoogle();
     } on AuthException catch (e) {
+      debugPrint(e.toString());
       if (!mounted) return;
       showSnackBar(
         text: '${AppLocalizations.of(context)!.error}: ${e.message}',

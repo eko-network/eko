@@ -7,7 +7,7 @@ import 'package:eko_app/database/database.dart';
 import 'package:eko_app/database/models/message_with_attachments.dart';
 import 'package:eko_app/database/type_converters.dart';
 import 'package:eko_app/providers/auth_provider.dart';
-import 'package:eko_app/providers/ecp_session_provider.dart';
+import 'package:eko_app/providers/ecp_client_holder.dart';
 import 'package:eko_app/services/messenger_notification_service.dart';
 import 'package:eko_app/utilities/platform.dart' as platform;
 import 'package:flutter/widgets.dart' hide Image;
@@ -36,9 +36,8 @@ class MessagePolling extends _$MessagePolling with WidgetsBindingObserver {
       }
     });
 
-    ref.listen(ecpSessionHolderProvider, (previous, next) {
-      final session = next.valueOrNull;
-      if (session != null && !session.isExpired) {
+    ref.listen(ecpClientHolderProvider, (previous, next) {
+      if (next.valueOrNull != null) {
         _tryStartStreaming();
       } else {
         _stopStreaming();
@@ -74,27 +73,30 @@ class MessagePolling extends _$MessagePolling with WidgetsBindingObserver {
   }
 
   void _tryStartStreaming() {
-    final session = ref.read(ecpSessionHolderProvider).valueOrNull;
-    if (session == null || session.isExpired) return;
-    if (ref.read(ecpSessionHolderProvider.notifier).client == null) return;
+    if (ref.read(ecpClientHolderProvider).valueOrNull == null) return;
+    if (ref.read(ecpClientHolderProvider.notifier).client == null) return;
     _startStreaming();
   }
 
   EcpClient? _activeClient() =>
-      ref.read(ecpSessionHolderProvider.notifier).client;
+      ref.read(ecpClientHolderProvider.notifier).client;
 
   void _pauseStream() {
     if (!_isStreamActive) return;
     try {
       _activeClient()?.messageStreamController.pause();
-    } catch (_) {}
+    } catch (e) {
+      debugPrint(e.toString());
+    }
   }
 
   void _resumeStream() {
     if (!_isStreamActive) return;
     try {
       _activeClient()?.messageStreamController.resume();
-    } catch (_) {}
+    } catch (e) {
+      debugPrint(e.toString());
+    }
   }
 
   void _startStreaming() {
@@ -102,13 +104,14 @@ class MessagePolling extends _$MessagePolling with WidgetsBindingObserver {
 
     final ecpClient = _activeClient();
     if (ecpClient == null) return;
+    if (ecpClient.capabilities.socket?.endpoint == null) return;
 
     _isStreamActive = true;
     _messageStreamSubscription =
         ecpClient.messageStreamController.getMessageStream().listen(
       processMessage,
       onError: (error) {
-        debugPrint('Error in message stream: $error');
+        debugPrint(error.toString());
       },
       cancelOnError: false,
     );
@@ -147,7 +150,7 @@ class MessagePolling extends _$MessagePolling with WidgetsBindingObserver {
             await db.contactsDao.insertNewContact(person);
             contact = person;
           } catch (e) {
-            debugPrint('Could not fetch remote actor $otherParty: $e');
+            debugPrint(e.toString());
             return;
           }
         }

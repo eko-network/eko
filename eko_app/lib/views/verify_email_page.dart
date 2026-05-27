@@ -60,7 +60,8 @@ class _VerifyEmailViewState extends ConsumerState<VerifyEmailView> {
     try {
       await ref.read(authProvider.notifier).sendEmailVerification(email);
       _startTimer();
-    } catch (_) {
+    } catch (e) {
+      debugPrint(e.toString());
     } finally {
       if (mounted) setState(() => _resendLoading = false);
     }

@@ -1,11 +1,15 @@
 import 'package:eko_app/database/daos/conversations_dao.dart';
 import 'package:eko_app/localization/generated/app_localizations.dart';
+import 'package:eko_app/interfaces/user.dart' as user_api;
 import 'package:eko_app/providers/auth_provider.dart';
+import 'package:eko_app/providers/ecp_client_provider.dart';
+import 'package:eko_app/utilities/ecp_person.dart';
+import 'package:eko_app/utilities/supabase_ref.dart';
 import 'package:eko_app/utilities/constants.dart' as c;
 import 'package:eko_app/utilities/emoji_text_style.dart';
-import 'package:eko_app/widgets/messenger/avatar.dart';
 import 'package:eko_app/widgets/messenger/relative_time.dart';
 import 'package:eko_app/widgets/messenger/resizable_panel.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -46,27 +50,73 @@ class _ConversationListState extends ConsumerState<ConversationList> {
     if (ref.read(authProvider).uid == null) {
       return;
     }
+    final query = newMessageController.text.trim();
+    if (query.isEmpty) return;
+
+    final username = query.startsWith('@') ? query.substring(1) : query;
+    final peerUid = await user_api.getUidFromUsername(username);
     if (!mounted) return;
-    await showDialog<void>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('User not found'),
-        content: Text(
-          'Could not find "${newMessageController.text.trim()}".',
+    if (peerUid == null || peerUid.isEmpty) {
+      await showDialog<void>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('User not found'),
+          content: Text('Could not find "@$username".'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(l10n.ok),
+            ),
+          ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(l10n.ok),
-          ),
-        ],
-      ),
-    );
+      );
+      return;
+    }
+
+    final userRow = await supabase
+        .from('users')
+        .select('username')
+        .eq('id', peerUid)
+        .maybeSingle();
+    final peerUsername = (userRow?['username'] as String?)?.trim() ?? username;
+
+    try {
+      final client = ref.read(ecpClientProvider);
+      final peer = buildMessengerPerson(
+        supabaseUid: peerUid,
+        preferredUsername: peerUsername,
+      );
+      await client.ensureKeysFor(person: peer);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Keys exchanged with @$peerUsername')),
+      );
+      setState(() {
+        newChatScreen = false;
+        newMessageController.clear();
+      });
+    } catch (e, st) {
+      debugPrint(e.toString());
+      debugPrint(st.toString());
+      if (!mounted) return;
+      await showDialog<void>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Key exchange failed'),
+          content: Text('$e'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(l10n.ok),
+            ),
+          ],
+        ),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
     final ecpReady = ref.watch(authProvider).uid?.isNotEmpty ?? false;
 
@@ -84,48 +134,21 @@ class _ConversationListState extends ConsumerState<ConversationList> {
                         mainAxisSize: MainAxisSize.max,
                         children: [
                           const SizedBox(height: 8),
-                          if (!showOnlyAvatar)
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                const SizedBox(width: 16),
-                                IconButton(
-                                  onPressed: () => context.go('/profile'),
-                                  icon: const Icon(Icons.settings_outlined),
-                                  iconSize: 30,
-                                  padding: const EdgeInsets.all(5),
-                                  splashRadius: c.kConversationAvatarRadius,
-                                ),
-                                const SizedBox(width: 16),
-                                Expanded(
-                                  child: Text(
-                                    l10n.messengerTitle,
-                                    style:
-                                        Theme.of(context).textTheme.titleLarge,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                                const SizedBox(width: 16),
-                                IconButton(
+                          showOnlyAvatar
+                              ? IconButton(
                                   onPressed: onNewPressed,
                                   icon: const Icon(Icons.edit_outlined),
-                                  iconSize: 30,
-                                  padding: const EdgeInsets.all(5),
-                                  splashRadius: c.kConversationAvatarRadius,
+                                )
+                              : Align(
+                                  alignment: Alignment.centerRight,
+                                  child: IconButton(
+                                    onPressed: onNewPressed,
+                                    icon: const Icon(Icons.edit_outlined),
+                                    iconSize: 30,
+                                    padding: const EdgeInsets.all(5),
+                                    splashRadius: c.kConversationAvatarRadius,
+                                  ),
                                 ),
-                                const SizedBox(width: 16),
-                              ],
-                            ),
-                          if (showOnlyAvatar) ...[
-                            IconButton(
-                              onPressed: () => context.go('/profile'),
-                              icon: const Icon(Icons.settings_outlined),
-                            ),
-                            IconButton(
-                              onPressed: onNewPressed,
-                              icon: const Icon(Icons.edit_outlined),
-                            ),
-                          ],
                           Expanded(
                             child: ListView.builder(
                               itemCount: widget.conversations.length,
@@ -148,11 +171,7 @@ class _ConversationListState extends ConsumerState<ConversationList> {
                                           const EdgeInsets.symmetric(
                                         vertical: 4,
                                       ),
-                                      title: Center(
-                                        child: MessengerAvatar(
-                                          person: conversation.contact,
-                                        ),
-                                      ),
+                                      title: Center(child: SizedBox()), //FIXME
                                       onTap: () => widget.onConversationTap(
                                         conversation.conversation.id,
                                       ),
@@ -164,9 +183,7 @@ class _ConversationListState extends ConsumerState<ConversationList> {
                                   selected: isSelected,
                                   selectedTileColor:
                                       colorScheme.secondaryContainer,
-                                  leading: MessengerAvatar(
-                                    person: conversation.contact,
-                                  ),
+                                  leading: SizedBox(), //FIXME
                                   title: Text(
                                     conversation.contact.preferredUsername,
                                     style: const TextStyle(

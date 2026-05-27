@@ -180,7 +180,7 @@ class _MessageStreamProviderElement
   Uri get actorId => (origin as MessageStreamProvider).actorId;
 }
 
-String _$messagePollingHash() => r'134d36962c7451e1751a951a9845d87b8dc39eaf';
+String _$messagePollingHash() => r'10d05629895cf70611cb2337eac110b88a65f5ad';
 
 /// See also [MessagePolling].
 @ProviderFor(MessagePolling)

@@ -104,6 +104,7 @@ class _ChangeEmailPageState extends ConsumerState<ChangeEmailPage> {
       );
       return;
     } catch (e) {
+      debugPrint(e.toString());
       if (!mounted) return;
       setState(() => isLoading = false);
       showSnackBar(

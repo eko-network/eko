@@ -16,16 +16,3 @@ class UserDevices extends Table {
       .map(const UriTypeConverter())();
   TextColumn get deviceId => text().unique().map(const UriTypeConverter())();
 }
-
-class AuthInfoTable extends Table {
-  IntColumn get id => integer().withDefault(const Constant(1))();
-  TextColumn get did => text().map(const UriTypeConverter())();
-  TextColumn get accessToken => text()();
-  TextColumn get refreshToken => text()();
-  DateTimeColumn get expiresAt => dateTime()();
-  TextColumn get actorJson => text()(); // Store actor as JSON
-  TextColumn get serverUrl => text().map(const UriTypeConverter())();
-
-  @override
-  Set<Column> get primaryKey => {id};
-}

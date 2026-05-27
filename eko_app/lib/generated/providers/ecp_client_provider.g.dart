@@ -6,7 +6,7 @@ part of '../../providers/ecp_client_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$ecpClientHash() => r'14223b1fcfcf40f4e577b7e892fdd41dc7509f38';
+String _$ecpClientHash() => r'cbaf27414a2d0c851d796b7cba60b53e8af8b31c';
 
 /// See also [ecpClient].
 @ProviderFor(ecpClient)
@@ -22,7 +22,7 @@ final ecpClientProvider = Provider<EcpClient>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef EcpClientRef = ProviderRef<EcpClient>;
-String _$ecpMessengerReadyHash() => r'5c0e33fa6ecbd05eb35d242822528d362e1a1975';
+String _$ecpMessengerReadyHash() => r'18ab682d7d15e662600efc438f17e9b05e912469';
 
 /// See also [ecpMessengerReady].
 @ProviderFor(ecpMessengerReady)

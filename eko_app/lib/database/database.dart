@@ -38,7 +38,6 @@ part '../generated/database/database.g.dart';
     // Auth
     Users,
     UserDevices,
-    AuthInfoTable,
     // Other
     Messages,
     Media,
@@ -51,7 +50,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration {

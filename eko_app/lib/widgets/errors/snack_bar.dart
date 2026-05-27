@@ -139,7 +139,6 @@ class _ToastContentState extends State<_ToastContent>
           ),
           child: Stack(
             children: [
-              // Main content
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: Row(
@@ -156,12 +155,10 @@ class _ToastContentState extends State<_ToastContent>
                         ),
                       ),
                     ),
-                    // Spacing for close button
                     const SizedBox(width: 32),
                   ],
                 ),
               ),
-              // Close button (visible on hover)
               Positioned(
                 top: 8,
                 right: 8,

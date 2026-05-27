@@ -6,7 +6,6 @@ Future<void> clearMessengerLocalData() async {
     await db.delete(db.media).go();
     await db.delete(db.conversations).go();
     await db.delete(db.contacts).go();
-    await db.delete(db.authInfoTable).go();
     await db.delete(db.capabilities).go();
     await db.delete(db.mlsCredentials).go();
     await db.delete(db.mlsKeyPackages).go();

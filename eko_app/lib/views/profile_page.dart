@@ -72,6 +72,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         }
       });
     } catch (e) {
+      debugPrint(e.toString());
       if (!mounted) return;
       setState(() {
         _error = AppLocalizations.of(context)!.profileResolveFailed;
@@ -381,9 +382,12 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
             );
           },
           loading: () => const Center(child: LoadingSpinner()),
-          error: (error, stack) => Center(
-            child: Text(AppLocalizations.of(context)!.profileLoadFailed),
-          ),
+          error: (error, stack) {
+            debugPrint(error.toString());
+            return Center(
+              child: Text(AppLocalizations.of(context)!.profileLoadFailed),
+            );
+          },
         ),
       ),
     );

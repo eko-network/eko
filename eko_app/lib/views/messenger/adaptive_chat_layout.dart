@@ -35,9 +35,12 @@ class AdaptiveChat extends ConsumerWidget {
           },
         ),
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stackTrace) => Center(
-          child: Text('Could not load conversations: $error'),
-        ),
+        error: (error, stackTrace) {
+          debugPrint(error.toString());
+          return Center(
+            child: Text('Could not load conversations: $error'),
+          );
+        },
       ),
     );
   }

@@ -1,61 +1,57 @@
 import 'package:ecp/ecp.dart';
 import 'package:eko_app/database/daos/ecp/storage.dart';
 import 'package:eko_app/database/database.dart';
-import 'package:eko_app/database/ecp_session_store.dart';
 import 'package:eko_app/providers/auth_provider.dart';
-import 'package:eko_app/types/ecp_session.dart';
+import 'package:eko_app/providers/current_user_provider.dart';
+import 'package:eko_app/utilities/ecp_person.dart';
+import 'package:eko_app/utilities/supabase_ecp_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part '../generated/providers/ecp_session_provider.g.dart';
-
-class _StaticTokenProvider implements TokenProvider {
-  _StaticTokenProvider(this._token);
-  final String _token;
-
-  @override
-  Future<String?> getAccessToken() async => _token;
-}
+part '../generated/providers/ecp_client_holder.g.dart';
 
 @Riverpod(keepAlive: true)
-class EcpSessionHolder extends _$EcpSessionHolder {
+class EcpClientHolder extends _$EcpClientHolder {
   EcpClient? _client;
 
   @override
-  Future<EcpSession?> build() async {
+  Future<EcpClient?> build() async {
     ref.listen(authProvider, (previous, next) {
       if (previous?.uid != next.uid) {
         ref.invalidateSelf();
       }
     });
 
-    final uid = ref.watch(authProvider).uid;
-    if (uid == null || uid.isEmpty) {
+    final auth = ref.watch(authProvider);
+    if (auth.uid == null ||
+        auth.uid!.isEmpty ||
+        auth.did == null ||
+        auth.did!.isEmpty) {
       await _closeClient();
       return null;
     }
 
-    final session = await EcpSessionStore(db).load();
-    if (session == null || session.isExpired) {
-      await _closeClient();
-      return session;
-    }
-
-    await _ensureClient(session);
-    return session;
+    await _ensureClient(auth.uid!, auth.did!);
+    return _client;
   }
 
-  Future<void> _ensureClient(EcpSession session) async {
+  Future<void> _ensureClient(String uid, String did) async {
     if (_client != null) return;
     try {
+      final user = ref.read(currentUserProvider).user;
+      final username = user.username.isNotEmpty ? user.username : uid;
+      final me = buildMessengerPerson(
+        supabaseUid: uid,
+        preferredUsername: username,
+      );
       _client = await EcpClient.build(
         storage: DriftStorage(db),
         client: http.Client(),
-        me: session.actor,
-        did: session.did,
-        tokenProvider: _StaticTokenProvider(session.accessToken),
+        me: me,
+        did: messengerDeviceId(uid, did),
+        tokenProvider: supabaseTokenProvider,
+        requestAuthenticator: supabaseRequestAuthenticator,
       );
     } catch (e, st) {
       debugPrint('Failed to build EcpClient: $e\n$st');
@@ -73,7 +69,7 @@ class EcpSessionHolder extends _$EcpSessionHolder {
 
   EcpClient? get client => _client;
 
-  Future<void> refreshSession() async {
+  Future<void> rebuildClient() async {
     await _closeClient();
     ref.invalidateSelf();
   }

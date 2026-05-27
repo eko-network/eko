@@ -122,7 +122,7 @@ class _ResizablePanelState extends State<ResizablePanel> {
 
   @override
   Widget build(BuildContext context) {
-    final dividerColor = Theme.of(context).colorScheme.outlineVariant;
+    final dividerColor = Theme.of(context).colorScheme.outline;
 
     return ListenableBuilder(
       listenable: _controller,

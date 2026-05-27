@@ -220,6 +220,7 @@ class _CommentCardState extends ConsumerState<CommentCard> {
         );
       },
       error: (error, stackTrace) {
+        debugPrint(error.toString());
         return _Error();
       },
       loading: () {
