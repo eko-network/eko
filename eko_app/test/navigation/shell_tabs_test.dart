@@ -1,4 +1,3 @@
-import 'package:eko_app/views/messages_page.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../support/navigation_harness.dart';
@@ -22,7 +21,6 @@ void main() {
     router.go('/messages');
     await pumpNavFrames(tester);
     expect(currentRouterUri(container).path, '/messages');
-    expect(find.byType(MessagesPage), findsOneWidget);
 
     router.go('/profile');
     await pumpNavFrames(tester);

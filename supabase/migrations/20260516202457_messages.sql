@@ -37,10 +37,7 @@ BEGIN
 END;
 $$;
 
-CREATE OR REPLACE FUNCTION public.register_device (
-  p_did UUID,
-  p_signer_public_key BYTEA DEFAULT NULL
-) RETURNS UUID LANGUAGE plpgsql SECURITY DEFINER
+CREATE OR REPLACE FUNCTION public.register_device (p_did UUID, p_signer_public_key TEXT DEFAULT NULL) RETURNS UUID LANGUAGE plpgsql SECURITY DEFINER
 SET
   search_path = '' AS $$
 DECLARE
@@ -52,9 +49,14 @@ BEGIN
   END IF;
 
   INSERT INTO public.devices (id, uid, session_id, signer_public_key)
-  VALUES (p_did, v_uid, v_session_id,  p_signer_public_key)
+  VALUES (
+    p_did, 
+    v_uid, 
+    v_session_id,  
+    CASE WHEN p_signer_public_key IS NOT NULL THEN decode(p_signer_public_key, 'base64') ELSE NULL END
+  )
   ON CONFLICT (id) DO UPDATE
-    SET session_id          = EXCLUDED.session_id,
+    SET session_id        = EXCLUDED.session_id,
         signer_public_key   = COALESCE(EXCLUDED.signer_public_key, public.devices.signer_public_key),
         created_at          = now()
   WHERE public.devices.uid = v_uid;
@@ -67,12 +69,12 @@ BEGIN
 END;
 $$;
 
-CREATE OR REPLACE FUNCTION public.add_key_packages (p_did UUID, p_key_packages BYTEA[]) RETURNS VOID LANGUAGE plpgsql SECURITY DEFINER
+CREATE OR REPLACE FUNCTION public.add_key_packages (p_did UUID, p_key_packages TEXT[]) RETURNS VOID LANGUAGE plpgsql SECURITY DEFINER
 SET
   search_path = '' AS $$
 DECLARE
   v_uid UUID := auth.uid();
-  pkg   BYTEA;
+  pkg   TEXT;          
 BEGIN
   IF v_uid IS NULL THEN
     RAISE EXCEPTION 'Not authenticated';
@@ -86,7 +88,7 @@ BEGIN
 
   FOREACH pkg IN ARRAY p_key_packages LOOP
     INSERT INTO public.key_packages (device_id, key_package)
-    VALUES (p_did, pkg);
+    VALUES (p_did, decode(pkg, 'base64'));
   END LOOP;
 END;
 $$;

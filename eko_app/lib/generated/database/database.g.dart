@@ -1931,11 +1931,6 @@ class $ContactsTable extends Contacts with TableInfo<$ContactsTable, Person> {
       devicesEndpoint: $ContactsTable.$converterdevicesEndpoint.fromSql(
           attachedDatabase.typeMapping.read(DriftSqlType.string,
               data['${effectivePrefix}devices_endpoint'])!),
-      preferredUsername: attachedDatabase.typeMapping.read(
-          DriftSqlType.string, data['${effectivePrefix}preferred_username'])!,
-      profilePicture: $ContactsTable.$converterprofilePicturen.fromSql(
-          attachedDatabase.typeMapping.read(
-              DriftSqlType.string, data['${effectivePrefix}profile_picture'])),
     );
   }
 

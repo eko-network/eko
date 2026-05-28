@@ -247,6 +247,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get iveVerifiedMyEmail => 'I\'ve verified my email';
 
   @override
+  String get keyExchangeFailed => 'Key exchange failed';
+
+  @override
+  String get keysExchanged => 'Keys exchanged';
+
+  @override
   String get likes => 'Up-ekos';
 
   @override
@@ -288,6 +294,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get newLines => 'New Lines';
+
+  @override
+  String get newMessage => 'New message';
 
   @override
   String get newPasswordMustBeDifferent => 'New Password Must be Different';
@@ -459,6 +468,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get usernameTakenBody =>
       'Please go back and choose a different username.';
+
+  @override
+  String get userMayNotHaveDeviceRegistered =>
+      'User may not have a device registered.';
 
   @override
   String get userNotFound => 'User Not Found';

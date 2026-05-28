@@ -2,7 +2,6 @@ import 'package:ecp/ecp.dart';
 import 'package:eko_app/database/daos/ecp/storage.dart';
 import 'package:eko_app/database/database.dart';
 import 'package:eko_app/providers/auth_provider.dart';
-import 'package:eko_app/providers/current_user_provider.dart';
 import 'package:eko_app/utilities/ecp_person.dart';
 import 'package:eko_app/utilities/supabase_ecp_auth.dart';
 import 'package:flutter/foundation.dart';
@@ -39,17 +38,14 @@ class EcpClientHolder extends _$EcpClientHolder {
   Future<void> _ensureClient(String uid, String did) async {
     if (_client != null) return;
     try {
-      final user = ref.read(currentUserProvider).user;
-      final username = user.username.isNotEmpty ? user.username : uid;
       final me = buildMessengerPerson(
         supabaseUid: uid,
-        preferredUsername: username,
       );
       _client = await EcpClient.build(
         storage: DriftStorage(db),
         client: http.Client(),
         me: me,
-        did: messengerDeviceId(uid, did),
+        did: did,
         tokenProvider: supabaseTokenProvider,
         requestAuthenticator: supabaseRequestAuthenticator,
       );

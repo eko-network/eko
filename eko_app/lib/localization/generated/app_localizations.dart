@@ -558,6 +558,18 @@ abstract class AppLocalizations {
   /// **'I\'ve verified my email'**
   String get iveVerifiedMyEmail;
 
+  /// No description provided for @keyExchangeFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Key exchange failed'**
+  String get keyExchangeFailed;
+
+  /// No description provided for @keysExchanged.
+  ///
+  /// In en, this message translates to:
+  /// **'Keys exchanged'**
+  String get keysExchanged;
+
   /// No description provided for @likes.
   ///
   /// In en, this message translates to:
@@ -641,6 +653,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'New Lines'**
   String get newLines;
+
+  /// No description provided for @newMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'New message'**
+  String get newMessage;
 
   /// No description provided for @newPasswordMustBeDifferent.
   ///
@@ -965,6 +983,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Please go back and choose a different username.'**
   String get usernameTakenBody;
+
+  /// No description provided for @userMayNotHaveDeviceRegistered.
+  ///
+  /// In en, this message translates to:
+  /// **'User may not have a device registered.'**
+  String get userMayNotHaveDeviceRegistered;
 
   /// No description provided for @userNotFound.
   ///

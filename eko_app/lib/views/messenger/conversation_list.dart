@@ -1,18 +1,22 @@
+import 'dart:async';
+
 import 'package:eko_app/database/daos/conversations_dao.dart';
+import 'package:eko_app/interfaces/search.dart';
 import 'package:eko_app/localization/generated/app_localizations.dart';
-import 'package:eko_app/interfaces/user.dart' as user_api;
 import 'package:eko_app/providers/auth_provider.dart';
 import 'package:eko_app/providers/ecp_client_provider.dart';
+import 'package:eko_app/types/user.dart';
 import 'package:eko_app/utilities/ecp_person.dart';
-import 'package:eko_app/utilities/supabase_ref.dart';
 import 'package:eko_app/utilities/constants.dart' as c;
 import 'package:eko_app/utilities/emoji_text_style.dart';
+import 'package:eko_app/widgets/common/infinite_scrolly.dart';
+import 'package:eko_app/widgets/loading/shimmer_loaders.dart';
 import 'package:eko_app/widgets/messenger/relative_time.dart';
 import 'package:eko_app/widgets/messenger/resizable_panel.dart';
-import 'package:flutter/foundation.dart';
+import 'package:eko_app/widgets/search/user_search_bar.dart';
+import 'package:eko_app/widgets/users/user_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 class ConversationList extends ConsumerStatefulWidget {
   final bool isWideScreen;
@@ -35,8 +39,12 @@ class ConversationList extends ConsumerStatefulWidget {
 }
 
 class _ConversationListState extends ConsumerState<ConversationList> {
-  final newMessageController = TextEditingController();
+  final searchController = TextEditingController();
   bool newChatScreen = false;
+  List<MapEntry<String, double>> searchData = [];
+  bool searchIsEnd = false;
+  Timer? debounce;
+  String lastSearchVal = '';
 
   void onNewPressed() {
     widget.panelController?.expand();
@@ -45,55 +53,78 @@ class _ConversationListState extends ConsumerState<ConversationList> {
     });
   }
 
-  Future<void> onSearchGetPressed() async {
+  void searchInputListener() {
+    if (searchController.text == lastSearchVal) return;
+    lastSearchVal = searchController.text;
+    setState(() {
+      searchData.clear();
+      searchIsEnd = false;
+    });
+    if (debounce?.isActive ?? false) debounce!.cancel();
+    debounce = Timer(
+      const Duration(milliseconds: c.searchPageDebounce),
+      () async {
+        final res = await SearchInterface.getter(
+          [],
+          ref,
+          searchController.text,
+          excludeCurrent: true,
+        );
+        setState(() {
+          searchData = res.$1;
+          searchIsEnd = res.$2;
+        });
+      },
+    );
+  }
+
+  Future<void> onSearchRefresh() async {
+    if (debounce?.isActive ?? false) debounce!.cancel();
+    final res = await SearchInterface.getter(
+      [],
+      ref,
+      searchController.text,
+      excludeCurrent: true,
+    );
+    setState(() {
+      searchData = res.$1;
+      searchIsEnd = res.$2;
+    });
+  }
+
+  Future<void> onSearchLoadMore() async {
+    final res = await SearchInterface.getter(
+      searchData,
+      ref,
+      searchController.text,
+      excludeCurrent: true,
+    );
+    setState(() {
+      searchData.addAll(res.$1);
+      searchIsEnd = res.$2;
+    });
+  }
+
+  Future<void> onUserSelected(UserModel user) async {
     final l10n = AppLocalizations.of(context)!;
-    if (ref.read(authProvider).uid == null) {
-      return;
-    }
-    final query = newMessageController.text.trim();
-    if (query.isEmpty) return;
-
-    final username = query.startsWith('@') ? query.substring(1) : query;
-    final peerUid = await user_api.getUidFromUsername(username);
-    if (!mounted) return;
-    if (peerUid == null || peerUid.isEmpty) {
-      await showDialog<void>(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('User not found'),
-          content: Text('Could not find "@$username".'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text(l10n.ok),
-            ),
-          ],
-        ),
-      );
-      return;
-    }
-
-    final userRow = await supabase
-        .from('users')
-        .select('username')
-        .eq('id', peerUid)
-        .maybeSingle();
-    final peerUsername = (userRow?['username'] as String?)?.trim() ?? username;
+    if (ref.read(authProvider).uid == null) return;
 
     try {
       final client = ref.read(ecpClientProvider);
       final peer = buildMessengerPerson(
-        supabaseUid: peerUid,
-        preferredUsername: peerUsername,
+        supabaseUid: user.uid,
       );
-      await client.ensureKeysFor(person: peer);
+      await client.session.createGroup([peer]);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Keys exchanged with @$peerUsername')),
+        SnackBar(content: Text(l10n.keysExchanged)),
       );
       setState(() {
         newChatScreen = false;
-        newMessageController.clear();
+        searchController.clear();
+        searchData.clear();
+        searchIsEnd = false;
+        lastSearchVal = '';
       });
     } catch (e, st) {
       debugPrint(e.toString());
@@ -102,8 +133,8 @@ class _ConversationListState extends ConsumerState<ConversationList> {
       await showDialog<void>(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('Key exchange failed'),
-          content: Text('$e'),
+          title: Text(l10n.keyExchangeFailed),
+          content: Text(l10n.userMayNotHaveDeviceRegistered),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
@@ -116,186 +147,173 @@ class _ConversationListState extends ConsumerState<ConversationList> {
   }
 
   @override
+  void initState() {
+    searchController.addListener(searchInputListener);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    searchController.removeListener(searchInputListener);
+    debounce?.cancel();
+    searchController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
-    final ecpReady = ref.watch(authProvider).uid?.isNotEmpty ?? false;
 
     return Scaffold(
       body: SafeArea(
-        child: ecpReady
-            ? LayoutBuilder(
-                builder: (context, constraints) {
-                  final showOnlyAvatar = constraints.maxWidth <
-                      (c.kConversationAvatarRadius * 2) + 45;
-                  return IndexedStack(
-                    index: newChatScreen ? 1 : 0,
-                    children: [
-                      Column(
-                        mainAxisSize: MainAxisSize.max,
-                        children: [
-                          const SizedBox(height: 8),
-                          showOnlyAvatar
-                              ? IconButton(
-                                  onPressed: onNewPressed,
-                                  icon: const Icon(Icons.edit_outlined),
-                                )
-                              : Align(
-                                  alignment: Alignment.centerRight,
-                                  child: IconButton(
-                                    onPressed: onNewPressed,
-                                    icon: const Icon(Icons.edit_outlined),
-                                    iconSize: 30,
-                                    padding: const EdgeInsets.all(5),
-                                    splashRadius: c.kConversationAvatarRadius,
-                                  ),
-                                ),
-                          Expanded(
-                            child: ListView.builder(
-                              itemCount: widget.conversations.length,
-                              itemBuilder: (context, index) {
-                                final conversation =
-                                    widget.conversations[index];
-                                final isSelected =
-                                    conversation.conversation.id ==
-                                        widget.selectedId;
-
-                                if (showOnlyAvatar) {
-                                  return Tooltip(
-                                    message:
-                                        conversation.contact.preferredUsername,
-                                    child: ListTile(
-                                      selected: isSelected,
-                                      selectedTileColor:
-                                          colorScheme.secondaryContainer,
-                                      contentPadding:
-                                          const EdgeInsets.symmetric(
-                                        vertical: 4,
-                                      ),
-                                      title: Center(child: SizedBox()), //FIXME
-                                      onTap: () => widget.onConversationTap(
-                                        conversation.conversation.id,
-                                      ),
-                                    ),
-                                  );
-                                }
-
-                                return ListTile(
-                                  selected: isSelected,
-                                  selectedTileColor:
-                                      colorScheme.secondaryContainer,
-                                  leading: SizedBox(), //FIXME
-                                  title: Text(
-                                    conversation.contact.preferredUsername,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  subtitle: Text(
-                                    conversation
-                                            .conversation.lastMessageContent ??
-                                        '',
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: emojiTextStyle(const TextStyle()),
-                                  ),
-                                  trailing: RelativeTimeWidget(
-                                    time: conversation
-                                        .conversation.lastMessageTime,
-                                  ),
-                                  onTap: () => widget.onConversationTap(
-                                    conversation.conversation.id,
-                                  ),
-                                );
-                              },
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final showOnlyAvatar =
+                constraints.maxWidth < (c.kConversationAvatarRadius * 2) + 45;
+            return IndexedStack(
+              index: newChatScreen ? 1 : 0,
+              children: [
+                Column(
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    const SizedBox(height: 8),
+                    showOnlyAvatar
+                        ? IconButton(
+                            onPressed: onNewPressed,
+                            icon: const Icon(Icons.edit_outlined),
+                          )
+                        : Align(
+                            alignment: Alignment.centerRight,
+                            child: IconButton(
+                              onPressed: onNewPressed,
+                              icon: const Icon(Icons.edit_outlined),
+                              iconSize: 30,
+                              padding: const EdgeInsets.all(5),
+                              splashRadius: c.kConversationAvatarRadius,
                             ),
                           ),
-                        ],
-                      ),
-                      Column(
-                        mainAxisSize: MainAxisSize.max,
-                        children: [
-                          const SizedBox(height: 8),
-                          if (!showOnlyAvatar)
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                const SizedBox(width: 16),
-                                SizedBox(
-                                  width: c.kConversationAvatarRadius * 2,
-                                  height: c.kConversationAvatarRadius * 2,
-                                  child: IconButton(
-                                    onPressed: () {
-                                      setState(() {
-                                        newChatScreen = false;
-                                      });
-                                    },
-                                    icon: const Icon(Icons.chevron_left),
-                                    iconSize: 30,
-                                    padding: const EdgeInsets.all(5),
-                                    splashRadius: c.kConversationAvatarRadius,
-                                  ),
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: widget.conversations.length,
+                        itemBuilder: (context, index) {
+                          final conversation = widget.conversations[index];
+                          final isSelected =
+                              conversation.conversation.id == widget.selectedId;
+
+                          if (showOnlyAvatar) {
+                            return Tooltip(
+                              message:
+                                  "", //conversation.contact.preferredUsername,
+                              child: ListTile(
+                                selected: isSelected,
+                                selectedTileColor:
+                                    colorScheme.secondaryContainer,
+                                contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 4,
                                 ),
-                                const SizedBox(width: 16),
-                                Text(
-                                  'New message',
-                                  style: Theme.of(context).textTheme.titleLarge,
-                                  overflow: TextOverflow.ellipsis,
+                                title: Center(child: SizedBox()), //FIXME
+                                onTap: () => widget.onConversationTap(
+                                  conversation.conversation.id,
                                 ),
-                              ],
-                            ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 2,
-                              horizontal: 5,
-                            ),
-                            child: TextField(
-                              controller: newMessageController,
-                              decoration: InputDecoration(
-                                hintText: '@username or address',
-                                border: const OutlineInputBorder(),
                               ),
+                            );
+                          }
+
+                          return ListTile(
+                            selected: isSelected,
+                            selectedTileColor: colorScheme.secondaryContainer,
+                            leading: SizedBox(), //FIXME
+                            title: Text(
+                              "",
+                              // conversation.contact.preferredUsername,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w600,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            subtitle: Text(
+                              conversation.conversation.lastMessageContent ??
+                                  '',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: emojiTextStyle(const TextStyle()),
+                            ),
+                            trailing: RelativeTimeWidget(
+                              time: conversation.conversation.lastMessageTime,
+                            ),
+                            onTap: () => widget.onConversationTap(
+                              conversation.conversation.id,
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                Column(
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    const SizedBox(height: 8),
+                    if (!showOnlyAvatar)
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          const SizedBox(width: 16),
+                          SizedBox(
+                            width: c.kConversationAvatarRadius * 2,
+                            height: c.kConversationAvatarRadius * 2,
+                            child: IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  newChatScreen = false;
+                                  searchController.clear();
+                                  searchData.clear();
+                                  searchIsEnd = false;
+                                  lastSearchVal = '';
+                                });
+                              },
+                              icon: const Icon(Icons.chevron_left),
+                              iconSize: 30,
+                              padding: const EdgeInsets.all(5),
+                              splashRadius: c.kConversationAvatarRadius,
                             ),
                           ),
-                          ValueListenableBuilder(
-                            valueListenable: newMessageController,
-                            builder: (context, value, child) {
-                              return newMessageController.text.isEmpty
-                                  ? const SizedBox()
-                                  : ListTile(
-                                      leading: CircleAvatar(
-                                        radius: c.kConversationAvatarRadius,
-                                        child: Text(
-                                          newMessageController.text[0],
-                                        ),
-                                      ),
-                                      title: Text(
-                                        newMessageController.text,
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                      onTap: onSearchGetPressed,
-                                    );
-                            },
+                          const SizedBox(width: 16),
+                          Text(
+                            l10n.newMessage,
+                            style: Theme.of(context).textTheme.titleLarge,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ],
                       ),
-                    ],
-                  );
-                },
-              )
-            : Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: Text(
-                    'Sign in to use messenger',
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.bodyLarge,
-                  ),
+                    Expanded(
+                      child: GestureDetector(
+                        onPanDown: (details) =>
+                            FocusManager.instance.primaryFocus?.unfocus(),
+                        onTap: () =>
+                            FocusManager.instance.primaryFocus?.unfocus(),
+                        child: InfiniteScrollyCore<String>(
+                          onRefresh: onSearchRefresh,
+                          list: searchData.map((item) => item.key).toList(),
+                          isEnd: searchIsEnd,
+                          getter: onSearchLoadMore,
+                          initialLoadingWidget: const UserLoader(),
+                          widget: (uid) => UserCard(
+                            actionWidget: (_) => SizedBox.shrink(),
+                            uid: uid,
+                            onCardPressed: onUserSelected,
+                          ),
+                          header: UserSearchBar(controller: searchController),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
+              ],
+            );
+          },
+        ),
       ),
     );
   }

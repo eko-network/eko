@@ -7,8 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:overlay_support/overlay_support.dart';
-import 'package:eko_app/providers/messages_provider.dart';
-import 'package:eko_app/providers/messenger_push_provider.dart';
 import 'package:eko_app/providers/theme_provider.dart';
 import 'package:eko_app/utilities/logo_service.dart';
 import 'package:eko_app/utilities/provider_debugger.dart';
@@ -84,8 +82,6 @@ class MyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = ref.watch(colorThemeProvider);
-    ref.watch(messagePollingProvider);
-    ref.watch(messengerPushProvider);
 
     return OverlaySupport(
       child: MaterialApp.router(

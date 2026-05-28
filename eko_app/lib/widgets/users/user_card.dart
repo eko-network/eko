@@ -83,84 +83,89 @@ class UserCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final width = c.widthGetter(context);
     final height = MediaQuery.sizeOf(context).height;
     final userAsync = ref.watch(userProvider(uid));
 
-    return userAsync.when(
-      data: (user) {
-        final currentUser = ref.watch(currentUserProvider);
-        if (!showBlockedUsers &&
-            (currentUser.blockedUsers.contains(user.uid) ||
-                currentUser.blockedBy.contains(user.uid))) {
-          return SizedBox.shrink();
-        }
-        return InkWell(
-          canRequestFocus: canRequestFocus,
-          onTapDown: onCardTapDown == null ? null : (_) => onCardTapDown!(user),
-          onTap: () {
-            if (onCardPressed != null) {
-              onCardPressed!(user);
-            } else {
-              context.push('/users/${user.username}?uid=${user.uid}');
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width = constraints.maxWidth;
+        return userAsync.when(
+          data: (user) {
+            final currentUser = ref.watch(currentUserProvider);
+            if (!showBlockedUsers &&
+                (currentUser.blockedUsers.contains(user.uid) ||
+                    currentUser.blockedBy.contains(user.uid))) {
+              return SizedBox.shrink();
             }
-          },
-          child: Padding(
-            padding: EdgeInsets.symmetric(
-              vertical: height * 0.01,
-              horizontal: 6,
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
+            return InkWell(
+              canRequestFocus: canRequestFocus,
+              onTapDown:
+                  onCardTapDown == null ? null : (_) => onCardTapDown!(user),
+              onTap: () {
+                if (onCardPressed != null) {
+                  onCardPressed!(user);
+                } else {
+                  context.push('/users/${user.username}?uid=${user.uid}');
+                }
+              },
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                  vertical: height * 0.01,
+                  horizontal: 6,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    ProfilePicture(uid: user.uid, size: width * 0.115),
-                    Padding(
-                      padding: EdgeInsets.all(width * 0.02),
-                      child: SizedBox(
-                        width: width * 0.5,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            if (user.name.isNotEmpty)
-                              Row(
-                                children: [
-                                  Text(
-                                    user.name,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
+                    Row(
+                      children: [
+                        ProfilePicture(uid: user.uid, size: width * 0.115),
+                        Padding(
+                          padding: EdgeInsets.all(width * 0.02),
+                          child: SizedBox(
+                            width: width * 0.5,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                if (user.name.isNotEmpty)
+                                  Row(
+                                    children: [
+                                      Text(
+                                        user.name,
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      if (user.isVerified)
+                                        VerificationBadge(uid: uid),
+                                    ],
                                   ),
-                                  if (user.isVerified)
-                                    VerificationBadge(uid: uid),
-                                ],
-                              ),
-                            Text(
-                              '@${user.username}',
-                              overflow: TextOverflow.ellipsis,
+                                Text(
+                                  '@${user.username}',
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
                             ),
-                          ],
+                          ),
                         ),
-                      ),
+                      ],
                     ),
+                    if (actionWidget != null)
+                      actionWidget!(user)
+                    else
+                      FollowButton(user: user),
                   ],
                 ),
-                if (actionWidget != null)
-                  actionWidget!(user)
-                else
-                  FollowButton(user: user),
-              ],
-            ),
-          ),
+              ),
+            );
+          },
+          error: (err, _) {
+            debugPrint(err.toString());
+            return Text(AppLocalizations.of(context)!.defaultErrorTitle);
+          },
+          loading: () => const UserLoader(),
         );
       },
-      error: (err, _) {
-        debugPrint(err.toString());
-        return Text(AppLocalizations.of(context)!.defaultErrorTitle);
-      },
-      loading: () => const UserLoader(),
     );
   }
 }

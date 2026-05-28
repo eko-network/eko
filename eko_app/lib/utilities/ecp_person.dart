@@ -12,16 +12,8 @@ Uri messengerActorId(String supabaseUid) {
   );
 }
 
-Uri messengerDeviceId(String supabaseUid, String deviceDid) {
-  final actorId = messengerActorId(supabaseUid);
-  return actorId.replace(
-    pathSegments: [...actorId.pathSegments, 'devices', deviceDid],
-  );
-}
-
 Person buildMessengerPerson({
   required String supabaseUid,
-  required String preferredUsername,
 }) {
   final actorId = messengerActorId(supabaseUid);
   return Person(
@@ -30,6 +22,5 @@ Person buildMessengerPerson({
     outbox: actorId.replace(pathSegments: [...actorId.pathSegments, 'outbox']),
     devicesEndpoint:
         actorId.replace(pathSegments: [...actorId.pathSegments, 'devices']),
-    preferredUsername: preferredUsername,
   );
 }

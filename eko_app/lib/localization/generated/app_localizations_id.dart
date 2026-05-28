@@ -246,6 +246,12 @@ class AppLocalizationsId extends AppLocalizations {
   String get iveVerifiedMyEmail => 'Saya telah memverifikasi email saya';
 
   @override
+  String get keyExchangeFailed => 'Pertukaran kunci gagal';
+
+  @override
+  String get keysExchanged => 'Kunci berhasil ditukar';
+
+  @override
   String get likes => 'Suka';
 
   @override
@@ -288,6 +294,9 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get newLines => 'Baris Baru';
+
+  @override
+  String get newMessage => 'Pesan baru';
 
   @override
   String get newPasswordMustBeDifferent => 'Kata Sandi Baru Harus Berbeda';
@@ -459,6 +468,10 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get usernameTakenBody =>
       'Silakan kembali dan pilih nama pengguna yang berbeda.';
+
+  @override
+  String get userMayNotHaveDeviceRegistered =>
+      'Pengguna mungkin belum mendaftarkan perangkat.';
 
   @override
   String get userNotFound => 'Pengguna Tidak Ditemukan';

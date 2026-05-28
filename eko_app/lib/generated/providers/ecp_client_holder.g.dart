@@ -6,7 +6,7 @@ part of '../../providers/ecp_client_holder.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$ecpClientHolderHash() => r'ca689497dca350b6a6a57f6ff218aa78071abc48';
+String _$ecpClientHolderHash() => r'2c1345b89adda15f0069a7dbcdfc8d18afe63901';
 
 /// See also [EcpClientHolder].
 @ProviderFor(EcpClientHolder)

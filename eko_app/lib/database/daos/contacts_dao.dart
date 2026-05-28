@@ -11,17 +11,17 @@ class ContactsDao extends DatabaseAccessor<AppDatabase>
     with _$ContactsDaoMixin {
   ContactsDao(super.db);
 
-  Future<void> insertNewContact(Person contact) async {
-    final companion = ContactsCompanion(
-      id: Value(contact.id),
-      preferredUsername: Value(contact.preferredUsername),
-      inbox: Value(contact.inbox),
-      outbox: Value(contact.outbox),
-      devicesEndpoint: Value(contact.devicesEndpoint),
-      profilePicture: Value(contact.profilePicture),
-    );
-    await into(contacts).insert(companion);
-  }
+  // Future<void> insertNewContact(Person contact) async {
+  //   final companion = ContactsCompanion(
+  //     id: Value(contact.id),
+  //     preferredUsername: Value(contact.preferredUsername),
+  //     inbox: Value(contact.inbox),
+  //     outbox: Value(contact.outbox),
+  //     devicesEndpoint: Value(contact.devicesEndpoint),
+  //     profilePicture: Value(contact.profilePicture),
+  //   );
+  //   await into(contacts).insert(companion);
+  // }
 
   Future<List<Person>> getContacts() async {
     return select(contacts).get();

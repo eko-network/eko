@@ -245,6 +245,12 @@ class AppLocalizationsHi extends AppLocalizations {
   String get iveVerifiedMyEmail => 'मैंने अपना ईमेल सत्यापित किया है';
 
   @override
+  String get keyExchangeFailed => 'कुंजी विनिमय विफल';
+
+  @override
+  String get keysExchanged => 'कुंजियाँ विनिमय हो गईं';
+
+  @override
   String get likes => 'Up-ekos';
 
   @override
@@ -287,6 +293,9 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get newLines => 'नई पंक्तियाँ';
+
+  @override
+  String get newMessage => 'नया संदेश';
 
   @override
   String get newPasswordMustBeDifferent => 'नया पासवर्ड भिन्न होना चाहिए';
@@ -458,6 +467,10 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get usernameTakenBody =>
       'कृपया वापस जाएं और एक अलग उपयोगकर्ता नाम चुनें।';
+
+  @override
+  String get userMayNotHaveDeviceRegistered =>
+      'हो सकता है कि उपयोगकर्ता ने कोई डिवाइस पंजीकृत न किया हो।';
 
   @override
   String get userNotFound => 'उपयोगकर्ता नहीं मिला';
