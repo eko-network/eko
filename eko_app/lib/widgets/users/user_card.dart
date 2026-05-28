@@ -29,7 +29,7 @@ class FollowButton extends ConsumerWidget {
     final buttonHeight = (width * 0.07).clamp(34.0, 40.0).toDouble();
     final currentUser = ref.watch(currentUserProvider);
     final userState = ref.watch(userProvider(user.uid));
-    final isFollowing = userState.valueOrNull?.isFollowing ?? user.isFollowing;
+    final isFollowing = userState.value?.isFollowing ?? user.isFollowing;
     if (user.uid == currentUser.user.uid) {
       return SizedBox();
     }

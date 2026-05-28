@@ -12,7 +12,15 @@ import 'package:eko_app/utilities/supabase_ref.dart';
 
 part '../generated/providers/current_user_provider.g.dart';
 
-final needsProfileSetupProvider = StateProvider<bool>((ref) => false);
+class NeedsProfileSetupNotifier extends Notifier<bool> {
+  @override
+  bool build() => false;
+}
+
+final needsProfileSetupProvider =
+    NotifierProvider<NeedsProfileSetupNotifier, bool>(
+  NeedsProfileSetupNotifier.new,
+);
 
 @Riverpod(keepAlive: true)
 class CurrentUser extends _$CurrentUser {

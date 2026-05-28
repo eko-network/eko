@@ -12,7 +12,7 @@ class VerificationBadge extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final userAsync = ref.watch(userProvider(uid));
-    final verificationUrl = userAsync.valueOrNull?.verificationUrl ?? '';
+    final verificationUrl = userAsync.value?.verificationUrl ?? '';
     final displayUrl = verificationUrl.replaceFirst(RegExp(r'^https?://'), '');
 
     return Padding(

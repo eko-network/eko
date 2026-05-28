@@ -4,7 +4,7 @@ import 'package:eko_app/database/daos/conversations_dao.dart';
 import 'package:eko_app/interfaces/search.dart';
 import 'package:eko_app/localization/generated/app_localizations.dart';
 import 'package:eko_app/providers/auth_provider.dart';
-import 'package:eko_app/providers/ecp_client_provider.dart';
+import 'package:eko_app/providers/ecp_runtime_provider.dart';
 import 'package:eko_app/types/user.dart';
 import 'package:eko_app/utilities/ecp_person.dart';
 import 'package:eko_app/utilities/constants.dart' as c;

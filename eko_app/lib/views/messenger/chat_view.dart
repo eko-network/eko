@@ -1,7 +1,7 @@
 import 'package:ecp/ecp.dart' as ecp;
 import 'package:eko_app/database/daos/conversations_dao.dart';
 import 'package:eko_app/providers/auth_provider.dart';
-import 'package:eko_app/providers/ecp_client_holder.dart';
+import 'package:eko_app/providers/ecp_runtime_provider.dart';
 import 'package:eko_app/providers/messages_provider.dart';
 import 'package:eko_app/utilities/emoji_text_style.dart';
 import 'package:eko_app/utilities/platform.dart' as platform;
@@ -270,7 +270,7 @@ class _ChatViewState extends ConsumerState<ChatView> {
 
   @override
   Widget build(BuildContext context) {
-    final client = ref.watch(ecpClientHolderProvider).valueOrNull;
+    final client = ref.watch(ecpRuntimeProvider).asData?.value;
     final signedIn = ref.watch(authProvider).uid?.isNotEmpty ?? false;
     final actorId = client?.me.id ?? widget.conversation.contact.id;
     final contactId = widget.conversation.contact.id;

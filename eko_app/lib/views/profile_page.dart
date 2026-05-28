@@ -448,7 +448,7 @@ class _Header extends ConsumerWidget {
     final actionButtonWidth = (width * 0.45).clamp(120.0, 170.0).toDouble();
     final actionButtonHeight = (width * 0.09).clamp(38.0, 44.0).toDouble();
     final userState = ref.watch(userProvider(user.uid));
-    final isFollowing = userState.valueOrNull?.isFollowing ?? user.isFollowing;
+    final isFollowing = userState.value?.isFollowing ?? user.isFollowing;
 
     return Column(
       children: [

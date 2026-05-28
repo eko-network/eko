@@ -18,6 +18,7 @@ import 'package:eko_app/types/follow_info.dart';
 import 'package:eko_app/types/post.dart';
 import 'package:eko_app/types/user.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:eko_app/utilities/router.dart';
@@ -153,10 +154,17 @@ class _EndedPopularFeed extends PopularFeed {
   Future<void> refresh() async {}
 }
 
+class _FakeNeedsProfileSetup extends NeedsProfileSetupNotifier {
+  _FakeNeedsProfileSetup(this._value);
+  final bool _value;
+
+  @override
+  bool build() => _value;
+}
+
 class _EmptyEndedProfilePosts extends ProfilePostListNotifier {
-  _EmptyEndedProfilePosts(super.ref) {
-    state = ([], true);
-  }
+  @override
+  ProfilePostListState build() => ([], true);
 
   @override
   Future<void> getter() async {}
@@ -166,9 +174,10 @@ class _EmptyEndedProfilePosts extends ProfilePostListNotifier {
 }
 
 class _EmptyEndedOtherProfilePosts extends OtherProfilePostListNotifier {
-  _EmptyEndedOtherProfilePosts(super.ref, super.uid) {
-    state = ([], true);
-  }
+  _EmptyEndedOtherProfilePosts(String uid) : super(uid);
+
+  @override
+  ProfilePostListState build() => ([], true);
 
   @override
   Future<void> getter() async {}
@@ -193,15 +202,15 @@ List<Override> signedInNavigationOverrides({bool needsProfileSetup = false}) {
     pendingDeepLinkProvider.overrideWith(FakePendingDeepLink.new),
     authProvider.overrideWith(FakeSignedInAuth.new),
     currentUserProvider.overrideWith(FakeSignedInCurrentUser.new),
-    needsProfileSetupProvider.overrideWith((ref) => needsProfileSetup),
+    needsProfileSetupProvider.overrideWith(
+      () => _FakeNeedsProfileSetup(needsProfileSetup),
+    ),
     newFeedProvider.overrideWith(_EndedNewFeed.new),
     followingFeedProvider.overrideWith(_EndedFollowingFeed.new),
     popularFeedProvider.overrideWith(_EndedPopularFeed.new),
-    profilePostListProvider.overrideWith(
-      (ref) => _EmptyEndedProfilePosts(ref),
-    ),
+    profilePostListProvider.overrideWith(_EmptyEndedProfilePosts.new),
     otherProfilePostListProvider(testUid).overrideWith(
-      (ref) => _EmptyEndedOtherProfilePosts(ref, testUid),
+      () => _EmptyEndedOtherProfilePosts(testUid),
     ),
     commentListProvider(testPostId).overrideWith(_EmptyEndedCommentList.new),
     postProvider(testPostId).overrideWith(_FakePost.new),

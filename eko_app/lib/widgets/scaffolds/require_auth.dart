@@ -4,26 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:eko_app/providers/auth_provider.dart';
 import 'package:eko_app/providers/current_user_provider.dart';
+import 'package:eko_app/providers/ecp_runtime_provider.dart';
 import 'package:eko_app/widgets/loading/loading_spinner.dart';
-
-Future<void>? _ensureDeviceJwtInFlight;
-
-Future<void> _ensureDeviceClaimInJwt(WidgetRef ref) async {
-  if (_ensureDeviceJwtInFlight != null) {
-    await _ensureDeviceJwtInFlight;
-    return;
-  }
-  _ensureDeviceJwtInFlight = () async {
-    ref.read(authProvider.notifier).syncDeviceIdFromJwt();
-    if (ref.read(authProvider).did != null) return;
-    await ref.read(authProvider.notifier).registerDeviceIfNeeded();
-  }();
-  try {
-    await _ensureDeviceJwtInFlight;
-  } finally {
-    _ensureDeviceJwtInFlight = null;
-  }
-}
 
 class RequireAuth extends ConsumerWidget {
   final Widget child;
@@ -46,11 +28,12 @@ class RequireAuth extends ConsumerWidget {
     if (user.user.uid.isEmpty) {
       return const Center(child: LoadingSpinner());
     }
-    if (!kIsWeb && auth.did == null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) async {
-        if (!context.mounted) return;
-        await _ensureDeviceClaimInJwt(ref);
-      });
+    if (!kIsWeb) {
+      final ecpReady = ref.watch(ecpRuntimeReadyProvider);
+      if (!ecpReady) {
+        return const Center(child: LoadingSpinner());
+      }
+    } else if (auth.did == null) {
       return const Center(child: LoadingSpinner());
     }
     return child;

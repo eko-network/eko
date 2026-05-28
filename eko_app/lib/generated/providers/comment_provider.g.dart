@@ -6,170 +6,93 @@ part of '../../providers/comment_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$commentHash() => r'a3a8c9977cde5910e25dd643ec510dbfae616163';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// Copied from Dart SDK
-class _SystemHash {
-  _SystemHash._();
-
-  static int combine(int hash, int value) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + value);
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x0007ffff & hash) << 10));
-    return hash ^ (hash >> 6);
-  }
-
-  static int finish(int hash) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x03ffffff & hash) << 3));
-    // ignore: parameter_assignments
-    hash = hash ^ (hash >> 11);
-    return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
-  }
-}
-
-abstract class _$Comment
-    extends BuildlessAutoDisposeAsyncNotifier<CommentModel> {
-  late final int id;
-
-  FutureOr<CommentModel> build(
-    int id,
-  );
-}
-
-/// See also [Comment].
 @ProviderFor(Comment)
-const commentProvider = CommentFamily();
+final commentProvider = CommentFamily._();
 
-/// See also [Comment].
-class CommentFamily extends Family<AsyncValue<CommentModel>> {
-  /// See also [Comment].
-  const CommentFamily();
-
-  /// See also [Comment].
-  CommentProvider call(
-    int id,
-  ) {
-    return CommentProvider(
-      id,
-    );
-  }
-
-  @override
-  CommentProvider getProviderOverride(
-    covariant CommentProvider provider,
-  ) {
-    return call(
-      provider.id,
-    );
-  }
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'commentProvider';
-}
-
-/// See also [Comment].
-class CommentProvider
-    extends AutoDisposeAsyncNotifierProviderImpl<Comment, CommentModel> {
-  /// See also [Comment].
-  CommentProvider(
-    int id,
-  ) : this._internal(
-          () => Comment()..id = id,
-          from: commentProvider,
+final class CommentProvider
+    extends $AsyncNotifierProvider<Comment, CommentModel> {
+  CommentProvider._(
+      {required CommentFamily super.from, required int super.argument})
+      : super(
+          retry: null,
           name: r'commentProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$commentHash,
-          dependencies: CommentFamily._dependencies,
-          allTransitiveDependencies: CommentFamily._allTransitiveDependencies,
-          id: id,
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
         );
 
-  CommentProvider._internal(
-    super._createNotifier, {
-    required super.name,
-    required super.dependencies,
-    required super.allTransitiveDependencies,
-    required super.debugGetCreateSourceHash,
-    required super.from,
-    required this.id,
-  }) : super.internal();
-
-  final int id;
+  @override
+  String debugGetCreateSourceHash() => _$commentHash();
 
   @override
-  FutureOr<CommentModel> runNotifierBuild(
-    covariant Comment notifier,
-  ) {
-    return notifier.build(
-      id,
-    );
+  String toString() {
+    return r'commentProvider'
+        ''
+        '($argument)';
   }
 
+  @$internal
   @override
-  Override overrideWith(Comment Function() create) {
-    return ProviderOverride(
-      origin: this,
-      override: CommentProvider._internal(
-        () => create()..id = id,
-        from: from,
-        name: null,
-        dependencies: null,
-        allTransitiveDependencies: null,
-        debugGetCreateSourceHash: null,
-        id: id,
-      ),
-    );
-  }
-
-  @override
-  AutoDisposeAsyncNotifierProviderElement<Comment, CommentModel>
-      createElement() {
-    return _CommentProviderElement(this);
-  }
+  Comment create() => Comment();
 
   @override
   bool operator ==(Object other) {
-    return other is CommentProvider && other.id == id;
+    return other is CommentProvider && other.argument == argument;
   }
 
   @override
   int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, id.hashCode);
-
-    return _SystemHash.finish(hash);
+    return argument.hashCode;
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-mixin CommentRef on AutoDisposeAsyncNotifierProviderRef<CommentModel> {
-  /// The parameter `id` of this provider.
-  int get id;
-}
+String _$commentHash() => r'a3a8c9977cde5910e25dd643ec510dbfae616163';
 
-class _CommentProviderElement
-    extends AutoDisposeAsyncNotifierProviderElement<Comment, CommentModel>
-    with CommentRef {
-  _CommentProviderElement(super.provider);
+final class CommentFamily extends $Family
+    with
+        $ClassFamilyOverride<Comment, AsyncValue<CommentModel>, CommentModel,
+            FutureOr<CommentModel>, int> {
+  CommentFamily._()
+      : super(
+          retry: null,
+          name: r'commentProvider',
+          dependencies: null,
+          $allTransitiveDependencies: null,
+          isAutoDispose: true,
+        );
+
+  CommentProvider call(
+    int id,
+  ) =>
+      CommentProvider._(argument: id, from: this);
 
   @override
-  int get id => (origin as CommentProvider).id;
+  String toString() => r'commentProvider';
 }
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+
+abstract class _$Comment extends $AsyncNotifier<CommentModel> {
+  late final _$args = ref.$arg as int;
+  int get id => _$args;
+
+  FutureOr<CommentModel> build(
+    int id,
+  );
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<AsyncValue<CommentModel>, CommentModel>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<AsyncValue<CommentModel>, CommentModel>,
+        AsyncValue<CommentModel>,
+        Object?,
+        Object?>;
+    element.handleCreate(
+        ref,
+        () => build(
+              _$args,
+            ));
+  }
+}

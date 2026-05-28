@@ -1,13 +1,10 @@
 import 'dart:convert';
-import 'dart:typed_data';
 import 'package:eko_app/localization/generated/app_localizations.dart';
-import 'package:eko_app/utilities/device_uid_service.dart';
 import 'package:eko_app/database/messenger_clear.dart';
-import 'package:eko_app/utilities/ecp_ref.dart';
 import 'package:eko_app/widgets/errors/snack_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart' show debugPrint, kDebugMode;
-import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:eko_app/types/auth.dart';
@@ -18,8 +15,6 @@ import 'package:eko_app/interfaces/notification_helper.dart';
 import 'package:eko_app/interfaces/user.dart' as user;
 import 'package:eko_app/utilities/gauth/supabase_google_oauth.dart';
 import 'package:eko_app/utilities/platform.dart' as platform;
-
-part '../generated/providers/auth_provider.g.dart';
 
 Future<void>? _registerNotificationsInFlight;
 
@@ -142,69 +137,52 @@ void handleAuthError(Object e, BuildContext context) {
   }
 }
 
-@Riverpod(keepAlive: true)
-class Auth extends _$Auth {
+final authProvider = NotifierProvider<Auth, AuthModel>(Auth.new);
+
+class Auth extends Notifier<AuthModel> {
   @override
   AuthModel build() {
-    _init();
+    _listenToAuthChanges();
+    final session = supabase.auth.currentSession;
+    if (session != null) {
+      _debugPrintSupabaseBearer(session);
+      return _stateFromSession(session, pendingPasswordRecovery: false);
+    }
     return AuthModel.loading();
   }
 
-  void _init() {
-    final currentSession = supabase.auth.currentSession;
-    if (currentSession != null) {
-      _debugPrintSupabaseBearer(currentSession);
-      final user = currentSession.user;
-      state = AuthModel(
-        uid: user.id,
-        isLoading: false,
-        email: user.email,
-        emailVerified: user.emailConfirmedAt != null,
-        creationTime: DateTime.tryParse(user.createdAt),
-        did: didFromSession(currentSession),
-      );
-      registerDeviceIfNeeded();
-    }
+  AuthModel _stateFromSession(
+    Session session, {
+    required bool pendingPasswordRecovery,
+  }) {
+    final u = session.user;
+    return AuthModel(
+      uid: u.id,
+      isLoading: false,
+      email: u.email,
+      emailVerified: u.emailConfirmedAt != null,
+      creationTime: DateTime.tryParse(u.createdAt),
+      pendingPasswordRecovery: pendingPasswordRecovery,
+      did: didFromSession(session),
+    );
+  }
 
+  void _listenToAuthChanges() {
     supabase.auth.onAuthStateChange.listen(
       (data) {
         final session = data.session;
         if (session == null) {
           clearMessengerLocalData();
           state = AuthModel.signedOut();
-        } else {
-          _debugPrintSupabaseBearer(session);
-          if (data.event == AuthChangeEvent.passwordRecovery) {
-            final user = session.user;
-            state = state.copyWith(
-              uid: user.id,
-              isLoading: false,
-              email: user.email,
-              emailVerified: user.emailConfirmedAt != null,
-              creationTime: DateTime.tryParse(user.createdAt),
-              pendingPasswordRecovery: true,
-              did: didFromSession(session),
-            );
-          } else {
-            final user = session.user;
-            state = state.copyWith(
-              uid: user.id,
-              isLoading: false,
-              email: user.email,
-              emailVerified: user.emailConfirmedAt != null,
-              creationTime: DateTime.tryParse(user.createdAt),
-              pendingPasswordRecovery: false,
-              did: didFromSession(session),
-            );
-            if (data.event == AuthChangeEvent.signedIn) {
-              registerDeviceIfNeeded();
-              // This throws on linux but appears to have to affect on android
-              if (!platform.isLinux) {
-                // ios typically opens an in-app web view, so it doesnt get dismissed otherwise
-                closeInAppWebView();
-              }
-            }
-          }
+          return;
+        }
+        _debugPrintSupabaseBearer(session);
+        final isRecovery = data.event == AuthChangeEvent.passwordRecovery;
+        state = _stateFromSession(session, pendingPasswordRecovery: isRecovery);
+        if (!isRecovery &&
+            data.event == AuthChangeEvent.signedIn &&
+            !platform.isLinux) {
+          closeInAppWebView();
         }
       },
       onError: (error) {
@@ -221,12 +199,6 @@ class Auth extends _$Auth {
 
   void clearPasswordRecovery() {
     state = state.copyWith(pendingPasswordRecovery: false);
-  }
-
-  void syncDeviceIdFromJwt() {
-    final session = supabase.auth.currentSession;
-    if (session == null) return;
-    state = state.copyWith(did: didFromSession(session));
   }
 
   Future<void> signIn({required String email, required String password}) async {
@@ -402,41 +374,6 @@ class Auth extends _$Auth {
     } catch (e) {
       debugPrint('createGoogleProfile error: $e');
       return const SignUpOutcome(errorCode: 'unknown');
-    }
-  }
-
-  Future<void> registerDeviceIfNeeded() async {
-    final uid = state.uid;
-    if (uid == null || uid.isEmpty) return;
-    if (state.did != null) return;
-
-    try {
-      final deviceUid = DeviceUidService.getOrCreate();
-      final credentialIdentity = Uint8List.fromList(utf8.encode(uid));
-
-      final identity = await ecp.initializeIdentity(
-        credentialIdentity: credentialIdentity,
-      );
-
-      await supabase.rpc('register_device', params: {
-        'p_did': deviceUid,
-        'p_signer_public_key': base64Encode(identity.signerPublicKey),
-      });
-
-      if (identity.keyPackages.isNotEmpty) {
-        await supabase.rpc('add_key_packages', params: {
-          'p_did': deviceUid,
-          'p_key_packages': identity.keyPackages.map(base64Encode).toList(),
-        });
-      }
-
-      await supabase.auth.refreshSession();
-      final session = supabase.auth.currentSession;
-      if (session != null) {
-        state = state.copyWith(did: didFromSession(session));
-      }
-    } catch (e) {
-      debugPrint('Error registering device: $e');
     }
   }
 

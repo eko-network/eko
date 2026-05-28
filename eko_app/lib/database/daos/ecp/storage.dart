@@ -3,7 +3,6 @@ import 'dart:math';
 
 import 'package:drift/drift.dart';
 import 'package:ecp/ecp.dart';
-import 'package:ecp/src/core/types/mls_group_record.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';

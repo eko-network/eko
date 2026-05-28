@@ -6,166 +6,92 @@ part of '../../providers/user_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$userHash() => r'4eb932ccbd408e1f55e11f37ea62b5cb422edc6d';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// Copied from Dart SDK
-class _SystemHash {
-  _SystemHash._();
-
-  static int combine(int hash, int value) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + value);
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x0007ffff & hash) << 10));
-    return hash ^ (hash >> 6);
-  }
-
-  static int finish(int hash) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x03ffffff & hash) << 3));
-    // ignore: parameter_assignments
-    hash = hash ^ (hash >> 11);
-    return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
-  }
-}
-
-abstract class _$User extends BuildlessAutoDisposeAsyncNotifier<UserModel> {
-  late final String uid;
-
-  FutureOr<UserModel> build(
-    String uid,
-  );
-}
-
-/// See also [User].
 @ProviderFor(User)
-const userProvider = UserFamily();
+final userProvider = UserFamily._();
 
-/// See also [User].
-class UserFamily extends Family<AsyncValue<UserModel>> {
-  /// See also [User].
-  const UserFamily();
-
-  /// See also [User].
-  UserProvider call(
-    String uid,
-  ) {
-    return UserProvider(
-      uid,
-    );
-  }
-
-  @override
-  UserProvider getProviderOverride(
-    covariant UserProvider provider,
-  ) {
-    return call(
-      provider.uid,
-    );
-  }
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'userProvider';
-}
-
-/// See also [User].
-class UserProvider
-    extends AutoDisposeAsyncNotifierProviderImpl<User, UserModel> {
-  /// See also [User].
-  UserProvider(
-    String uid,
-  ) : this._internal(
-          () => User()..uid = uid,
-          from: userProvider,
+final class UserProvider extends $AsyncNotifierProvider<User, UserModel> {
+  UserProvider._(
+      {required UserFamily super.from, required String super.argument})
+      : super(
+          retry: null,
           name: r'userProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product') ? null : _$userHash,
-          dependencies: UserFamily._dependencies,
-          allTransitiveDependencies: UserFamily._allTransitiveDependencies,
-          uid: uid,
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
         );
 
-  UserProvider._internal(
-    super._createNotifier, {
-    required super.name,
-    required super.dependencies,
-    required super.allTransitiveDependencies,
-    required super.debugGetCreateSourceHash,
-    required super.from,
-    required this.uid,
-  }) : super.internal();
-
-  final String uid;
+  @override
+  String debugGetCreateSourceHash() => _$userHash();
 
   @override
-  FutureOr<UserModel> runNotifierBuild(
-    covariant User notifier,
-  ) {
-    return notifier.build(
-      uid,
-    );
+  String toString() {
+    return r'userProvider'
+        ''
+        '($argument)';
   }
 
+  @$internal
   @override
-  Override overrideWith(User Function() create) {
-    return ProviderOverride(
-      origin: this,
-      override: UserProvider._internal(
-        () => create()..uid = uid,
-        from: from,
-        name: null,
-        dependencies: null,
-        allTransitiveDependencies: null,
-        debugGetCreateSourceHash: null,
-        uid: uid,
-      ),
-    );
-  }
-
-  @override
-  AutoDisposeAsyncNotifierProviderElement<User, UserModel> createElement() {
-    return _UserProviderElement(this);
-  }
+  User create() => User();
 
   @override
   bool operator ==(Object other) {
-    return other is UserProvider && other.uid == uid;
+    return other is UserProvider && other.argument == argument;
   }
 
   @override
   int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, uid.hashCode);
-
-    return _SystemHash.finish(hash);
+    return argument.hashCode;
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-mixin UserRef on AutoDisposeAsyncNotifierProviderRef<UserModel> {
-  /// The parameter `uid` of this provider.
-  String get uid;
-}
+String _$userHash() => r'6f68ad25774799581ded9dd315fd061239a17408';
 
-class _UserProviderElement
-    extends AutoDisposeAsyncNotifierProviderElement<User, UserModel>
-    with UserRef {
-  _UserProviderElement(super.provider);
+final class UserFamily extends $Family
+    with
+        $ClassFamilyOverride<User, AsyncValue<UserModel>, UserModel,
+            FutureOr<UserModel>, String> {
+  UserFamily._()
+      : super(
+          retry: null,
+          name: r'userProvider',
+          dependencies: null,
+          $allTransitiveDependencies: null,
+          isAutoDispose: true,
+        );
+
+  UserProvider call(
+    String uid,
+  ) =>
+      UserProvider._(argument: uid, from: this);
 
   @override
-  String get uid => (origin as UserProvider).uid;
+  String toString() => r'userProvider';
 }
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+
+abstract class _$User extends $AsyncNotifier<UserModel> {
+  late final _$args = ref.$arg as String;
+  String get uid => _$args;
+
+  FutureOr<UserModel> build(
+    String uid,
+  );
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<AsyncValue<UserModel>, UserModel>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<AsyncValue<UserModel>, UserModel>,
+        AsyncValue<UserModel>,
+        Object?,
+        Object?>;
+    element.handleCreate(
+        ref,
+        () => build(
+              _$args,
+            ));
+  }
+}

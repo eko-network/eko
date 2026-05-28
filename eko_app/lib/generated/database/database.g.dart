@@ -1920,7 +1920,7 @@ class $ContactsTable extends Contacts with TableInfo<$ContactsTable, Person> {
   @override
   Person map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return Person.new(
+    return Person(
       id: $ContactsTable.$converterid.fromSql(attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}id'])!),
       inbox: $ContactsTable.$converterinbox.fromSql(attachedDatabase.typeMapping

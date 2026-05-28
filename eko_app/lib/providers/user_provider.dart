@@ -81,7 +81,7 @@ class User extends _$User {
   }
 
   Future<void> _followInner(bool isFollow) async {
-    final user = state.valueOrNull;
+    final user = state.value;
     if (user == null || _isFollowAction) {
       return;
     }

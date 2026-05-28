@@ -90,9 +90,6 @@ Future<String> _getDbPassword() async {
 
 LazyDatabase _openConnection() {
   return LazyDatabase(() async {
-    // Load SQLCipher for Android
-    await applyWorkaroundToOpenSqlCipherOnOldAndroidVersions();
-
     final password = await _getDbPassword();
     final dbFolder = await getApplicationSupportDirectory();
     final file = File(p.join(dbFolder.path, c.db));
