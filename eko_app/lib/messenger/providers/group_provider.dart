@@ -16,7 +16,7 @@ Stream<List<GroupWithUsers>> group(Ref ref) {
     final l = list.map((gr) => gr.toRecord());
     return await Future.wait(
       l.map((gr) async {
-        final gm = await ecp.session.getMembers(gr);
+        final gm = await ecp.groups.getMembers(gr);
         return (
           group: gm.group,
           users: gm.members.map((m) {

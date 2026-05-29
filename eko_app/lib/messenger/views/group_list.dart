@@ -107,7 +107,7 @@ class _ConversationListState extends ConsumerState<GroupList> {
 
     try {
       final peer = buildPerson(uid: user.uid);
-      await ref.watch(ecpClientProvider).session.createGroup([peer]);
+      await ref.watch(ecpClientProvider).groups.createGroup([peer]);
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,

@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:klipy_dart/klipy_dart.dart';
-import 'package:uuid/uuid.dart';
 
 extension SafeLookup<T> on List<T> {
   T? getOrNull(int index) {
@@ -29,7 +28,6 @@ class _ChatViewState extends ConsumerState<ChatView> {
   final TextEditingController _messageController = TextEditingController();
   final MenuController _menuController = MenuController();
   final FocusNode _focusNode = FocusNode();
-  final _uuid = Uuid();
   bool _showMediaPicker = false;
   Map<Uri, ecp.Image> _selectedGifs = {};
 
@@ -60,7 +58,7 @@ class _ChatViewState extends ConsumerState<ChatView> {
     setState(() {
       final url = Uri.parse(obj.url);
       _selectedGifs[url] = ecp.Image(
-        base: ecp.ObjectBase(id: _uuid.v4obj()),
+        id: ecp.InternalId.gen(),
         url: url,
         height: obj.dimensions.height.round(),
         width: obj.dimensions.width.round(),
@@ -85,7 +83,7 @@ class _ChatViewState extends ConsumerState<ChatView> {
       await _dispatchMessage(
         ecp.Note(
           content: text,
-          base: ecp.ObjectBase(id: _uuid.v4obj()),
+          id: ecp.InternalId.gen(),
           attachments: gifs.isEmpty ? null : gifs.toList(),
         ),
       );
