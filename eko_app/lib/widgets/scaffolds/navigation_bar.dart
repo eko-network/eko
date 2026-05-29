@@ -37,26 +37,22 @@ class ScaffoldWithNestedNavigation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        const navRailWidth = 80.0;
-        final hasRoomForRail =
-            constraints.maxWidth >= c.indealAppWidth + navRailWidth;
+    const navRailWidth = 80.0;
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final hasRoomForRail = screenWidth >= c.indealAppWidth + navRailWidth;
 
-        if (hasRoomForRail) {
-          return ScaffoldWithNavigationRail(
-            body: navigationShell,
-            selectedIndex: navigationShell.currentIndex,
-            onDestinationSelected: goBranch,
-          );
-        }
+    if (hasRoomForRail) {
+      return ScaffoldWithNavigationRail(
+        body: navigationShell,
+        selectedIndex: navigationShell.currentIndex,
+        onDestinationSelected: goBranch,
+      );
+    }
 
-        return ScaffoldWithNavigationBar(
-          body: navigationShell,
-          selectedIndex: navigationShell.currentIndex,
-          onDestinationSelected: goBranch,
-        );
-      },
+    return ScaffoldWithNavigationBar(
+      body: navigationShell,
+      selectedIndex: navigationShell.currentIndex,
+      onDestinationSelected: goBranch,
     );
   }
 }
