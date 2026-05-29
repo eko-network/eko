@@ -15,6 +15,7 @@ class RequireNoAuth extends ConsumerWidget {
       return const Center(child: LoadingSpinner());
     }
     if (auth.value?.uid != null) {
+      debugPrint('[RequireNoAuth] User Signed In');
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (context.mounted) context.go('/feed');
       });

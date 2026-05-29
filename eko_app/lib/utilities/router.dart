@@ -57,49 +57,10 @@ class GoRouterRefreshNotifier extends ChangeNotifier {
 }
 
 final goRouterProvider = Provider<GoRouter>((ref) {
-  final refreshNotifier = GoRouterRefreshNotifier();
-  ref.listen(authProvider, (_, __) => refreshNotifier.refresh());
-  // needsProfileSetup is set async in currentUserProvider.reload(); without this,
-  // GoRouter never re-runs redirect and /feed stays on RequireAuth's spinner forever.
-  ref.listen(needsProfileSetupProvider, (_, __) => refreshNotifier.refresh());
   return GoRouter(
     initialLocation: '/feed',
     navigatorKey: NotificationHelper.navigatorKey,
-    refreshListenable: refreshNotifier,
     debugLogDiagnostics: kDebugMode,
-    redirectLimit: 15,
-    redirect: (context, state) {
-      final auth = ref.read(authProvider);
-      final loc = state.matchedLocation;
-      if (auth.isLoading) return null;
-
-      final needsSetup = ref.read(needsProfileSetupProvider);
-      if (auth.value?.uid != null && needsSetup && loc != '/google_setup') {
-        return '/google_setup';
-      }
-
-      const unauthenticatedRoutes = [
-        '/',
-        '/signup',
-        '/login',
-        '/auth',
-        '/download',
-        '/google_setup',
-      ];
-
-      if (auth.value?.uid == null) {
-        if (unauthenticatedRoutes.contains(loc)) return null;
-        ref.read(pendingDeepLinkProvider.notifier).set(state.uri.toString());
-        return '/';
-      }
-
-      if (unauthenticatedRoutes.sublist(0, 3).contains(loc)) {
-        final pending = ref.read(pendingDeepLinkProvider.notifier).consume();
-        return pending ?? '/feed';
-      }
-
-      return null;
-    },
     routes: [
       GoRoute(
         path: '/google_setup',
@@ -118,7 +79,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: '/',
         name: 'root',
         builder: (context, state) {
-          return const WelcomePage();
+          return const RequireNoAuth(child: WelcomePage());
         },
         routes: [
           GoRoute(

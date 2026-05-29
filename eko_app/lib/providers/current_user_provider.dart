@@ -28,12 +28,12 @@ class CurrentUser extends _$CurrentUser {
     ref.listen(authProvider, (previous, next) {
       final prevUid = previous?.value?.uid;
       final nextUid = next.value?.uid;
-      if (prevUid == nextUid) {
-        return;
-      }
       if (nextUid == null) {
         state = CurrentUserModel.loading();
       } else {
+        if (prevUid == nextUid) {
+          return;
+        }
         reload();
       }
     });
