@@ -69,7 +69,7 @@ final class CommentListProvider extends $NotifierProvider<
   }
 }
 
-String _$commentListHash() => r'fd95661e86ccb137e6d341de2dd137b76a1e2c47';
+String _$commentListHash() => r'bca825d1244663f507f28c7a977efed927677311';
 
 final class CommentListFamily extends $Family
     with
