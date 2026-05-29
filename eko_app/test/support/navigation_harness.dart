@@ -48,8 +48,6 @@ UserModel get testNavigationUser => UserModel(
       username: testUsername,
       profilePicture: '',
       bio: '',
-      followers: [],
-      following: [],
       uid: testUid,
       isVerified: false,
       shareOnlineStatus: false,
@@ -57,19 +55,16 @@ UserModel get testNavigationUser => UserModel(
 
 class FakeSignedOutAuth extends Auth {
   @override
-  AuthModel build() => AuthModel.signedOut();
+  Future<AuthModel> build() async {
+    return AuthModel.signedOut();
+  }
 }
 
 class FakeSignedInAuth extends Auth {
   @override
-  AuthModel build() {
+  Future<AuthModel> build() async {
     return AuthModel(
       uid: testUid,
-      email: 'test@example.com',
-      isLoading: false,
-      emailVerified: true,
-      creationTime: DateTime.utc(2020),
-      pendingPasswordRecovery: false,
     );
   }
 }
@@ -115,8 +110,6 @@ class FakeSignedInCurrentUser extends CurrentUser {
   CurrentUserModel build() {
     return CurrentUserModel(
       user: testNavigationUser,
-      blockedUsers: {},
-      blockedBy: {},
     );
   }
 }

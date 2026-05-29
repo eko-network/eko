@@ -18,8 +18,6 @@ mixin _$UserModel {
   String get username;
   String get profilePicture;
   String get bio;
-  List<String> get followers;
-  List<String> get following;
   String get uid;
   bool get isVerified;
   String? get verificationUrl;
@@ -44,8 +42,6 @@ mixin _$UserModel {
             (identical(other.profilePicture, profilePicture) ||
                 other.profilePicture == profilePicture) &&
             (identical(other.bio, bio) || other.bio == bio) &&
-            const DeepCollectionEquality().equals(other.followers, followers) &&
-            const DeepCollectionEquality().equals(other.following, following) &&
             (identical(other.uid, uid) || other.uid == uid) &&
             (identical(other.isVerified, isVerified) ||
                 other.isVerified == isVerified) &&
@@ -58,23 +54,12 @@ mixin _$UserModel {
   }
 
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      name,
-      username,
-      profilePicture,
-      bio,
-      const DeepCollectionEquality().hash(followers),
-      const DeepCollectionEquality().hash(following),
-      uid,
-      isVerified,
-      verificationUrl,
-      shareOnlineStatus,
-      isFollowing);
+  int get hashCode => Object.hash(runtimeType, name, username, profilePicture,
+      bio, uid, isVerified, verificationUrl, shareOnlineStatus, isFollowing);
 
   @override
   String toString() {
-    return 'UserModel(name: $name, username: $username, profilePicture: $profilePicture, bio: $bio, followers: $followers, following: $following, uid: $uid, isVerified: $isVerified, verificationUrl: $verificationUrl, shareOnlineStatus: $shareOnlineStatus, isFollowing: $isFollowing)';
+    return 'UserModel(name: $name, username: $username, profilePicture: $profilePicture, bio: $bio, uid: $uid, isVerified: $isVerified, verificationUrl: $verificationUrl, shareOnlineStatus: $shareOnlineStatus, isFollowing: $isFollowing)';
   }
 }
 
@@ -88,8 +73,6 @@ abstract mixin class $UserModelCopyWith<$Res> {
       String username,
       String profilePicture,
       String bio,
-      List<String> followers,
-      List<String> following,
       String uid,
       bool isVerified,
       String? verificationUrl,
@@ -113,8 +96,6 @@ class _$UserModelCopyWithImpl<$Res> implements $UserModelCopyWith<$Res> {
     Object? username = null,
     Object? profilePicture = null,
     Object? bio = null,
-    Object? followers = null,
-    Object? following = null,
     Object? uid = null,
     Object? isVerified = null,
     Object? verificationUrl = freezed,
@@ -138,14 +119,6 @@ class _$UserModelCopyWithImpl<$Res> implements $UserModelCopyWith<$Res> {
           ? _self.bio
           : bio // ignore: cast_nullable_to_non_nullable
               as String,
-      followers: null == followers
-          ? _self.followers
-          : followers // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-      following: null == following
-          ? _self.following
-          : following // ignore: cast_nullable_to_non_nullable
-              as List<String>,
       uid: null == uid
           ? _self.uid
           : uid // ignore: cast_nullable_to_non_nullable
@@ -268,8 +241,6 @@ extension UserModelPatterns on UserModel {
             String username,
             String profilePicture,
             String bio,
-            List<String> followers,
-            List<String> following,
             String uid,
             bool isVerified,
             String? verificationUrl,
@@ -286,8 +257,6 @@ extension UserModelPatterns on UserModel {
             _that.username,
             _that.profilePicture,
             _that.bio,
-            _that.followers,
-            _that.following,
             _that.uid,
             _that.isVerified,
             _that.verificationUrl,
@@ -318,8 +287,6 @@ extension UserModelPatterns on UserModel {
             String username,
             String profilePicture,
             String bio,
-            List<String> followers,
-            List<String> following,
             String uid,
             bool isVerified,
             String? verificationUrl,
@@ -335,8 +302,6 @@ extension UserModelPatterns on UserModel {
             _that.username,
             _that.profilePicture,
             _that.bio,
-            _that.followers,
-            _that.following,
             _that.uid,
             _that.isVerified,
             _that.verificationUrl,
@@ -366,8 +331,6 @@ extension UserModelPatterns on UserModel {
             String username,
             String profilePicture,
             String bio,
-            List<String> followers,
-            List<String> following,
             String uid,
             bool isVerified,
             String? verificationUrl,
@@ -383,8 +346,6 @@ extension UserModelPatterns on UserModel {
             _that.username,
             _that.profilePicture,
             _that.bio,
-            _that.followers,
-            _that.following,
             _that.uid,
             _that.isVerified,
             _that.verificationUrl,
@@ -404,15 +365,11 @@ class _UserModel implements UserModel {
       required this.username,
       required this.profilePicture,
       required this.bio,
-      required final List<String> followers,
-      required final List<String> following,
       required this.uid,
       required this.isVerified,
       this.verificationUrl,
       required this.shareOnlineStatus,
-      this.isFollowing = false})
-      : _followers = followers,
-        _following = following;
+      this.isFollowing = false});
 
   @override
   final String name;
@@ -422,22 +379,6 @@ class _UserModel implements UserModel {
   final String profilePicture;
   @override
   final String bio;
-  final List<String> _followers;
-  @override
-  List<String> get followers {
-    if (_followers is EqualUnmodifiableListView) return _followers;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_followers);
-  }
-
-  final List<String> _following;
-  @override
-  List<String> get following {
-    if (_following is EqualUnmodifiableListView) return _following;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_following);
-  }
-
   @override
   final String uid;
   @override
@@ -469,10 +410,6 @@ class _UserModel implements UserModel {
             (identical(other.profilePicture, profilePicture) ||
                 other.profilePicture == profilePicture) &&
             (identical(other.bio, bio) || other.bio == bio) &&
-            const DeepCollectionEquality()
-                .equals(other._followers, _followers) &&
-            const DeepCollectionEquality()
-                .equals(other._following, _following) &&
             (identical(other.uid, uid) || other.uid == uid) &&
             (identical(other.isVerified, isVerified) ||
                 other.isVerified == isVerified) &&
@@ -485,23 +422,12 @@ class _UserModel implements UserModel {
   }
 
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      name,
-      username,
-      profilePicture,
-      bio,
-      const DeepCollectionEquality().hash(_followers),
-      const DeepCollectionEquality().hash(_following),
-      uid,
-      isVerified,
-      verificationUrl,
-      shareOnlineStatus,
-      isFollowing);
+  int get hashCode => Object.hash(runtimeType, name, username, profilePicture,
+      bio, uid, isVerified, verificationUrl, shareOnlineStatus, isFollowing);
 
   @override
   String toString() {
-    return 'UserModel(name: $name, username: $username, profilePicture: $profilePicture, bio: $bio, followers: $followers, following: $following, uid: $uid, isVerified: $isVerified, verificationUrl: $verificationUrl, shareOnlineStatus: $shareOnlineStatus, isFollowing: $isFollowing)';
+    return 'UserModel(name: $name, username: $username, profilePicture: $profilePicture, bio: $bio, uid: $uid, isVerified: $isVerified, verificationUrl: $verificationUrl, shareOnlineStatus: $shareOnlineStatus, isFollowing: $isFollowing)';
   }
 }
 
@@ -518,8 +444,6 @@ abstract mixin class _$UserModelCopyWith<$Res>
       String username,
       String profilePicture,
       String bio,
-      List<String> followers,
-      List<String> following,
       String uid,
       bool isVerified,
       String? verificationUrl,
@@ -543,8 +467,6 @@ class __$UserModelCopyWithImpl<$Res> implements _$UserModelCopyWith<$Res> {
     Object? username = null,
     Object? profilePicture = null,
     Object? bio = null,
-    Object? followers = null,
-    Object? following = null,
     Object? uid = null,
     Object? isVerified = null,
     Object? verificationUrl = freezed,
@@ -568,14 +490,6 @@ class __$UserModelCopyWithImpl<$Res> implements _$UserModelCopyWith<$Res> {
           ? _self.bio
           : bio // ignore: cast_nullable_to_non_nullable
               as String,
-      followers: null == followers
-          ? _self._followers
-          : followers // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-      following: null == following
-          ? _self._following
-          : following // ignore: cast_nullable_to_non_nullable
-              as List<String>,
       uid: null == uid
           ? _self.uid
           : uid // ignore: cast_nullable_to_non_nullable

@@ -12,10 +12,10 @@ Uri messengerActorId(String supabaseUid) {
   );
 }
 
-Person buildMessengerPerson({
-  required String supabaseUid,
+Person buildPerson({
+  required String uid,
 }) {
-  final actorId = messengerActorId(supabaseUid);
+  final actorId = messengerActorId(uid);
   return Person(
     id: actorId,
     inbox: actorId.replace(pathSegments: [...actorId.pathSegments, 'inbox']),

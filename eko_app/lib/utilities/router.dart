@@ -73,12 +73,8 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       final loc = state.matchedLocation;
       if (auth.isLoading) return null;
 
-      if (auth.pendingPasswordRecovery && loc != '/auth') {
-        return '/auth?type=recovery';
-      }
-
       final needsSetup = ref.read(needsProfileSetupProvider);
-      if (auth.uid != null && needsSetup && loc != '/google_setup') {
+      if (auth.value?.uid != null && needsSetup && loc != '/google_setup') {
         return '/google_setup';
       }
 
@@ -91,7 +87,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         '/google_setup',
       ];
 
-      if (auth.uid == null) {
+      if (auth.value?.uid == null) {
         if (unauthenticatedRoutes.contains(loc)) return null;
         ref.read(pendingDeepLinkProvider.notifier).set(state.uri.toString());
         return '/';

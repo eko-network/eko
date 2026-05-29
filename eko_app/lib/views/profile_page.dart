@@ -151,17 +151,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     final width = c.widthGetter(context);
     final userAsync = ref.watch(userProvider(uid));
     final currentUser = ref.watch(currentUserProvider);
-    final isBlockedByMe = userAsync.when(
-      data: (profileUser) => currentUser.blockedUsers.contains(profileUser.uid),
-      loading: () => false,
-      error: (_, __) => false,
-    );
-
-    final blocksMe = userAsync.when(
-      data: (profileUser) => currentUser.blockedBy.contains(profileUser.uid),
-      loading: () => false,
-      error: (_, __) => false,
-    );
     final bool isCurrentUser = currentUser.user.uid == uid;
     final selectedSort = isCurrentUser
         ? ref.watch(profilePostSortProvider)
@@ -237,43 +226,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     return PopScope(
       canPop: true,
       child: AppScaffold(
-        appBar: userAsync.when(
-          data: (profileUser) => (isBlockedByMe || blocksMe)
-              ? EkoAppBar(
-                  title: _ProfileAppBarContent(
-                    leading: buildLeadingWidget(context, isCurrentUser),
-                    title: const SizedBox(),
-                    actions: const [],
-                  ),
-                )
-              : null,
-          loading: () => EkoAppBar(
-            title: _ProfileAppBarContent(
-              leading: buildLeadingWidget(context, isCurrentUser),
-              title: const SizedBox(),
-              actions: const [],
-            ),
-          ),
-          error: (_, __) => EkoAppBar(
-            title: _ProfileAppBarContent(
-              leading: buildLeadingWidget(context, isCurrentUser),
-              title: const SizedBox(),
-              actions: const [],
-            ),
-          ),
-        ),
         body: userAsync.when(
           data: (profileUser) {
-            if (isBlockedByMe || blocksMe) {
-              return Center(
-                child: SizedBox(
-                  width: width * 0.7,
-                  child: Text(
-                    AppLocalizations.of(context)!.blockedByUserMessage,
-                  ),
-                ),
-              );
-            }
             return InfiniteScrollyCore<int>(
               getter: loadMorePosts,
               list: postListState.$1,

@@ -4,9 +4,7 @@ import 'package:flutter/material.dart' show debugPrint;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:eko_app/interfaces/user.dart';
 import 'package:eko_app/providers/auth_provider.dart';
-import 'package:eko_app/providers/user_provider.dart';
 import 'package:eko_app/types/current_user.dart';
 import 'package:eko_app/utilities/supabase_ref.dart';
 
@@ -28,8 +26,8 @@ class CurrentUser extends _$CurrentUser {
   // This is nullable instead of async so that we can just bang it. Await will happen inside the require auth widget.
   CurrentUserModel build() {
     ref.listen(authProvider, (previous, next) {
-      final prevUid = previous?.uid;
-      final nextUid = next.uid;
+      final prevUid = previous?.value?.uid;
+      final nextUid = next.value?.uid;
       if (prevUid == nextUid) {
         return;
       }
@@ -40,10 +38,6 @@ class CurrentUser extends _$CurrentUser {
       }
     });
 
-    final auth = ref.read(authProvider);
-    if (auth.uid != null) {
-      reload();
-    }
     return CurrentUserModel.loading();
   }
 
@@ -152,62 +146,27 @@ class CurrentUser extends _$CurrentUser {
   }
 
   Future<void> signOut() async {
-    final stateUid = state.user.uid;
-    final authUid = ref.read(authProvider).uid;
-    final uid = stateUid.isNotEmpty ? stateUid : (authUid ?? '');
-    if (uid.isNotEmpty) {
-      await removeDeviceNotificationToken(uid);
-    }
-    await supabase.auth.signOut();
-  }
-
-  Future<List<String>> _getPeopleWhoBlockedMe() async {
-    try {
-      final uid = ref.read(authProvider).uid!;
-      final rows = await supabase
-          .from('blocked')
-          .select('source_uid')
-          .eq('target_uid', uid);
-      return (rows as List).map((r) => r['source_uid'] as String).toList();
-    } catch (e) {
-      return [];
-    }
+    await ref.read(authProvider.notifier).signOut();
   }
 
   Future<void> blockUser(String uid) async {
-    state = state.copyWith(blockedUsers: <String>{...state.blockedUsers, uid});
-    try {
-      await supabase.from('blocked').insert({
-        'source_uid': state.user.uid,
-        'target_uid': uid,
-      });
-    } catch (e) {
-      final blocked = <String>{...state.blockedUsers};
-      blocked.remove(uid);
-      state = state.copyWith(blockedUsers: blocked);
-    }
     await _unfollowUser(uid);
+    await supabase.from('blocked').insert({
+      'source_uid': state.user.uid,
+      'target_uid': uid,
+    });
   }
 
   Future<void> unBlockUser(String uid) async {
-    final blocked = <String>{...state.blockedUsers};
-    blocked.remove(uid);
-    state = state.copyWith(blockedUsers: blocked);
-    try {
-      await supabase
-          .from('blocked')
-          .delete()
-          .eq('source_uid', state.user.uid)
-          .eq('target_uid', uid);
-    } catch (e) {
-      state = state.copyWith(
-        blockedUsers: <String>{...state.blockedUsers, uid},
-      );
-    }
+    await supabase
+        .from('blocked')
+        .delete()
+        .eq('source_uid', state.user.uid)
+        .eq('target_uid', uid);
   }
 
   Future<void> reload() async {
-    final uid = ref.read(authProvider).uid;
+    final uid = ref.read(authProvider).value?.uid;
     if (uid == null) return;
     try {
       final response = await supabase.rpc(
@@ -238,49 +197,16 @@ class CurrentUser extends _$CurrentUser {
         ref.read(needsProfileSetupProvider.notifier).state = true;
         return;
       }
-      final blockedBy = await _getPeopleWhoBlockedMe();
-      row['blocked_by'] = blockedBy;
       state = CurrentUserModel.fromJson(row);
-      ref.read(authProvider.notifier).registerNotificationsIfNeeded();
     } catch (e) {
       debugPrint('Error reloading current user from Supabase: $e');
     }
   }
 
   Future<void> _unfollowUser(String otherUid) async {
-    try {
-      final updatedFollowing =
-          state.user.following.where((id) => id != otherUid).toList();
-      state = state.copyWith(
-        user: state.user.copyWith(following: updatedFollowing),
-      );
-      final userState = ref.read(userProvider(otherUid));
-      userState.whenData((otherUser) {
-        final updatedFollowers =
-            otherUser.followers.where((id) => id != state.user.uid).toList();
-        ref
-            .read(userProvider(otherUid).notifier)
-            .updateFollowers(updatedFollowers);
-      });
-
-      await supabase.rpc(
-        'change_follow_state',
-        params: {'p_uid': otherUid, 'p_is_follow': false},
-      );
-    } catch (e) {
-      final revertedFollowing = [...state.user.following, otherUid];
-      state = state.copyWith(
-        user: state.user.copyWith(following: revertedFollowing),
-      );
-      final userState = ref.read(userProvider(otherUid));
-      userState.whenData((otherUser) {
-        if (!otherUser.followers.contains(state.user.uid)) {
-          final revertedFollowers = [...otherUser.followers, state.user.uid];
-          ref
-              .read(userProvider(otherUid).notifier)
-              .updateFollowers(revertedFollowers);
-        }
-      });
-    }
+    await supabase.rpc(
+      'change_follow_state',
+      params: {'p_uid': otherUid, 'p_is_follow': false},
+    );
   }
 }

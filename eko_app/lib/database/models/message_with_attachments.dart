@@ -1,7 +1,9 @@
-import 'package:eko_app/database/database.dart';
-
 class MessageWithAttachments {
-  final Message message;
-  final List<MediaData> attachments;
-  MessageWithAttachments({required this.message, this.attachments = const []});
+  final dynamic message;
+  final List<dynamic> attachments;
+
+  MessageWithAttachments({
+    required this.message,
+    required this.attachments,
+  });
 }

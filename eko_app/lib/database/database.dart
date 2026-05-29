@@ -4,10 +4,6 @@ import 'dart:math';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:ecp/ecp.dart' hide Capabilities;
-import 'package:eko_app/database/daos/contacts_dao.dart';
-import 'package:eko_app/database/daos/conversations_dao.dart';
-import 'package:eko_app/database/tables/contacts.dart';
-import 'package:eko_app/database/tables/conversations.dart';
 import 'package:eko_app/database/type_converters.dart';
 import 'package:eko_app/utilities/constants.dart' as c;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -15,17 +11,10 @@ import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 import 'package:sqlite3/sqlite3.dart';
 // import 'package:sqlite3_flutter_libs/sqlite3_flutter_libs.dart';
-import 'package:sqlcipher_flutter_libs/sqlcipher_flutter_libs.dart';
-import 'package:uuid/uuid_value.dart';
 
 // Import table definitions
 import 'tables/auth.dart';
 import 'tables/ecp.dart';
-import 'tables/messages.dart';
-import 'tables/media.dart';
-
-// Import DAOs
-import 'daos/messages_dao.dart';
 
 part '../generated/database/database.g.dart';
 
@@ -38,13 +27,7 @@ part '../generated/database/database.g.dart';
     // Auth
     Users,
     UserDevices,
-    // Other
-    Messages,
-    Media,
-    Contacts,
-    Conversations,
   ],
-  daos: [MessagesDao, ContactsDao, ConversationsDao],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
@@ -90,11 +73,41 @@ Future<String> _getDbPassword() async {
 
 LazyDatabase _openConnection() {
   return LazyDatabase(() async {
-    final password = await _getDbPassword();
     final dbFolder = await getApplicationSupportDirectory();
     final file = File(p.join(dbFolder.path, c.db));
 
-    // Open with SQLCipher
+    if (Platform.isLinux) {
+      if (await file.exists()) {
+        final header = await file.openRead(0, 16).first;
+        const sqliteHeader = [
+          0x53,
+          0x51,
+          0x4c,
+          0x69,
+          0x74,
+          0x65,
+          0x20,
+          0x66,
+          0x6f,
+          0x72,
+          0x6d,
+          0x61,
+          0x74,
+          0x20,
+          0x33,
+          0x00,
+        ];
+        final isValidSqlite = header.length >= 16 &&
+            List.generate(16, (i) => header[i] == sqliteHeader[i])
+                .every((v) => v);
+        if (!isValidSqlite) {
+          await file.delete();
+        }
+      }
+      return NativeDatabase(file);
+    }
+
+    final password = await _getDbPassword();
     final rawDb = sqlite3.open(file.path, uri: false);
 
     final result = rawDb.select('PRAGMA cipher_version;');

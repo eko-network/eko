@@ -36,7 +36,7 @@ class User extends _$User {
     });
     // ********************************************* //
 
-    if (ref.watch(authProvider).uid == uid) {
+    if (ref.watch(currentUserProvider).user.uid == uid) {
       return ref.watch(currentUserProvider).user;
     }
 
@@ -62,12 +62,6 @@ class User extends _$User {
     }
   }
 
-  void updateFollowers(List<String> newFollowers) {
-    state.whenData((user) {
-      state = AsyncData(user.copyWith(followers: newFollowers));
-    });
-  }
-
   Future<void> toggleFollow() async {
     (await future).isFollowing ? await unfollow() : await follow();
   }
@@ -91,8 +85,8 @@ class User extends _$User {
       await supabase.rpc('change_follow_state',
           params: {'p_uid': user.uid, 'p_is_follow': isFollow});
       ref.invalidate(followInfoProvider(user.uid));
-      final actorUid = ref.read(authProvider).uid;
-      if (actorUid != null && actorUid.isNotEmpty && actorUid != user.uid) {
+      final actorUid = ref.read(currentUserProvider).user.uid;
+      if (actorUid.isNotEmpty && actorUid != user.uid) {
         ref.invalidate(followInfoProvider(actorUid));
       }
     } catch (e) {

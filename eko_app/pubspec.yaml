@@ -1,29 +1,9 @@
 name: eko_app
 description: A new Flutter project.
-# The following line prevents the package from being accidentally published to
-# pub.dev using `flutter pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
-# The following defines the version and build number for your application.
-# A version number is three numbers separated by dots, like 1.2.43
-# followed by an optional build number separated by a +.
-# Both the version and the builder number may be overridden in flutter
-# build by specifying --build-name and --build-number, respectively.
-# In Android, build-name is used as versionName while build-number used as versionCode.
-# Read more about Android versioning at https://developer.android.com/studio/publish/versioning
-# In iOS, build-name is used as CFBundleShortVersionString while build-number is used as CFBundleVersion.
-# Read more about iOS versioning at
-# https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-# In Windows, build-name is used as the major, minor, and patch parts
-# of the product and file versions while build-number is used as the build suffix.
+publish_to: 'none'
 version: 2.1.7+70
 environment:
-  sdk: '>=3.0.0 <4.0.0'
-# Dependencies specify other packages that your package needs in order to work.
-# To automatically upgrade your package dependencies to the latest versions
-# consider running `flutter pub upgrade --major-versions`. Alternatively,
-# dependencies can be manually updated by changing the version numbers below to
-# the latest version available on pub.dev. To see which dependencies have newer
-# versions available, run `flutter pub outdated`.
+  sdk: '>=3.8.0 <4.0.0'
 dependencies:
   flutter:
     sdk: flutter
@@ -74,15 +54,16 @@ dependencies:
   unifiedpush_storage_shared_preferences: ^1.0.0
   flutter_local_notifications: ^21.0.0
   webcrypto: ^0.6.0
-  drift: ^2.20.2
-  sqlcipher_flutter_libs: ^0.7.0+eol
-  sqlite3: ^2.5.0
   flutter_secure_storage: ^10.3.1
   path: ^1.9.1
   ecp:
      path: ../../ecp-dart-sdk
+  sqlite3: ^2.9.4
+  drift: ^2.31.0
+  sqlcipher_flutter_libs: ^0.7.0+eol
 
 dependency_overrides:
+  meta: ^1.18.0
   webcrypto:
     git:
       url: https://github.com/google/webcrypto.dart
@@ -90,31 +71,28 @@ dependency_overrides:
   flutter_markdown_plus: ^1.0.7
   markdown: ^7.3.1
   flutter_math_fork: ^0.7.4
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  # The "flutter_lints" package below contains a set of recommended lints to
-  # encourage good coding practices. The lint set provided by the package is
-  # activated in the `analysis_options.yaml` file located at the root of your
-  # package. See that file for information about deactivating specific lint
-  # rules and activating additional ones.
   build_runner: ^2.15.0
   flutter_lints: ^6.0.0
   freezed: ^3.0.6
   json_serializable: ^6.9.5
   remove_unused_localizations_keys: ^0.0.40
   riverpod_generator: ^4.0.1
-  drift_dev: ^2.20.2
+  drift_dev: ^2.31.0
+
 flutter:
   generate: true
-  # The following line ensures that the Material Icons font is
-  # included with your application, so that you can use the icons in
-  # the material Icons class.
   uses-material-design: true
   fonts:
     - family: MartianMono
       fonts:
         - asset: fonts/martian_mono_bold.ttf
-  # To add assets to your application, add an assets section, like this:
   assets:
     - images/
+hooks:
+  user_defines:
+    sqlite3:
+      source: sqlite3mc

@@ -1,12 +1,6 @@
 import 'package:ecp/ecp.dart' as ecp;
-import 'package:eko_app/database/daos/conversations_dao.dart';
-import 'package:eko_app/providers/auth_provider.dart';
-import 'package:eko_app/providers/ecp_runtime_provider.dart';
-import 'package:eko_app/providers/messages_provider.dart';
 import 'package:eko_app/utilities/emoji_text_style.dart';
 import 'package:eko_app/utilities/platform.dart' as platform;
-import 'package:eko_app/widgets/messenger/media_picker.dart';
-import 'package:eko_app/widgets/messenger/message.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -21,10 +15,10 @@ extension SafeLookup<T> on List<T> {
 }
 
 class ChatView extends ConsumerStatefulWidget {
-  final ConversationWithContact conversation;
+  // final ConversationWithContact conversation;
   final VoidCallback? onBack;
 
-  const ChatView({super.key, required this.conversation, this.onBack});
+  const ChatView({super.key, this.onBack});
 
   @override
   ConsumerState<ChatView> createState() => _ChatViewState();
@@ -76,8 +70,6 @@ class _ChatViewState extends ConsumerState<ChatView> {
   }
 
   Future<void> _sendMessage() async {
-    if (ref.read(authProvider).uid == null) return;
-
     final text = _messageController.text.trim();
     final gifs = _selectedGifs.values;
     if (text.isEmpty && gifs.isEmpty) return;
@@ -191,7 +183,6 @@ class _ChatViewState extends ConsumerState<ChatView> {
                     },
                     child: TextField(
                       focusNode: _focusNode,
-                      enabled: ref.watch(authProvider).uid?.isNotEmpty ?? false,
                       style: emojiTextStyle(const TextStyle()),
                       controller: _messageController,
                       maxLines: null,
@@ -237,45 +228,42 @@ class _ChatViewState extends ConsumerState<ChatView> {
         CircleAvatar(
           backgroundColor: colorScheme.primary,
           child: IconButton(
-            icon: const Icon(Icons.send, color: Colors.white, size: 20),
-            onPressed: (ref.watch(authProvider).uid?.isNotEmpty ?? false)
-                ? _sendMessage
-                : null,
-          ),
+              icon: const Icon(Icons.send, color: Colors.white, size: 20),
+              onPressed: _sendMessage),
         ),
       ],
     );
   }
 
-  MessagePosition _determinePosition(
-    DateTime? prev,
-    DateTime me,
-    DateTime? next,
-  ) {
-    const tolerance = Duration(minutes: 1);
-
-    final hasPrev = prev != null && me.difference(prev).abs() <= tolerance;
-    final hasNext = next != null && next.difference(me).abs() <= tolerance;
-
-    if (hasPrev && hasNext) {
-      return MessagePosition.middle;
-    } else if (hasPrev) {
-      return MessagePosition.bottom;
-    } else if (hasNext) {
-      return MessagePosition.top;
-    } else {
-      return MessagePosition.single;
-    }
-  }
+  // MessagePosition _determinePosition(
+  //   DateTime? prev,
+  //   DateTime me,
+  //   DateTime? next,
+  // ) {
+  //   const tolerance = Duration(minutes: 1);
+  //
+  //   final hasPrev = prev != null && me.difference(prev).abs() <= tolerance;
+  //   final hasNext = next != null && next.difference(me).abs() <= tolerance;
+  //
+  //   if (hasPrev && hasNext) {
+  //     return MessagePosition.middle;
+  //   } else if (hasPrev) {
+  //     return MessagePosition.bottom;
+  //   } else if (hasNext) {
+  //     return MessagePosition.top;
+  //   } else {
+  //     return MessagePosition.single;
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
-    final client = ref.watch(ecpRuntimeProvider).asData?.value;
-    final signedIn = ref.watch(authProvider).uid?.isNotEmpty ?? false;
-    final actorId = client?.me.id ?? widget.conversation.contact.id;
-    final contactId = widget.conversation.contact.id;
-
-    final inputRow = _buildInputRow(context);
+    // final client = ref.watch(ecpRuntimeProvider).asData?.value;
+    // final signedIn = ref.watch(authProvider).uid?.isNotEmpty ?? false;
+    // final actorId = client?.me.id ?? widget.conversation.contact.id;
+    // final contactId = widget.conversation.contact.id;
+    //
+    // final inputRow = _buildInputRow(context);
 
     return Scaffold(
       appBar: AppBar(

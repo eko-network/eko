@@ -48,7 +48,7 @@ final class UserProvider extends $AsyncNotifierProvider<User, UserModel> {
   }
 }
 
-String _$userHash() => r'6f68ad25774799581ded9dd315fd061239a17408';
+String _$userHash() => r'74c1248da382a01c7e72b0ff99b61ea96d67cced';
 
 final class UserFamily extends $Family
     with

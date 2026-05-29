@@ -59,7 +59,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     } catch (e, st) {
       debugPrint('Google SignIn Error: $e\n$st');
       if (!mounted) return;
-      if (ref.read(authProvider).uid != null) return;
+      if (ref.read(authProvider).value?.uid != null) return;
       // url_launcher throws a PlatformException on iOS if the Safari View Controller is closed
       if (e.toString().contains('PlatformException')) return;
       showSnackBar(

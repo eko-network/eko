@@ -1,12 +1,11 @@
 import 'dart:async';
 
-import 'package:eko_app/database/daos/conversations_dao.dart';
 import 'package:eko_app/interfaces/search.dart';
 import 'package:eko_app/localization/generated/app_localizations.dart';
 import 'package:eko_app/providers/auth_provider.dart';
-import 'package:eko_app/providers/ecp_runtime_provider.dart';
+import 'package:eko_app/providers/ecp_provider.dart';
 import 'package:eko_app/types/user.dart';
-import 'package:eko_app/utilities/ecp_person.dart';
+import 'package:eko_app/utilities/ecp_helpers.dart';
 import 'package:eko_app/utilities/constants.dart' as c;
 import 'package:eko_app/utilities/emoji_text_style.dart';
 import 'package:eko_app/widgets/common/infinite_scrolly.dart';
@@ -20,14 +19,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ConversationList extends ConsumerStatefulWidget {
   final bool isWideScreen;
-  final List<ConversationWithContact> conversations;
+  // final List<> conversations;
   final int? selectedId;
   final ResizablePanelController? panelController;
   final void Function(int) onConversationTap;
 
   const ConversationList({
     super.key,
-    required this.conversations,
+    // required this.conversations,
     required this.selectedId,
     required this.onConversationTap,
     required this.isWideScreen,
@@ -107,14 +106,12 @@ class _ConversationListState extends ConsumerState<ConversationList> {
 
   Future<void> onUserSelected(UserModel user) async {
     final l10n = AppLocalizations.of(context)!;
-    if (ref.read(authProvider).uid == null) return;
 
     try {
-      final client = ref.read(ecpClientProvider);
-      final peer = buildMessengerPerson(
-        supabaseUid: user.uid,
+      final peer = buildPerson(
+        uid: user.uid,
       );
-      await client.session.createGroup([peer]);
+      await ref.watch(ecpClientProvider).session.createGroup([peer]);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(l10n.keysExchanged)),
@@ -193,62 +190,62 @@ class _ConversationListState extends ConsumerState<ConversationList> {
                               splashRadius: c.kConversationAvatarRadius,
                             ),
                           ),
-                    Expanded(
-                      child: ListView.builder(
-                        itemCount: widget.conversations.length,
-                        itemBuilder: (context, index) {
-                          final conversation = widget.conversations[index];
-                          final isSelected =
-                              conversation.conversation.id == widget.selectedId;
-
-                          if (showOnlyAvatar) {
-                            return Tooltip(
-                              message:
-                                  "", //conversation.contact.preferredUsername,
-                              child: ListTile(
-                                selected: isSelected,
-                                selectedTileColor:
-                                    colorScheme.secondaryContainer,
-                                contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 4,
-                                ),
-                                title: Center(child: SizedBox()), //FIXME
-                                onTap: () => widget.onConversationTap(
-                                  conversation.conversation.id,
-                                ),
-                              ),
-                            );
-                          }
-
-                          return ListTile(
-                            selected: isSelected,
-                            selectedTileColor: colorScheme.secondaryContainer,
-                            leading: SizedBox(), //FIXME
-                            title: Text(
-                              "",
-                              // conversation.contact.preferredUsername,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w600,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            subtitle: Text(
-                              conversation.conversation.lastMessageContent ??
-                                  '',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: emojiTextStyle(const TextStyle()),
-                            ),
-                            trailing: RelativeTimeWidget(
-                              time: conversation.conversation.lastMessageTime,
-                            ),
-                            onTap: () => widget.onConversationTap(
-                              conversation.conversation.id,
-                            ),
-                          );
-                        },
-                      ),
-                    ),
+                    // Expanded(
+                    // child: ListView.builder(
+                    //   itemCount: widget.conversations.length,
+                    //   itemBuilder: (context, index) {
+                    //     final conversation = widget.conversations[index];
+                    //     final isSelected =
+                    //         conversation.conversation.id == widget.selectedId;
+                    //
+                    //     if (showOnlyAvatar) {
+                    //       return Tooltip(
+                    //         message:
+                    //             "", //conversation.contact.preferredUsername,
+                    //         child: ListTile(
+                    //           selected: isSelected,
+                    //           selectedTileColor:
+                    //               colorScheme.secondaryContainer,
+                    //           contentPadding: const EdgeInsets.symmetric(
+                    //             vertical: 4,
+                    //           ),
+                    //           title: Center(child: SizedBox()), //FIXME
+                    //           onTap: () => widget.onConversationTap(
+                    //             conversation.conversation.id,
+                    //           ),
+                    //         ),
+                    //       );
+                    //     }
+                    //
+                    //     return ListTile(
+                    //       selected: isSelected,
+                    //       selectedTileColor: colorScheme.secondaryContainer,
+                    //       leading: SizedBox(), //FIXME
+                    //       title: Text(
+                    //         "",
+                    //         // conversation.contact.preferredUsername,
+                    //         style: const TextStyle(
+                    //           fontWeight: FontWeight.w600,
+                    //         ),
+                    //         overflow: TextOverflow.ellipsis,
+                    //       ),
+                    //       subtitle: Text(
+                    //         conversation.conversation.lastMessageContent ??
+                    //             '',
+                    //         maxLines: 1,
+                    //         overflow: TextOverflow.ellipsis,
+                    //         style: emojiTextStyle(const TextStyle()),
+                    //       ),
+                    //       trailing: RelativeTimeWidget(
+                    //         time: conversation.conversation.lastMessageTime,
+                    //       ),
+                    //       onTap: () => widget.onConversationTap(
+                    //         conversation.conversation.id,
+                    //       ),
+                    //     );
+                    //   },
+                    // ),
+                    // ),
                   ],
                 ),
                 Column(

@@ -70,7 +70,7 @@ class _ChangePasswordPageState extends ConsumerState<ChangePasswordPage> {
     if (!mounted) return;
     final username = ref.read(currentUserProvider).user.username;
     showSnackBar(text: l10n.passwordChangedBody, context: context);
-    ref.read(authProvider.notifier).clearPasswordRecovery();
+    // ref.read(authProvider.notifier).clearPasswordRecovery();
     context.goNamed(
       'user_settings',
       pathParameters: {'username': username},

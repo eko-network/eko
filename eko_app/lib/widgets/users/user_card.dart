@@ -91,12 +91,6 @@ class UserCard extends ConsumerWidget {
         final width = constraints.maxWidth;
         return userAsync.when(
           data: (user) {
-            final currentUser = ref.watch(currentUserProvider);
-            if (!showBlockedUsers &&
-                (currentUser.blockedUsers.contains(user.uid) ||
-                    currentUser.blockedBy.contains(user.uid))) {
-              return SizedBox.shrink();
-            }
             return InkWell(
               canRequestFocus: canRequestFocus,
               onTapDown:

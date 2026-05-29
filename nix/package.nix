@@ -22,6 +22,7 @@ pkgs.flutter.buildFlutterApplication {
     jsoncpp
     openssl
     libsecret
+    sqlite
   ];
 
   nativeBuildInputs = with pkgs; [

@@ -1,10 +1,18 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:typed_data';
+import 'package:ecp/core/default.dart';
+import 'package:ecp/ecp.dart';
+import 'package:eko_app/database/database.dart' hide User;
+import 'package:eko_app/database/storage.dart';
 import 'package:eko_app/localization/generated/app_localizations.dart';
 import 'package:eko_app/database/messenger_clear.dart';
+import 'package:eko_app/utilities/device_uid_service.dart';
 import 'package:eko_app/widgets/errors/snack_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart' show debugPrint, kDebugMode;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:eko_app/types/auth.dart';
@@ -15,6 +23,7 @@ import 'package:eko_app/interfaces/notification_helper.dart';
 import 'package:eko_app/interfaces/user.dart' as user;
 import 'package:eko_app/utilities/gauth/supabase_google_oauth.dart';
 import 'package:eko_app/utilities/platform.dart' as platform;
+import 'package:uuid/uuid.dart';
 
 Future<void>? _registerNotificationsInFlight;
 
@@ -137,48 +146,74 @@ void handleAuthError(Object e, BuildContext context) {
   }
 }
 
-final authProvider = NotifierProvider<Auth, AuthModel>(Auth.new);
+final authProvider = AsyncNotifierProvider<Auth, AuthModel>(Auth.new);
 
-class Auth extends Notifier<AuthModel> {
+class Auth extends AsyncNotifier<AuthModel> {
+  EcpCore? _core;
+  StreamSubscription? _authSub;
+  EcpCore? get core => _core;
   @override
-  AuthModel build() {
+  Future<AuthModel> build() async {
+    ref.onDispose(() {
+      _authSub?.cancel();
+      _core?.close();
+    });
     _listenToAuthChanges();
-    final session = supabase.auth.currentSession;
-    if (session != null) {
-      _debugPrintSupabaseBearer(session);
-      return _stateFromSession(session, pendingPasswordRecovery: false);
-    }
-    return AuthModel.loading();
+    return AuthModel.signedOut();
   }
 
-  AuthModel _stateFromSession(
-    Session session, {
-    required bool pendingPasswordRecovery,
-  }) {
+  Future<AuthModel> _stateFromSession(Session session) async {
+    debugPrint('[Auth] _stateFromSession called');
     final u = session.user;
-    return AuthModel(
-      uid: u.id,
-      isLoading: false,
-      email: u.email,
-      emailVerified: u.emailConfirmedAt != null,
-      creationTime: DateTime.tryParse(u.createdAt),
-      pendingPasswordRecovery: pendingPasswordRecovery,
-      did: didFromSession(session),
-    );
+    String? did;
+    if (!platform.isWeb) {
+      if (_core == null) {
+        debugPrint('[Auth][ECP] Initilizing core');
+        final storage = AppStorage(db);
+        final path = await getApplicationSupportDirectory();
+        _core = EcpCore(
+            storage: storage,
+            credentialIdentity: Uint8List.fromList(Uuid.parse(u.id)),
+            engineConfig:
+                await MlsEngineConfig.fromPath('$path/mls.db', storage));
+      }
+      assert(_core != null, 'core cannot be null');
+      await _core!.open();
+      debugPrint('[Auth][ECP] Core is open');
+      did = didFromSession(session);
+      if (did == null) {
+        debugPrint('[Auth][ECP] Registering device');
+        final (credential, keyPackages) = await _core!.createIdentity();
+        await supabase.rpc('register_device', params: {
+          'p_did': DeviceUidService.getOrCreate(),
+          'p_signer_public_key': base64Encode(credential.signerPublicKey),
+          'p_key_packages': keyPackages
+              .map((it) => base64Encode(it.keyPackageBytes))
+              .toList(),
+        });
+        await supabase.auth.refreshSession();
+      }
+    }
+
+    return AuthModel(uid: u.id, did: did, email: u.email);
   }
 
   void _listenToAuthChanges() {
-    supabase.auth.onAuthStateChange.listen(
-      (data) {
+    _authSub = supabase.auth.onAuthStateChange.listen(
+      (data) async {
+        // Filter token refreshes so as to not trigger _stateFromSession twice
+        if (data.event == AuthChangeEvent.tokenRefreshed) return;
         final session = data.session;
         if (session == null) {
-          clearMessengerLocalData();
-          state = AuthModel.signedOut();
+          debugPrint('[Auth] SignOut called');
+          _cleanAfterSignOut();
           return;
         }
         _debugPrintSupabaseBearer(session);
         final isRecovery = data.event == AuthChangeEvent.passwordRecovery;
-        state = _stateFromSession(session, pendingPasswordRecovery: isRecovery);
+        state = AsyncValue.loading();
+        state = await AsyncValue.guard(() => _stateFromSession(session));
+        registerNotificationsIfNeeded();
         if (!isRecovery &&
             data.event == AuthChangeEvent.signedIn &&
             !platform.isLinux) {
@@ -192,13 +227,9 @@ class Auth extends Notifier<AuthModel> {
             debugPrint('Error signing out after auth error: $e');
           });
         }
-        state = AuthModel.signedOut();
+        state = AsyncValue.data(AuthModel.signedOut());
       },
     );
-  }
-
-  void clearPasswordRecovery() {
-    state = state.copyWith(pendingPasswordRecovery: false);
   }
 
   Future<void> signIn({required String email, required String password}) async {
@@ -258,9 +289,23 @@ class Auth extends Notifier<AuthModel> {
     }
   }
 
+  Future<void> signOut() async {
+    final uid = state.value?.uid;
+    if (uid != null) {
+      await user.removeDeviceNotificationToken(uid);
+    }
+    supabase.auth.signOut();
+  }
+
+  Future<void> _cleanAfterSignOut() async {
+    clearMessengerLocalData();
+    state = AsyncValue.data(AuthModel.signedOut());
+    _core = null;
+  }
+
   Future<void> deleteAccount() async {
     try {
-      final uid = state.uid;
+      final uid = state.value?.uid;
       if (uid == null) return;
       await supabase.rpc('delete_user');
       await supabase.auth.signOut();
@@ -284,14 +329,6 @@ class Auth extends Notifier<AuthModel> {
   Future<void> refreshEmailVerification() async {
     try {
       await supabase.auth.refreshSession();
-      final session = supabase.auth.currentSession;
-      final user = session?.user;
-      if (user != null && session != null) {
-        state = state.copyWith(
-          emailVerified: user.emailConfirmedAt != null,
-          did: didFromSession(session),
-        );
-      }
     } catch (e) {
       debugPrint('Error refreshing email verification: $e');
     }
@@ -378,7 +415,7 @@ class Auth extends Notifier<AuthModel> {
   }
 
   Future<void> registerNotificationsIfNeeded() async {
-    final uid = state.uid;
+    final uid = state.value?.uid;
     if (uid == null || uid.isEmpty) return;
     if (_registerNotificationsInFlight != null) {
       await _registerNotificationsInFlight;
@@ -402,7 +439,7 @@ class Auth extends Notifier<AuthModel> {
   }
 
   Future<void> refreshDeviceNotificationTokenIfNeeded() async {
-    final uid = state.uid;
+    final uid = state.value?.uid;
     if (uid == null || uid.isEmpty) return;
     if (!PrefsService.notificationsEnabled) return;
     await user.refreshDeviceNotificationTokenIfNeeded(uid);

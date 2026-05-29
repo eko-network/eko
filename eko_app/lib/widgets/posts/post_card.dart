@@ -138,11 +138,6 @@ class _PostCardState extends ConsumerState<PostCard> {
     final asyncPost = ref.watch(postProvider(widget.id));
     return asyncPost.when(
       data: (post) {
-        final currentUser = ref.watch(currentUserProvider);
-        if (currentUser.blockedUsers.contains(post.uid) ||
-            currentUser.blockedBy.contains(post.uid)) {
-          return SizedBox.shrink();
-        }
         return PostCardFromPost(
           isOnProfile: widget.isOnProfile,
           sharePressed: sharePressed,

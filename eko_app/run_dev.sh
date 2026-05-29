@@ -16,6 +16,10 @@ elif [ "$PLATFORM" == "linux" ]; then
   elif [ -n "$PROFILE" ]; then
     export XDG_DATA_HOME="$HOME/.local/share/eko-$PROFILE"
   fi
+  SQLITE_LIB_DIR=$(dirname "$(find /nix/store -maxdepth 3 -name "libsqlite3.so" 2>/dev/null | head -1)" 2>/dev/null || true)
+  if [ -n "$SQLITE_LIB_DIR" ] && [ "$SQLITE_LIB_DIR" != "." ]; then
+    export LD_LIBRARY_PATH="$SQLITE_LIB_DIR:$LD_LIBRARY_PATH"
+  fi
   FLUTTER_COMMAND="$FLUTTER_COMMAND -d linux"
 elif [ -n "$PLATFORM" ]; then
   FLUTTER_COMMAND="$FLUTTER_COMMAND -d $PLATFORM"

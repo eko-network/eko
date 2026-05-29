@@ -39,6 +39,8 @@ in {
         openssl.out
         cmake
         pkg-config
+        sqlite
+        sqlite.dev
       ])
       ++ [
         flutterPkg
@@ -46,7 +48,7 @@ in {
     shellHook =
       ''
         export CMAKE_TOOLCHAIN_FILE="${cmakeToolchain}"
-        export LD_LIBRARY_PATH="$PWD/eko_app/build/native_assets/linux:$LD_LIBRARY_PATH"
+        export LD_LIBRARY_PATH="$PWD/eko_app/build/native_assets/linux:${pkgs.sqlite.out}/lib:$LD_LIBRARY_PATH"
         export CHROME_EXECUTABLE=$(which chromium)
       ''
       + commonShellHook;

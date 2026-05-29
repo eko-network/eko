@@ -37,12 +37,17 @@ BEGIN
 END;
 $$;
 
-CREATE OR REPLACE FUNCTION public.register_device (p_did UUID, p_signer_public_key TEXT DEFAULT NULL) RETURNS UUID LANGUAGE plpgsql SECURITY DEFINER
+CREATE OR REPLACE FUNCTION public.register_device (
+  p_did UUID,
+  p_signer_public_key TEXT DEFAULT NULL,
+  p_key_packages TEXT[] DEFAULT NULL
+) RETURNS UUID LANGUAGE plpgsql SECURITY DEFINER
 SET
   search_path = '' AS $$
 DECLARE
   v_uid        UUID := auth.uid();
   v_session_id UUID := (auth.jwt() ->> 'session_id')::UUID;
+  pkg          TEXT;
 BEGIN
   IF v_uid IS NULL THEN
     RAISE EXCEPTION 'Not authenticated';
@@ -50,19 +55,26 @@ BEGIN
 
   INSERT INTO public.devices (id, uid, session_id, signer_public_key)
   VALUES (
-    p_did, 
-    v_uid, 
-    v_session_id,  
+    p_did,
+    v_uid,
+    v_session_id,
     CASE WHEN p_signer_public_key IS NOT NULL THEN decode(p_signer_public_key, 'base64') ELSE NULL END
   )
   ON CONFLICT (id) DO UPDATE
-    SET session_id        = EXCLUDED.session_id,
+    SET session_id          = EXCLUDED.session_id,
         signer_public_key   = COALESCE(EXCLUDED.signer_public_key, public.devices.signer_public_key),
         created_at          = now()
   WHERE public.devices.uid = v_uid;
 
   IF NOT FOUND THEN
     RAISE EXCEPTION 'Device id % is registered to a different user', p_did;
+  END IF;
+
+  IF p_key_packages IS NOT NULL AND array_length(p_key_packages, 1) > 0 THEN
+    FOREACH pkg IN ARRAY p_key_packages LOOP
+      INSERT INTO public.key_packages (device_id, key_package)
+      VALUES (p_did, decode(pkg, 'base64'));
+    END LOOP;
   END IF;
 
   RETURN p_did;
