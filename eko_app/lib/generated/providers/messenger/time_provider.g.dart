@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of '../../providers/messenger_time_provider.dart';
+part of '../../../providers/messenger/time_provider.dart';
 
 // **************************************************************************
 // RiverpodGenerator
@@ -16,15 +16,15 @@ final class CurrentTimeProvider
     extends $FunctionalProvider<DateTime, DateTime, DateTime>
     with $Provider<DateTime> {
   CurrentTimeProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'currentTimeProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'currentTimeProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$currentTimeHash();

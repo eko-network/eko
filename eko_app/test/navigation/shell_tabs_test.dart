@@ -24,13 +24,7 @@ void main() {
 
     router.go('/profile');
     await pumpNavFrames(tester);
-    expect(
-      currentRouterUri(container).path,
-      '/users/$testUsername',
-    );
-    expect(
-      currentRouterUri(container).queryParameters['uid'],
-      testUid,
-    );
+    expect(currentRouterUri(container).path, '/users/$testUsername');
+    expect(currentRouterUri(container).queryParameters['uid'], testUid);
   });
 }

@@ -1,43 +1,40 @@
 import 'dart:async';
-
+import 'package:ecp/ecp.dart';
 import 'package:eko_app/interfaces/search.dart';
 import 'package:eko_app/localization/generated/app_localizations.dart';
-import 'package:eko_app/providers/auth_provider.dart';
 import 'package:eko_app/providers/ecp_provider.dart';
 import 'package:eko_app/types/user.dart';
 import 'package:eko_app/utilities/ecp_helpers.dart';
 import 'package:eko_app/utilities/constants.dart' as c;
-import 'package:eko_app/utilities/emoji_text_style.dart';
 import 'package:eko_app/widgets/common/infinite_scrolly.dart';
 import 'package:eko_app/widgets/loading/shimmer_loaders.dart';
-import 'package:eko_app/widgets/messenger/relative_time.dart';
 import 'package:eko_app/widgets/messenger/resizable_panel.dart';
 import 'package:eko_app/widgets/search/user_search_bar.dart';
 import 'package:eko_app/widgets/users/user_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ConversationList extends ConsumerStatefulWidget {
+class GroupList extends ConsumerStatefulWidget {
   final bool isWideScreen;
-  // final List<> conversations;
+  final List<MlsGroupRecord> groups;
   final int? selectedId;
   final ResizablePanelController? panelController;
   final void Function(int) onConversationTap;
 
-  const ConversationList({
+  const GroupList({
     super.key,
-    // required this.conversations,
     required this.selectedId,
     required this.onConversationTap,
     required this.isWideScreen,
+    required this.groups,
     this.panelController,
   });
 
   @override
-  ConsumerState<ConversationList> createState() => _ConversationListState();
+  ConsumerState<GroupList> createState() => _ConversationListState();
 }
 
-class _ConversationListState extends ConsumerState<ConversationList> {
+class _ConversationListState extends ConsumerState<GroupList> {
   final searchController = TextEditingController();
   bool newChatScreen = false;
   List<MapEntry<String, double>> searchData = [];
@@ -108,14 +105,12 @@ class _ConversationListState extends ConsumerState<ConversationList> {
     final l10n = AppLocalizations.of(context)!;
 
     try {
-      final peer = buildPerson(
-        uid: user.uid,
-      );
+      final peer = buildPerson(uid: user.uid);
       await ref.watch(ecpClientProvider).session.createGroup([peer]);
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.keysExchanged)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.keysExchanged)));
       setState(() {
         newChatScreen = false;
         searchController.clear();

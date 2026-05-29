@@ -32,7 +32,9 @@ class _PostHost extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final asyncPost = ref.watch(postProvider(_postId));
     return asyncPost.when(
-      data: (post) => Scaffold(body: Center(child: LikeButtons(post: post))),
+      data: (post) => Scaffold(
+        body: Center(child: LikeButtons(post: post)),
+      ),
       loading: () => const SizedBox.shrink(),
       error: (_, __) => const SizedBox.shrink(),
     );
@@ -40,8 +42,9 @@ class _PostHost extends ConsumerWidget {
 }
 
 void main() {
-  testWidgets('like count refreshes after returning from view likes page',
-      (tester) async {
+  testWidgets('like count refreshes after returning from view likes page', (
+    tester,
+  ) async {
     var serverLikes = 0;
     _FakePost.likesGetter = () => serverLikes;
 

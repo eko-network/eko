@@ -49,18 +49,20 @@ Future<EcpClient> asyncEcpClient(Ref ref) async {
   if (core == null || session == null) {
     throw StateError('EcpClient accessed before auth or on web');
   }
-  final httpClient =
-      AuthenticatedClient(() => supabase.auth.currentSession?.accessToken);
+  final httpClient = AuthenticatedClient(
+    () => supabase.auth.currentSession?.accessToken,
+  );
 
   ref.onDispose(() {
     httpClient.close();
   });
 
   final client = EcpClient.build(
-      core: core!,
-      did: DeviceUidService.getOrCreate(),
-      client: httpClient,
-      me: ecp_helpers.buildPerson(uid: session!.user.id));
+    core: core!,
+    did: DeviceUidService.getOrCreate(),
+    client: httpClient,
+    me: ecp_helpers.buildPerson(uid: session!.user.id),
+  );
   return client;
 }
 

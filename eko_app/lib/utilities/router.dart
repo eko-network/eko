@@ -1,13 +1,11 @@
 import 'package:cross_file/cross_file.dart' show XFile;
+import 'package:eko_app/views/messenger/no_web_gaurd.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:eko_app/widgets/scaffolds/app_safe_area.dart';
 import 'package:eko_app/interfaces/notification_helper.dart';
-import 'package:eko_app/providers/auth_provider.dart';
-import 'package:eko_app/providers/current_user_provider.dart';
-import 'package:eko_app/providers/pending_deep_link_provider.dart';
 import 'package:eko_app/views/blocked_users_page.dart';
 import 'package:eko_app/views/change_email_page.dart';
 import 'package:eko_app/views/change_password_page.dart';
@@ -158,8 +156,9 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                         path: 'likes',
                         name: 'likes',
                         builder: (context, state) {
-                          final id =
-                              int.tryParse(state.pathParameters['id'] ?? '');
+                          final id = int.tryParse(
+                            state.pathParameters['id'] ?? '',
+                          );
                           if (id == null) {
                             return const FeedPage();
                           }
@@ -170,8 +169,9 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                         path: 'dislikes',
                         name: 'dislikes',
                         builder: (context, state) {
-                          final id =
-                              int.tryParse(state.pathParameters['id'] ?? '');
+                          final id = int.tryParse(
+                            state.pathParameters['id'] ?? '',
+                          );
                           if (id == null) {
                             return const FeedPage();
                           }
@@ -200,7 +200,9 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                         return const FeedPage();
                       }
                       return ViewCommentLikesPage(
-                          commentId: id, dislikes: true);
+                        commentId: id,
+                        dislikes: true,
+                      );
                     },
                   ),
                 ],
@@ -213,8 +215,9 @@ final goRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: '/messages',
                 name: 'messages',
-                pageBuilder: (context, state) =>
-                    NoTransitionPage(child: AdaptiveChat()),
+                pageBuilder: (context, state) => NoTransitionPage(
+                  child: NoMessagesForWeb(child: AdaptiveChat()),
+                ),
                 routes: [
                   GoRoute(
                     path: ':id',
@@ -222,10 +225,14 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                     pageBuilder: (context, state) {
                       final id = int.tryParse(state.pathParameters['id'] ?? '');
                       if (id == null) {
-                        return NoTransitionPage(child: AdaptiveChat());
+                        return NoTransitionPage(
+                          child: NoMessagesForWeb(child: AdaptiveChat()),
+                        );
                       }
                       return NoTransitionPage(
-                        child: AdaptiveChat(selectedConversationId: id),
+                        child: NoMessagesForWeb(
+                          child: AdaptiveChat(selectedGroupId: id),
+                        ),
                       );
                     },
                   ),
@@ -277,21 +284,21 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                         child: GifSearchSection(),
                         transitionsBuilder:
                             (context, animation, secondaryAnimation, child) {
-                          const begin = Offset(0.0, 1.0);
-                          const end = Offset.zero;
-                          const curve = Curves.easeOut;
+                              const begin = Offset(0.0, 1.0);
+                              const end = Offset.zero;
+                              const curve = Curves.easeOut;
 
-                          final tween = Tween(
-                            begin: begin,
-                            end: end,
-                          ).chain(CurveTween(curve: curve));
-                          final offsetAnimation = animation.drive(tween);
+                              final tween = Tween(
+                                begin: begin,
+                                end: end,
+                              ).chain(CurveTween(curve: curve));
+                              final offsetAnimation = animation.drive(tween);
 
-                          return SlideTransition(
-                            position: offsetAnimation,
-                            child: child,
-                          );
-                        },
+                              return SlideTransition(
+                                position: offsetAnimation,
+                                child: child,
+                              );
+                            },
                       );
                     },
                   ),

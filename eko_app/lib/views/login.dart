@@ -86,7 +86,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         isLoading = true;
       });
       try {
-        await ref.read(authProvider.notifier).signIn(
+        await ref
+            .read(authProvider.notifier)
+            .signIn(
               email: emailController.text.trim(),
               password: passwordController.text,
             );
@@ -136,9 +138,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         debugPrint(e.toString());
         if (mounted) {
           showSnackBar(
-              text: AppLocalizations.of(context)!.defaultErrorTitle,
-              context: context,
-              variant: SnackBarVariant.destructive);
+            text: AppLocalizations.of(context)!.defaultErrorTitle,
+            context: context,
+            variant: SnackBarVariant.destructive,
+          );
         }
       } finally {
         if (mounted) {

@@ -4,8 +4,6 @@
 // import 'package:drift/drift.dart';
 // import 'package:ecp/ecp.dart';
 // import 'package:eko_app/database/database.dart';
-// import 'package:eko_app/database/models/message_with_attachments.dart';
-// import 'package:eko_app/database/type_converters.dart';
 // import 'package:eko_app/providers/auth_provider.dart';
 // import 'package:eko_app/providers/ecp_client_holder.dart';
 // import 'package:eko_app/services/messenger_notification_service.dart';

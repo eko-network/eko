@@ -35,7 +35,7 @@ class InfiniteScrolly<K, V> extends StatefulWidget {
   ///		must treat the list it recives as read only. The data may get out of date, but that is ok.
   ///   Also must return bool to signifiy if this is the last chunk
   final Future<(List<MapEntry<K, V>>, bool)> Function(List<MapEntry<K, V>>)
-      getter;
+  getter;
 
   /// Builder function that takes a key and returns a widget to display it.
   final Widget Function(K) widget;
@@ -256,7 +256,8 @@ class _InfiniteScrollyCore<T> extends State<InfiniteScrollyCore<T>> {
               //what to return if dataset is empty
               if (isEmptySet) {
                 return MaxWidthContent(
-                  child: widget.emptySetNotice ??
+                  child:
+                      widget.emptySetNotice ??
                       Padding(
                         padding: EdgeInsets.all(10),
                         child: Center(
@@ -270,7 +271,8 @@ class _InfiniteScrollyCore<T> extends State<InfiniteScrollyCore<T>> {
               //what to return if dataset is under initial load sequence
               if (!widget.isEnd && widget.list.isEmpty) {
                 return MaxWidthContent(
-                  child: widget.initialLoadingWidget ??
+                  child:
+                      widget.initialLoadingWidget ??
                       const _DefaultInitialLoader(),
                 );
               }
@@ -280,7 +282,8 @@ class _InfiniteScrollyCore<T> extends State<InfiniteScrollyCore<T>> {
               }
               // new posts are loading
               return MaxWidthContent(
-                child: widget.loadingWidget ??
+                child:
+                    widget.loadingWidget ??
                     const Center(
                       child: Padding(
                         padding: EdgeInsets.all(10),
@@ -291,7 +294,9 @@ class _InfiniteScrollyCore<T> extends State<InfiniteScrollyCore<T>> {
             },
           ),
           const SliverFillRemaining(
-              hasScrollBody: false, child: SizedBox.shrink()),
+            hasScrollBody: false,
+            child: SizedBox.shrink(),
+          ),
         ],
       ),
     );

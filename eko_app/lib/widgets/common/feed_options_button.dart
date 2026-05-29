@@ -93,11 +93,7 @@ class FeedOptionsButton<T> extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 2),
-            Icon(
-              Icons.arrow_drop_down,
-              size: 20,
-              color: colorScheme.onSurface,
-            ),
+            Icon(Icons.arrow_drop_down, size: 20, color: colorScheme.onSurface),
           ],
         ),
       ),
@@ -136,11 +132,7 @@ class _OptionTile extends StatelessWidget {
             ),
             const Spacer(),
             if (isSelected)
-              Icon(
-                Icons.check,
-                size: 20,
-                color: colorScheme.primary,
-              ),
+              Icon(Icons.check, size: 20, color: colorScheme.primary),
           ],
         ),
       ),

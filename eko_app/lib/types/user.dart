@@ -42,7 +42,8 @@ abstract class UserModel with _$UserModel {
         ? Map<String, dynamic>.from(profileDataRaw)
         : <String, dynamic>{};
 
-    final profilePicture = profileData['profilePicture'] ??
+    final profilePicture =
+        profileData['profilePicture'] ??
         profileData['profile_picture'] ??
         json['profile_picture'] ??
         '';

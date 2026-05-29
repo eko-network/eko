@@ -38,20 +38,20 @@ Future<void> ensureNavigationTestPrefs() async {
 
 /// Minimal [PostModel] for [postPoolProvider] so [postProvider] never hits RPC.
 PostModel get testNavigationPost => PostModel(
-      uid: 'author-uid',
-      id: testPostId,
-      createdAt: '2020-01-01T00:00:00.000Z',
-    );
+  uid: 'author-uid',
+  id: testPostId,
+  createdAt: '2020-01-01T00:00:00.000Z',
+);
 
 UserModel get testNavigationUser => UserModel(
-      name: 'Tester',
-      username: testUsername,
-      profilePicture: '',
-      bio: '',
-      uid: testUid,
-      isVerified: false,
-      shareOnlineStatus: false,
-    );
+  name: 'Tester',
+  username: testUsername,
+  profilePicture: '',
+  bio: '',
+  uid: testUid,
+  isVerified: false,
+  shareOnlineStatus: false,
+);
 
 class FakeSignedOutAuth extends Auth {
   @override
@@ -63,9 +63,7 @@ class FakeSignedOutAuth extends Auth {
 class FakeSignedInAuth extends Auth {
   @override
   Future<AuthModel> build() async {
-    return AuthModel(
-      uid: testUid,
-    );
+    return AuthModel(uid: testUid);
   }
 }
 
@@ -108,9 +106,7 @@ class FakePendingDeepLink extends PendingDeepLink {
 class FakeSignedInCurrentUser extends CurrentUser {
   @override
   CurrentUserModel build() {
-    return CurrentUserModel(
-      user: testNavigationUser,
-    );
+    return CurrentUserModel(user: testNavigationUser);
   }
 }
 
@@ -202,9 +198,9 @@ List<Override> signedInNavigationOverrides({bool needsProfileSetup = false}) {
     followingFeedProvider.overrideWith(_EndedFollowingFeed.new),
     popularFeedProvider.overrideWith(_EndedPopularFeed.new),
     profilePostListProvider.overrideWith(_EmptyEndedProfilePosts.new),
-    otherProfilePostListProvider(testUid).overrideWith(
-      () => _EmptyEndedOtherProfilePosts(testUid),
-    ),
+    otherProfilePostListProvider(
+      testUid,
+    ).overrideWith(() => _EmptyEndedOtherProfilePosts(testUid)),
     commentListProvider(testPostId).overrideWith(_EmptyEndedCommentList.new),
     postProvider(testPostId).overrideWith(_FakePost.new),
     userProvider(testUid).overrideWith(_FakeUser.new),

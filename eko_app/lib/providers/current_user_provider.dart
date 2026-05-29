@@ -17,8 +17,8 @@ class NeedsProfileSetupNotifier extends Notifier<bool> {
 
 final needsProfileSetupProvider =
     NotifierProvider<NeedsProfileSetupNotifier, bool>(
-  NeedsProfileSetupNotifier.new,
-);
+      NeedsProfileSetupNotifier.new,
+    );
 
 @Riverpod(keepAlive: true)
 class CurrentUser extends _$CurrentUser {
@@ -177,7 +177,8 @@ class CurrentUser extends _$CurrentUser {
         final currentUser = supabase.auth.currentUser;
         final provider = currentUser?.appMetadata['provider'] as String?;
         final identities = currentUser?.identities ?? [];
-        final isOAuth = provider == 'google' ||
+        final isOAuth =
+            provider == 'google' ||
             identities.any((i) => i.provider == 'google');
         if (isOAuth) {
           ref.read(needsProfileSetupProvider.notifier).state = true;

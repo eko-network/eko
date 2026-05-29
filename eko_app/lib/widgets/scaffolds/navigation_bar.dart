@@ -24,8 +24,7 @@ const List<IconData> _activeIconList = [
 
 class ScaffoldWithNestedNavigation extends StatelessWidget {
   const ScaffoldWithNestedNavigation({Key? key, required this.navigationShell})
-      : super(
-            key: key ?? const ValueKey<String>('ScaffoldWithNestedNavigation'));
+    : super(key: key ?? const ValueKey<String>('ScaffoldWithNestedNavigation'));
   final StatefulNavigationShell navigationShell;
 
   void goBranch(int index) {

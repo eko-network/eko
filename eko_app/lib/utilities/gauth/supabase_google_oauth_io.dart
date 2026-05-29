@@ -42,8 +42,11 @@ Future<void> signInWithGoogleOAuth(GoTrueClient auth) async {
 
     Future<void> respondDoneHtml(HttpRequest request) async {
       request.response.statusCode = 200;
-      request.response.headers.contentType =
-          ContentType('text', 'html', charset: 'utf-8');
+      request.response.headers.contentType = ContentType(
+        'text',
+        'html',
+        charset: 'utf-8',
+      );
       request.response.write(
         '<!DOCTYPE html><html><head><meta charset="utf-8">'
         '<title>eko</title>'
@@ -73,9 +76,11 @@ Future<void> signInWithGoogleOAuth(GoTrueClient auth) async {
       final uri = request.requestedUri;
       if (uri.queryParameters.containsKey('error')) {
         completer.completeError(
-          AuthException(uri.queryParameters['error_description'] ??
-              uri.queryParameters['error'] ??
-              'OAuth error'),
+          AuthException(
+            uri.queryParameters['error_description'] ??
+                uri.queryParameters['error'] ??
+                'OAuth error',
+          ),
         );
         return;
       }
@@ -91,8 +96,11 @@ Future<void> signInWithGoogleOAuth(GoTrueClient auth) async {
       final path = uri.path.isEmpty ? '/' : uri.path;
       if (path == '/') {
         request.response.statusCode = 200;
-        request.response.headers.contentType =
-            ContentType('text', 'html', charset: 'utf-8');
+        request.response.headers.contentType = ContentType(
+          'text',
+          'html',
+          charset: 'utf-8',
+        );
         request.response.write(
           '<!DOCTYPE html><html><head><meta charset="utf-8"><title>eko</title>'
           '</head><body>'

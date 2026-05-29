@@ -72,9 +72,7 @@ class ActivityCardWidget extends ConsumerWidget {
                         ),
                       ),
                       const SizedBox(width: 8),
-                      TimeStamp(
-                        time: activity.dateTime,
-                      ),
+                      TimeStamp(time: activity.dateTime),
                     ],
                   ),
                   _ActivityBody(activity: activity),
@@ -96,18 +94,18 @@ class _ActivityBody extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final String? text = switch (activity.type) {
       ActivityType.follow => null,
-      ActivityType.comment ||
-      ActivityType.commentTag =>
+      ActivityType.comment || ActivityType.commentTag =>
         activity.commentId == null
             ? null
             : ref
-                .watch(commentProvider(activity.commentId!))
-                .whenOrNull(data: (c) => c.body),
-      ActivityType.postTag || ActivityType.eko => activity.postId == null
-          ? null
-          : ref
-              .watch(postProvider(activity.postId!))
-              .whenOrNull(data: (p) => p.title ?? p.body),
+                  .watch(commentProvider(activity.commentId!))
+                  .whenOrNull(data: (c) => c.body),
+      ActivityType.postTag || ActivityType.eko =>
+        activity.postId == null
+            ? null
+            : ref
+                  .watch(postProvider(activity.postId!))
+                  .whenOrNull(data: (p) => p.title ?? p.body),
     };
 
     if (text == null || text.isEmpty) {
@@ -120,9 +118,7 @@ class _ActivityBody extends ConsumerWidget {
         text,
         maxLines: 2,
         overflow: TextOverflow.ellipsis,
-        style: TextStyle(
-          color: Theme.of(context).colorScheme.onSurface,
-        ),
+        style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
       ),
     );
   }

@@ -160,13 +160,15 @@ class OtherProfilePostListNotifier extends Notifier<ProfilePostListState> {
 
 final profilePostListProvider =
     NotifierProvider<ProfilePostListNotifier, ProfilePostListState>(
-  ProfilePostListNotifier.new,
-);
+      ProfilePostListNotifier.new,
+    );
 
-final otherProfilePostListProvider = NotifierProvider.family<
-    OtherProfilePostListNotifier,
-    ProfilePostListState,
-    String>((uid) => OtherProfilePostListNotifier(uid));
+final otherProfilePostListProvider =
+    NotifierProvider.family<
+      OtherProfilePostListNotifier,
+      ProfilePostListState,
+      String
+    >((uid) => OtherProfilePostListNotifier(uid));
 
 class _ProfilePostSort extends Notifier<ProfilePostSort> {
   @override
@@ -183,5 +185,5 @@ class _OtherProfilePostSort extends Notifier<ProfilePostSort> {
 
 final otherProfilePostSortProvider =
     NotifierProvider.family<_OtherProfilePostSort, ProfilePostSort, String>(
-  (_) => _OtherProfilePostSort(),
-);
+      (_) => _OtherProfilePostSort(),
+    );

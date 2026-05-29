@@ -15,15 +15,15 @@ final pendingDeepLinkProvider = PendingDeepLinkProvider._();
 final class PendingDeepLinkProvider
     extends $NotifierProvider<PendingDeepLink, String?> {
   PendingDeepLinkProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'pendingDeepLinkProvider',
-          isAutoDispose: false,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'pendingDeepLinkProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$pendingDeepLinkHash();
@@ -49,8 +49,14 @@ abstract class _$PendingDeepLink extends $Notifier<String?> {
   @override
   void runBuild() {
     final ref = this.ref as $Ref<String?, String?>;
-    final element = ref.element as $ClassProviderElement<
-        AnyNotifier<String?, String?>, String?, Object?, Object?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<String?, String?>,
+              String?,
+              Object?,
+              Object?
+            >;
     element.handleCreate(ref, build);
   }
 }

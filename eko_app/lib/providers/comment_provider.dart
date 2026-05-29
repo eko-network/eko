@@ -42,13 +42,12 @@ class Comment extends _$Comment {
   }
 
   Future<CommentModel> _fetchCommentModel(int id) async {
-    final rows = await supabase.rpc('get_comment_by_id', params: {
-      'p_id': id,
-    });
+    final rows = await supabase.rpc('get_comment_by_id', params: {'p_id': id});
     final list = rows as List<dynamic>? ?? const [];
     final comments = list
-        .map((row) =>
-            CommentModel.fromJson(Map<String, dynamic>.from(row as Map)))
+        .map(
+          (row) => CommentModel.fromJson(Map<String, dynamic>.from(row as Map)),
+        )
         .toList();
     if (comments.isEmpty) {
       throw Exception('Failed to load');
@@ -61,11 +60,10 @@ class Comment extends _$Comment {
     required bool isLiking,
     required bool isDislike,
   }) async {
-    await supabase.rpc('change_comment_likes', params: {
-      'p_id': id,
-      'p_is_liking': isLiking,
-      'p_is_dislike': isDislike,
-    });
+    await supabase.rpc(
+      'change_comment_likes',
+      params: {'p_id': id, 'p_is_liking': isLiking, 'p_is_dislike': isDislike},
+    );
   }
 
   Future<void> likeCommentToggle() async {
@@ -74,29 +72,39 @@ class Comment extends _$Comment {
     _isLiking = true;
     if (prevState.isLiked) {
       state = AsyncData(
-          prevState.copyWith(isLiked: false, likes: prevState.likes - 1));
+        prevState.copyWith(isLiked: false, likes: prevState.likes - 1),
+      );
       try {
-        await _changeCommentLike(prevState.id,
-            isLiking: false, isDislike: false);
+        await _changeCommentLike(
+          prevState.id,
+          isLiking: false,
+          isDislike: false,
+        );
       } catch (e) {
         debugPrint('likeCommentToggle unlike error: $e');
         state = AsyncData(prevState);
       }
     } else {
       if (prevState.isDisliked) {
-        state = AsyncData(prevState.copyWith(
-          isLiked: true,
-          isDisliked: false,
-          likes: prevState.likes + 1,
-          dislikes: prevState.dislikes - 1,
-        ));
+        state = AsyncData(
+          prevState.copyWith(
+            isLiked: true,
+            isDisliked: false,
+            likes: prevState.likes + 1,
+            dislikes: prevState.dislikes - 1,
+          ),
+        );
       } else {
         state = AsyncData(
-            prevState.copyWith(isLiked: true, likes: prevState.likes + 1));
+          prevState.copyWith(isLiked: true, likes: prevState.likes + 1),
+        );
       }
       try {
-        await _changeCommentLike(prevState.id,
-            isLiking: true, isDislike: false);
+        await _changeCommentLike(
+          prevState.id,
+          isLiking: true,
+          isDislike: false,
+        );
       } catch (e) {
         debugPrint('likeCommentToggle like error: $e');
         state = AsyncData(prevState);
@@ -110,26 +118,36 @@ class Comment extends _$Comment {
     if (_isLiking) return;
     _isLiking = true;
     if (prevState.isDisliked) {
-      state = AsyncData(prevState.copyWith(
-          isDisliked: false, dislikes: prevState.dislikes - 1));
+      state = AsyncData(
+        prevState.copyWith(isDisliked: false, dislikes: prevState.dislikes - 1),
+      );
       try {
-        await _changeCommentLike(prevState.id,
-            isLiking: false, isDislike: true);
+        await _changeCommentLike(
+          prevState.id,
+          isLiking: false,
+          isDislike: true,
+        );
       } catch (e) {
         debugPrint('dislikeCommentToggle undislike error: $e');
         state = AsyncData(prevState);
       }
     } else {
       if (prevState.isLiked) {
-        state = AsyncData(prevState.copyWith(
-          isDisliked: true,
-          isLiked: false,
-          dislikes: prevState.dislikes + 1,
-          likes: prevState.likes - 1,
-        ));
+        state = AsyncData(
+          prevState.copyWith(
+            isDisliked: true,
+            isLiked: false,
+            dislikes: prevState.dislikes + 1,
+            likes: prevState.likes - 1,
+          ),
+        );
       } else {
-        state = AsyncData(prevState.copyWith(
-            isDisliked: true, dislikes: prevState.dislikes + 1));
+        state = AsyncData(
+          prevState.copyWith(
+            isDisliked: true,
+            dislikes: prevState.dislikes + 1,
+          ),
+        );
       }
       try {
         await _changeCommentLike(prevState.id, isLiking: true, isDislike: true);

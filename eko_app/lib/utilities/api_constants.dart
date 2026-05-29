@@ -64,7 +64,7 @@ const _klipyKey = [
   113,
   117,
   73,
-  76
+  76,
 ];
 final _supabaseKey = [
   115,
@@ -112,7 +112,7 @@ final _supabaseKey = [
   73,
   118,
   104,
-  50
+  50,
 ];
 const _useLocal = kDebugMode && (String.fromEnvironment('USE_LOCAL') == '1');
 const supabaseUrl = _useLocal

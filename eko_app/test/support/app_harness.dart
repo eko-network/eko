@@ -35,10 +35,7 @@ Future<ProviderContainer> pumpAppHarness(
   });
 
   await tester.pumpWidget(
-    UncontrolledProviderScope(
-      container: container,
-      child: const MyApp(),
-    ),
+    UncontrolledProviderScope(container: container, child: const MyApp()),
   );
   await tester.pump();
   await tester.pump(const Duration(milliseconds: 300));

@@ -83,10 +83,9 @@ class _VerifyEmailViewState extends ConsumerState<VerifyEmailView> {
     }
     setState(() => _checkLoading = true);
     try {
-      await ref.read(authProvider.notifier).signIn(
-            email: email,
-            password: widget.passwordController.text,
-          );
+      await ref
+          .read(authProvider.notifier)
+          .signIn(email: email, password: widget.passwordController.text);
       if (mounted) context.go('/feed');
     } catch (e) {
       if (mounted) handleAuthError(e, context);
@@ -140,8 +139,9 @@ class _VerifyEmailViewState extends ConsumerState<VerifyEmailView> {
                     ? l10n.resendInSeconds(_resendCountdown)
                     : l10n.resendVerificationEmail,
                 isLoading: _resendLoading,
-                onPressed:
-                    (_resendLoading || _resendCountdown > 0) ? null : _resend,
+                onPressed: (_resendLoading || _resendCountdown > 0)
+                    ? null
+                    : _resend,
               ),
               const SizedBox(height: c.authElementSpacing),
               AuthButton.secondary(

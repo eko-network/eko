@@ -9,8 +9,9 @@ void main() {
     await ensureNavigationTestPrefs();
   });
 
-  testWidgets('/feed/post/:id opens ViewPostPage when post is in pool',
-      (tester) async {
+  testWidgets('/feed/post/:id opens ViewPostPage when post is in pool', (
+    tester,
+  ) async {
     final container = await pumpNavigationApp(
       tester,
       overrides: signedInNavigationOverrides(),

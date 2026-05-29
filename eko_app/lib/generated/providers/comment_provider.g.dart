@@ -14,15 +14,16 @@ final commentProvider = CommentFamily._();
 
 final class CommentProvider
     extends $AsyncNotifierProvider<Comment, CommentModel> {
-  CommentProvider._(
-      {required CommentFamily super.from, required int super.argument})
-      : super(
-          retry: null,
-          name: r'commentProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+  CommentProvider._({
+    required CommentFamily super.from,
+    required int super.argument,
+  }) : super(
+         retry: null,
+         name: r'commentProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
 
   @override
   String debugGetCreateSourceHash() => _$commentHash();
@@ -53,21 +54,23 @@ String _$commentHash() => r'a3a8c9977cde5910e25dd643ec510dbfae616163';
 
 final class CommentFamily extends $Family
     with
-        $ClassFamilyOverride<Comment, AsyncValue<CommentModel>, CommentModel,
-            FutureOr<CommentModel>, int> {
+        $ClassFamilyOverride<
+          Comment,
+          AsyncValue<CommentModel>,
+          CommentModel,
+          FutureOr<CommentModel>,
+          int
+        > {
   CommentFamily._()
-      : super(
-          retry: null,
-          name: r'commentProvider',
-          dependencies: null,
-          $allTransitiveDependencies: null,
-          isAutoDispose: true,
-        );
+    : super(
+        retry: null,
+        name: r'commentProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
 
-  CommentProvider call(
-    int id,
-  ) =>
-      CommentProvider._(argument: id, from: this);
+  CommentProvider call(int id) => CommentProvider._(argument: id, from: this);
 
   @override
   String toString() => r'commentProvider';
@@ -77,22 +80,19 @@ abstract class _$Comment extends $AsyncNotifier<CommentModel> {
   late final _$args = ref.$arg as int;
   int get id => _$args;
 
-  FutureOr<CommentModel> build(
-    int id,
-  );
+  FutureOr<CommentModel> build(int id);
   @$mustCallSuper
   @override
   void runBuild() {
     final ref = this.ref as $Ref<AsyncValue<CommentModel>, CommentModel>;
-    final element = ref.element as $ClassProviderElement<
-        AnyNotifier<AsyncValue<CommentModel>, CommentModel>,
-        AsyncValue<CommentModel>,
-        Object?,
-        Object?>;
-    element.handleCreate(
-        ref,
-        () => build(
-              _$args,
-            ));
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<CommentModel>, CommentModel>,
+              AsyncValue<CommentModel>,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, () => build(_$args));
   }
 }

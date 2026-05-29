@@ -15,16 +15,16 @@ class FollowingFeed extends _$FollowingFeed {
   }
 
   Future<void> getter() async {
-    final params = <String, dynamic>{
-      'p_limit': c.postsOnRefresh,
-    };
+    final params = <String, dynamic>{'p_limit': c.postsOnRefresh};
     if (_cursors.isNotEmpty) {
       final last = _cursors.last;
       params['p_last_time'] = last.value;
       params['p_last_id'] = last.key;
     }
-    final rows =
-        await supabase.rpc('paginated_following_posts', params: params);
+    final rows = await supabase.rpc(
+      'paginated_following_posts',
+      params: params,
+    );
     final list = rows as List<dynamic>? ?? const [];
     final postList = list
         .map((row) => PostModel.fromJson(Map<String, dynamic>.from(row as Map)))

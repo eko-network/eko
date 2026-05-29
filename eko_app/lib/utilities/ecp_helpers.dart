@@ -7,20 +7,19 @@ Uri messengerActorId(String supabaseUid) {
     pathSegments: [
       ...base.pathSegments.where((s) => s.isNotEmpty),
       'users',
-      supabaseUid
+      supabaseUid,
     ],
   );
 }
 
-Person buildPerson({
-  required String uid,
-}) {
+Person buildPerson({required String uid}) {
   final actorId = messengerActorId(uid);
   return Person(
     id: actorId,
     inbox: actorId.replace(pathSegments: [...actorId.pathSegments, 'inbox']),
     outbox: actorId.replace(pathSegments: [...actorId.pathSegments, 'outbox']),
-    devicesEndpoint:
-        actorId.replace(pathSegments: [...actorId.pathSegments, 'devices']),
+    devicesEndpoint: actorId.replace(
+      pathSegments: [...actorId.pathSegments, 'devices'],
+    ),
   );
 }

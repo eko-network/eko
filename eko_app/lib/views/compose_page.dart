@@ -85,11 +85,7 @@ class _ComposePageState extends ConsumerState<ComposePage> {
   String? timestamp;
   AsciiImage? image;
   bool isPoll = false;
-  List<String> pollOptions = List.filled(
-    c.minPollOptions,
-    '',
-    growable: true,
-  );
+  List<String> pollOptions = List.filled(c.minPollOptions, '', growable: true);
   final titleController = TextEditingController();
   final bodyController = TextEditingController();
   final scrollController = ScrollController();
@@ -183,8 +179,9 @@ class _ComposePageState extends ConsumerState<ComposePage> {
     final String middle = text.substring(loC, hiC);
     final String replacement = '$left$middle$right';
     final String newText = text.replaceRange(loC, hiC, replacement);
-    final int newOffset =
-        middle.isEmpty ? loC + left.length : loC + replacement.length;
+    final int newOffset = middle.isEmpty
+        ? loC + left.length
+        : loC + replacement.length;
     controller.value = TextEditingValue(
       text: newText,
       selection: TextSelection.collapsed(
@@ -240,11 +237,7 @@ class _ComposePageState extends ConsumerState<ComposePage> {
     setState(() {
       repostId = null;
       isPoll = false;
-      pollOptions = List.filled(
-        c.minPollOptions,
-        '',
-        growable: true,
-      );
+      pollOptions = List.filled(c.minPollOptions, '', growable: true);
       gif = null;
       image = null;
       bodyNewLines = 0;
@@ -254,7 +247,9 @@ class _ComposePageState extends ConsumerState<ComposePage> {
   }
 
   Future<void> _uploadAndNavigate(
-      PostModel post, List<String>? pollOptions) async {
+    PostModel post,
+    List<String>? pollOptions,
+  ) async {
     if (isUploading) return;
     try {
       isUploading = true;
@@ -369,22 +364,24 @@ class _ComposePageState extends ConsumerState<ComposePage> {
 
       final postPollOptions = !isPoll ? null : pollOptions;
       final post = PostModel(
-          uid: ref.read(currentUserProvider).user.uid,
-          id: 0,
-          tags: tags,
-          likes: 0,
-          dislikes: 0,
-          commentCount: 0,
-          createdAt: DateTime.now().toUtc().toIso8601String(),
-          imageString: image,
-          gifUrl: gif,
-          repostId: repostId,
-          title: title,
-          body: body,
-          poll: postPollOptions
-              ?.map<PollOptionModel>(
-                  (v) => PollOptionModel(value: v, optionId: 0, voteCount: 0))
-              .toList());
+        uid: ref.read(currentUserProvider).user.uid,
+        id: 0,
+        tags: tags,
+        likes: 0,
+        dislikes: 0,
+        commentCount: 0,
+        createdAt: DateTime.now().toUtc().toIso8601String(),
+        imageString: image,
+        gifUrl: gif,
+        repostId: repostId,
+        title: title,
+        body: body,
+        poll: postPollOptions
+            ?.map<PollOptionModel>(
+              (v) => PollOptionModel(value: v, optionId: 0, voteCount: 0),
+            )
+            .toList(),
+      );
 
       if (mounted) {
         if (ref.read(postPreviewProvider)) {
@@ -395,9 +392,7 @@ class _ComposePageState extends ConsumerState<ComposePage> {
               final l10n = AppLocalizations.of(context)!;
               return AlertDialog(
                 backgroundColor: Theme.of(context).colorScheme.outlineVariant,
-                title: Text(
-                  l10n.postToPublicConfirmTitle(l10n.public),
-                ),
+                title: Text(l10n.postToPublicConfirmTitle(l10n.public)),
                 content: SingleChildScrollView(
                   child: PostCardFromPost(post: post, isPreview: true),
                 ),
@@ -536,8 +531,10 @@ class _ComposePageState extends ConsumerState<ComposePage> {
                       backgroundColor: Theme.of(
                         context,
                       ).colorScheme.primaryContainer,
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
@@ -582,10 +579,7 @@ class _ComposePageState extends ConsumerState<ComposePage> {
                       ),
                       const SizedBox(width: 9),
                       ToggleButtons(
-                        isSelected: [
-                          !showMarkdownPreview,
-                          showMarkdownPreview,
-                        ],
+                        isSelected: [!showMarkdownPreview, showMarkdownPreview],
                         onPressed: (index) {
                           setState(() {
                             showMarkdownPreview = (index == 1);
@@ -593,16 +587,22 @@ class _ComposePageState extends ConsumerState<ComposePage> {
                         },
                         borderRadius: BorderRadius.circular(12),
                         color: Theme.of(context).colorScheme.onSurface,
-                        selectedColor:
-                            Theme.of(context).colorScheme.onPrimaryContainer,
-                        fillColor:
-                            Theme.of(context).colorScheme.surfaceContainer,
-                        borderColor:
-                            Theme.of(context).colorScheme.onSurfaceVariant,
-                        selectedBorderColor:
-                            Theme.of(context).colorScheme.onSurfaceVariant,
-                        constraints:
-                            BoxConstraints(minHeight: 32, minWidth: 70),
+                        selectedColor: Theme.of(
+                          context,
+                        ).colorScheme.onPrimaryContainer,
+                        fillColor: Theme.of(
+                          context,
+                        ).colorScheme.surfaceContainer,
+                        borderColor: Theme.of(
+                          context,
+                        ).colorScheme.onSurfaceVariant,
+                        selectedBorderColor: Theme.of(
+                          context,
+                        ).colorScheme.onSurfaceVariant,
+                        constraints: BoxConstraints(
+                          minHeight: 32,
+                          minWidth: 70,
+                        ),
                         children: [
                           Text(AppLocalizations.of(context)!.write),
                           Text(AppLocalizations.of(context)!.preview),
@@ -610,8 +610,9 @@ class _ComposePageState extends ConsumerState<ComposePage> {
                       ),
                       const SizedBox(width: 8),
                       IconButton(
-                        tooltip:
-                            AppLocalizations.of(context)!.markdownBoldTooltip,
+                        tooltip: AppLocalizations.of(
+                          context,
+                        )!.markdownBoldTooltip,
                         onPressed: showMarkdownPreview
                             ? null
                             : () => _wrapActiveFieldMarkdown('**', '**'),
@@ -623,8 +624,9 @@ class _ComposePageState extends ConsumerState<ComposePage> {
                         ),
                       ),
                       IconButton(
-                        tooltip:
-                            AppLocalizations.of(context)!.markdownItalicTooltip,
+                        tooltip: AppLocalizations.of(
+                          context,
+                        )!.markdownItalicTooltip,
                         onPressed: showMarkdownPreview
                             ? null
                             : () => _wrapActiveFieldMarkdown('*', '*'),
@@ -660,9 +662,9 @@ class _ComposePageState extends ConsumerState<ComposePage> {
                             hintText: AppLocalizations.of(context)!.postTitle,
                             hintStyle: TextStyle(
                               fontSize: 22,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSurfaceVariant,
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurfaceVariant,
                             ),
                             border: InputBorder.none,
                           ),
@@ -694,8 +696,9 @@ class _ComposePageState extends ConsumerState<ComposePage> {
                                 repostId = null;
                               }),
                               child: ConstrainedBox(
-                                constraints:
-                                    BoxConstraints(minWidth: width * 0.8),
+                                constraints: BoxConstraints(
+                                  minWidth: width * 0.8,
+                                ),
                                 child: RepostCard(
                                   postId: repostId!,
                                   isLoggedIn: true,
@@ -724,8 +727,9 @@ class _ComposePageState extends ConsumerState<ComposePage> {
                             SizedBox(height: 5),
                           if (isPoll)
                             Padding(
-                              padding:
-                                  EdgeInsetsGeometry.symmetric(horizontal: 10),
+                              padding: EdgeInsetsGeometry.symmetric(
+                                horizontal: 10,
+                              ),
                               child: _CornerClose(
                                 onPressed: () => setState(() {
                                   isPoll = false;
@@ -747,21 +751,24 @@ class _ComposePageState extends ConsumerState<ComposePage> {
                                     focusNode: bodyFocus,
                                     controller: bodyController,
                                     maxLines: null,
-                                    cursorColor:
-                                        Theme.of(context).colorScheme.onSurface,
+                                    cursorColor: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurface,
                                     keyboardType: TextInputType.multiline,
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.normal,
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurface,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onSurface,
                                     ),
                                     decoration: InputDecoration(
-                                      contentPadding:
-                                          EdgeInsets.all(height * 0.01),
-                                      hintText:
-                                          AppLocalizations.of(context)!.addText,
+                                      contentPadding: EdgeInsets.all(
+                                        height * 0.01,
+                                      ),
+                                      hintText: AppLocalizations.of(
+                                        context,
+                                      )!.addText,
                                       hintStyle: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.normal,
@@ -824,8 +831,10 @@ class _ComposePageState extends ConsumerState<ComposePage> {
                         ],
                       ),
                       AnimatedBuilder(
-                        animation:
-                            Listenable.merge([titleController, titleFocus]),
+                        animation: Listenable.merge([
+                          titleController,
+                          titleFocus,
+                        ]),
                         builder: (context, _) {
                           final text = searchText(titleController);
                           if (text != null && titleFocus.hasFocus) {

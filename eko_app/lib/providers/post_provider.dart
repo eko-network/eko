@@ -60,11 +60,10 @@ class Post extends _$Post {
     required bool isLiking,
     required bool isDislike,
   }) async {
-    await supabase.rpc('change_post_likes', params: {
-      'p_id': id,
-      'p_is_liking': isLiking,
-      'p_is_dislike': isDislike,
-    });
+    await supabase.rpc(
+      'change_post_likes',
+      params: {'p_id': id, 'p_is_liking': isLiking, 'p_is_dislike': isDislike},
+    );
   }
 
   Future<void> likePostToggle() async {
@@ -73,7 +72,8 @@ class Post extends _$Post {
     _isLiking = true;
     if (prevState.isLiked) {
       state = AsyncData(
-          prevState.copyWith(isLiked: false, likes: prevState.likes - 1));
+        prevState.copyWith(isLiked: false, likes: prevState.likes - 1),
+      );
       try {
         await _changePostLike(prevState.id, isLiking: false, isDislike: false);
       } catch (e) {
@@ -82,15 +82,18 @@ class Post extends _$Post {
       }
     } else {
       if (prevState.isDisliked) {
-        state = AsyncData(prevState.copyWith(
-          isLiked: true,
-          isDisliked: false,
-          likes: prevState.likes + 1,
-          dislikes: prevState.dislikes - 1,
-        ));
+        state = AsyncData(
+          prevState.copyWith(
+            isLiked: true,
+            isDisliked: false,
+            likes: prevState.likes + 1,
+            dislikes: prevState.dislikes - 1,
+          ),
+        );
       } else {
         state = AsyncData(
-            prevState.copyWith(isLiked: true, likes: prevState.likes + 1));
+          prevState.copyWith(isLiked: true, likes: prevState.likes + 1),
+        );
       }
       try {
         await _changePostLike(prevState.id, isLiking: true, isDislike: false);
@@ -107,8 +110,9 @@ class Post extends _$Post {
     if (_isLiking) return;
     _isLiking = true;
     if (prevState.isDisliked) {
-      state = AsyncData(prevState.copyWith(
-          isDisliked: false, dislikes: prevState.dislikes - 1));
+      state = AsyncData(
+        prevState.copyWith(isDisliked: false, dislikes: prevState.dislikes - 1),
+      );
       try {
         await _changePostLike(prevState.id, isLiking: false, isDislike: true);
       } catch (e) {
@@ -117,15 +121,21 @@ class Post extends _$Post {
       }
     } else {
       if (prevState.isLiked) {
-        state = AsyncData(prevState.copyWith(
-          isDisliked: true,
-          isLiked: false,
-          dislikes: prevState.dislikes + 1,
-          likes: prevState.likes - 1,
-        ));
+        state = AsyncData(
+          prevState.copyWith(
+            isDisliked: true,
+            isLiked: false,
+            dislikes: prevState.dislikes + 1,
+            likes: prevState.likes - 1,
+          ),
+        );
       } else {
-        state = AsyncData(prevState.copyWith(
-            isDisliked: true, dislikes: prevState.dislikes + 1));
+        state = AsyncData(
+          prevState.copyWith(
+            isDisliked: true,
+            dislikes: prevState.dislikes + 1,
+          ),
+        );
       }
       try {
         await _changePostLike(prevState.id, isLiking: true, isDislike: true);
@@ -160,10 +170,7 @@ class Post extends _$Post {
     try {
       await supabase.rpc(
         'poll_vote',
-        params: {
-          'p_post_id': prevState.id,
-          'p_option_id': optionId,
-        },
+        params: {'p_post_id': prevState.id, 'p_option_id': optionId},
       );
     } catch (_) {
       state = AsyncData(prevState);
@@ -184,22 +191,18 @@ class Post extends _$Post {
         .map(
           (item) => item.optionId == currentVote
               ? item.copyWith(
-                  voteCount: (item.voteCount > 0 ? item.voteCount - 1 : 0))
+                  voteCount: (item.voteCount > 0 ? item.voteCount - 1 : 0),
+                )
               : item,
         )
         .toList();
-    final optimisticState = prevState.copyWith(
-      vote: null,
-      poll: updatedPoll,
-    );
+    final optimisticState = prevState.copyWith(vote: null, poll: updatedPoll);
     state = AsyncData(optimisticState);
 
     try {
       await supabase.rpc(
         'remove_poll_vote',
-        params: {
-          'p_post_id': prevState.id,
-        },
+        params: {'p_post_id': prevState.id},
       );
     } catch (_) {
       state = AsyncData(prevState);

@@ -59,13 +59,13 @@ class _PollCreatorState extends State<PollCreator> {
                             : null,
                       ),
                       maxLength: 50, // Set maximum lengths
-                      buildCounter: (
-                        context, {
-                        required currentLength,
-                        required isFocused,
-                        maxLength,
-                      }) =>
-                          null, // Hide default counter
+                      buildCounter:
+                          (
+                            context, {
+                            required currentLength,
+                            required isFocused,
+                            maxLength,
+                          }) => null, // Hide default counter
                       onChanged: (value) {
                         if (value.length <= 50) {
                           setState(() {

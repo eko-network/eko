@@ -29,7 +29,8 @@ class _StyledEmojiPickerState extends State<StyledEmojiPicker> {
         emojiViewConfig: EmojiViewConfig(
           backgroundColor: backgroundColor,
           columns: 8,
-          emojiSizeMax: 28 *
+          emojiSizeMax:
+              28 *
               (foundation.defaultTargetPlatform == TargetPlatform.iOS
                   ? 1.20
                   : 1.0),
@@ -151,8 +152,9 @@ class _StyledEmojiLayoutState extends State<_StyledEmojiLayout>
     }
 
     final lowerQuery = query.toLowerCase();
-    final allEmojis =
-        widget.state.categoryEmoji.expand((cat) => cat.emoji).toList();
+    final allEmojis = widget.state.categoryEmoji
+        .expand((cat) => cat.emoji)
+        .toList();
 
     setState(() {
       _isSearching = true;
@@ -199,9 +201,9 @@ class _StyledEmojiLayoutState extends State<_StyledEmojiLayout>
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Text(
                 _getCategoryName(widget.state.categoryEmoji[i].category),
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      color: colorScheme.onSurface,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleSmall?.copyWith(color: colorScheme.onSurface),
               ),
             ),
           ),

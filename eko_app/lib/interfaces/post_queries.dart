@@ -25,8 +25,9 @@ Future<(List<MapEntry<int, String>>, bool)> profilePageGetter(
       .map((row) => PostModel.fromJson(Map<String, dynamic>.from(row as Map)))
       .toList();
   ref.read(postPoolProvider).putAll(postList);
-  final retList =
-      postList.map((item) => MapEntry(item.id, item.createdAt)).toList();
+  final retList = postList
+      .map((item) => MapEntry(item.id, item.createdAt))
+      .toList();
   return (retList, retList.length < c.postsOnRefresh);
 }
 
@@ -50,8 +51,9 @@ Future<(List<MapEntry<int, String>>, bool)> otherProfilePageGetter(
       .where((p) => p.tags.contains('public'))
       .toList();
   ref.read(postPoolProvider).putAll(postList);
-  final retList =
-      postList.map((item) => MapEntry(item.id, item.createdAt)).toList();
+  final retList = postList
+      .map((item) => MapEntry(item.id, item.createdAt))
+      .toList();
   return (retList, retList.length < c.postsOnRefresh);
 }
 
@@ -72,6 +74,7 @@ Future<List<CommentModel>> getCommentsForPost(
   final list = rows as List<dynamic>? ?? const [];
   return list
       .map(
-          (row) => CommentModel.fromJson(Map<String, dynamic>.from(row as Map)))
+        (row) => CommentModel.fromJson(Map<String, dynamic>.from(row as Map)),
+      )
       .toList();
 }

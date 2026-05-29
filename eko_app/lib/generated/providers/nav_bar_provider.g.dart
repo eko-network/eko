@@ -14,15 +14,15 @@ final navBarProvider = NavBarProvider._();
 
 final class NavBarProvider extends $NotifierProvider<NavBar, bool> {
   NavBarProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'navBarProvider',
-          isAutoDispose: false,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'navBarProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$navBarHash();
@@ -48,8 +48,14 @@ abstract class _$NavBar extends $Notifier<bool> {
   @override
   void runBuild() {
     final ref = this.ref as $Ref<bool, bool>;
-    final element = ref.element as $ClassProviderElement<
-        AnyNotifier<bool, bool>, bool, Object?, Object?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<bool, bool>,
+              bool,
+              Object?,
+              Object?
+            >;
     element.handleCreate(ref, build);
   }
 }

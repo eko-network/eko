@@ -28,9 +28,9 @@ class EkoAppBar extends StatelessWidget implements PreferredSizeWidget {
   final PreferredSizeWidget? bottom;
 
   static TextStyle titleTextStyle(BuildContext context) => TextStyle(
-        fontWeight: FontWeight.normal,
-        color: Theme.of(context).colorScheme.onSurface,
-      );
+    fontWeight: FontWeight.normal,
+    color: Theme.of(context).colorScheme.onSurface,
+  );
 
   @override
   Size get preferredSize {
@@ -52,10 +52,7 @@ class EkoAppBar extends StatelessWidget implements PreferredSizeWidget {
 
     final Widget? titleWidget = title == null
         ? null
-        : DefaultTextStyle.merge(
-            style: titleTextStyle(context),
-            child: title!,
-          );
+        : DefaultTextStyle.merge(style: titleTextStyle(context), child: title!);
 
     return AppBar(
       leading: resolvedLeading,

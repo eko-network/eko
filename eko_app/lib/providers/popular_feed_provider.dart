@@ -17,9 +17,7 @@ class PopularFeed extends _$PopularFeed {
   }
 
   Future<void> getter() async {
-    final params = <String, dynamic>{
-      'p_limit': c.postsOnRefresh,
-    };
+    final params = <String, dynamic>{'p_limit': c.postsOnRefresh};
     if (_cursors.isNotEmpty) {
       final last = _cursors.last;
       params['p_last_likes'] = last.value.$1;

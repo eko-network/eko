@@ -50,9 +50,7 @@ class FollowButton extends ConsumerWidget {
               ? AppLocalizations.of(context)!.following
               : AppLocalizations.of(context)!.follow,
           maxLines: 1,
-          style: TextStyle(
-            color: Theme.of(context).colorScheme.onSurface,
-          ),
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
         ),
       ),
     );
@@ -93,8 +91,9 @@ class UserCard extends ConsumerWidget {
           data: (user) {
             return InkWell(
               canRequestFocus: canRequestFocus,
-              onTapDown:
-                  onCardTapDown == null ? null : (_) => onCardTapDown!(user),
+              onTapDown: onCardTapDown == null
+                  ? null
+                  : (_) => onCardTapDown!(user),
               onTap: () {
                 if (onCardPressed != null) {
                   onCardPressed!(user);

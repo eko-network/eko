@@ -41,8 +41,10 @@ class _InnerCameraPageState extends State<InnerCameraPage> {
     final XFile? picked = await picker.pickImage(source: ImageSource.gallery);
     if (picked == null) return;
     if (mounted) {
-      final asciiImage =
-          await context.pushNamed<AsciiImage?>('edit_picture', extra: picked);
+      final asciiImage = await context.pushNamed<AsciiImage?>(
+        'edit_picture',
+        extra: picked,
+      );
       if (mounted && asciiImage != null) {
         context.pop(asciiImage);
       }
@@ -99,10 +101,10 @@ class _InnerCameraPageState extends State<InnerCameraPage> {
       height: 150,
     );
     _ctrl.initialize().then(
-          (_) => setState(() {
-            cameraAvailable = true;
-          }),
-        );
+      (_) => setState(() {
+        cameraAvailable = true;
+      }),
+    );
 
     _accelerometer = accelerometerEventStream().listen((
       AccelerometerEvent event,

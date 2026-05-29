@@ -4,13 +4,7 @@ part '../generated/types/activity.freezed.dart';
 part '../generated/types/activity.g.dart';
 
 @JsonEnum(fieldRename: FieldRename.snake)
-enum ActivityType {
-  postTag,
-  commentTag,
-  follow,
-  comment,
-  eko,
-}
+enum ActivityType { postTag, commentTag, follow, comment, eko }
 
 @freezed
 abstract class ActivityModel with _$ActivityModel {

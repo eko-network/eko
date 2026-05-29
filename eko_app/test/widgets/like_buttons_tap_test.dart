@@ -46,7 +46,9 @@ class _PostHost extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final asyncPost = ref.watch(postProvider(_postId));
     return asyncPost.when(
-      data: (post) => Scaffold(body: Center(child: LikeButtons(post: post))),
+      data: (post) => Scaffold(
+        body: Center(child: LikeButtons(post: post)),
+      ),
       loading: () => const SizedBox.shrink(),
       error: (_, __) => const SizedBox.shrink(),
     );

@@ -12,19 +12,24 @@ part of '../../providers/ecp_provider.dart';
 @ProviderFor(asyncEcpClient)
 final asyncEcpClientProvider = AsyncEcpClientProvider._();
 
-final class AsyncEcpClientProvider extends $FunctionalProvider<
-        AsyncValue<EcpClient>, EcpClient, FutureOr<EcpClient>>
+final class AsyncEcpClientProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<EcpClient>,
+          EcpClient,
+          FutureOr<EcpClient>
+        >
     with $FutureModifier<EcpClient>, $FutureProvider<EcpClient> {
   AsyncEcpClientProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'asyncEcpClientProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'asyncEcpClientProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$asyncEcpClientHash();
@@ -49,15 +54,15 @@ final class EcpClientProvider
     extends $FunctionalProvider<EcpClient, EcpClient, EcpClient>
     with $Provider<EcpClient> {
   EcpClientProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'ecpClientProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'ecpClientProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$ecpClientHash();

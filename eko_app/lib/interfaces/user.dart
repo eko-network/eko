@@ -83,13 +83,16 @@ Future<void> _updateNotifications({
   required bool isActive,
 }) async {
   final deviceUid = DeviceUidService.getOrCreate();
-  await supabase.rpc('update_notifications', params: {
-    'p_device_id': deviceUid,
-    'p_token': token,
-    'p_active': isActive,
-    'p_device_type': deviceTypeFromPlatform(),
-    'p_notification_type': notificationTypeFromPlatform(),
-  });
+  await supabase.rpc(
+    'update_notifications',
+    params: {
+      'p_device_id': deviceUid,
+      'p_token': token,
+      'p_active': isActive,
+      'p_device_type': deviceTypeFromPlatform(),
+      'p_notification_type': notificationTypeFromPlatform(),
+    },
+  );
 }
 
 Future<String> forgotPassword({

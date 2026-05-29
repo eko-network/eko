@@ -1,16 +1,15 @@
 import 'dart:async';
+import 'package:path/path.dart' as p;
 import 'dart:convert';
+import 'dart:io';
 import 'dart:typed_data';
-import 'package:ecp/core/default.dart';
 import 'package:ecp/ecp.dart';
-import 'package:eko_app/database/database.dart' hide User;
+import 'package:eko_app/database/database.dart' hide User, MlsEngineConfig;
 import 'package:eko_app/database/storage.dart';
 import 'package:eko_app/localization/generated/app_localizations.dart';
-import 'package:eko_app/database/messenger_clear.dart';
 import 'package:eko_app/utilities/device_uid_service.dart';
 import 'package:eko_app/widgets/errors/snack_bar.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart' show debugPrint, kDebugMode;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -46,19 +45,6 @@ Map<String, dynamic>? decodeJwtPayloadMap(String? accessToken) {
   }
 }
 
-void _debugPrintJwtPayload(String accessToken) {
-  if (!kDebugMode) return;
-  final map = decodeJwtPayloadMap(accessToken);
-  if (map == null) {
-    debugPrint('JWT debug: decode failed or invalid token');
-    return;
-  }
-  debugPrint('JWT debug: full payload JSON: ${jsonEncode(map)}');
-  debugPrint(
-    'JWT debug: app_metadata=${map['app_metadata']} user_metadata keys=${map['user_metadata'] is Map ? (map['user_metadata'] as Map).keys.toList() : map['user_metadata']}',
-  );
-}
-
 String? _didFromDynamic(Object? v) {
   if (v is String && v.isNotEmpty) return v;
   return null;
@@ -79,19 +65,6 @@ String? didFromSession(Session session) {
   final fromSdk = didFromUserAppMetadata(session.user);
   if (fromSdk != null) return fromSdk;
   return didFromAccessTokenClaims(session.accessToken);
-}
-
-void _debugPrintSupabaseBearer(Session? session) {
-  if (!kDebugMode) return;
-  final token = session?.accessToken;
-  if (token == null || token.isEmpty) return;
-  debugPrint('Supabase Bearer JWT: Bearer $token');
-  _debugPrintJwtPayload(token);
-  if (session != null) {
-    debugPrint(
-      'JWT debug: SDK session.user.appMetadata=${session.user.appMetadata}',
-    );
-  }
 }
 
 String? didFromUserAppMetadata(User user) {
@@ -158,8 +131,15 @@ class Auth extends AsyncNotifier<AuthModel> {
       _authSub?.cancel();
       _core?.close();
     });
+    final session = supabase.auth.currentSession;
+    final AuthModel nextState;
+    if (session != null) {
+      nextState = await _stateFromSession(session);
+    } else {
+      nextState = AuthModel.signedOut();
+    }
     _listenToAuthChanges();
-    return AuthModel.signedOut();
+    return nextState;
   }
 
   Future<AuthModel> _stateFromSession(Session session) async {
@@ -172,10 +152,13 @@ class Auth extends AsyncNotifier<AuthModel> {
         final storage = AppStorage(db);
         final path = await getApplicationSupportDirectory();
         _core = EcpCore(
-            storage: storage,
-            credentialIdentity: Uint8List.fromList(Uuid.parse(u.id)),
-            engineConfig:
-                await MlsEngineConfig.fromPath('$path/mls.db', storage));
+          storage: storage,
+          credentialIdentity: Uint8List.fromList(Uuid.parse(u.id)),
+          engineConfig: await MlsEngineConfig.fromPath(
+            File(p.join(path.path, 'mls.db')),
+            storage,
+          ),
+        );
       }
       assert(_core != null, 'core cannot be null');
       await _core!.open();
@@ -184,37 +167,45 @@ class Auth extends AsyncNotifier<AuthModel> {
       if (did == null) {
         debugPrint('[Auth][ECP] Registering device');
         final (credential, keyPackages) = await _core!.createIdentity();
-        await supabase.rpc('register_device', params: {
-          'p_did': DeviceUidService.getOrCreate(),
-          'p_signer_public_key': base64Encode(credential.signerPublicKey),
-          'p_key_packages': keyPackages
-              .map((it) => base64Encode(it.keyPackageBytes))
-              .toList(),
-        });
+        await supabase.rpc(
+          'register_device',
+          params: {
+            'p_did': DeviceUidService.getOrCreate(),
+            'p_signer_public_key': base64Encode(credential.signerPublicKey),
+            'p_key_packages': keyPackages
+                .map((it) => base64Encode(it.keyPackageBytes))
+                .toList(),
+          },
+        );
         await supabase.auth.refreshSession();
       }
     }
 
+    registerNotificationsIfNeeded(u.id);
     return AuthModel(uid: u.id, did: did, email: u.email);
   }
 
   void _listenToAuthChanges() {
     _authSub = supabase.auth.onAuthStateChange.listen(
       (data) async {
-        // Filter token refreshes so as to not trigger _stateFromSession twice
-        if (data.event == AuthChangeEvent.tokenRefreshed) return;
+        if (data.event == AuthChangeEvent.initialSession) return;
         final session = data.session;
         if (session == null) {
           debugPrint('[Auth] SignOut called');
           _cleanAfterSignOut();
           return;
         }
-        _debugPrintSupabaseBearer(session);
-        final isRecovery = data.event == AuthChangeEvent.passwordRecovery;
-        state = AsyncValue.loading();
-        state = await AsyncValue.guard(() => _stateFromSession(session));
-        registerNotificationsIfNeeded();
-        if (!isRecovery &&
+
+        final isSameToken =
+            state.value?.uid == session.user.id &&
+            state.value?.email == session.user.email &&
+            (platform.isWeb || state.value?.did == didFromSession(session));
+
+        if (!isSameToken) {
+          state = AsyncValue.loading();
+          state = await AsyncValue.guard(() => _stateFromSession(session));
+        }
+        if (!(data.event == AuthChangeEvent.passwordRecovery) &&
             data.event == AuthChangeEvent.signedIn &&
             !platform.isLinux) {
           closeInAppWebView();
@@ -298,7 +289,7 @@ class Auth extends AsyncNotifier<AuthModel> {
   }
 
   Future<void> _cleanAfterSignOut() async {
-    await clearMessengerLocalData();
+    await AppStorage(db).clear();
     final core = _core;
     _core = null;
     if (core != null) {
@@ -339,15 +330,11 @@ class Auth extends AsyncNotifier<AuthModel> {
   }
 
   Future<void> updatePassword(String newPassword) async {
-    await supabase.auth.updateUser(
-      UserAttributes(password: newPassword),
-    );
+    await supabase.auth.updateUser(UserAttributes(password: newPassword));
   }
 
   Future<void> updateEmailBeforeVerify(String newEmail) async {
-    await supabase.auth.updateUser(
-      UserAttributes(email: newEmail.trim()),
-    );
+    await supabase.auth.updateUser(UserAttributes(email: newEmail.trim()));
   }
 
   String? _oauthAvatarUrl() {
@@ -418,9 +405,8 @@ class Auth extends AsyncNotifier<AuthModel> {
     }
   }
 
-  Future<void> registerNotificationsIfNeeded() async {
-    final uid = state.value?.uid;
-    if (uid == null || uid.isEmpty) return;
+  Future<void> registerNotificationsIfNeeded(String uid) async {
+    if (uid.isEmpty) return;
     if (_registerNotificationsInFlight != null) {
       await _registerNotificationsInFlight;
       return;

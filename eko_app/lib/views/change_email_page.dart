@@ -142,8 +142,8 @@ class _ChangeEmailPageState extends ConsumerState<ChangeEmailPage> {
                   child: Text(
                     l10n.changeEmail,
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),

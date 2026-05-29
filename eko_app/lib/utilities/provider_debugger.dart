@@ -4,12 +4,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 base class ProviderDebuggerObserver extends ProviderObserver {
   @override
   void didAddProvider(ProviderObserverContext context, Object? value) {
-    debugPrint('Provider ${context.provider} was initialized');
+    debugPrint('[Provider] ${context.provider} was initialized');
   }
 
   @override
   void didDisposeProvider(ProviderObserverContext context) {
-    debugPrint('Provider ${context.provider} was disposed');
+    debugPrint('[Provider] ${context.provider} was disposed');
   }
 
   @override
@@ -18,7 +18,7 @@ base class ProviderDebuggerObserver extends ProviderObserver {
     Object? previousValue,
     Object? newValue,
   ) {
-    debugPrint('Provider ${context.provider} updated');
+    debugPrint('[Provider] ${context.provider} updated');
   }
 
   @override
@@ -27,6 +27,6 @@ base class ProviderDebuggerObserver extends ProviderObserver {
     Object error,
     StackTrace stackTrace,
   ) {
-    debugPrint('Provider ${context.provider} threw $error at $stackTrace');
+    debugPrint('[Provider] ${context.provider} threw $error at $stackTrace');
   }
 }

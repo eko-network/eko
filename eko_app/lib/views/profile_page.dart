@@ -88,7 +88,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
     final bool isMyOwnProfile =
         (widget.uid != null && widget.uid == currentUserId) ||
-            (widget.uid == null && widget.username == currentUsername);
+        (widget.uid == null && widget.username == currentUsername);
 
     Widget? buildLeadingWidget(BuildContext context, bool isMyProfile) {
       if (isMyProfile) {
@@ -138,8 +138,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               Text(
                 AppLocalizations.of(context)!.userNotFound,
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ],
           ),
@@ -195,7 +195,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         futures.add(ref.read(profilePostListProvider.notifier).refresh());
       } else {
         futures.add(
-            ref.read(otherProfilePostListProvider(uid).notifier).refresh());
+          ref.read(otherProfilePostListProvider(uid).notifier).refresh(),
+        );
       }
       await Future.wait(futures);
     }
@@ -316,8 +317,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                           child: Icon(
                             Icons.more_vert,
                             size: 20,
-                            color:
-                                Theme.of(context).colorScheme.onSurfaceVariant,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurfaceVariant,
                           ),
                         ),
                       ),
@@ -406,10 +408,7 @@ class _Header extends ConsumerWidget {
 
     return Column(
       children: [
-        ProfileHeader(
-          user: user,
-          loggedIn: true,
-        ),
+        ProfileHeader(user: user, loggedIn: true),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 15),
           child: isCurrentUser

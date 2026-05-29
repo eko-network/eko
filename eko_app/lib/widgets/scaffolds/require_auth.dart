@@ -1,6 +1,5 @@
 import 'package:eko_app/providers/ecp_provider.dart';
 import 'package:eko_app/utilities/platform.dart' as platform;
-import 'package:eko_app/utilities/supabase_ref.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -32,13 +31,14 @@ class RequireAuth extends ConsumerWidget {
       debugPrint('[RequireAuth] authProvider error');
       return _e(context);
     }
-    if (auth.value?.uid == null && supabase.auth.currentSession == null) {
+    if (auth.value?.uid == null) {
       debugPrint('[RequireAuth] authProvider not loading but uid==null');
       return _e(context);
     }
     if (user.user.uid.isEmpty) {
       debugPrint(
-          '[RequireAuth] authProvider not loading but user.uid is empty');
+        '[RequireAuth] authProvider not loading but user.uid is empty',
+      );
       return const Center(child: LoadingSpinner());
     }
     debugPrint('[RequireAuth] authProvider satisfied');

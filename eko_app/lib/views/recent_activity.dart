@@ -17,9 +17,7 @@ class RecentActivity extends ConsumerWidget {
     List<MapEntry<ActivityModel, Never?>> list,
     WidgetRef ref,
   ) async {
-    final params = <String, dynamic>{
-      'p_limit': c.postsOnRefresh,
-    };
+    final params = <String, dynamic>{'p_limit': c.postsOnRefresh};
     if (list.isNotEmpty) {
       params['p_last_time'] = list.last.key.createdAt;
       params['p_last_id'] = list.last.key.id;

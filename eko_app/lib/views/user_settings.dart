@@ -34,7 +34,8 @@ class _UserSettingsState extends ConsumerState<UserSettings> {
       await addDeviceNotificationToken(ref.read(currentUserProvider).user.uid);
     } else {
       await removeDeviceNotificationToken(
-          ref.read(currentUserProvider).user.uid);
+        ref.read(currentUserProvider).user.uid,
+      );
     }
   }
 

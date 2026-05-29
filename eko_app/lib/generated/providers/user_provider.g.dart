@@ -13,15 +13,16 @@ part of '../../providers/user_provider.dart';
 final userProvider = UserFamily._();
 
 final class UserProvider extends $AsyncNotifierProvider<User, UserModel> {
-  UserProvider._(
-      {required UserFamily super.from, required String super.argument})
-      : super(
-          retry: null,
-          name: r'userProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+  UserProvider._({
+    required UserFamily super.from,
+    required String super.argument,
+  }) : super(
+         retry: null,
+         name: r'userProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
 
   @override
   String debugGetCreateSourceHash() => _$userHash();
@@ -52,21 +53,23 @@ String _$userHash() => r'74c1248da382a01c7e72b0ff99b61ea96d67cced';
 
 final class UserFamily extends $Family
     with
-        $ClassFamilyOverride<User, AsyncValue<UserModel>, UserModel,
-            FutureOr<UserModel>, String> {
+        $ClassFamilyOverride<
+          User,
+          AsyncValue<UserModel>,
+          UserModel,
+          FutureOr<UserModel>,
+          String
+        > {
   UserFamily._()
-      : super(
-          retry: null,
-          name: r'userProvider',
-          dependencies: null,
-          $allTransitiveDependencies: null,
-          isAutoDispose: true,
-        );
+    : super(
+        retry: null,
+        name: r'userProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
 
-  UserProvider call(
-    String uid,
-  ) =>
-      UserProvider._(argument: uid, from: this);
+  UserProvider call(String uid) => UserProvider._(argument: uid, from: this);
 
   @override
   String toString() => r'userProvider';
@@ -76,22 +79,19 @@ abstract class _$User extends $AsyncNotifier<UserModel> {
   late final _$args = ref.$arg as String;
   String get uid => _$args;
 
-  FutureOr<UserModel> build(
-    String uid,
-  );
+  FutureOr<UserModel> build(String uid);
   @$mustCallSuper
   @override
   void runBuild() {
     final ref = this.ref as $Ref<AsyncValue<UserModel>, UserModel>;
-    final element = ref.element as $ClassProviderElement<
-        AnyNotifier<AsyncValue<UserModel>, UserModel>,
-        AsyncValue<UserModel>,
-        Object?,
-        Object?>;
-    element.handleCreate(
-        ref,
-        () => build(
-              _$args,
-            ));
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<UserModel>, UserModel>,
+              AsyncValue<UserModel>,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, () => build(_$args));
   }
 }

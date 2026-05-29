@@ -41,9 +41,7 @@ Future<void> _initSupabase() async {
               persistSessionKey: 'sb-$projectRef-auth-token',
             ),
           )
-        : FlutterAuthClientOptions(
-            authFlowType: AuthFlowType.implicit,
-          ),
+        : FlutterAuthClientOptions(authFlowType: AuthFlowType.implicit),
   );
 }
 
@@ -57,23 +55,18 @@ Future<void> main(List<String> args) async {
     return;
   }
   usePathUrlStrategy();
-  await Future.wait([
-    PrefsService.init(),
-    _initSupabase(),
-  ]);
+  await Future.wait([PrefsService.init(), _initSupabase()]);
   // setupLocator();
   //protected/dependent services
-  await Future.wait([
-    _checkFirstInstall(),
-    LogoService.init(),
-  ]);
+  await Future.wait([_checkFirstInstall(), LogoService.init()]);
 
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
-  final List<ProviderObserver>? observers =
-      kDebugMode ? [ProviderDebuggerObserver()] : null;
+  final List<ProviderObserver>? observers = kDebugMode
+      ? [ProviderDebuggerObserver()]
+      : null;
   runApp(ProviderScope(observers: observers, child: MyApp()));
 }
 

@@ -14,15 +14,15 @@ final postPreviewProvider = PostPreviewProvider._();
 
 final class PostPreviewProvider extends $NotifierProvider<PostPreview, bool> {
   PostPreviewProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'postPreviewProvider',
-          isAutoDispose: false,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'postPreviewProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$postPreviewHash();
@@ -48,8 +48,14 @@ abstract class _$PostPreview extends $Notifier<bool> {
   @override
   void runBuild() {
     final ref = this.ref as $Ref<bool, bool>;
-    final element = ref.element as $ClassProviderElement<
-        AnyNotifier<bool, bool>, bool, Object?, Object?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<bool, bool>,
+              bool,
+              Object?,
+              Object?
+            >;
     element.handleCreate(ref, build);
   }
 }

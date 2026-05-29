@@ -5,17 +5,11 @@ part '../generated/types/current_user.freezed.dart';
 
 @freezed
 abstract class CurrentUserModel with _$CurrentUserModel {
-  const factory CurrentUserModel({
-    required UserModel user,
-  }) = _CurrentUserModel;
+  const factory CurrentUserModel({required UserModel user}) = _CurrentUserModel;
   factory CurrentUserModel.fromJson(Map<String, dynamic> json) {
-    return CurrentUserModel(
-      user: UserModel.fromJson(json),
-    );
+    return CurrentUserModel(user: UserModel.fromJson(json));
   }
   factory CurrentUserModel.loading() {
-    return CurrentUserModel(
-      user: UserModel.userNotFound(),
-    );
+    return CurrentUserModel(user: UserModel.userNotFound());
   }
 }

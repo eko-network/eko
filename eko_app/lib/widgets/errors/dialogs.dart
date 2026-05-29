@@ -6,10 +6,8 @@ void showLoadingDialog(BuildContext context) {
     context: context,
     barrierDismissible: false,
     barrierColor: Theme.of(context).colorScheme.surface,
-    builder: (context) => const PopScope(
-      canPop: false,
-      child: Center(child: LoadingSpinner()),
-    ),
+    builder: (context) =>
+        const PopScope(canPop: false, child: Center(child: LoadingSpinner())),
   );
 }
 

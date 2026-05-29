@@ -39,8 +39,8 @@ class PollWidget extends ConsumerWidget {
                 onTap: isPreview
                     ? null
                     : () => ref
-                        .read(postProvider(post.id).notifier)
-                        .addPollVote(optionId: optionId),
+                          .read(postProvider(post.id).notifier)
+                          .addPollVote(optionId: optionId),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -66,12 +66,12 @@ class PollWidget extends ConsumerWidget {
                           decoration: BoxDecoration(
                             color: selectedVote != null
                                 ? (selectedVote == optionId)
-                                    ? Theme.of(
-                                        context,
-                                      ).colorScheme.primaryContainer
-                                    : Theme.of(
-                                        context,
-                                      ).colorScheme.surfaceContainerHighest
+                                      ? Theme.of(
+                                          context,
+                                        ).colorScheme.primaryContainer
+                                      : Theme.of(
+                                          context,
+                                        ).colorScheme.surfaceContainerHighest
                                 : Theme.of(context).colorScheme.outlineVariant,
                             borderRadius: BorderRadius.circular(8),
                           ),

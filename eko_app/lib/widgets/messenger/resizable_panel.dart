@@ -49,19 +49,19 @@ class ResizablePanel extends StatefulWidget {
     required this.snapWidth,
     this.defaultWidth,
     this.controller,
-  })  : assert(snapWidth < minWidth, 'snapWidth must be less than minWidth'),
-        assert(
-          minWidth <= maxWidth,
-          'minWidth must be less than or equal to maxWidth',
-        ),
-        assert(
-          defaultWidth == null || defaultWidth <= maxWidth,
-          'defaultWidth must be less than maxWidth',
-        ),
-        assert(
-          defaultWidth == null || defaultWidth >= minWidth,
-          'defaultWidth must be greater than minWidth',
-        );
+  }) : assert(snapWidth < minWidth, 'snapWidth must be less than minWidth'),
+       assert(
+         minWidth <= maxWidth,
+         'minWidth must be less than or equal to maxWidth',
+       ),
+       assert(
+         defaultWidth == null || defaultWidth <= maxWidth,
+         'defaultWidth must be less than maxWidth',
+       ),
+       assert(
+         defaultWidth == null || defaultWidth >= minWidth,
+         'defaultWidth must be greater than minWidth',
+       );
 
   @override
   State<ResizablePanel> createState() => _ResizablePanelState();
@@ -147,10 +147,7 @@ class _ResizablePanelState extends State<ResizablePanel> {
                       width: 8,
                       color: Colors.transparent,
                       child: Center(
-                        child: Container(
-                          width: 1,
-                          color: dividerColor,
-                        ),
+                        child: Container(width: 1, color: dividerColor),
                       ),
                     ),
                   ),

@@ -7,8 +7,10 @@ part '../generated/providers/follow_info_provider.g.dart';
 class FollowInfo extends _$FollowInfo {
   @override
   Future<FollowInfoModel> build(String uid) async {
-    final List<Map<String, dynamic>> res =
-        await supabase.rpc('get_follow_info', params: {'p_uid': uid});
+    final List<Map<String, dynamic>> res = await supabase.rpc(
+      'get_follow_info',
+      params: {'p_uid': uid},
+    );
     return FollowInfoModel.fromJson(res.first);
   }
 }

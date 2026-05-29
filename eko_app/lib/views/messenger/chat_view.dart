@@ -15,10 +15,10 @@ extension SafeLookup<T> on List<T> {
 }
 
 class ChatView extends ConsumerStatefulWidget {
-  // final ConversationWithContact conversation;
+  final ecp.MlsGroupRecord group;
   final VoidCallback? onBack;
 
-  const ChatView({super.key, this.onBack});
+  const ChatView({super.key, this.onBack, required this.group});
 
   @override
   ConsumerState<ChatView> createState() => _ChatViewState();
@@ -173,9 +173,7 @@ class _ChatViewState extends ConsumerState<ChatView> {
                     ),
                   ),
                 ConstrainedBox(
-                  constraints: const BoxConstraints(
-                    maxHeight: 12 * 24.0,
-                  ),
+                  constraints: const BoxConstraints(maxHeight: 12 * 24.0),
                   child: CallbackShortcuts(
                     bindings: {
                       const SingleActivator(LogicalKeyboardKey.enter):
@@ -191,8 +189,10 @@ class _ChatViewState extends ConsumerState<ChatView> {
                       keyboardType: TextInputType.multiline,
                       decoration: InputDecoration(
                         prefixIcon: IconButton(
-                          icon: const Icon(Icons.emoji_emotions_outlined,
-                              size: 24),
+                          icon: const Icon(
+                            Icons.emoji_emotions_outlined,
+                            size: 24,
+                          ),
                           onPressed: () {
                             if (platform.isMobile) {
                               FocusScope.of(context).unfocus();
@@ -228,8 +228,9 @@ class _ChatViewState extends ConsumerState<ChatView> {
         CircleAvatar(
           backgroundColor: colorScheme.primary,
           child: IconButton(
-              icon: const Icon(Icons.send, color: Colors.white, size: 20),
-              onPressed: _sendMessage),
+            icon: const Icon(Icons.send, color: Colors.white, size: 20),
+            onPressed: _sendMessage,
+          ),
         ),
       ],
     );
@@ -291,121 +292,121 @@ class _ChatViewState extends ConsumerState<ChatView> {
       ),
       body: Placeholder(),
 
-// Column(
-//         children: [
-//           Expanded(
-//             child: messagesAsync.when(
-//               data: (messages) {
-//                 if (messages.isEmpty) {
-//                   return Center(
-//                     child: Text(
-//                       'No messages yet',
-//                       style: TextStyle(
-//                         color: Theme.of(context).colorScheme.onSurfaceVariant,
-//                         fontSize: 16,
-//                       ),
-//                     ),
-//                   );
-//                 }
-//
-//                 return ListView.builder(
-//                   padding: const EdgeInsets.all(16),
-//                   reverse: true,
-//                   itemCount: messages.length,
-//                   itemBuilder: (context, index) {
-//                     final chronoIndex = messages.length - 1 - index;
-//                     final message = messages[chronoIndex].message;
-//                     final isReceived = message.from != actorId;
-//
-//                     final prevMsg =
-//                         messages.getOrNull(chronoIndex - 1)?.message;
-//                     final nextMsg =
-//                         messages.getOrNull(chronoIndex + 1)?.message;
-//
-//                     final DateTime? prevTime =
-//                         (prevMsg?.from == message.from) ? prevMsg?.time : null;
-//                     final DateTime? nextTime =
-//                         (nextMsg?.from == message.from) ? nextMsg?.time : null;
-//
-//                     var isFirstOfDate = false;
-//                     if (prevMsg == null) {
-//                       isFirstOfDate = true;
-//                     } else {
-//                       final d1 = message.time;
-//                       final d2 = prevMsg.time;
-//                       isFirstOfDate = d1.year != d2.year ||
-//                           d1.month != d2.month ||
-//                           d1.day != d2.day;
-//                     }
-//
-//                     final messageWidget = MessageWidget(
-//                       isReceived: isReceived,
-//                       messageWithAttachments: messages[chronoIndex],
-//                       position: _determinePosition(
-//                         prevTime,
-//                         message.time,
-//                         nextTime,
-//                       ),
-//                     );
-//
-//                     if (isFirstOfDate) {
-//                       return Column(
-//                         children: [
-//                           DateChip(time: message.time),
-//                           messageWidget,
-//                         ],
-//                       );
-//                     }
-//                     return messageWidget;
-//                   },
-//                 );
-//               },
-//               loading: () => const Center(child: CircularProgressIndicator()),
-//               error: (error, stack) {
-//                 debugPrint(error.toString());
-//                 return Center(
-//                   child: Text('Could not load messages: $error'),
-//                 );
-//               },
-//             ),
-//           ),
-//           SafeArea(
-//             top: false,
-//             child: Column(
-//               mainAxisSize: MainAxisSize.min,
-//               children: [
-//                 Padding(
-//                   padding: const EdgeInsets.all(8),
-//                   child: signedIn && !platform.isMobile
-//                       ? MenuAnchor(
-//                           controller: _menuController,
-//                           menuChildren: [
-//                             SizedBox(
-//                               width: 380,
-//                               height: 450,
-//                               child: MediaPicker(
-//                                 textController: _messageController,
-//                                 onGifSelected: _onGifSelected,
-//                               ),
-//                             ),
-//                           ],
-//                           child: inputRow,
-//                         )
-//                       : inputRow,
-//                 ),
-//                 if (platform.isMobile && _showMediaPicker)
-//                   SizedBox(
-//                     height: 400,
-//                     child: MediaPicker(
-//                       textController: _messageController,
-//                       onGifSelected: _onGifSelected,
-//                     ),
-//                   ),
-//               ],
-//             ),
-//           ),
-//         ],
-//       ),
+      // Column(
+      //         children: [
+      //           Expanded(
+      //             child: messagesAsync.when(
+      //               data: (messages) {
+      //                 if (messages.isEmpty) {
+      //                   return Center(
+      //                     child: Text(
+      //                       'No messages yet',
+      //                       style: TextStyle(
+      //                         color: Theme.of(context).colorScheme.onSurfaceVariant,
+      //                         fontSize: 16,
+      //                       ),
+      //                     ),
+      //                   );
+      //                 }
+      //
+      //                 return ListView.builder(
+      //                   padding: const EdgeInsets.all(16),
+      //                   reverse: true,
+      //                   itemCount: messages.length,
+      //                   itemBuilder: (context, index) {
+      //                     final chronoIndex = messages.length - 1 - index;
+      //                     final message = messages[chronoIndex].message;
+      //                     final isReceived = message.from != actorId;
+      //
+      //                     final prevMsg =
+      //                         messages.getOrNull(chronoIndex - 1)?.message;
+      //                     final nextMsg =
+      //                         messages.getOrNull(chronoIndex + 1)?.message;
+      //
+      //                     final DateTime? prevTime =
+      //                         (prevMsg?.from == message.from) ? prevMsg?.time : null;
+      //                     final DateTime? nextTime =
+      //                         (nextMsg?.from == message.from) ? nextMsg?.time : null;
+      //
+      //                     var isFirstOfDate = false;
+      //                     if (prevMsg == null) {
+      //                       isFirstOfDate = true;
+      //                     } else {
+      //                       final d1 = message.time;
+      //                       final d2 = prevMsg.time;
+      //                       isFirstOfDate = d1.year != d2.year ||
+      //                           d1.month != d2.month ||
+      //                           d1.day != d2.day;
+      //                     }
+      //
+      //                     final messageWidget = MessageWidget(
+      //                       isReceived: isReceived,
+      //                       messageWithAttachments: messages[chronoIndex],
+      //                       position: _determinePosition(
+      //                         prevTime,
+      //                         message.time,
+      //                         nextTime,
+      //                       ),
+      //                     );
+      //
+      //                     if (isFirstOfDate) {
+      //                       return Column(
+      //                         children: [
+      //                           DateChip(time: message.time),
+      //                           messageWidget,
+      //                         ],
+      //                       );
+      //                     }
+      //                     return messageWidget;
+      //                   },
+      //                 );
+      //               },
+      //               loading: () => const Center(child: CircularProgressIndicator()),
+      //               error: (error, stack) {
+      //                 debugPrint(error.toString());
+      //                 return Center(
+      //                   child: Text('Could not load messages: $error'),
+      //                 );
+      //               },
+      //             ),
+      //           ),
+      //           SafeArea(
+      //             top: false,
+      //             child: Column(
+      //               mainAxisSize: MainAxisSize.min,
+      //               children: [
+      //                 Padding(
+      //                   padding: const EdgeInsets.all(8),
+      //                   child: signedIn && !platform.isMobile
+      //                       ? MenuAnchor(
+      //                           controller: _menuController,
+      //                           menuChildren: [
+      //                             SizedBox(
+      //                               width: 380,
+      //                               height: 450,
+      //                               child: MediaPicker(
+      //                                 textController: _messageController,
+      //                                 onGifSelected: _onGifSelected,
+      //                               ),
+      //                             ),
+      //                           ],
+      //                           child: inputRow,
+      //                         )
+      //                       : inputRow,
+      //                 ),
+      //                 if (platform.isMobile && _showMediaPicker)
+      //                   SizedBox(
+      //                     height: 400,
+      //                     child: MediaPicker(
+      //                       textController: _messageController,
+      //                       onGifSelected: _onGifSelected,
+      //                     ),
+      //                   ),
+      //               ],
+      //             ),
+      //           ),
+      //         ],
+      //       ),
     );
   }
 }

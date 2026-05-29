@@ -15,15 +15,15 @@ final colorThemeProvider = ColorThemeProvider._();
 final class ColorThemeProvider
     extends $NotifierProvider<ColorTheme, ColorScheme> {
   ColorThemeProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'colorThemeProvider',
-          isAutoDispose: false,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'colorThemeProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$colorThemeHash();
@@ -49,8 +49,14 @@ abstract class _$ColorTheme extends $Notifier<ColorScheme> {
   @override
   void runBuild() {
     final ref = this.ref as $Ref<ColorScheme, ColorScheme>;
-    final element = ref.element as $ClassProviderElement<
-        AnyNotifier<ColorScheme, ColorScheme>, ColorScheme, Object?, Object?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<ColorScheme, ColorScheme>,
+              ColorScheme,
+              Object?,
+              Object?
+            >;
     element.handleCreate(ref, build);
   }
 }

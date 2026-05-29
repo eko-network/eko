@@ -49,8 +49,10 @@ class User extends _$User {
 
   Future<UserModel> _fetchUserModel(String uid) async {
     try {
-      final response =
-          await supabase.rpc('get_user_by_id', params: {'p_uid': uid});
+      final response = await supabase.rpc(
+        'get_user_by_id',
+        params: {'p_uid': uid},
+      );
       if (response is! List || response.isEmpty) {
         return UserModel.userNotFound();
       }
@@ -82,8 +84,10 @@ class User extends _$User {
     _isFollowAction = true;
     try {
       state = AsyncData(user.copyWith(isFollowing: isFollow));
-      await supabase.rpc('change_follow_state',
-          params: {'p_uid': user.uid, 'p_is_follow': isFollow});
+      await supabase.rpc(
+        'change_follow_state',
+        params: {'p_uid': user.uid, 'p_is_follow': isFollow},
+      );
       ref.invalidate(followInfoProvider(user.uid));
       final actorUid = ref.read(currentUserProvider).user.uid;
       if (actorUid.isNotEmpty && actorUid != user.uid) {
