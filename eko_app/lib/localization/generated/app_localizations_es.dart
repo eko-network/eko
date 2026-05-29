@@ -313,6 +313,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get nothingToSeeHere => 'No hay nada que ver aquí!';
 
   @override
+  String get noteToSelf => 'Nota personal';
+
+  @override
   String get ok => 'Ok';
 
   @override

@@ -1,7 +1,8 @@
 import 'dart:async';
-import 'package:ecp/ecp.dart';
 import 'package:eko_app/interfaces/search.dart';
 import 'package:eko_app/localization/generated/app_localizations.dart';
+import 'package:eko_app/messenger/types/group.dart';
+import 'package:eko_app/messenger/widgets/group_card.dart';
 import 'package:eko_app/providers/ecp_provider.dart';
 import 'package:eko_app/types/user.dart';
 import 'package:eko_app/messenger/ecp_helpers.dart';
@@ -16,15 +17,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class GroupList extends ConsumerStatefulWidget {
   final bool isWideScreen;
-  final List<MlsGroupRecord> groups;
+  final List<GroupWithUsers> groups;
   final int? selectedId;
   final ResizablePanelController? panelController;
-  final void Function(int) onConversationTap;
+  final void Function(int) onGroupTap;
 
   const GroupList({
     super.key,
     required this.selectedId,
-    required this.onConversationTap,
+    required this.onGroupTap,
     required this.isWideScreen,
     required this.groups,
     this.panelController,
@@ -185,62 +186,21 @@ class _ConversationListState extends ConsumerState<GroupList> {
                               splashRadius: c.kConversationAvatarRadius,
                             ),
                           ),
-                    // Expanded(
-                    // child: ListView.builder(
-                    //   itemCount: widget.conversations.length,
-                    //   itemBuilder: (context, index) {
-                    //     final conversation = widget.conversations[index];
-                    //     final isSelected =
-                    //         conversation.conversation.id == widget.selectedId;
-                    //
-                    //     if (showOnlyAvatar) {
-                    //       return Tooltip(
-                    //         message:
-                    //             "", //conversation.contact.preferredUsername,
-                    //         child: ListTile(
-                    //           selected: isSelected,
-                    //           selectedTileColor:
-                    //               colorScheme.secondaryContainer,
-                    //           contentPadding: const EdgeInsets.symmetric(
-                    //             vertical: 4,
-                    //           ),
-                    //           title: Center(child: SizedBox()), //FIXME
-                    //           onTap: () => widget.onConversationTap(
-                    //             conversation.conversation.id,
-                    //           ),
-                    //         ),
-                    //       );
-                    //     }
-                    //
-                    //     return ListTile(
-                    //       selected: isSelected,
-                    //       selectedTileColor: colorScheme.secondaryContainer,
-                    //       leading: SizedBox(), //FIXME
-                    //       title: Text(
-                    //         "",
-                    //         // conversation.contact.preferredUsername,
-                    //         style: const TextStyle(
-                    //           fontWeight: FontWeight.w600,
-                    //         ),
-                    //         overflow: TextOverflow.ellipsis,
-                    //       ),
-                    //       subtitle: Text(
-                    //         conversation.conversation.lastMessageContent ??
-                    //             '',
-                    //         maxLines: 1,
-                    //         overflow: TextOverflow.ellipsis,
-                    //         style: emojiTextStyle(const TextStyle()),
-                    //       ),
-                    //       trailing: RelativeTimeWidget(
-                    //         time: conversation.conversation.lastMessageTime,
-                    //       ),
-                    //       onTap: () => widget.onConversationTap(
-                    //         conversation.conversation.id,
-                    //       ),
-                    //     );
-                    //   },
-                    // ),
-                    // ),
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: widget.groups.length,
+                        itemBuilder: (context, index) {
+                          final gu = widget.groups[index];
+                          final isSelected = gu.group.id == widget.selectedId;
+                          return GroupCard(
+                            showOnlyAvatar: showOnlyAvatar,
+                            gu: gu,
+                            isSelected: isSelected,
+                            onTap: () => widget.onGroupTap(gu.group.id),
+                          );
+                        },
+                      ),
+                    ),
                   ],
                 ),
                 Column(

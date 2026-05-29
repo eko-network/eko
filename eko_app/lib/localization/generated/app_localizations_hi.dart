@@ -307,6 +307,9 @@ class AppLocalizationsHi extends AppLocalizations {
   String get nothingToSeeHere => 'यहाँ कुछ नहीं देखने को है!';
 
   @override
+  String get noteToSelf => 'स्वयं के लिए नोट';
+
+  @override
   String get ok => 'ठीक है';
 
   @override

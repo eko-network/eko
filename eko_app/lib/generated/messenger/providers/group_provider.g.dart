@@ -15,13 +15,13 @@ final groupProvider = GroupProvider._();
 final class GroupProvider
     extends
         $FunctionalProvider<
-          AsyncValue<List<MlsGroupRecord>>,
-          List<MlsGroupRecord>,
-          Stream<List<MlsGroupRecord>>
+          AsyncValue<List<GroupWithUsers>>,
+          List<GroupWithUsers>,
+          Stream<List<GroupWithUsers>>
         >
     with
-        $FutureModifier<List<MlsGroupRecord>>,
-        $StreamProvider<List<MlsGroupRecord>> {
+        $FutureModifier<List<GroupWithUsers>>,
+        $StreamProvider<List<GroupWithUsers>> {
   GroupProvider._()
     : super(
         from: null,
@@ -38,14 +38,14 @@ final class GroupProvider
 
   @$internal
   @override
-  $StreamProviderElement<List<MlsGroupRecord>> $createElement(
+  $StreamProviderElement<List<GroupWithUsers>> $createElement(
     $ProviderPointer pointer,
   ) => $StreamProviderElement(pointer);
 
   @override
-  Stream<List<MlsGroupRecord>> create(Ref ref) {
+  Stream<List<GroupWithUsers>> create(Ref ref) {
     return group(ref);
   }
 }
 
-String _$groupHash() => r'd30d4d90fedf6f2325e0572565417e9b6555aa97';
+String _$groupHash() => r'8a4351d990d525d6922dbd6ce9456ec929372df3';

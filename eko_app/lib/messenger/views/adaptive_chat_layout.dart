@@ -1,7 +1,7 @@
 import 'package:collection/collection.dart';
-import 'package:ecp/ecp.dart';
 import 'package:eko_app/localization/generated/app_localizations.dart';
 import 'package:eko_app/messenger/providers/group_provider.dart';
+import 'package:eko_app/messenger/types/group.dart';
 import 'package:eko_app/utilities/constants.dart' as c;
 import 'package:eko_app/messenger/views/chat_view.dart';
 import 'package:eko_app/messenger/views/group_list.dart';
@@ -25,7 +25,6 @@ class AdaptiveChat extends ConsumerWidget {
       body: groupsAsync.when(
         data: (groups) => LayoutBuilder(
           builder: (context, constraints) {
-            print(groups);
             final isWideScreen = constraints.maxWidth >= c.messengerWideScreen;
             if (isWideScreen) {
               return _buildWideLayout(context, constraints, groups, l10n);
@@ -46,7 +45,7 @@ class AdaptiveChat extends ConsumerWidget {
   Widget _buildWideLayout(
     BuildContext context,
     BoxConstraints constraints,
-    List<MlsGroupRecord> groups,
+    List<GroupWithUsers> groups,
     AppLocalizations l10n,
   ) {
     const double minWidth = 200.0;
@@ -55,7 +54,7 @@ class AdaptiveChat extends ConsumerWidget {
     const double snapWidth = c.kConversationAvatarRadius * 2 + 20;
 
     final selectedGroup = groups.firstWhereOrNull(
-      (item) => item.id == selectedGroupId,
+      (item) => item.group.id == selectedGroupId,
     );
 
     return ResizablePanel(
@@ -70,7 +69,7 @@ class AdaptiveChat extends ConsumerWidget {
         groups: groups,
         selectedId: selectedGroupId,
         panelController: controller,
-        onConversationTap: (id) => context.go('/messages/$id'),
+        onGroupTap: (id) => context.go('/messages/$id'),
       ),
       secondPanel: selectedGroupId == null || selectedGroup == null
           ? Center(
@@ -88,11 +87,11 @@ class AdaptiveChat extends ConsumerWidget {
 
   Widget _buildNarrowLayout(
     BuildContext context,
-    List<MlsGroupRecord> groups,
+    List<GroupWithUsers> groups,
     AppLocalizations l10n,
   ) {
     final selectedConversation = groups.firstWhereOrNull(
-      (item) => item.id == selectedGroupId,
+      (item) => item.group.id == selectedGroupId,
     );
 
     if (selectedGroupId == null || selectedConversation == null) {
@@ -100,7 +99,7 @@ class AdaptiveChat extends ConsumerWidget {
         isWideScreen: false,
         groups: groups,
         selectedId: null,
-        onConversationTap: (id) => context.push('/messages/$id'),
+        onGroupTap: (id) => context.push('/messages/$id'),
       );
     } else {
       return ChatView(

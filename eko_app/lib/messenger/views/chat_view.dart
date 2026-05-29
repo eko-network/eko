@@ -1,4 +1,5 @@
 import 'package:ecp/ecp.dart' as ecp;
+import 'package:eko_app/messenger/types/group.dart';
 import 'package:eko_app/utilities/emoji_text_style.dart';
 import 'package:eko_app/utilities/platform.dart' as platform;
 import 'package:flutter/material.dart';
@@ -15,7 +16,7 @@ extension SafeLookup<T> on List<T> {
 }
 
 class ChatView extends ConsumerStatefulWidget {
-  final ecp.MlsGroupRecord group;
+  final GroupWithUsers group;
   final VoidCallback? onBack;
 
   const ChatView({super.key, this.onBack, required this.group});

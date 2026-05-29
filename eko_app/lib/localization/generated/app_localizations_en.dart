@@ -308,6 +308,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get nothingToSeeHere => 'Nothing to see here!';
 
   @override
+  String get noteToSelf => 'Note to Self';
+
+  @override
   String get ok => 'Ok';
 
   @override

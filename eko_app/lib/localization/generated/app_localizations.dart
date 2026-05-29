@@ -678,6 +678,12 @@ abstract class AppLocalizations {
   /// **'Nothing to see here!'**
   String get nothingToSeeHere;
 
+  /// No description provided for @noteToSelf.
+  ///
+  /// In en, this message translates to:
+  /// **'Note to Self'**
+  String get noteToSelf;
+
   /// No description provided for @ok.
   ///
   /// In en, this message translates to:

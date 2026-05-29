@@ -308,6 +308,9 @@ class AppLocalizationsId extends AppLocalizations {
   String get nothingToSeeHere => 'Tidak ada yang bisa dilihat di sini!';
 
   @override
+  String get noteToSelf => 'Catatan untuk diri sendiri';
+
+  @override
   String get ok => 'Oke';
 
   @override
