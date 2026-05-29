@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:math';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
+import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
@@ -187,6 +188,7 @@ LazyDatabase _openConnection() {
     final dbFolder = await getApplicationSupportDirectory();
     final file = File(p.join(dbFolder.path, c.db));
 
+    debugPrint('[LazyDatabase] opening db: ${file.path}');
     final password = await _getDbPassword();
     final rawDb = sqlite3.open(file.path, uri: false);
 

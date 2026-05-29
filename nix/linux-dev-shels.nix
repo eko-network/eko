@@ -4,14 +4,6 @@
   commonShellHook,
   ...
 }: let
-  flutterPkg = pkgs.flutter.override {
-    supportedTargetFlutterPlatforms = [
-      "universal"
-      "web"
-      "android"
-      "linux"
-    ];
-  };
   androidComposition = pkgs.androidenv.composeAndroidPackages {
     buildToolsVersions = ["35.0.0"];
     platformVersions = [36 35 34 33 31];
@@ -34,24 +26,16 @@ in {
       ++ (with pkgs; [
         yq-go
         libsecret.dev
-        openssl.dev
         clang
+        openssl.dev
         openssl.out
         cmake
+        flutter
+        dart
         pkg-config
-        sqlite
-        sqlite.dev
-      ])
-      ++ [
-        flutterPkg
-      ];
+      ]);
     shellHook =
-      ''
-        export CMAKE_TOOLCHAIN_FILE="${cmakeToolchain}"
-        export LD_LIBRARY_PATH="$PWD/eko_app/build/native_assets/linux:${pkgs.sqlite.out}/lib:$LD_LIBRARY_PATH"
-        export CHROME_EXECUTABLE=$(which chromium)
-      ''
-      + commonShellHook;
+      commonShellHook;
   };
   android = pkgs.mkShellNoCC {
     ANDROID_SDK_ROOT = sdkPath;
@@ -61,9 +45,10 @@ in {
       ++ (with pkgs; [
         clang
         cmake
+        flutter
+        dart
       ])
       ++ [
-        flutterPkg
         androidSdk
       ];
     shellHook =
@@ -74,10 +59,9 @@ in {
       commonPackages
       ++ (with pkgs; [
         ungoogled-chromium
-      ])
-      ++ [
-        flutterPkg
-      ];
+        flutter
+        dart
+      ]);
     shellHook =
       ''
         export CHROME_EXECUTABLE=$(which chromium)

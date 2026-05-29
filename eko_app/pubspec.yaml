@@ -60,7 +60,7 @@ dependencies:
      path: ../../ecp-dart-sdk
   sqlite3: ^2.9.4
   drift: ^2.31.0
-  sqlcipher_flutter_libs: ^0.7.0+eol
+  sqlcipher_flutter_libs: ^0.6.8
 
 dependency_overrides:
   meta: ^1.18.0
@@ -92,7 +92,3 @@ flutter:
         - asset: fonts/martian_mono_bold.ttf
   assets:
     - images/
-hooks:
-  user_defines:
-    sqlite3:
-      source: sqlite3mc
