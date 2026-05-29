@@ -29,16 +29,26 @@ class AuthenticatedClient extends http.BaseClient {
   }
 }
 
-@Riverpod(keepAlive: true)
+@Riverpod()
 Future<EcpClient> asyncEcpClient(Ref ref) async {
-  ref.listen(authProvider, (_, next) {
-    if (next.value?.uid == null) ref.invalidateSelf();
+  ref.listen(authProvider, (prev, next) {
+    final prevUid = prev?.value?.uid;
+    final nextUid = next.value?.uid;
+    if (nextUid != null && prevUid != nextUid) {
+      ref.invalidateSelf();
+    }
   });
 
-  final core = ref.watch(authProvider.notifier).core;
+  final uid = ref.read(authProvider).value?.uid;
+  if (uid == null) {
+    throw StateError('EcpClient accessed before auth is ready');
+  }
+
+  final core = ref.read(authProvider.notifier).core;
   final session = supabase.auth.currentSession;
-  assert(core != null && session != null,
-      'EcpClient accessed before auth or on web');
+  if (core == null || session == null) {
+    throw StateError('EcpClient accessed before auth or on web');
+  }
   final httpClient =
       AuthenticatedClient(() => supabase.auth.currentSession?.accessToken);
 
@@ -54,7 +64,7 @@ Future<EcpClient> asyncEcpClient(Ref ref) async {
   return client;
 }
 
-@Riverpod(keepAlive: true)
+@Riverpod()
 EcpClient ecpClient(Ref ref) {
   return ref.watch(asyncEcpClientProvider).requireValue;
 }

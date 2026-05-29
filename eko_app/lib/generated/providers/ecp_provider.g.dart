@@ -21,7 +21,7 @@ final class AsyncEcpClientProvider extends $FunctionalProvider<
           argument: null,
           retry: null,
           name: r'asyncEcpClientProvider',
-          isAutoDispose: false,
+          isAutoDispose: true,
           dependencies: null,
           $allTransitiveDependencies: null,
         );
@@ -40,7 +40,7 @@ final class AsyncEcpClientProvider extends $FunctionalProvider<
   }
 }
 
-String _$asyncEcpClientHash() => r'a10c1911ed90e7e77cd15b00e89ae7ba90a67188';
+String _$asyncEcpClientHash() => r'71b6188865c317ae670b36ae48c00bc526d59dfa';
 
 @ProviderFor(ecpClient)
 final ecpClientProvider = EcpClientProvider._();
@@ -54,7 +54,7 @@ final class EcpClientProvider
           argument: null,
           retry: null,
           name: r'ecpClientProvider',
-          isAutoDispose: false,
+          isAutoDispose: true,
           dependencies: null,
           $allTransitiveDependencies: null,
         );
@@ -81,4 +81,4 @@ final class EcpClientProvider
   }
 }
 
-String _$ecpClientHash() => r'd3133a5da735f9c121d01e9c062a781f09b36fe4';
+String _$ecpClientHash() => r'0a121ddf3721a3bd707a168dfde380d995742f19';

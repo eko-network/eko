@@ -298,9 +298,13 @@ class Auth extends AsyncNotifier<AuthModel> {
   }
 
   Future<void> _cleanAfterSignOut() async {
-    clearMessengerLocalData();
-    state = AsyncValue.data(AuthModel.signedOut());
+    await clearMessengerLocalData();
+    final core = _core;
     _core = null;
+    if (core != null) {
+      await core.close();
+    }
+    state = AsyncValue.data(AuthModel.signedOut());
   }
 
   Future<void> deleteAccount() async {
