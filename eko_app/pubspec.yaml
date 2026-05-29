@@ -53,7 +53,7 @@ dependencies:
   unifiedpush_platform_interface: ^4.0.0
   unifiedpush_storage_shared_preferences: ^1.0.0
   flutter_local_notifications: ^21.0.0
-  webcrypto: ^0.6.0
+  webcrypto: ^0.6.1
   flutter_secure_storage: ^10.3.1
   path: ^1.9.1
   ecp:
@@ -64,10 +64,6 @@ dependencies:
 
 dependency_overrides:
   meta: ^1.18.0
-  webcrypto:
-    git:
-      url: https://github.com/google/webcrypto.dart
-      ref: 0239e850839a03f5b1f6563c8486529a2b82cbdc
   flutter_markdown_plus: ^1.0.7
   markdown: ^7.3.1
   flutter_math_fork: ^0.7.4
