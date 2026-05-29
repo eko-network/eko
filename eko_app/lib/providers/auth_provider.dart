@@ -4,14 +4,14 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:ecp/ecp.dart';
-import 'package:eko_app/database/database.dart' hide User, MlsEngineConfig;
+import 'package:eko_app/database/database.dart';
 import 'package:eko_app/database/storage.dart';
 import 'package:eko_app/localization/generated/app_localizations.dart';
 import 'package:eko_app/utilities/device_uid_service.dart';
 import 'package:eko_app/widgets/errors/snack_bar.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:eko_app/types/auth.dart';
@@ -23,6 +23,7 @@ import 'package:eko_app/interfaces/user.dart' as user;
 import 'package:eko_app/utilities/gauth/supabase_google_oauth.dart';
 import 'package:eko_app/utilities/platform.dart' as platform;
 import 'package:uuid/uuid.dart';
+part '../generated/providers/auth_provider.g.dart';
 
 Future<void>? _registerNotificationsInFlight;
 
@@ -119,9 +120,8 @@ void handleAuthError(Object e, BuildContext context) {
   }
 }
 
-final authProvider = AsyncNotifierProvider<Auth, AuthModel>(Auth.new);
-
-class Auth extends AsyncNotifier<AuthModel> {
+@riverpod
+class Auth extends _$Auth {
   EcpCore? _core;
   StreamSubscription? _authSub;
   EcpCore? get core => _core;

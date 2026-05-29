@@ -31,6 +31,7 @@ in {
         openssl.out
         cmake
         flutter
+        cmake
         dart
         pkg-config
       ]);

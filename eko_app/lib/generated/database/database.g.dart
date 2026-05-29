@@ -868,8 +868,12 @@ class $MlsGroupsTable extends MlsGroups
     'id',
     aliasedName,
     false,
+    hasAutoIncrement: true,
     type: DriftSqlType.int,
     requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
   );
   static const VerificationMeta _groupIdBytesMeta = const VerificationMeta(
     'groupIdBytes',
@@ -883,17 +887,6 @@ class $MlsGroupsTable extends MlsGroups
         type: DriftSqlType.blob,
         requiredDuringInsert: true,
       );
-  static const VerificationMeta _groupIdHexMeta = const VerificationMeta(
-    'groupIdHex',
-  );
-  @override
-  late final GeneratedColumn<String> groupIdHex = GeneratedColumn<String>(
-    'group_id_hex',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
   static const VerificationMeta _displayNameMeta = const VerificationMeta(
     'displayName',
   );
@@ -901,9 +894,9 @@ class $MlsGroupsTable extends MlsGroups
   late final GeneratedColumn<String> displayName = GeneratedColumn<String>(
     'display_name',
     aliasedName,
-    false,
+    true,
     type: DriftSqlType.string,
-    requiredDuringInsert: true,
+    requiredDuringInsert: false,
   );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
@@ -914,7 +907,8 @@ class $MlsGroupsTable extends MlsGroups
     aliasedName,
     false,
     type: DriftSqlType.dateTime,
-    requiredDuringInsert: true,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
   );
   static const VerificationMeta _lastActivityAtMeta = const VerificationMeta(
     'lastActivityAt',
@@ -924,9 +918,10 @@ class $MlsGroupsTable extends MlsGroups
       GeneratedColumn<DateTime>(
         'last_activity_at',
         aliasedName,
-        true,
+        false,
         type: DriftSqlType.dateTime,
         requiredDuringInsert: false,
+        defaultValue: currentDateAndTime,
       );
   static const VerificationMeta _isActiveMeta = const VerificationMeta(
     'isActive',
@@ -947,7 +942,6 @@ class $MlsGroupsTable extends MlsGroups
   List<GeneratedColumn> get $columns => [
     id,
     groupIdBytes,
-    groupIdHex,
     displayName,
     createdAt,
     lastActivityAt,
@@ -979,17 +973,6 @@ class $MlsGroupsTable extends MlsGroups
     } else if (isInserting) {
       context.missing(_groupIdBytesMeta);
     }
-    if (data.containsKey('group_id_hex')) {
-      context.handle(
-        _groupIdHexMeta,
-        groupIdHex.isAcceptableOrUnknown(
-          data['group_id_hex']!,
-          _groupIdHexMeta,
-        ),
-      );
-    } else if (isInserting) {
-      context.missing(_groupIdHexMeta);
-    }
     if (data.containsKey('display_name')) {
       context.handle(
         _displayNameMeta,
@@ -998,16 +981,12 @@ class $MlsGroupsTable extends MlsGroups
           _displayNameMeta,
         ),
       );
-    } else if (isInserting) {
-      context.missing(_displayNameMeta);
     }
     if (data.containsKey('created_at')) {
       context.handle(
         _createdAtMeta,
         createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
       );
-    } else if (isInserting) {
-      context.missing(_createdAtMeta);
     }
     if (data.containsKey('last_activity_at')) {
       context.handle(
@@ -1041,14 +1020,10 @@ class $MlsGroupsTable extends MlsGroups
         DriftSqlType.blob,
         data['${effectivePrefix}group_id_bytes'],
       )!,
-      groupIdHex: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}group_id_hex'],
-      )!,
       displayName: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}display_name'],
-      )!,
+      ),
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
@@ -1056,7 +1031,7 @@ class $MlsGroupsTable extends MlsGroups
       lastActivityAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}last_activity_at'],
-      ),
+      )!,
       isActive: attachedDatabase.typeMapping.read(
         DriftSqlType.bool,
         data['${effectivePrefix}is_active'],
@@ -1073,18 +1048,16 @@ class $MlsGroupsTable extends MlsGroups
 class MlsGroupRow extends DataClass implements Insertable<MlsGroupRow> {
   final int id;
   final Uint8List groupIdBytes;
-  final String groupIdHex;
-  final String displayName;
+  final String? displayName;
   final DateTime createdAt;
-  final DateTime? lastActivityAt;
+  final DateTime lastActivityAt;
   final bool isActive;
   const MlsGroupRow({
     required this.id,
     required this.groupIdBytes,
-    required this.groupIdHex,
-    required this.displayName,
+    this.displayName,
     required this.createdAt,
-    this.lastActivityAt,
+    required this.lastActivityAt,
     required this.isActive,
   });
   @override
@@ -1092,12 +1065,11 @@ class MlsGroupRow extends DataClass implements Insertable<MlsGroupRow> {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
     map['group_id_bytes'] = Variable<Uint8List>(groupIdBytes);
-    map['group_id_hex'] = Variable<String>(groupIdHex);
-    map['display_name'] = Variable<String>(displayName);
-    map['created_at'] = Variable<DateTime>(createdAt);
-    if (!nullToAbsent || lastActivityAt != null) {
-      map['last_activity_at'] = Variable<DateTime>(lastActivityAt);
+    if (!nullToAbsent || displayName != null) {
+      map['display_name'] = Variable<String>(displayName);
     }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['last_activity_at'] = Variable<DateTime>(lastActivityAt);
     map['is_active'] = Variable<bool>(isActive);
     return map;
   }
@@ -1106,12 +1078,11 @@ class MlsGroupRow extends DataClass implements Insertable<MlsGroupRow> {
     return MlsGroupsCompanion(
       id: Value(id),
       groupIdBytes: Value(groupIdBytes),
-      groupIdHex: Value(groupIdHex),
-      displayName: Value(displayName),
-      createdAt: Value(createdAt),
-      lastActivityAt: lastActivityAt == null && nullToAbsent
+      displayName: displayName == null && nullToAbsent
           ? const Value.absent()
-          : Value(lastActivityAt),
+          : Value(displayName),
+      createdAt: Value(createdAt),
+      lastActivityAt: Value(lastActivityAt),
       isActive: Value(isActive),
     );
   }
@@ -1124,10 +1095,9 @@ class MlsGroupRow extends DataClass implements Insertable<MlsGroupRow> {
     return MlsGroupRow(
       id: serializer.fromJson<int>(json['id']),
       groupIdBytes: serializer.fromJson<Uint8List>(json['groupIdBytes']),
-      groupIdHex: serializer.fromJson<String>(json['groupIdHex']),
-      displayName: serializer.fromJson<String>(json['displayName']),
+      displayName: serializer.fromJson<String?>(json['displayName']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
-      lastActivityAt: serializer.fromJson<DateTime?>(json['lastActivityAt']),
+      lastActivityAt: serializer.fromJson<DateTime>(json['lastActivityAt']),
       isActive: serializer.fromJson<bool>(json['isActive']),
     );
   }
@@ -1137,10 +1107,9 @@ class MlsGroupRow extends DataClass implements Insertable<MlsGroupRow> {
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'groupIdBytes': serializer.toJson<Uint8List>(groupIdBytes),
-      'groupIdHex': serializer.toJson<String>(groupIdHex),
-      'displayName': serializer.toJson<String>(displayName),
+      'displayName': serializer.toJson<String?>(displayName),
       'createdAt': serializer.toJson<DateTime>(createdAt),
-      'lastActivityAt': serializer.toJson<DateTime?>(lastActivityAt),
+      'lastActivityAt': serializer.toJson<DateTime>(lastActivityAt),
       'isActive': serializer.toJson<bool>(isActive),
     };
   }
@@ -1148,20 +1117,16 @@ class MlsGroupRow extends DataClass implements Insertable<MlsGroupRow> {
   MlsGroupRow copyWith({
     int? id,
     Uint8List? groupIdBytes,
-    String? groupIdHex,
-    String? displayName,
+    Value<String?> displayName = const Value.absent(),
     DateTime? createdAt,
-    Value<DateTime?> lastActivityAt = const Value.absent(),
+    DateTime? lastActivityAt,
     bool? isActive,
   }) => MlsGroupRow(
     id: id ?? this.id,
     groupIdBytes: groupIdBytes ?? this.groupIdBytes,
-    groupIdHex: groupIdHex ?? this.groupIdHex,
-    displayName: displayName ?? this.displayName,
+    displayName: displayName.present ? displayName.value : this.displayName,
     createdAt: createdAt ?? this.createdAt,
-    lastActivityAt: lastActivityAt.present
-        ? lastActivityAt.value
-        : this.lastActivityAt,
+    lastActivityAt: lastActivityAt ?? this.lastActivityAt,
     isActive: isActive ?? this.isActive,
   );
   MlsGroupRow copyWithCompanion(MlsGroupsCompanion data) {
@@ -1170,9 +1135,6 @@ class MlsGroupRow extends DataClass implements Insertable<MlsGroupRow> {
       groupIdBytes: data.groupIdBytes.present
           ? data.groupIdBytes.value
           : this.groupIdBytes,
-      groupIdHex: data.groupIdHex.present
-          ? data.groupIdHex.value
-          : this.groupIdHex,
       displayName: data.displayName.present
           ? data.displayName.value
           : this.displayName,
@@ -1189,7 +1151,6 @@ class MlsGroupRow extends DataClass implements Insertable<MlsGroupRow> {
     return (StringBuffer('MlsGroupRow(')
           ..write('id: $id, ')
           ..write('groupIdBytes: $groupIdBytes, ')
-          ..write('groupIdHex: $groupIdHex, ')
           ..write('displayName: $displayName, ')
           ..write('createdAt: $createdAt, ')
           ..write('lastActivityAt: $lastActivityAt, ')
@@ -1202,7 +1163,6 @@ class MlsGroupRow extends DataClass implements Insertable<MlsGroupRow> {
   int get hashCode => Object.hash(
     id,
     $driftBlobEquality.hash(groupIdBytes),
-    groupIdHex,
     displayName,
     createdAt,
     lastActivityAt,
@@ -1214,7 +1174,6 @@ class MlsGroupRow extends DataClass implements Insertable<MlsGroupRow> {
       (other is MlsGroupRow &&
           other.id == this.id &&
           $driftBlobEquality.equals(other.groupIdBytes, this.groupIdBytes) &&
-          other.groupIdHex == this.groupIdHex &&
           other.displayName == this.displayName &&
           other.createdAt == this.createdAt &&
           other.lastActivityAt == this.lastActivityAt &&
@@ -1224,15 +1183,13 @@ class MlsGroupRow extends DataClass implements Insertable<MlsGroupRow> {
 class MlsGroupsCompanion extends UpdateCompanion<MlsGroupRow> {
   final Value<int> id;
   final Value<Uint8List> groupIdBytes;
-  final Value<String> groupIdHex;
-  final Value<String> displayName;
+  final Value<String?> displayName;
   final Value<DateTime> createdAt;
-  final Value<DateTime?> lastActivityAt;
+  final Value<DateTime> lastActivityAt;
   final Value<bool> isActive;
   const MlsGroupsCompanion({
     this.id = const Value.absent(),
     this.groupIdBytes = const Value.absent(),
-    this.groupIdHex = const Value.absent(),
     this.displayName = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.lastActivityAt = const Value.absent(),
@@ -1241,19 +1198,14 @@ class MlsGroupsCompanion extends UpdateCompanion<MlsGroupRow> {
   MlsGroupsCompanion.insert({
     this.id = const Value.absent(),
     required Uint8List groupIdBytes,
-    required String groupIdHex,
-    required String displayName,
-    required DateTime createdAt,
+    this.displayName = const Value.absent(),
+    this.createdAt = const Value.absent(),
     this.lastActivityAt = const Value.absent(),
     this.isActive = const Value.absent(),
-  }) : groupIdBytes = Value(groupIdBytes),
-       groupIdHex = Value(groupIdHex),
-       displayName = Value(displayName),
-       createdAt = Value(createdAt);
+  }) : groupIdBytes = Value(groupIdBytes);
   static Insertable<MlsGroupRow> custom({
     Expression<int>? id,
     Expression<Uint8List>? groupIdBytes,
-    Expression<String>? groupIdHex,
     Expression<String>? displayName,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? lastActivityAt,
@@ -1262,7 +1214,6 @@ class MlsGroupsCompanion extends UpdateCompanion<MlsGroupRow> {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (groupIdBytes != null) 'group_id_bytes': groupIdBytes,
-      if (groupIdHex != null) 'group_id_hex': groupIdHex,
       if (displayName != null) 'display_name': displayName,
       if (createdAt != null) 'created_at': createdAt,
       if (lastActivityAt != null) 'last_activity_at': lastActivityAt,
@@ -1273,16 +1224,14 @@ class MlsGroupsCompanion extends UpdateCompanion<MlsGroupRow> {
   MlsGroupsCompanion copyWith({
     Value<int>? id,
     Value<Uint8List>? groupIdBytes,
-    Value<String>? groupIdHex,
-    Value<String>? displayName,
+    Value<String?>? displayName,
     Value<DateTime>? createdAt,
-    Value<DateTime?>? lastActivityAt,
+    Value<DateTime>? lastActivityAt,
     Value<bool>? isActive,
   }) {
     return MlsGroupsCompanion(
       id: id ?? this.id,
       groupIdBytes: groupIdBytes ?? this.groupIdBytes,
-      groupIdHex: groupIdHex ?? this.groupIdHex,
       displayName: displayName ?? this.displayName,
       createdAt: createdAt ?? this.createdAt,
       lastActivityAt: lastActivityAt ?? this.lastActivityAt,
@@ -1298,9 +1247,6 @@ class MlsGroupsCompanion extends UpdateCompanion<MlsGroupRow> {
     }
     if (groupIdBytes.present) {
       map['group_id_bytes'] = Variable<Uint8List>(groupIdBytes.value);
-    }
-    if (groupIdHex.present) {
-      map['group_id_hex'] = Variable<String>(groupIdHex.value);
     }
     if (displayName.present) {
       map['display_name'] = Variable<String>(displayName.value);
@@ -1322,7 +1268,6 @@ class MlsGroupsCompanion extends UpdateCompanion<MlsGroupRow> {
     return (StringBuffer('MlsGroupsCompanion(')
           ..write('id: $id, ')
           ..write('groupIdBytes: $groupIdBytes, ')
-          ..write('groupIdHex: $groupIdHex, ')
           ..write('displayName: $displayName, ')
           ..write('createdAt: $createdAt, ')
           ..write('lastActivityAt: $lastActivityAt, ')
@@ -1589,399 +1534,6 @@ class MlsEngineConfigsCompanion extends UpdateCompanion<MlsEngineConfigRow> {
   }
 }
 
-class $UsersTable extends Users with TableInfo<$UsersTable, UserRow> {
-  @override
-  final GeneratedDatabase attachedDatabase;
-  final String? _alias;
-  $UsersTable(this.attachedDatabase, [this._alias]);
-  @override
-  late final GeneratedColumnWithTypeConverter<Uri, String> id =
-      GeneratedColumn<String>(
-        'id',
-        aliasedName,
-        false,
-        type: DriftSqlType.string,
-        requiredDuringInsert: true,
-      ).withConverter<Uri>($UsersTable.$converterid);
-  @override
-  List<GeneratedColumn> get $columns => [id];
-  @override
-  String get aliasedName => _alias ?? actualTableName;
-  @override
-  String get actualTableName => $name;
-  static const String $name = 'users';
-  @override
-  Set<GeneratedColumn> get $primaryKey => {id};
-  @override
-  UserRow map(Map<String, dynamic> data, {String? tablePrefix}) {
-    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return UserRow(
-      id: $UsersTable.$converterid.fromSql(
-        attachedDatabase.typeMapping.read(
-          DriftSqlType.string,
-          data['${effectivePrefix}id'],
-        )!,
-      ),
-    );
-  }
-
-  @override
-  $UsersTable createAlias(String alias) {
-    return $UsersTable(attachedDatabase, alias);
-  }
-
-  static TypeConverter<Uri, String> $converterid = const UriTypeConverter();
-}
-
-class UserRow extends DataClass implements Insertable<UserRow> {
-  final Uri id;
-  const UserRow({required this.id});
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    {
-      map['id'] = Variable<String>($UsersTable.$converterid.toSql(id));
-    }
-    return map;
-  }
-
-  UsersCompanion toCompanion(bool nullToAbsent) {
-    return UsersCompanion(id: Value(id));
-  }
-
-  factory UserRow.fromJson(
-    Map<String, dynamic> json, {
-    ValueSerializer? serializer,
-  }) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return UserRow(id: serializer.fromJson<Uri>(json['id']));
-  }
-  @override
-  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return <String, dynamic>{'id': serializer.toJson<Uri>(id)};
-  }
-
-  UserRow copyWith({Uri? id}) => UserRow(id: id ?? this.id);
-  UserRow copyWithCompanion(UsersCompanion data) {
-    return UserRow(id: data.id.present ? data.id.value : this.id);
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('UserRow(')
-          ..write('id: $id')
-          ..write(')'))
-        .toString();
-  }
-
-  @override
-  int get hashCode => id.hashCode;
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) || (other is UserRow && other.id == this.id);
-}
-
-class UsersCompanion extends UpdateCompanion<UserRow> {
-  final Value<Uri> id;
-  final Value<int> rowid;
-  const UsersCompanion({
-    this.id = const Value.absent(),
-    this.rowid = const Value.absent(),
-  });
-  UsersCompanion.insert({required Uri id, this.rowid = const Value.absent()})
-    : id = Value(id);
-  static Insertable<UserRow> custom({
-    Expression<String>? id,
-    Expression<int>? rowid,
-  }) {
-    return RawValuesInsertable({
-      if (id != null) 'id': id,
-      if (rowid != null) 'rowid': rowid,
-    });
-  }
-
-  UsersCompanion copyWith({Value<Uri>? id, Value<int>? rowid}) {
-    return UsersCompanion(id: id ?? this.id, rowid: rowid ?? this.rowid);
-  }
-
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    if (id.present) {
-      map['id'] = Variable<String>($UsersTable.$converterid.toSql(id.value));
-    }
-    if (rowid.present) {
-      map['rowid'] = Variable<int>(rowid.value);
-    }
-    return map;
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('UsersCompanion(')
-          ..write('id: $id, ')
-          ..write('rowid: $rowid')
-          ..write(')'))
-        .toString();
-  }
-}
-
-class $UserDevicesTable extends UserDevices
-    with TableInfo<$UserDevicesTable, UserDeviceRow> {
-  @override
-  final GeneratedDatabase attachedDatabase;
-  final String? _alias;
-  $UserDevicesTable(this.attachedDatabase, [this._alias]);
-  static const VerificationMeta _idMeta = const VerificationMeta('id');
-  @override
-  late final GeneratedColumn<int> id = GeneratedColumn<int>(
-    'id',
-    aliasedName,
-    false,
-    hasAutoIncrement: true,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'PRIMARY KEY AUTOINCREMENT',
-    ),
-  );
-  @override
-  late final GeneratedColumnWithTypeConverter<Uri, String> userId =
-      GeneratedColumn<String>(
-        'user_id',
-        aliasedName,
-        false,
-        type: DriftSqlType.string,
-        requiredDuringInsert: true,
-        defaultConstraints: GeneratedColumn.constraintIsAlways(
-          'REFERENCES users (id) ON DELETE CASCADE',
-        ),
-      ).withConverter<Uri>($UserDevicesTable.$converteruserId);
-  @override
-  late final GeneratedColumnWithTypeConverter<Uri, String> deviceId =
-      GeneratedColumn<String>(
-        'device_id',
-        aliasedName,
-        false,
-        type: DriftSqlType.string,
-        requiredDuringInsert: true,
-        defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
-      ).withConverter<Uri>($UserDevicesTable.$converterdeviceId);
-  @override
-  List<GeneratedColumn> get $columns => [id, userId, deviceId];
-  @override
-  String get aliasedName => _alias ?? actualTableName;
-  @override
-  String get actualTableName => $name;
-  static const String $name = 'user_devices';
-  @override
-  VerificationContext validateIntegrity(
-    Insertable<UserDeviceRow> instance, {
-    bool isInserting = false,
-  }) {
-    final context = VerificationContext();
-    final data = instance.toColumns(true);
-    if (data.containsKey('id')) {
-      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
-    }
-    return context;
-  }
-
-  @override
-  Set<GeneratedColumn> get $primaryKey => {id};
-  @override
-  UserDeviceRow map(Map<String, dynamic> data, {String? tablePrefix}) {
-    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return UserDeviceRow(
-      id: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}id'],
-      )!,
-      userId: $UserDevicesTable.$converteruserId.fromSql(
-        attachedDatabase.typeMapping.read(
-          DriftSqlType.string,
-          data['${effectivePrefix}user_id'],
-        )!,
-      ),
-      deviceId: $UserDevicesTable.$converterdeviceId.fromSql(
-        attachedDatabase.typeMapping.read(
-          DriftSqlType.string,
-          data['${effectivePrefix}device_id'],
-        )!,
-      ),
-    );
-  }
-
-  @override
-  $UserDevicesTable createAlias(String alias) {
-    return $UserDevicesTable(attachedDatabase, alias);
-  }
-
-  static TypeConverter<Uri, String> $converteruserId = const UriTypeConverter();
-  static TypeConverter<Uri, String> $converterdeviceId =
-      const UriTypeConverter();
-}
-
-class UserDeviceRow extends DataClass implements Insertable<UserDeviceRow> {
-  final int id;
-  final Uri userId;
-  final Uri deviceId;
-  const UserDeviceRow({
-    required this.id,
-    required this.userId,
-    required this.deviceId,
-  });
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    map['id'] = Variable<int>(id);
-    {
-      map['user_id'] = Variable<String>(
-        $UserDevicesTable.$converteruserId.toSql(userId),
-      );
-    }
-    {
-      map['device_id'] = Variable<String>(
-        $UserDevicesTable.$converterdeviceId.toSql(deviceId),
-      );
-    }
-    return map;
-  }
-
-  UserDevicesCompanion toCompanion(bool nullToAbsent) {
-    return UserDevicesCompanion(
-      id: Value(id),
-      userId: Value(userId),
-      deviceId: Value(deviceId),
-    );
-  }
-
-  factory UserDeviceRow.fromJson(
-    Map<String, dynamic> json, {
-    ValueSerializer? serializer,
-  }) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return UserDeviceRow(
-      id: serializer.fromJson<int>(json['id']),
-      userId: serializer.fromJson<Uri>(json['userId']),
-      deviceId: serializer.fromJson<Uri>(json['deviceId']),
-    );
-  }
-  @override
-  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return <String, dynamic>{
-      'id': serializer.toJson<int>(id),
-      'userId': serializer.toJson<Uri>(userId),
-      'deviceId': serializer.toJson<Uri>(deviceId),
-    };
-  }
-
-  UserDeviceRow copyWith({int? id, Uri? userId, Uri? deviceId}) =>
-      UserDeviceRow(
-        id: id ?? this.id,
-        userId: userId ?? this.userId,
-        deviceId: deviceId ?? this.deviceId,
-      );
-  UserDeviceRow copyWithCompanion(UserDevicesCompanion data) {
-    return UserDeviceRow(
-      id: data.id.present ? data.id.value : this.id,
-      userId: data.userId.present ? data.userId.value : this.userId,
-      deviceId: data.deviceId.present ? data.deviceId.value : this.deviceId,
-    );
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('UserDeviceRow(')
-          ..write('id: $id, ')
-          ..write('userId: $userId, ')
-          ..write('deviceId: $deviceId')
-          ..write(')'))
-        .toString();
-  }
-
-  @override
-  int get hashCode => Object.hash(id, userId, deviceId);
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is UserDeviceRow &&
-          other.id == this.id &&
-          other.userId == this.userId &&
-          other.deviceId == this.deviceId);
-}
-
-class UserDevicesCompanion extends UpdateCompanion<UserDeviceRow> {
-  final Value<int> id;
-  final Value<Uri> userId;
-  final Value<Uri> deviceId;
-  const UserDevicesCompanion({
-    this.id = const Value.absent(),
-    this.userId = const Value.absent(),
-    this.deviceId = const Value.absent(),
-  });
-  UserDevicesCompanion.insert({
-    this.id = const Value.absent(),
-    required Uri userId,
-    required Uri deviceId,
-  }) : userId = Value(userId),
-       deviceId = Value(deviceId);
-  static Insertable<UserDeviceRow> custom({
-    Expression<int>? id,
-    Expression<String>? userId,
-    Expression<String>? deviceId,
-  }) {
-    return RawValuesInsertable({
-      if (id != null) 'id': id,
-      if (userId != null) 'user_id': userId,
-      if (deviceId != null) 'device_id': deviceId,
-    });
-  }
-
-  UserDevicesCompanion copyWith({
-    Value<int>? id,
-    Value<Uri>? userId,
-    Value<Uri>? deviceId,
-  }) {
-    return UserDevicesCompanion(
-      id: id ?? this.id,
-      userId: userId ?? this.userId,
-      deviceId: deviceId ?? this.deviceId,
-    );
-  }
-
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    if (id.present) {
-      map['id'] = Variable<int>(id.value);
-    }
-    if (userId.present) {
-      map['user_id'] = Variable<String>(
-        $UserDevicesTable.$converteruserId.toSql(userId.value),
-      );
-    }
-    if (deviceId.present) {
-      map['device_id'] = Variable<String>(
-        $UserDevicesTable.$converterdeviceId.toSql(deviceId.value),
-      );
-    }
-    return map;
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('UserDevicesCompanion(')
-          ..write('id: $id, ')
-          ..write('userId: $userId, ')
-          ..write('deviceId: $deviceId')
-          ..write(')'))
-        .toString();
-  }
-}
-
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -1991,12 +1543,6 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $MlsGroupsTable mlsGroups = $MlsGroupsTable(this);
   late final $MlsEngineConfigsTable mlsEngineConfigs = $MlsEngineConfigsTable(
     this,
-  );
-  late final $UsersTable users = $UsersTable(this);
-  late final $UserDevicesTable userDevices = $UserDevicesTable(this);
-  late final Index idxDeviceId = Index(
-    'idx_device_id',
-    'CREATE INDEX idx_device_id ON user_devices (device_id)',
   );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
@@ -2008,20 +1554,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     mlsKeyPackages,
     mlsGroups,
     mlsEngineConfigs,
-    users,
-    userDevices,
-    idxDeviceId,
   ];
-  @override
-  StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
-    WritePropagation(
-      on: TableUpdateQuery.onTableName(
-        'users',
-        limitUpdateKind: UpdateKind.delete,
-      ),
-      result: [TableUpdate('user_devices', kind: UpdateKind.delete)],
-    ),
-  ]);
 }
 
 typedef $$CapabilitiesTableCreateCompanionBuilder =
@@ -2542,20 +2075,18 @@ typedef $$MlsGroupsTableCreateCompanionBuilder =
     MlsGroupsCompanion Function({
       Value<int> id,
       required Uint8List groupIdBytes,
-      required String groupIdHex,
-      required String displayName,
-      required DateTime createdAt,
-      Value<DateTime?> lastActivityAt,
+      Value<String?> displayName,
+      Value<DateTime> createdAt,
+      Value<DateTime> lastActivityAt,
       Value<bool> isActive,
     });
 typedef $$MlsGroupsTableUpdateCompanionBuilder =
     MlsGroupsCompanion Function({
       Value<int> id,
       Value<Uint8List> groupIdBytes,
-      Value<String> groupIdHex,
-      Value<String> displayName,
+      Value<String?> displayName,
       Value<DateTime> createdAt,
-      Value<DateTime?> lastActivityAt,
+      Value<DateTime> lastActivityAt,
       Value<bool> isActive,
     });
 
@@ -2575,11 +2106,6 @@ class $$MlsGroupsTableFilterComposer
 
   ColumnFilters<Uint8List> get groupIdBytes => $composableBuilder(
     column: $table.groupIdBytes,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get groupIdHex => $composableBuilder(
-    column: $table.groupIdHex,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -2623,11 +2149,6 @@ class $$MlsGroupsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get groupIdHex => $composableBuilder(
-    column: $table.groupIdHex,
-    builder: (column) => ColumnOrderings(column),
-  );
-
   ColumnOrderings<String> get displayName => $composableBuilder(
     column: $table.displayName,
     builder: (column) => ColumnOrderings(column),
@@ -2663,11 +2184,6 @@ class $$MlsGroupsTableAnnotationComposer
 
   GeneratedColumn<Uint8List> get groupIdBytes => $composableBuilder(
     column: $table.groupIdBytes,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<String> get groupIdHex => $composableBuilder(
-    column: $table.groupIdHex,
     builder: (column) => column,
   );
 
@@ -2721,15 +2237,13 @@ class $$MlsGroupsTableTableManager
               ({
                 Value<int> id = const Value.absent(),
                 Value<Uint8List> groupIdBytes = const Value.absent(),
-                Value<String> groupIdHex = const Value.absent(),
-                Value<String> displayName = const Value.absent(),
+                Value<String?> displayName = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
-                Value<DateTime?> lastActivityAt = const Value.absent(),
+                Value<DateTime> lastActivityAt = const Value.absent(),
                 Value<bool> isActive = const Value.absent(),
               }) => MlsGroupsCompanion(
                 id: id,
                 groupIdBytes: groupIdBytes,
-                groupIdHex: groupIdHex,
                 displayName: displayName,
                 createdAt: createdAt,
                 lastActivityAt: lastActivityAt,
@@ -2739,15 +2253,13 @@ class $$MlsGroupsTableTableManager
               ({
                 Value<int> id = const Value.absent(),
                 required Uint8List groupIdBytes,
-                required String groupIdHex,
-                required String displayName,
-                required DateTime createdAt,
-                Value<DateTime?> lastActivityAt = const Value.absent(),
+                Value<String?> displayName = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> lastActivityAt = const Value.absent(),
                 Value<bool> isActive = const Value.absent(),
               }) => MlsGroupsCompanion.insert(
                 id: id,
                 groupIdBytes: groupIdBytes,
-                groupIdHex: groupIdHex,
                 displayName: displayName,
                 createdAt: createdAt,
                 lastActivityAt: lastActivityAt,
@@ -2946,485 +2458,6 @@ typedef $$MlsEngineConfigsTableProcessedTableManager =
       MlsEngineConfigRow,
       PrefetchHooks Function()
     >;
-typedef $$UsersTableCreateCompanionBuilder =
-    UsersCompanion Function({required Uri id, Value<int> rowid});
-typedef $$UsersTableUpdateCompanionBuilder =
-    UsersCompanion Function({Value<Uri> id, Value<int> rowid});
-
-final class $$UsersTableReferences
-    extends BaseReferences<_$AppDatabase, $UsersTable, UserRow> {
-  $$UsersTableReferences(super.$_db, super.$_table, super.$_typedResult);
-
-  static MultiTypedResultKey<$UserDevicesTable, List<UserDeviceRow>>
-  _userDevicesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
-    db.userDevices,
-    aliasName: $_aliasNameGenerator(db.users.id, db.userDevices.userId),
-  );
-
-  $$UserDevicesTableProcessedTableManager get userDevicesRefs {
-    final manager = $$UserDevicesTableTableManager(
-      $_db,
-      $_db.userDevices,
-    ).filter((f) => f.userId.id.sqlEquals($_itemColumn<String>('id')!));
-
-    final cache = $_typedResult.readTableOrNull(_userDevicesRefsTable($_db));
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: cache),
-    );
-  }
-}
-
-class $$UsersTableFilterComposer extends Composer<_$AppDatabase, $UsersTable> {
-  $$UsersTableFilterComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  ColumnWithTypeConverterFilters<Uri, Uri, String> get id => $composableBuilder(
-    column: $table.id,
-    builder: (column) => ColumnWithTypeConverterFilters(column),
-  );
-
-  Expression<bool> userDevicesRefs(
-    Expression<bool> Function($$UserDevicesTableFilterComposer f) f,
-  ) {
-    final $$UserDevicesTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.userDevices,
-      getReferencedColumn: (t) => t.userId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$UserDevicesTableFilterComposer(
-            $db: $db,
-            $table: $db.userDevices,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-}
-
-class $$UsersTableOrderingComposer
-    extends Composer<_$AppDatabase, $UsersTable> {
-  $$UsersTableOrderingComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  ColumnOrderings<String> get id => $composableBuilder(
-    column: $table.id,
-    builder: (column) => ColumnOrderings(column),
-  );
-}
-
-class $$UsersTableAnnotationComposer
-    extends Composer<_$AppDatabase, $UsersTable> {
-  $$UsersTableAnnotationComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  GeneratedColumnWithTypeConverter<Uri, String> get id =>
-      $composableBuilder(column: $table.id, builder: (column) => column);
-
-  Expression<T> userDevicesRefs<T extends Object>(
-    Expression<T> Function($$UserDevicesTableAnnotationComposer a) f,
-  ) {
-    final $$UserDevicesTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.userDevices,
-      getReferencedColumn: (t) => t.userId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$UserDevicesTableAnnotationComposer(
-            $db: $db,
-            $table: $db.userDevices,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-}
-
-class $$UsersTableTableManager
-    extends
-        RootTableManager<
-          _$AppDatabase,
-          $UsersTable,
-          UserRow,
-          $$UsersTableFilterComposer,
-          $$UsersTableOrderingComposer,
-          $$UsersTableAnnotationComposer,
-          $$UsersTableCreateCompanionBuilder,
-          $$UsersTableUpdateCompanionBuilder,
-          (UserRow, $$UsersTableReferences),
-          UserRow,
-          PrefetchHooks Function({bool userDevicesRefs})
-        > {
-  $$UsersTableTableManager(_$AppDatabase db, $UsersTable table)
-    : super(
-        TableManagerState(
-          db: db,
-          table: table,
-          createFilteringComposer: () =>
-              $$UsersTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () =>
-              $$UsersTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer: () =>
-              $$UsersTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback:
-              ({
-                Value<Uri> id = const Value.absent(),
-                Value<int> rowid = const Value.absent(),
-              }) => UsersCompanion(id: id, rowid: rowid),
-          createCompanionCallback:
-              ({required Uri id, Value<int> rowid = const Value.absent()}) =>
-                  UsersCompanion.insert(id: id, rowid: rowid),
-          withReferenceMapper: (p0) => p0
-              .map(
-                (e) =>
-                    (e.readTable(table), $$UsersTableReferences(db, table, e)),
-              )
-              .toList(),
-          prefetchHooksCallback: ({userDevicesRefs = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [if (userDevicesRefs) db.userDevices],
-              addJoins: null,
-              getPrefetchedDataCallback: (items) async {
-                return [
-                  if (userDevicesRefs)
-                    await $_getPrefetchedData<
-                      UserRow,
-                      $UsersTable,
-                      UserDeviceRow
-                    >(
-                      currentTable: table,
-                      referencedTable: $$UsersTableReferences
-                          ._userDevicesRefsTable(db),
-                      managerFromTypedResult: (p0) =>
-                          $$UsersTableReferences(db, table, p0).userDevicesRefs,
-                      referencedItemsForCurrentItem: (item, referencedItems) =>
-                          referencedItems.where((e) => e.userId == item.id),
-                      typedResults: items,
-                    ),
-                ];
-              },
-            );
-          },
-        ),
-      );
-}
-
-typedef $$UsersTableProcessedTableManager =
-    ProcessedTableManager<
-      _$AppDatabase,
-      $UsersTable,
-      UserRow,
-      $$UsersTableFilterComposer,
-      $$UsersTableOrderingComposer,
-      $$UsersTableAnnotationComposer,
-      $$UsersTableCreateCompanionBuilder,
-      $$UsersTableUpdateCompanionBuilder,
-      (UserRow, $$UsersTableReferences),
-      UserRow,
-      PrefetchHooks Function({bool userDevicesRefs})
-    >;
-typedef $$UserDevicesTableCreateCompanionBuilder =
-    UserDevicesCompanion Function({
-      Value<int> id,
-      required Uri userId,
-      required Uri deviceId,
-    });
-typedef $$UserDevicesTableUpdateCompanionBuilder =
-    UserDevicesCompanion Function({
-      Value<int> id,
-      Value<Uri> userId,
-      Value<Uri> deviceId,
-    });
-
-final class $$UserDevicesTableReferences
-    extends BaseReferences<_$AppDatabase, $UserDevicesTable, UserDeviceRow> {
-  $$UserDevicesTableReferences(super.$_db, super.$_table, super.$_typedResult);
-
-  static $UsersTable _userIdTable(_$AppDatabase db) => db.users.createAlias(
-    $_aliasNameGenerator(db.userDevices.userId, db.users.id),
-  );
-
-  $$UsersTableProcessedTableManager get userId {
-    final $_column = $_itemColumn<String>('user_id')!;
-
-    final manager = $$UsersTableTableManager(
-      $_db,
-      $_db.users,
-    ).filter((f) => f.id.sqlEquals($_column));
-    final item = $_typedResult.readTableOrNull(_userIdTable($_db));
-    if (item == null) return manager;
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: [item]),
-    );
-  }
-}
-
-class $$UserDevicesTableFilterComposer
-    extends Composer<_$AppDatabase, $UserDevicesTable> {
-  $$UserDevicesTableFilterComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  ColumnFilters<int> get id => $composableBuilder(
-    column: $table.id,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnWithTypeConverterFilters<Uri, Uri, String> get deviceId =>
-      $composableBuilder(
-        column: $table.deviceId,
-        builder: (column) => ColumnWithTypeConverterFilters(column),
-      );
-
-  $$UsersTableFilterComposer get userId {
-    final $$UsersTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.userId,
-      referencedTable: $db.users,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$UsersTableFilterComposer(
-            $db: $db,
-            $table: $db.users,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
-}
-
-class $$UserDevicesTableOrderingComposer
-    extends Composer<_$AppDatabase, $UserDevicesTable> {
-  $$UserDevicesTableOrderingComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  ColumnOrderings<int> get id => $composableBuilder(
-    column: $table.id,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get deviceId => $composableBuilder(
-    column: $table.deviceId,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  $$UsersTableOrderingComposer get userId {
-    final $$UsersTableOrderingComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.userId,
-      referencedTable: $db.users,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$UsersTableOrderingComposer(
-            $db: $db,
-            $table: $db.users,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
-}
-
-class $$UserDevicesTableAnnotationComposer
-    extends Composer<_$AppDatabase, $UserDevicesTable> {
-  $$UserDevicesTableAnnotationComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  GeneratedColumn<int> get id =>
-      $composableBuilder(column: $table.id, builder: (column) => column);
-
-  GeneratedColumnWithTypeConverter<Uri, String> get deviceId =>
-      $composableBuilder(column: $table.deviceId, builder: (column) => column);
-
-  $$UsersTableAnnotationComposer get userId {
-    final $$UsersTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.userId,
-      referencedTable: $db.users,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$UsersTableAnnotationComposer(
-            $db: $db,
-            $table: $db.users,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
-}
-
-class $$UserDevicesTableTableManager
-    extends
-        RootTableManager<
-          _$AppDatabase,
-          $UserDevicesTable,
-          UserDeviceRow,
-          $$UserDevicesTableFilterComposer,
-          $$UserDevicesTableOrderingComposer,
-          $$UserDevicesTableAnnotationComposer,
-          $$UserDevicesTableCreateCompanionBuilder,
-          $$UserDevicesTableUpdateCompanionBuilder,
-          (UserDeviceRow, $$UserDevicesTableReferences),
-          UserDeviceRow,
-          PrefetchHooks Function({bool userId})
-        > {
-  $$UserDevicesTableTableManager(_$AppDatabase db, $UserDevicesTable table)
-    : super(
-        TableManagerState(
-          db: db,
-          table: table,
-          createFilteringComposer: () =>
-              $$UserDevicesTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () =>
-              $$UserDevicesTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer: () =>
-              $$UserDevicesTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback:
-              ({
-                Value<int> id = const Value.absent(),
-                Value<Uri> userId = const Value.absent(),
-                Value<Uri> deviceId = const Value.absent(),
-              }) => UserDevicesCompanion(
-                id: id,
-                userId: userId,
-                deviceId: deviceId,
-              ),
-          createCompanionCallback:
-              ({
-                Value<int> id = const Value.absent(),
-                required Uri userId,
-                required Uri deviceId,
-              }) => UserDevicesCompanion.insert(
-                id: id,
-                userId: userId,
-                deviceId: deviceId,
-              ),
-          withReferenceMapper: (p0) => p0
-              .map(
-                (e) => (
-                  e.readTable(table),
-                  $$UserDevicesTableReferences(db, table, e),
-                ),
-              )
-              .toList(),
-          prefetchHooksCallback: ({userId = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [],
-              addJoins:
-                  <
-                    T extends TableManagerState<
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic
-                    >
-                  >(state) {
-                    if (userId) {
-                      state =
-                          state.withJoin(
-                                currentTable: table,
-                                currentColumn: table.userId,
-                                referencedTable: $$UserDevicesTableReferences
-                                    ._userIdTable(db),
-                                referencedColumn: $$UserDevicesTableReferences
-                                    ._userIdTable(db)
-                                    .id,
-                              )
-                              as T;
-                    }
-
-                    return state;
-                  },
-              getPrefetchedDataCallback: (items) async {
-                return [];
-              },
-            );
-          },
-        ),
-      );
-}
-
-typedef $$UserDevicesTableProcessedTableManager =
-    ProcessedTableManager<
-      _$AppDatabase,
-      $UserDevicesTable,
-      UserDeviceRow,
-      $$UserDevicesTableFilterComposer,
-      $$UserDevicesTableOrderingComposer,
-      $$UserDevicesTableAnnotationComposer,
-      $$UserDevicesTableCreateCompanionBuilder,
-      $$UserDevicesTableUpdateCompanionBuilder,
-      (UserDeviceRow, $$UserDevicesTableReferences),
-      UserDeviceRow,
-      PrefetchHooks Function({bool userId})
-    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -3439,8 +2472,4 @@ class $AppDatabaseManager {
       $$MlsGroupsTableTableManager(_db, _db.mlsGroups);
   $$MlsEngineConfigsTableTableManager get mlsEngineConfigs =>
       $$MlsEngineConfigsTableTableManager(_db, _db.mlsEngineConfigs);
-  $$UsersTableTableManager get users =>
-      $$UsersTableTableManager(_db, _db.users);
-  $$UserDevicesTableTableManager get userDevices =>
-      $$UserDevicesTableTableManager(_db, _db.userDevices);
 }

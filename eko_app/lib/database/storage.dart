@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:drift/drift.dart';
 import 'package:ecp/ecp.dart';
-import 'database.dart' hide MlsEngineConfig;
+import 'database.dart';
 import 'mappers.dart';
 
 class AppStorage extends Storage {
@@ -24,8 +24,6 @@ class AppStorage extends Storage {
       await _db.delete(_db.capabilities).go();
       await _db.delete(_db.mlsGroups).go();
       await _db.delete(_db.mlsEngineConfigs).go();
-      await _db.delete(_db.userDevices).go();
-      await _db.delete(_db.users).go();
     });
   }
 }
@@ -122,13 +120,6 @@ class _DriftGroupStore implements GroupStore {
   _DriftGroupStore(this._db);
 
   @override
-  Future<void> deleteGroup(String id) async {
-    await (_db.delete(
-      _db.mlsGroups,
-    )..where((t) => t.groupIdHex.equals(id))).go();
-  }
-
-  @override
   Future<MlsGroupRecord?> getGroup(int id) async {
     final row = await (_db.select(
       _db.mlsGroups,
@@ -137,34 +128,16 @@ class _DriftGroupStore implements GroupStore {
   }
 
   @override
-  Future<List<MlsGroupRecord>> listGroups({bool activeOnly = true}) async {
-    final query = _db.select(_db.mlsGroups);
-    if (activeOnly) {
-      query.where((t) => t.isActive.equals(true));
-    }
-    final rows = await query.get();
-    return rows.map((row) => row.toRecord()).toList();
-  }
-
-  @override
-  Future<void> markInactive(String id) async {
-    await (_db.update(_db.mlsGroups)..where((t) => t.groupIdHex.equals(id)))
-        .write(const MlsGroupsCompanion(isActive: Value(false)));
-  }
-
-  @override
-  Future<void> saveGroup(MlsGroupRecord record) async {
+  Future<void> saveGroup({
+    required Uint8List groupIdBytes,
+    String? displayName,
+  }) async {
     await _db
         .into(_db.mlsGroups)
         .insertOnConflictUpdate(
-          MlsGroupRow(
-            id: record.id,
-            groupIdBytes: record.groupIdBytes,
-            groupIdHex: base64Encode(record.groupIdBytes),
-            displayName: record.displayName,
-            createdAt: record.createdAt,
-            lastActivityAt: record.lastActivityAt,
-            isActive: record.isActive,
+          MlsGroupsCompanion(
+            groupIdBytes: Value(groupIdBytes),
+            displayName: Value.absentIfNull(displayName),
           ),
         );
   }

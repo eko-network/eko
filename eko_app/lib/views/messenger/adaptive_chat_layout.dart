@@ -25,6 +25,7 @@ class AdaptiveChat extends ConsumerWidget {
       body: groupsAsync.when(
         data: (groups) => LayoutBuilder(
           builder: (context, constraints) {
+            print(groups);
             final isWideScreen = constraints.maxWidth >= c.messengerWideScreen;
             if (isWideScreen) {
               return _buildWideLayout(context, constraints, groups, l10n);

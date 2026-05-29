@@ -58,10 +58,10 @@ Future<EcpClient> asyncEcpClient(Ref ref) async {
   });
 
   final client = EcpClient.build(
-    core: core!,
+    core: core,
     did: DeviceUidService.getOrCreate(),
     client: httpClient,
-    me: ecp_helpers.buildPerson(uid: session!.user.id),
+    me: ecp_helpers.buildPerson(uid: session.user.id),
   );
   return client;
 }

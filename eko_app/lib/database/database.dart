@@ -88,12 +88,12 @@ class MlsKeyPackages extends Table {
 
 @DataClassName('MlsGroupRow')
 class MlsGroups extends Table {
-  IntColumn get id => integer()();
+  IntColumn get id => integer().autoIncrement()();
   BlobColumn get groupIdBytes => blob()();
-  TextColumn get groupIdHex => text()();
-  TextColumn get displayName => text()();
-  DateTimeColumn get createdAt => dateTime()();
-  DateTimeColumn get lastActivityAt => dateTime().nullable()();
+  TextColumn get displayName => text().nullable()();
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+  DateTimeColumn get lastActivityAt =>
+      dateTime().withDefault(currentDateAndTime)();
   BoolColumn get isActive => boolean().withDefault(const Constant(true))();
 
   @override
@@ -110,24 +110,6 @@ class MlsEngineConfigs extends Table {
   Set<Column> get primaryKey => {id};
 }
 
-@DataClassName('UserRow')
-class Users extends Table {
-  TextColumn get id => text().map(const UriTypeConverter())();
-
-  @override
-  Set<Column> get primaryKey => {id};
-}
-
-@DataClassName('UserDeviceRow')
-@TableIndex(name: 'idx_device_id', columns: {#deviceId})
-class UserDevices extends Table {
-  IntColumn get id => integer().autoIncrement()();
-  TextColumn get userId => text()
-      .references(Users, #id, onDelete: KeyAction.cascade)
-      .map(const UriTypeConverter())();
-  TextColumn get deviceId => text().unique().map(const UriTypeConverter())();
-}
-
 // --- Database ---
 
 @DriftDatabase(
@@ -137,8 +119,6 @@ class UserDevices extends Table {
     MlsKeyPackages,
     MlsGroups,
     MlsEngineConfigs,
-    Users,
-    UserDevices,
   ],
 )
 class AppDatabase extends _$AppDatabase {
