@@ -1,5 +1,5 @@
-import 'package:eko_app/widgets/messenger/emoji_picker.dart';
-import 'package:eko_app/widgets/messenger/gif_picker.dart';
+import 'package:eko_app/messenger/widgets/emoji_picker.dart';
+import 'package:eko_app/messenger/widgets/gif_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:klipy_dart/klipy_dart.dart';
 

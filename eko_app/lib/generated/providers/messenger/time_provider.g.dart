@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of '../../../providers/messenger/time_provider.dart';
+part of '../../../messenger/providers/time_provider.dart';
 
 // **************************************************************************
 // RiverpodGenerator

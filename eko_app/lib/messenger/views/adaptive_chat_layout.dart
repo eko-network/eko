@@ -1,11 +1,11 @@
 import 'package:collection/collection.dart';
 import 'package:ecp/ecp.dart';
 import 'package:eko_app/localization/generated/app_localizations.dart';
-import 'package:eko_app/providers/messenger/group_provider.dart';
+import 'package:eko_app/messenger/providers/group_provider.dart';
 import 'package:eko_app/utilities/constants.dart' as c;
-import 'package:eko_app/views/messenger/chat_view.dart';
-import 'package:eko_app/views/messenger/group_list.dart';
-import 'package:eko_app/widgets/messenger/resizable_panel.dart';
+import 'package:eko_app/messenger/views/chat_view.dart';
+import 'package:eko_app/messenger/views/group_list.dart';
+import 'package:eko_app/messenger/widgets/resizable_panel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';

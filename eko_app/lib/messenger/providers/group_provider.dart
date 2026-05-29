@@ -2,7 +2,7 @@ import 'package:ecp/core/types/mls_group_record.dart';
 import 'package:eko_app/database/database.dart';
 import 'package:eko_app/database/mappers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-part '../../generated/providers/messenger/group_provider.g.dart';
+part '../../generated/messenger/providers/group_provider.g.dart';
 
 @riverpod
 Stream<List<MlsGroupRecord>> group(Ref ref) {

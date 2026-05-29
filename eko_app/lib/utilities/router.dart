@@ -1,5 +1,5 @@
 import 'package:cross_file/cross_file.dart' show XFile;
-import 'package:eko_app/views/messenger/no_web_gaurd.dart';
+import 'package:eko_app/messenger/views/no_web_gaurd.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -18,7 +18,7 @@ import 'package:eko_app/views/sign_up.dart';
 import 'package:eko_app/views/user_settings.dart';
 import 'package:eko_app/views/compose_page.dart';
 import 'package:eko_app/views/feed_page.dart';
-import 'package:eko_app/views/messenger/adaptive_chat_layout.dart';
+import 'package:eko_app/messenger/views/adaptive_chat_layout.dart';
 import 'package:eko_app/views/search_page.dart';
 import 'package:eko_app/views/edit_profile.dart';
 import 'package:eko_app/widgets/scaffolds/navigation_bar.dart';
