@@ -127,7 +127,7 @@ class _ActivityBody extends ConsumerWidget {
 String _username(AsyncValue<UserModel> asyncUser, String someone) {
   return asyncUser.when(
     data: (user) => user.username,
-    error: (_, __) => someone,
+    error: (_, _) => someone,
     loading: () => someone,
   );
 }

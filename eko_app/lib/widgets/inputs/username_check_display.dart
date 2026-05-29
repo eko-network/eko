@@ -91,7 +91,7 @@ class _UsernameCheckDisplayState extends State<UsernameCheckDisplay> {
   Widget build(BuildContext context) {
     return ValueListenableBuilder<TextEditingValue>(
       valueListenable: widget.controller,
-      builder: (BuildContext context, TextEditingValue value, __) {
+      builder: (BuildContext context, TextEditingValue value, _) {
         final potentialUsername = value.text.trim();
         if (widget.skipVal == potentialUsername || potentialUsername.isEmpty) {
           return SizedBox.shrink();

@@ -50,7 +50,7 @@ class _PostHost extends ConsumerWidget {
         body: Center(child: LikeButtons(post: post)),
       ),
       loading: () => const SizedBox.shrink(),
-      error: (_, __) => const SizedBox.shrink(),
+      error: (_, _) => const SizedBox.shrink(),
     );
   }
 }

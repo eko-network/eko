@@ -47,7 +47,7 @@ class UserTag extends ConsumerWidget {
           ),
         );
       },
-      error: (_, __) {
+      error: (_, _) {
         return Text(AppLocalizations.of(context)!.shortLoadError);
       },
       loading: () => Text(AppLocalizations.of(context)!.loadingEllipsis),

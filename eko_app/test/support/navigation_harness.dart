@@ -163,7 +163,7 @@ class _EmptyEndedProfilePosts extends ProfilePostListNotifier {
 }
 
 class _EmptyEndedOtherProfilePosts extends OtherProfilePostListNotifier {
-  _EmptyEndedOtherProfilePosts(String uid) : super(uid);
+  _EmptyEndedOtherProfilePosts(super.uid);
 
   @override
   ProfilePostListState build() => ([], true);

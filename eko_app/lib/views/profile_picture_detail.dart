@@ -33,7 +33,7 @@ class ProfilePictureDetail extends ConsumerWidget {
                   data: (user) => NetworkOrDefaultProfileImage(
                     imageUrl: user.profilePicture,
                   ),
-                  error: (_, __) => Center(
+                  error: (_, _) => Center(
                     child: Text(AppLocalizations.of(context)!.shortLoadError),
                   ),
                   loading: () => const Center(child: LoadingProfileImage()),

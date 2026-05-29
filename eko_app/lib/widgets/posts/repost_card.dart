@@ -158,7 +158,7 @@ class RepostCard extends ConsumerWidget {
           ),
         ),
       ),
-      error: (e, __) {
+      error: (e, _) {
         debugPrint(e.toString());
         return Text(AppLocalizations.of(context)!.repostLoadFailed);
       },

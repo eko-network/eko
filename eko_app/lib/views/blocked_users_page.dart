@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:eko_app/localization/generated/app_localizations.dart';
-import 'package:eko_app/providers/current_user_provider.dart';
 import 'package:eko_app/utilities/constants.dart' as c;
 import 'package:eko_app/widgets/scaffolds/app_scaffold.dart';
 import 'package:eko_app/widgets/scaffolds/eko_app_bar.dart';
-import 'package:eko_app/widgets/users/user_card.dart';
 
 //FIXME was using firebase style block
 class BlockedUsersPage extends ConsumerWidget {

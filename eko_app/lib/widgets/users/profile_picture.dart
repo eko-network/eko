@@ -41,7 +41,7 @@ class ProfilePicture extends ConsumerWidget {
                       imageUrl: user.profilePicture,
                     );
                   },
-                  error: (_, __) {
+                  error: (_, _) {
                     return Text(AppLocalizations.of(context)!.shortLoadError);
                   },
                   loading: () => LoadingProfileImage(),

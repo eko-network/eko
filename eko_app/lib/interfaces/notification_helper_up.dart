@@ -328,7 +328,7 @@ class UnifiedPushNotificationAdapter extends NotificationPlatformAdapter {
             child: ListView.separated(
               shrinkWrap: true,
               itemCount: distributors.length,
-              separatorBuilder: (_, __) => const Divider(height: 1),
+              separatorBuilder: (_, _) => const Divider(height: 1),
               itemBuilder: (context, index) {
                 final distributor = distributors[index];
                 final name = distributor.split('.').last;

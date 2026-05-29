@@ -15,7 +15,7 @@ const String _mathInlinePlaceholderPattern = r'⟦m(\d+)⟧';
 
 String _mathPhInline(int idx) => '\u27e6m$idx\u27e7';
 
-String _mathPhBlock(int idx) => '${_mathBlockPlaceholderPrefix}$idx';
+String _mathPhBlock(int idx) => '$_mathBlockPlaceholderPrefix$idx';
 
 Future<void> _defaultTagPressed(
   String username,
@@ -147,7 +147,7 @@ class _LatexBlockPlaceholderSyntax extends md.BlockSyntax {
   const _LatexBlockPlaceholderSyntax();
 
   static final RegExp _line = RegExp(
-    '^\\s*${_mathBlockPlaceholderPrefix}(\\d+)\\s*\$',
+    '^\\s*$_mathBlockPlaceholderPrefix(\\d+)\\s*\$',
   );
 
   @override
@@ -309,7 +309,7 @@ class MarkdownView extends ConsumerWidget {
     final data = _format(prep.masked);
     return MarkdownBody(
       key: ValueKey(data),
-      onTapLink: (_, uri, __) {
+      onTapLink: (_, uri, _) {
         if (uri?.startsWith('@') ?? false) {
           _defaultTagPressed(uri!.substring(1), context, ref);
         } else if (uri != null) {
@@ -319,7 +319,7 @@ class MarkdownView extends ConsumerWidget {
           } finally {}
         }
       },
-      imageBuilder: (_, __, ___) => SizedBox(),
+      imageBuilder: (_, _, _) => SizedBox(),
       checkboxBuilder: (checked) {
         final colors = Theme.of(context).colorScheme;
         final borderColor = checked
