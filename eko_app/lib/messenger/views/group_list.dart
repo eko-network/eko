@@ -1,15 +1,16 @@
 import 'dart:async';
+import 'package:ecp/ecp.dart';
 import 'package:eko_app/interfaces/search.dart';
 import 'package:eko_app/localization/generated/app_localizations.dart';
 import 'package:eko_app/messenger/types/group.dart';
 import 'package:eko_app/messenger/widgets/group_card.dart';
 import 'package:eko_app/providers/ecp_provider.dart';
 import 'package:eko_app/types/user.dart';
-import 'package:eko_app/messenger/ecp_helpers.dart';
 import 'package:eko_app/utilities/constants.dart' as c;
 import 'package:eko_app/widgets/common/infinite_scrolly.dart';
 import 'package:eko_app/widgets/loading/shimmer_loaders.dart';
 import 'package:eko_app/messenger/widgets/resizable_panel.dart';
+import 'package:eko_app/messenger/ecp_helpers.dart';
 import 'package:eko_app/widgets/search/user_search_bar.dart';
 import 'package:eko_app/widgets/users/user_card.dart';
 import 'package:flutter/material.dart';
@@ -106,7 +107,7 @@ class _ConversationListState extends ConsumerState<GroupList> {
     final l10n = AppLocalizations.of(context)!;
 
     try {
-      final peer = buildPerson(uid: user.uid);
+      final peer = EkoPerson.fromUid(user.uid);
       await ref.watch(ecpClientProvider).groups.createGroup([peer]);
       if (!mounted) return;
       ScaffoldMessenger.of(

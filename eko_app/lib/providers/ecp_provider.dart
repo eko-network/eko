@@ -1,7 +1,6 @@
 import 'package:ecp/ecp.dart';
 import 'package:eko_app/providers/auth_provider.dart';
 import 'package:eko_app/utilities/device_uid_service.dart';
-import 'package:eko_app/messenger/ecp_helpers.dart' as ecp_helpers;
 import 'package:eko_app/utilities/supabase_ref.dart';
 import 'package:http/http.dart' as http;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -61,7 +60,6 @@ Future<EcpClient> asyncEcpClient(Ref ref) async {
     core: core,
     did: DeviceUidService.getOrCreate(),
     client: httpClient,
-    me: ecp_helpers.buildPerson(uid: session.user.id),
   );
   return client;
 }

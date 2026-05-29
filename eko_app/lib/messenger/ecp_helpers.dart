@@ -1,7 +1,7 @@
 import 'package:ecp/ecp.dart';
 import 'package:eko_app/utilities/constants.dart' as c;
 
-Uri messengerActorId(String supabaseUid) {
+Uri actorIdFromUid(String supabaseUid) {
   final base = c.messengerDefaultServerUrl;
   return base.replace(
     pathSegments: [
@@ -12,14 +12,16 @@ Uri messengerActorId(String supabaseUid) {
   );
 }
 
-Person buildPerson({required String uid}) {
-  final actorId = messengerActorId(uid);
-  return Person(
-    id: actorId,
-    inbox: actorId.replace(pathSegments: [...actorId.pathSegments, 'inbox']),
-    outbox: actorId.replace(pathSegments: [...actorId.pathSegments, 'outbox']),
-    devicesEndpoint: actorId.replace(
-      pathSegments: [...actorId.pathSegments, 'devices'],
-    ),
-  );
+String uidFromActorId(Uri id) {
+  return id.pathSegments.last;
+}
+
+extension type EkoPerson(Person person) implements Person {
+  EkoPerson.fromUid(String uid) : person = Person.fromId(actorIdFromUid(uid));
+}
+
+extension EcpHelpers on Person {
+  String uid() {
+    return id.pathSegments.last;
+  }
 }

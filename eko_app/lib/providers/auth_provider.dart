@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:eko_app/messenger/ecp_helpers.dart';
 import 'package:path/path.dart' as p;
 import 'dart:convert';
 import 'dart:io';
@@ -153,7 +154,7 @@ class Auth extends _$Auth {
         final path = await getApplicationSupportDirectory();
         _core = EcpCore(
           storage: storage,
-          credentialIdentity: Uint8List.fromList(Uuid.parse(u.id)),
+          identity: EkoPerson.fromUid(u.id),
           engineConfig: await MlsEngineConfig.fromPath(
             File(p.join(path.path, 'mls.db')),
             storage,
