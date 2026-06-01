@@ -93,6 +93,8 @@
   "newEmail" : "नया ईमेल",
   "newLines" : "नई पंक्तियाँ",
   "newMessage" : "नया संदेश",
+  "noMessagesYet" : "अभी तक कोई संदेश नहीं",
+  "typeAMessage" : "एक संदेश लिखें",
   "newPasswordMustBeDifferent" : "नया पासवर्ड भिन्न होना चाहिए",
   "next" : "अगला",
   "nothingToSeeHere" : "यहाँ कुछ नहीं देखने को है!",
@@ -185,5 +187,7 @@
   "profileLoadFailed" : "यह प्रोफ़ाइल लोड नहीं हो सकी",
   "profileResolveFailed" : "उपयोगकर्ता लोड नहीं हो सका",
   "imageSavedToGallery" : "छवि गैलरी में सहेजी गई",
+  "today" : "आज",
+  "yesterday" : "कल",
   "repostLoadFailed" : "यह पोस्ट लोड नहीं हो सकी"
 }

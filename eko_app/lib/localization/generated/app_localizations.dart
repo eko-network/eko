@@ -660,6 +660,18 @@ abstract class AppLocalizations {
   /// **'New message'**
   String get newMessage;
 
+  /// No description provided for @noMessagesYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No messages yet'**
+  String get noMessagesYet;
+
+  /// No description provided for @typeAMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Type a message'**
+  String get typeAMessage;
+
   /// No description provided for @newPasswordMustBeDifferent.
   ///
   /// In en, this message translates to:
@@ -1169,6 +1181,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Image saved to gallery'**
   String get imageSavedToGallery;
+
+  /// No description provided for @today.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get today;
+
+  /// No description provided for @yesterday.
+  ///
+  /// In en, this message translates to:
+  /// **'Yesterday'**
+  String get yesterday;
 
   /// No description provided for @repostLoadFailed.
   ///

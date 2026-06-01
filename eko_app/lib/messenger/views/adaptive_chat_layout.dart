@@ -81,7 +81,7 @@ class AdaptiveChat extends ConsumerWidget {
                 ),
               ),
             )
-          : SizedBox(), //ChatView(conversation: selecte, onBack: null),
+          : ChatView(group: selectedGroup, onBack: null),
     );
   }
 
@@ -90,11 +90,11 @@ class AdaptiveChat extends ConsumerWidget {
     List<GroupWithUsers> groups,
     AppLocalizations l10n,
   ) {
-    final selectedConversation = groups.firstWhereOrNull(
+    final selectedGroup = groups.firstWhereOrNull(
       (item) => item.group.id == selectedGroupId,
     );
 
-    if (selectedGroupId == null || selectedConversation == null) {
+    if (selectedGroupId == null || selectedGroup == null) {
       return GroupList(
         isWideScreen: false,
         groups: groups,
@@ -103,7 +103,7 @@ class AdaptiveChat extends ConsumerWidget {
       );
     } else {
       return ChatView(
-        group: selectedConversation,
+        group: selectedGroup,
         onBack: () => context.go('/messages'),
       );
     }

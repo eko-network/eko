@@ -68,3 +68,10 @@ Future<EcpClient> asyncEcpClient(Ref ref) async {
 EcpClient ecpClient(Ref ref) {
   return ref.watch(asyncEcpClientProvider).requireValue;
 }
+
+@Riverpod(keepAlive: true)
+void inboxPolling(Ref ref) {
+  final client = ref.watch(asyncEcpClientProvider).requireValue;
+  final controller = MessageStreamController(client: client);
+  controller.messages().listen((_) {});
+}

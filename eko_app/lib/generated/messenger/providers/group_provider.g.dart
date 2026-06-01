@@ -48,4 +48,4 @@ final class GroupProvider
   }
 }
 
-String _$groupHash() => r'8a4351d990d525d6922dbd6ce9456ec929372df3';
+String _$groupHash() => r'f77cc9fbac7217bf479682be2594f6f1c67714c1';

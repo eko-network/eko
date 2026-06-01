@@ -1,11 +1,18 @@
 import 'package:ecp/ecp.dart' as ecp;
+import 'package:eko_app/localization/generated/app_localizations.dart';
+import 'package:eko_app/messenger/providers/message_provider.dart';
 import 'package:eko_app/messenger/types/group.dart';
+import 'package:eko_app/messenger/widgets/group_card.dart';
+import 'package:eko_app/messenger/widgets/message.dart';
+import 'package:eko_app/providers/ecp_provider.dart';
 import 'package:eko_app/utilities/emoji_text_style.dart';
 import 'package:eko_app/utilities/platform.dart' as platform;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:klipy_dart/klipy_dart.dart';
+
+enum MessagePosition { middle, bottom, top, single }
 
 extension SafeLookup<T> on List<T> {
   T? getOrNull(int index) {
@@ -91,7 +98,13 @@ class _ChatViewState extends ConsumerState<ChatView> {
   }
 
   Future<void> _dispatchMessage(ecp.ActivityPubObject object) async {
-    debugPrint('Send message placeholder: ${object.type}');
+    await ref
+        .read(ecpClientProvider)
+        .messages
+        .sendMessage(
+          ecp.Activity.newCreate(object: object),
+          widget.group.group.groupIdBytes,
+        );
   }
 
   Widget _buildInputRow(BuildContext context) {
@@ -205,7 +218,7 @@ class _ChatViewState extends ConsumerState<ChatView> {
                             }
                           },
                         ),
-                        hintText: 'Type a message',
+                        hintText: AppLocalizations.of(context)!.typeAMessage,
                         border: InputBorder.none,
                         focusedBorder: InputBorder.none,
                         enabledBorder: InputBorder.none,
@@ -235,38 +248,38 @@ class _ChatViewState extends ConsumerState<ChatView> {
     );
   }
 
-  // MessagePosition _determinePosition(
-  //   DateTime? prev,
-  //   DateTime me,
-  //   DateTime? next,
-  // ) {
-  //   const tolerance = Duration(minutes: 1);
-  //
-  //   final hasPrev = prev != null && me.difference(prev).abs() <= tolerance;
-  //   final hasNext = next != null && next.difference(me).abs() <= tolerance;
-  //
-  //   if (hasPrev && hasNext) {
-  //     return MessagePosition.middle;
-  //   } else if (hasPrev) {
-  //     return MessagePosition.bottom;
-  //   } else if (hasNext) {
-  //     return MessagePosition.top;
-  //   } else {
-  //     return MessagePosition.single;
-  //   }
-  // }
+  MessagePosition _determinePosition(
+    DateTime? prev,
+    DateTime me,
+    DateTime? next,
+  ) {
+    const tolerance = Duration(minutes: 1);
+
+    final hasPrev = prev != null && me.difference(prev).abs() <= tolerance;
+    final hasNext = next != null && next.difference(me).abs() <= tolerance;
+
+    if (hasPrev && hasNext) {
+      return MessagePosition.middle;
+    } else if (hasPrev) {
+      return MessagePosition.bottom;
+    } else if (hasNext) {
+      return MessagePosition.top;
+    } else {
+      return MessagePosition.single;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    // final client = ref.watch(ecpRuntimeProvider).asData?.value;
-    // final signedIn = ref.watch(authProvider).uid?.isNotEmpty ?? false;
-    // final actorId = client?.me.id ?? widget.conversation.contact.id;
-    // final contactId = widget.conversation.contact.id;
-    //
-    // final inputRow = _buildInputRow(context);
+    final actorId = ref.watch(ecpClientProvider).me.id;
+    final messagesAsync = ref.watch(
+      messageProvider(widget.group.group.groupIdBytes),
+    );
+    final inputRow = _buildInputRow(context);
 
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         leading: widget.onBack != null
             ? IconButton(
                 icon: const Icon(Icons.arrow_back),
@@ -275,137 +288,131 @@ class _ChatViewState extends ConsumerState<ChatView> {
             : null,
         title: Row(
           children: [
-            SizedBox(), // TODO FIXME
+            SizedBox(height: 35, child: GroupIcon(group: widget.group)),
             const SizedBox(width: 12),
-            Expanded(
-              child: SizedBox(),
-
-              // Text(
-              //   // widget.conversation.contact.preferredUsername,
-              //   overflow: TextOverflow.ellipsis,
-              // ),
-            ),
+            Expanded(child: GroupTitle(group: widget.group)),
           ],
         ),
-        elevation: 0,
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        surfaceTintColor: Colors.transparent,
+        scrolledUnderElevation: 0.0,
       ),
-      body: Placeholder(),
+      body: Column(
+        children: [
+          Expanded(
+            child: messagesAsync.when(
+              data: (messages) {
+                if (messages.isEmpty) {
+                  return Center(
+                    child: Text(
+                      AppLocalizations.of(context)!.noMessagesYet,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        fontSize: 16,
+                      ),
+                    ),
+                  );
+                }
 
-      // Column(
-      //         children: [
-      //           Expanded(
-      //             child: messagesAsync.when(
-      //               data: (messages) {
-      //                 if (messages.isEmpty) {
-      //                   return Center(
-      //                     child: Text(
-      //                       'No messages yet',
-      //                       style: TextStyle(
-      //                         color: Theme.of(context).colorScheme.onSurfaceVariant,
-      //                         fontSize: 16,
-      //                       ),
-      //                     ),
-      //                   );
-      //                 }
-      //
-      //                 return ListView.builder(
-      //                   padding: const EdgeInsets.all(16),
-      //                   reverse: true,
-      //                   itemCount: messages.length,
-      //                   itemBuilder: (context, index) {
-      //                     final chronoIndex = messages.length - 1 - index;
-      //                     final message = messages[chronoIndex].message;
-      //                     final isReceived = message.from != actorId;
-      //
-      //                     final prevMsg =
-      //                         messages.getOrNull(chronoIndex - 1)?.message;
-      //                     final nextMsg =
-      //                         messages.getOrNull(chronoIndex + 1)?.message;
-      //
-      //                     final DateTime? prevTime =
-      //                         (prevMsg?.from == message.from) ? prevMsg?.time : null;
-      //                     final DateTime? nextTime =
-      //                         (nextMsg?.from == message.from) ? nextMsg?.time : null;
-      //
-      //                     var isFirstOfDate = false;
-      //                     if (prevMsg == null) {
-      //                       isFirstOfDate = true;
-      //                     } else {
-      //                       final d1 = message.time;
-      //                       final d2 = prevMsg.time;
-      //                       isFirstOfDate = d1.year != d2.year ||
-      //                           d1.month != d2.month ||
-      //                           d1.day != d2.day;
-      //                     }
-      //
-      //                     final messageWidget = MessageWidget(
-      //                       isReceived: isReceived,
-      //                       messageWithAttachments: messages[chronoIndex],
-      //                       position: _determinePosition(
-      //                         prevTime,
-      //                         message.time,
-      //                         nextTime,
-      //                       ),
-      //                     );
-      //
-      //                     if (isFirstOfDate) {
-      //                       return Column(
-      //                         children: [
-      //                           DateChip(time: message.time),
-      //                           messageWidget,
-      //                         ],
-      //                       );
-      //                     }
-      //                     return messageWidget;
-      //                   },
-      //                 );
-      //               },
-      //               loading: () => const Center(child: CircularProgressIndicator()),
-      //               error: (error, stack) {
-      //                 debugPrint(error.toString());
-      //                 return Center(
-      //                   child: Text('Could not load messages: $error'),
-      //                 );
-      //               },
-      //             ),
-      //           ),
-      //           SafeArea(
-      //             top: false,
-      //             child: Column(
-      //               mainAxisSize: MainAxisSize.min,
-      //               children: [
-      //                 Padding(
-      //                   padding: const EdgeInsets.all(8),
-      //                   child: signedIn && !platform.isMobile
-      //                       ? MenuAnchor(
-      //                           controller: _menuController,
-      //                           menuChildren: [
-      //                             SizedBox(
-      //                               width: 380,
-      //                               height: 450,
-      //                               child: MediaPicker(
-      //                                 textController: _messageController,
-      //                                 onGifSelected: _onGifSelected,
-      //                               ),
-      //                             ),
-      //                           ],
-      //                           child: inputRow,
-      //                         )
-      //                       : inputRow,
-      //                 ),
-      //                 if (platform.isMobile && _showMediaPicker)
-      //                   SizedBox(
-      //                     height: 400,
-      //                     child: MediaPicker(
-      //                       textController: _messageController,
-      //                       onGifSelected: _onGifSelected,
-      //                     ),
-      //                   ),
-      //               ],
-      //             ),
-      //           ),
-      //         ],
-      //       ),
+                return ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  reverse: true,
+                  itemCount: messages.length,
+                  itemBuilder: (context, index) {
+                    final chronoIndex = messages.length - 1 - index;
+                    final message = messages[chronoIndex];
+                    final isReceived = message.senderId != actorId;
+
+                    final prevMsg = messages.getOrNull(chronoIndex - 1);
+                    final nextMsg = messages.getOrNull(chronoIndex + 1);
+
+                    final DateTime? prevTime =
+                        (prevMsg?.senderId == message.senderId)
+                        ? prevMsg?.receivedAt
+                        : null;
+                    final DateTime? nextTime =
+                        (nextMsg?.senderId == message.senderId)
+                        ? nextMsg?.receivedAt
+                        : null;
+
+                    var isFirstOfDate = false;
+                    if (prevMsg == null) {
+                      isFirstOfDate = true;
+                    } else {
+                      final d1 = message.receivedAt;
+                      final d2 = prevMsg.receivedAt;
+                      isFirstOfDate =
+                          d1.year != d2.year ||
+                          d1.month != d2.month ||
+                          d1.day != d2.day;
+                    }
+
+                    final messageWidget = MessageWidget(
+                      isReceived: isReceived,
+                      message: message,
+                      position: _determinePosition(
+                        prevTime,
+                        message.receivedAt,
+                        nextTime,
+                      ),
+                    );
+
+                    if (isFirstOfDate) {
+                      return Column(
+                        children: [
+                          DateChip(time: message.receivedAt),
+                          messageWidget,
+                        ],
+                      );
+                    }
+                    return messageWidget;
+                  },
+                );
+              },
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (error, stack) {
+                debugPrint(error.toString());
+                return Center(child: Text('Could not load messages: $error'));
+              },
+            ),
+          ),
+          SafeArea(
+            top: false,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: !platform.isMobile
+                      ? MenuAnchor(
+                          controller: _menuController,
+                          menuChildren: [
+                            SizedBox(
+                              width: 380,
+                              height: 450,
+                              // child: MediaPicker(
+                              //   textController: _messageController,
+                              //   onGifSelected: _onGifSelected,
+                              // ),
+                            ),
+                          ],
+                          child: inputRow,
+                        )
+                      : inputRow,
+                ),
+                if (platform.isMobile && _showMediaPicker)
+                  SizedBox(
+                    height: 400,
+                    // child: MediaPicker(
+                    //   textController: _messageController,
+                    //   onGifSelected: _onGifSelected,
+                    // ),
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

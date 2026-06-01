@@ -298,6 +298,12 @@ class AppLocalizationsHi extends AppLocalizations {
   String get newMessage => 'नया संदेश';
 
   @override
+  String get noMessagesYet => 'अभी तक कोई संदेश नहीं';
+
+  @override
+  String get typeAMessage => 'एक संदेश लिखें';
+
+  @override
   String get newPasswordMustBeDifferent => 'नया पासवर्ड भिन्न होना चाहिए';
 
   @override
@@ -565,6 +571,12 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get imageSavedToGallery => 'छवि गैलरी में सहेजी गई';
+
+  @override
+  String get today => 'आज';
+
+  @override
+  String get yesterday => 'कल';
 
   @override
   String get repostLoadFailed => 'यह पोस्ट लोड नहीं हो सकी';

@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:ecp/ecp.dart';
+import 'package:flutter/foundation.dart';
 import 'database.dart';
 import 'mappers.dart';
 
@@ -12,6 +13,8 @@ class AppStorage extends Storage {
         mlsCredentialStore: _DriftMlsCredentialStore(_db),
         capabilitiesStore: _DriftCapabilitiesStore(_db),
         groupStore: _DriftGroupStore(_db),
+        messageStore: _DriftMessageStore(_db),
+        processedObjectStore: _DriftProcessedObjectStore(_db),
       );
 
   @override
@@ -22,6 +25,9 @@ class AppStorage extends Storage {
       await _db.delete(_db.capabilities).go();
       await _db.delete(_db.mlsGroups).go();
       await _db.delete(_db.mlsEngineConfigs).go();
+      await _db.delete(_db.processedObjects).go();
+      await _db.delete(_db.storedMessages).go();
+      await _db.delete(_db.messageAttachments).go();
     });
   }
 }
@@ -138,5 +144,61 @@ class _DriftGroupStore implements GroupStore {
             displayName: Value.absentIfNull(displayName),
           ),
         );
+  }
+}
+
+class _DriftMessageStore implements MessageStore {
+  final AppDatabase _db;
+  _DriftMessageStore(this._db);
+
+  @override
+  Future<void> saveMessage(StoredMessage message) async {
+    debugPrint('[AppStorage] saving message with content: ${message.content}');
+
+    await _db.transaction(() async {
+      await _db
+          .into(_db.storedMessages)
+          .insertOnConflictUpdate(
+            StoredMessagesCompanion.insert(
+              serverActivityId: message.serverActivityId,
+              groupId: message.groupId,
+              receivedAt: message.receivedAt,
+              senderId: message.senderId,
+              id: message.id,
+              content: Value(message.content),
+              inReplyTo: Value(message.inReplyTo),
+            ),
+          );
+      for (final attachmentId in message.attachment) {
+        await _db
+            .into(_db.messageAttachments)
+            .insert(
+              MessageAttachmentsCompanion.insert(
+                messageId: message.serverActivityId,
+                attachmentId: attachmentId,
+              ),
+            );
+      }
+    });
+  }
+}
+
+class _DriftProcessedObjectStore implements ProcessedObjectStore {
+  final AppDatabase _db;
+  _DriftProcessedObjectStore(this._db);
+
+  @override
+  Future<void> add(Uri id) async {
+    await _db
+        .into(_db.processedObjects)
+        .insertOnConflictUpdate(ProcessedObjectRow(id: id));
+  }
+
+  @override
+  Future<bool> check(Uri id) async {
+    final row = await (_db.select(
+      _db.processedObjects,
+    )..where((t) => t.id.equals(id.toString()))).getSingleOrNull();
+    return row != null;
   }
 }

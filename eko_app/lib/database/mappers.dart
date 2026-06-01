@@ -25,6 +25,20 @@ extension MlsGroupRowMapper on MlsGroupRow {
   }
 }
 
+extension StoredMessageRowMapper on StoredMessageRow {
+  StoredMessage toMessage() {
+    return StoredMessage(
+      content: content,
+      serverActivityId: serverActivityId,
+      receivedAt: receivedAt,
+      senderId: senderId,
+      id: id,
+      attachment: [],
+      groupId: groupId,
+    );
+  }
+}
+
 extension MlsEngineConfigRowMapper on MlsEngineConfigRow {
   MlsEngineConfig toConfig() {
     return MlsEngineConfig(dbPath: dbPath, encryptionKey: encryptionKey);

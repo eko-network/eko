@@ -62,6 +62,7 @@ class RequireEcp extends ConsumerWidget {
       return _e(context);
     }
     debugPrint('[RequireEcp] ecpProvider satisfied');
+    ref.watch(inboxPollingProvider);
     return child;
   }
 }

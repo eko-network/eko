@@ -12,13 +12,13 @@ class ProfilePicture extends ConsumerWidget {
   final bool onlineIndicatorEnabled;
   final void Function()? onPressed;
   final EdgeInsets? padding;
-  final double size;
+  final double? size;
   const ProfilePicture({
     required this.uid,
     this.onlineIndicatorEnabled = true,
     this.onPressed,
     this.padding,
-    required this.size,
+    this.size,
     super.key,
   });
 

@@ -299,6 +299,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get newMessage => 'New message';
 
   @override
+  String get noMessagesYet => 'No messages yet';
+
+  @override
+  String get typeAMessage => 'Type a message';
+
+  @override
   String get newPasswordMustBeDifferent => 'New Password Must be Different';
 
   @override
@@ -565,6 +571,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get imageSavedToGallery => 'Image saved to gallery';
+
+  @override
+  String get today => 'Today';
+
+  @override
+  String get yesterday => 'Yesterday';
 
   @override
   String get repostLoadFailed => 'Could not load this post';

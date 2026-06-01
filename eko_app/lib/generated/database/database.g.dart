@@ -1534,6 +1534,859 @@ class MlsEngineConfigsCompanion extends UpdateCompanion<MlsEngineConfigRow> {
   }
 }
 
+class $ProcessedObjectsTable extends ProcessedObjects
+    with TableInfo<$ProcessedObjectsTable, ProcessedObjectRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ProcessedObjectsTable(this.attachedDatabase, [this._alias]);
+  @override
+  late final GeneratedColumnWithTypeConverter<Uri, String> id =
+      GeneratedColumn<String>(
+        'id',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<Uri>($ProcessedObjectsTable.$converterid);
+  @override
+  List<GeneratedColumn> get $columns => [id];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'processed_objects';
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  ProcessedObjectRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ProcessedObjectRow(
+      id: $ProcessedObjectsTable.$converterid.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}id'],
+        )!,
+      ),
+    );
+  }
+
+  @override
+  $ProcessedObjectsTable createAlias(String alias) {
+    return $ProcessedObjectsTable(attachedDatabase, alias);
+  }
+
+  static TypeConverter<Uri, String> $converterid = const UriTypeConverter();
+}
+
+class ProcessedObjectRow extends DataClass
+    implements Insertable<ProcessedObjectRow> {
+  final Uri id;
+  const ProcessedObjectRow({required this.id});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    {
+      map['id'] = Variable<String>(
+        $ProcessedObjectsTable.$converterid.toSql(id),
+      );
+    }
+    return map;
+  }
+
+  ProcessedObjectsCompanion toCompanion(bool nullToAbsent) {
+    return ProcessedObjectsCompanion(id: Value(id));
+  }
+
+  factory ProcessedObjectRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ProcessedObjectRow(id: serializer.fromJson<Uri>(json['id']));
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{'id': serializer.toJson<Uri>(id)};
+  }
+
+  ProcessedObjectRow copyWith({Uri? id}) =>
+      ProcessedObjectRow(id: id ?? this.id);
+  ProcessedObjectRow copyWithCompanion(ProcessedObjectsCompanion data) {
+    return ProcessedObjectRow(id: data.id.present ? data.id.value : this.id);
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ProcessedObjectRow(')
+          ..write('id: $id')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => id.hashCode;
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ProcessedObjectRow && other.id == this.id);
+}
+
+class ProcessedObjectsCompanion extends UpdateCompanion<ProcessedObjectRow> {
+  final Value<Uri> id;
+  final Value<int> rowid;
+  const ProcessedObjectsCompanion({
+    this.id = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ProcessedObjectsCompanion.insert({
+    required Uri id,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id);
+  static Insertable<ProcessedObjectRow> custom({
+    Expression<String>? id,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ProcessedObjectsCompanion copyWith({Value<Uri>? id, Value<int>? rowid}) {
+    return ProcessedObjectsCompanion(
+      id: id ?? this.id,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(
+        $ProcessedObjectsTable.$converterid.toSql(id.value),
+      );
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ProcessedObjectsCompanion(')
+          ..write('id: $id, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $StoredMessagesTable extends StoredMessages
+    with TableInfo<$StoredMessagesTable, StoredMessageRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $StoredMessagesTable(this.attachedDatabase, [this._alias]);
+  @override
+  late final GeneratedColumnWithTypeConverter<Uri, String> serverActivityId =
+      GeneratedColumn<String>(
+        'server_activity_id',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<Uri>($StoredMessagesTable.$converterserverActivityId);
+  static const VerificationMeta _receivedAtMeta = const VerificationMeta(
+    'receivedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> receivedAt = GeneratedColumn<DateTime>(
+    'received_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<Uri, String> senderId =
+      GeneratedColumn<String>(
+        'sender_id',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<Uri>($StoredMessagesTable.$convertersenderId);
+  @override
+  late final GeneratedColumnWithTypeConverter<InternalId, String> id =
+      GeneratedColumn<String>(
+        'id',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<InternalId>($StoredMessagesTable.$converterid);
+  static const VerificationMeta _contentMeta = const VerificationMeta(
+    'content',
+  );
+  @override
+  late final GeneratedColumn<String> content = GeneratedColumn<String>(
+    'content',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _groupIdMeta = const VerificationMeta(
+    'groupId',
+  );
+  @override
+  late final GeneratedColumn<Uint8List> groupId = GeneratedColumn<Uint8List>(
+    'group_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.blob,
+    requiredDuringInsert: true,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<InternalId?, String> inReplyTo =
+      GeneratedColumn<String>(
+        'in_reply_to',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      ).withConverter<InternalId?>($StoredMessagesTable.$converterinReplyTon);
+  @override
+  List<GeneratedColumn> get $columns => [
+    serverActivityId,
+    receivedAt,
+    senderId,
+    id,
+    content,
+    groupId,
+    inReplyTo,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'stored_messages';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<StoredMessageRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('received_at')) {
+      context.handle(
+        _receivedAtMeta,
+        receivedAt.isAcceptableOrUnknown(data['received_at']!, _receivedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_receivedAtMeta);
+    }
+    if (data.containsKey('content')) {
+      context.handle(
+        _contentMeta,
+        content.isAcceptableOrUnknown(data['content']!, _contentMeta),
+      );
+    }
+    if (data.containsKey('group_id')) {
+      context.handle(
+        _groupIdMeta,
+        groupId.isAcceptableOrUnknown(data['group_id']!, _groupIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_groupIdMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {serverActivityId};
+  @override
+  StoredMessageRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return StoredMessageRow(
+      serverActivityId: $StoredMessagesTable.$converterserverActivityId.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}server_activity_id'],
+        )!,
+      ),
+      receivedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}received_at'],
+      )!,
+      senderId: $StoredMessagesTable.$convertersenderId.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}sender_id'],
+        )!,
+      ),
+      id: $StoredMessagesTable.$converterid.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}id'],
+        )!,
+      ),
+      content: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}content'],
+      ),
+      groupId: attachedDatabase.typeMapping.read(
+        DriftSqlType.blob,
+        data['${effectivePrefix}group_id'],
+      )!,
+      inReplyTo: $StoredMessagesTable.$converterinReplyTon.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}in_reply_to'],
+        ),
+      ),
+    );
+  }
+
+  @override
+  $StoredMessagesTable createAlias(String alias) {
+    return $StoredMessagesTable(attachedDatabase, alias);
+  }
+
+  static TypeConverter<Uri, String> $converterserverActivityId =
+      const UriTypeConverter();
+  static TypeConverter<Uri, String> $convertersenderId =
+      const UriTypeConverter();
+  static TypeConverter<InternalId, String> $converterid =
+      const InternalIdConverter();
+  static TypeConverter<InternalId, String> $converterinReplyTo =
+      const InternalIdConverter();
+  static TypeConverter<InternalId?, String?> $converterinReplyTon =
+      NullAwareTypeConverter.wrap($converterinReplyTo);
+}
+
+class StoredMessageRow extends DataClass
+    implements Insertable<StoredMessageRow> {
+  final Uri serverActivityId;
+  final DateTime receivedAt;
+  final Uri senderId;
+  final InternalId id;
+  final String? content;
+  final Uint8List groupId;
+  final InternalId? inReplyTo;
+  const StoredMessageRow({
+    required this.serverActivityId,
+    required this.receivedAt,
+    required this.senderId,
+    required this.id,
+    this.content,
+    required this.groupId,
+    this.inReplyTo,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    {
+      map['server_activity_id'] = Variable<String>(
+        $StoredMessagesTable.$converterserverActivityId.toSql(serverActivityId),
+      );
+    }
+    map['received_at'] = Variable<DateTime>(receivedAt);
+    {
+      map['sender_id'] = Variable<String>(
+        $StoredMessagesTable.$convertersenderId.toSql(senderId),
+      );
+    }
+    {
+      map['id'] = Variable<String>($StoredMessagesTable.$converterid.toSql(id));
+    }
+    if (!nullToAbsent || content != null) {
+      map['content'] = Variable<String>(content);
+    }
+    map['group_id'] = Variable<Uint8List>(groupId);
+    if (!nullToAbsent || inReplyTo != null) {
+      map['in_reply_to'] = Variable<String>(
+        $StoredMessagesTable.$converterinReplyTon.toSql(inReplyTo),
+      );
+    }
+    return map;
+  }
+
+  StoredMessagesCompanion toCompanion(bool nullToAbsent) {
+    return StoredMessagesCompanion(
+      serverActivityId: Value(serverActivityId),
+      receivedAt: Value(receivedAt),
+      senderId: Value(senderId),
+      id: Value(id),
+      content: content == null && nullToAbsent
+          ? const Value.absent()
+          : Value(content),
+      groupId: Value(groupId),
+      inReplyTo: inReplyTo == null && nullToAbsent
+          ? const Value.absent()
+          : Value(inReplyTo),
+    );
+  }
+
+  factory StoredMessageRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return StoredMessageRow(
+      serverActivityId: serializer.fromJson<Uri>(json['serverActivityId']),
+      receivedAt: serializer.fromJson<DateTime>(json['receivedAt']),
+      senderId: serializer.fromJson<Uri>(json['senderId']),
+      id: serializer.fromJson<InternalId>(json['id']),
+      content: serializer.fromJson<String?>(json['content']),
+      groupId: serializer.fromJson<Uint8List>(json['groupId']),
+      inReplyTo: serializer.fromJson<InternalId?>(json['inReplyTo']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'serverActivityId': serializer.toJson<Uri>(serverActivityId),
+      'receivedAt': serializer.toJson<DateTime>(receivedAt),
+      'senderId': serializer.toJson<Uri>(senderId),
+      'id': serializer.toJson<InternalId>(id),
+      'content': serializer.toJson<String?>(content),
+      'groupId': serializer.toJson<Uint8List>(groupId),
+      'inReplyTo': serializer.toJson<InternalId?>(inReplyTo),
+    };
+  }
+
+  StoredMessageRow copyWith({
+    Uri? serverActivityId,
+    DateTime? receivedAt,
+    Uri? senderId,
+    InternalId? id,
+    Value<String?> content = const Value.absent(),
+    Uint8List? groupId,
+    Value<InternalId?> inReplyTo = const Value.absent(),
+  }) => StoredMessageRow(
+    serverActivityId: serverActivityId ?? this.serverActivityId,
+    receivedAt: receivedAt ?? this.receivedAt,
+    senderId: senderId ?? this.senderId,
+    id: id ?? this.id,
+    content: content.present ? content.value : this.content,
+    groupId: groupId ?? this.groupId,
+    inReplyTo: inReplyTo.present ? inReplyTo.value : this.inReplyTo,
+  );
+  StoredMessageRow copyWithCompanion(StoredMessagesCompanion data) {
+    return StoredMessageRow(
+      serverActivityId: data.serverActivityId.present
+          ? data.serverActivityId.value
+          : this.serverActivityId,
+      receivedAt: data.receivedAt.present
+          ? data.receivedAt.value
+          : this.receivedAt,
+      senderId: data.senderId.present ? data.senderId.value : this.senderId,
+      id: data.id.present ? data.id.value : this.id,
+      content: data.content.present ? data.content.value : this.content,
+      groupId: data.groupId.present ? data.groupId.value : this.groupId,
+      inReplyTo: data.inReplyTo.present ? data.inReplyTo.value : this.inReplyTo,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('StoredMessageRow(')
+          ..write('serverActivityId: $serverActivityId, ')
+          ..write('receivedAt: $receivedAt, ')
+          ..write('senderId: $senderId, ')
+          ..write('id: $id, ')
+          ..write('content: $content, ')
+          ..write('groupId: $groupId, ')
+          ..write('inReplyTo: $inReplyTo')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    serverActivityId,
+    receivedAt,
+    senderId,
+    id,
+    content,
+    $driftBlobEquality.hash(groupId),
+    inReplyTo,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is StoredMessageRow &&
+          other.serverActivityId == this.serverActivityId &&
+          other.receivedAt == this.receivedAt &&
+          other.senderId == this.senderId &&
+          other.id == this.id &&
+          other.content == this.content &&
+          $driftBlobEquality.equals(other.groupId, this.groupId) &&
+          other.inReplyTo == this.inReplyTo);
+}
+
+class StoredMessagesCompanion extends UpdateCompanion<StoredMessageRow> {
+  final Value<Uri> serverActivityId;
+  final Value<DateTime> receivedAt;
+  final Value<Uri> senderId;
+  final Value<InternalId> id;
+  final Value<String?> content;
+  final Value<Uint8List> groupId;
+  final Value<InternalId?> inReplyTo;
+  final Value<int> rowid;
+  const StoredMessagesCompanion({
+    this.serverActivityId = const Value.absent(),
+    this.receivedAt = const Value.absent(),
+    this.senderId = const Value.absent(),
+    this.id = const Value.absent(),
+    this.content = const Value.absent(),
+    this.groupId = const Value.absent(),
+    this.inReplyTo = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  StoredMessagesCompanion.insert({
+    required Uri serverActivityId,
+    required DateTime receivedAt,
+    required Uri senderId,
+    required InternalId id,
+    this.content = const Value.absent(),
+    required Uint8List groupId,
+    this.inReplyTo = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : serverActivityId = Value(serverActivityId),
+       receivedAt = Value(receivedAt),
+       senderId = Value(senderId),
+       id = Value(id),
+       groupId = Value(groupId);
+  static Insertable<StoredMessageRow> custom({
+    Expression<String>? serverActivityId,
+    Expression<DateTime>? receivedAt,
+    Expression<String>? senderId,
+    Expression<String>? id,
+    Expression<String>? content,
+    Expression<Uint8List>? groupId,
+    Expression<String>? inReplyTo,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (serverActivityId != null) 'server_activity_id': serverActivityId,
+      if (receivedAt != null) 'received_at': receivedAt,
+      if (senderId != null) 'sender_id': senderId,
+      if (id != null) 'id': id,
+      if (content != null) 'content': content,
+      if (groupId != null) 'group_id': groupId,
+      if (inReplyTo != null) 'in_reply_to': inReplyTo,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  StoredMessagesCompanion copyWith({
+    Value<Uri>? serverActivityId,
+    Value<DateTime>? receivedAt,
+    Value<Uri>? senderId,
+    Value<InternalId>? id,
+    Value<String?>? content,
+    Value<Uint8List>? groupId,
+    Value<InternalId?>? inReplyTo,
+    Value<int>? rowid,
+  }) {
+    return StoredMessagesCompanion(
+      serverActivityId: serverActivityId ?? this.serverActivityId,
+      receivedAt: receivedAt ?? this.receivedAt,
+      senderId: senderId ?? this.senderId,
+      id: id ?? this.id,
+      content: content ?? this.content,
+      groupId: groupId ?? this.groupId,
+      inReplyTo: inReplyTo ?? this.inReplyTo,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (serverActivityId.present) {
+      map['server_activity_id'] = Variable<String>(
+        $StoredMessagesTable.$converterserverActivityId.toSql(
+          serverActivityId.value,
+        ),
+      );
+    }
+    if (receivedAt.present) {
+      map['received_at'] = Variable<DateTime>(receivedAt.value);
+    }
+    if (senderId.present) {
+      map['sender_id'] = Variable<String>(
+        $StoredMessagesTable.$convertersenderId.toSql(senderId.value),
+      );
+    }
+    if (id.present) {
+      map['id'] = Variable<String>(
+        $StoredMessagesTable.$converterid.toSql(id.value),
+      );
+    }
+    if (content.present) {
+      map['content'] = Variable<String>(content.value);
+    }
+    if (groupId.present) {
+      map['group_id'] = Variable<Uint8List>(groupId.value);
+    }
+    if (inReplyTo.present) {
+      map['in_reply_to'] = Variable<String>(
+        $StoredMessagesTable.$converterinReplyTon.toSql(inReplyTo.value),
+      );
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('StoredMessagesCompanion(')
+          ..write('serverActivityId: $serverActivityId, ')
+          ..write('receivedAt: $receivedAt, ')
+          ..write('senderId: $senderId, ')
+          ..write('id: $id, ')
+          ..write('content: $content, ')
+          ..write('groupId: $groupId, ')
+          ..write('inReplyTo: $inReplyTo, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $MessageAttachmentsTable extends MessageAttachments
+    with TableInfo<$MessageAttachmentsTable, MessageAttachmentRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $MessageAttachmentsTable(this.attachedDatabase, [this._alias]);
+  @override
+  late final GeneratedColumnWithTypeConverter<Uri, String> messageId =
+      GeneratedColumn<String>(
+        'message_id',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+        defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'REFERENCES stored_messages (server_activity_id)',
+        ),
+      ).withConverter<Uri>($MessageAttachmentsTable.$convertermessageId);
+  @override
+  late final GeneratedColumnWithTypeConverter<InternalId, String> attachmentId =
+      GeneratedColumn<String>(
+        'attachment_id',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<InternalId>(
+        $MessageAttachmentsTable.$converterattachmentId,
+      );
+  @override
+  List<GeneratedColumn> get $columns => [messageId, attachmentId];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'message_attachments';
+  @override
+  Set<GeneratedColumn> get $primaryKey => const {};
+  @override
+  MessageAttachmentRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return MessageAttachmentRow(
+      messageId: $MessageAttachmentsTable.$convertermessageId.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}message_id'],
+        )!,
+      ),
+      attachmentId: $MessageAttachmentsTable.$converterattachmentId.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}attachment_id'],
+        )!,
+      ),
+    );
+  }
+
+  @override
+  $MessageAttachmentsTable createAlias(String alias) {
+    return $MessageAttachmentsTable(attachedDatabase, alias);
+  }
+
+  static TypeConverter<Uri, String> $convertermessageId =
+      const UriTypeConverter();
+  static TypeConverter<InternalId, String> $converterattachmentId =
+      const InternalIdConverter();
+}
+
+class MessageAttachmentRow extends DataClass
+    implements Insertable<MessageAttachmentRow> {
+  final Uri messageId;
+  final InternalId attachmentId;
+  const MessageAttachmentRow({
+    required this.messageId,
+    required this.attachmentId,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    {
+      map['message_id'] = Variable<String>(
+        $MessageAttachmentsTable.$convertermessageId.toSql(messageId),
+      );
+    }
+    {
+      map['attachment_id'] = Variable<String>(
+        $MessageAttachmentsTable.$converterattachmentId.toSql(attachmentId),
+      );
+    }
+    return map;
+  }
+
+  MessageAttachmentsCompanion toCompanion(bool nullToAbsent) {
+    return MessageAttachmentsCompanion(
+      messageId: Value(messageId),
+      attachmentId: Value(attachmentId),
+    );
+  }
+
+  factory MessageAttachmentRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return MessageAttachmentRow(
+      messageId: serializer.fromJson<Uri>(json['messageId']),
+      attachmentId: serializer.fromJson<InternalId>(json['attachmentId']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'messageId': serializer.toJson<Uri>(messageId),
+      'attachmentId': serializer.toJson<InternalId>(attachmentId),
+    };
+  }
+
+  MessageAttachmentRow copyWith({Uri? messageId, InternalId? attachmentId}) =>
+      MessageAttachmentRow(
+        messageId: messageId ?? this.messageId,
+        attachmentId: attachmentId ?? this.attachmentId,
+      );
+  MessageAttachmentRow copyWithCompanion(MessageAttachmentsCompanion data) {
+    return MessageAttachmentRow(
+      messageId: data.messageId.present ? data.messageId.value : this.messageId,
+      attachmentId: data.attachmentId.present
+          ? data.attachmentId.value
+          : this.attachmentId,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MessageAttachmentRow(')
+          ..write('messageId: $messageId, ')
+          ..write('attachmentId: $attachmentId')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(messageId, attachmentId);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is MessageAttachmentRow &&
+          other.messageId == this.messageId &&
+          other.attachmentId == this.attachmentId);
+}
+
+class MessageAttachmentsCompanion
+    extends UpdateCompanion<MessageAttachmentRow> {
+  final Value<Uri> messageId;
+  final Value<InternalId> attachmentId;
+  final Value<int> rowid;
+  const MessageAttachmentsCompanion({
+    this.messageId = const Value.absent(),
+    this.attachmentId = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  MessageAttachmentsCompanion.insert({
+    required Uri messageId,
+    required InternalId attachmentId,
+    this.rowid = const Value.absent(),
+  }) : messageId = Value(messageId),
+       attachmentId = Value(attachmentId);
+  static Insertable<MessageAttachmentRow> custom({
+    Expression<String>? messageId,
+    Expression<String>? attachmentId,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (messageId != null) 'message_id': messageId,
+      if (attachmentId != null) 'attachment_id': attachmentId,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  MessageAttachmentsCompanion copyWith({
+    Value<Uri>? messageId,
+    Value<InternalId>? attachmentId,
+    Value<int>? rowid,
+  }) {
+    return MessageAttachmentsCompanion(
+      messageId: messageId ?? this.messageId,
+      attachmentId: attachmentId ?? this.attachmentId,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (messageId.present) {
+      map['message_id'] = Variable<String>(
+        $MessageAttachmentsTable.$convertermessageId.toSql(messageId.value),
+      );
+    }
+    if (attachmentId.present) {
+      map['attachment_id'] = Variable<String>(
+        $MessageAttachmentsTable.$converterattachmentId.toSql(
+          attachmentId.value,
+        ),
+      );
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MessageAttachmentsCompanion(')
+          ..write('messageId: $messageId, ')
+          ..write('attachmentId: $attachmentId, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -1544,6 +2397,12 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $MlsEngineConfigsTable mlsEngineConfigs = $MlsEngineConfigsTable(
     this,
   );
+  late final $ProcessedObjectsTable processedObjects = $ProcessedObjectsTable(
+    this,
+  );
+  late final $StoredMessagesTable storedMessages = $StoredMessagesTable(this);
+  late final $MessageAttachmentsTable messageAttachments =
+      $MessageAttachmentsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -1554,6 +2413,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     mlsKeyPackages,
     mlsGroups,
     mlsEngineConfigs,
+    processedObjects,
+    storedMessages,
+    messageAttachments,
   ];
 }
 
@@ -2458,6 +3320,785 @@ typedef $$MlsEngineConfigsTableProcessedTableManager =
       MlsEngineConfigRow,
       PrefetchHooks Function()
     >;
+typedef $$ProcessedObjectsTableCreateCompanionBuilder =
+    ProcessedObjectsCompanion Function({required Uri id, Value<int> rowid});
+typedef $$ProcessedObjectsTableUpdateCompanionBuilder =
+    ProcessedObjectsCompanion Function({Value<Uri> id, Value<int> rowid});
+
+class $$ProcessedObjectsTableFilterComposer
+    extends Composer<_$AppDatabase, $ProcessedObjectsTable> {
+  $$ProcessedObjectsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnWithTypeConverterFilters<Uri, Uri, String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+}
+
+class $$ProcessedObjectsTableOrderingComposer
+    extends Composer<_$AppDatabase, $ProcessedObjectsTable> {
+  $$ProcessedObjectsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$ProcessedObjectsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ProcessedObjectsTable> {
+  $$ProcessedObjectsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumnWithTypeConverter<Uri, String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+}
+
+class $$ProcessedObjectsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ProcessedObjectsTable,
+          ProcessedObjectRow,
+          $$ProcessedObjectsTableFilterComposer,
+          $$ProcessedObjectsTableOrderingComposer,
+          $$ProcessedObjectsTableAnnotationComposer,
+          $$ProcessedObjectsTableCreateCompanionBuilder,
+          $$ProcessedObjectsTableUpdateCompanionBuilder,
+          (
+            ProcessedObjectRow,
+            BaseReferences<
+              _$AppDatabase,
+              $ProcessedObjectsTable,
+              ProcessedObjectRow
+            >,
+          ),
+          ProcessedObjectRow,
+          PrefetchHooks Function()
+        > {
+  $$ProcessedObjectsTableTableManager(
+    _$AppDatabase db,
+    $ProcessedObjectsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ProcessedObjectsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ProcessedObjectsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ProcessedObjectsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<Uri> id = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ProcessedObjectsCompanion(id: id, rowid: rowid),
+          createCompanionCallback:
+              ({required Uri id, Value<int> rowid = const Value.absent()}) =>
+                  ProcessedObjectsCompanion.insert(id: id, rowid: rowid),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$ProcessedObjectsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ProcessedObjectsTable,
+      ProcessedObjectRow,
+      $$ProcessedObjectsTableFilterComposer,
+      $$ProcessedObjectsTableOrderingComposer,
+      $$ProcessedObjectsTableAnnotationComposer,
+      $$ProcessedObjectsTableCreateCompanionBuilder,
+      $$ProcessedObjectsTableUpdateCompanionBuilder,
+      (
+        ProcessedObjectRow,
+        BaseReferences<
+          _$AppDatabase,
+          $ProcessedObjectsTable,
+          ProcessedObjectRow
+        >,
+      ),
+      ProcessedObjectRow,
+      PrefetchHooks Function()
+    >;
+typedef $$StoredMessagesTableCreateCompanionBuilder =
+    StoredMessagesCompanion Function({
+      required Uri serverActivityId,
+      required DateTime receivedAt,
+      required Uri senderId,
+      required InternalId id,
+      Value<String?> content,
+      required Uint8List groupId,
+      Value<InternalId?> inReplyTo,
+      Value<int> rowid,
+    });
+typedef $$StoredMessagesTableUpdateCompanionBuilder =
+    StoredMessagesCompanion Function({
+      Value<Uri> serverActivityId,
+      Value<DateTime> receivedAt,
+      Value<Uri> senderId,
+      Value<InternalId> id,
+      Value<String?> content,
+      Value<Uint8List> groupId,
+      Value<InternalId?> inReplyTo,
+      Value<int> rowid,
+    });
+
+final class $$StoredMessagesTableReferences
+    extends
+        BaseReferences<_$AppDatabase, $StoredMessagesTable, StoredMessageRow> {
+  $$StoredMessagesTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static MultiTypedResultKey<
+    $MessageAttachmentsTable,
+    List<MessageAttachmentRow>
+  >
+  _messageAttachmentsRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.messageAttachments,
+        aliasName: $_aliasNameGenerator(
+          db.storedMessages.serverActivityId,
+          db.messageAttachments.messageId,
+        ),
+      );
+
+  $$MessageAttachmentsTableProcessedTableManager get messageAttachmentsRefs {
+    final manager =
+        $$MessageAttachmentsTableTableManager(
+          $_db,
+          $_db.messageAttachments,
+        ).filter(
+          (f) => f.messageId.serverActivityId.sqlEquals(
+            $_itemColumn<String>('server_activity_id')!,
+          ),
+        );
+
+    final cache = $_typedResult.readTableOrNull(
+      _messageAttachmentsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$StoredMessagesTableFilterComposer
+    extends Composer<_$AppDatabase, $StoredMessagesTable> {
+  $$StoredMessagesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnWithTypeConverterFilters<Uri, Uri, String> get serverActivityId =>
+      $composableBuilder(
+        column: $table.serverActivityId,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
+  ColumnFilters<DateTime> get receivedAt => $composableBuilder(
+    column: $table.receivedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<Uri, Uri, String> get senderId =>
+      $composableBuilder(
+        column: $table.senderId,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
+  ColumnWithTypeConverterFilters<InternalId, InternalId, String> get id =>
+      $composableBuilder(
+        column: $table.id,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
+  ColumnFilters<String> get content => $composableBuilder(
+    column: $table.content,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<Uint8List> get groupId => $composableBuilder(
+    column: $table.groupId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<InternalId?, InternalId, String>
+  get inReplyTo => $composableBuilder(
+    column: $table.inReplyTo,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  Expression<bool> messageAttachmentsRefs(
+    Expression<bool> Function($$MessageAttachmentsTableFilterComposer f) f,
+  ) {
+    final $$MessageAttachmentsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.serverActivityId,
+      referencedTable: $db.messageAttachments,
+      getReferencedColumn: (t) => t.messageId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MessageAttachmentsTableFilterComposer(
+            $db: $db,
+            $table: $db.messageAttachments,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$StoredMessagesTableOrderingComposer
+    extends Composer<_$AppDatabase, $StoredMessagesTable> {
+  $$StoredMessagesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get serverActivityId => $composableBuilder(
+    column: $table.serverActivityId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get receivedAt => $composableBuilder(
+    column: $table.receivedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get senderId => $composableBuilder(
+    column: $table.senderId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get content => $composableBuilder(
+    column: $table.content,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<Uint8List> get groupId => $composableBuilder(
+    column: $table.groupId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get inReplyTo => $composableBuilder(
+    column: $table.inReplyTo,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$StoredMessagesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $StoredMessagesTable> {
+  $$StoredMessagesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumnWithTypeConverter<Uri, String> get serverActivityId =>
+      $composableBuilder(
+        column: $table.serverActivityId,
+        builder: (column) => column,
+      );
+
+  GeneratedColumn<DateTime> get receivedAt => $composableBuilder(
+    column: $table.receivedAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumnWithTypeConverter<Uri, String> get senderId =>
+      $composableBuilder(column: $table.senderId, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<InternalId, String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get content =>
+      $composableBuilder(column: $table.content, builder: (column) => column);
+
+  GeneratedColumn<Uint8List> get groupId =>
+      $composableBuilder(column: $table.groupId, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<InternalId?, String> get inReplyTo =>
+      $composableBuilder(column: $table.inReplyTo, builder: (column) => column);
+
+  Expression<T> messageAttachmentsRefs<T extends Object>(
+    Expression<T> Function($$MessageAttachmentsTableAnnotationComposer a) f,
+  ) {
+    final $$MessageAttachmentsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.serverActivityId,
+          referencedTable: $db.messageAttachments,
+          getReferencedColumn: (t) => t.messageId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$MessageAttachmentsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.messageAttachments,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+}
+
+class $$StoredMessagesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $StoredMessagesTable,
+          StoredMessageRow,
+          $$StoredMessagesTableFilterComposer,
+          $$StoredMessagesTableOrderingComposer,
+          $$StoredMessagesTableAnnotationComposer,
+          $$StoredMessagesTableCreateCompanionBuilder,
+          $$StoredMessagesTableUpdateCompanionBuilder,
+          (StoredMessageRow, $$StoredMessagesTableReferences),
+          StoredMessageRow,
+          PrefetchHooks Function({bool messageAttachmentsRefs})
+        > {
+  $$StoredMessagesTableTableManager(
+    _$AppDatabase db,
+    $StoredMessagesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$StoredMessagesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$StoredMessagesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$StoredMessagesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<Uri> serverActivityId = const Value.absent(),
+                Value<DateTime> receivedAt = const Value.absent(),
+                Value<Uri> senderId = const Value.absent(),
+                Value<InternalId> id = const Value.absent(),
+                Value<String?> content = const Value.absent(),
+                Value<Uint8List> groupId = const Value.absent(),
+                Value<InternalId?> inReplyTo = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => StoredMessagesCompanion(
+                serverActivityId: serverActivityId,
+                receivedAt: receivedAt,
+                senderId: senderId,
+                id: id,
+                content: content,
+                groupId: groupId,
+                inReplyTo: inReplyTo,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required Uri serverActivityId,
+                required DateTime receivedAt,
+                required Uri senderId,
+                required InternalId id,
+                Value<String?> content = const Value.absent(),
+                required Uint8List groupId,
+                Value<InternalId?> inReplyTo = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => StoredMessagesCompanion.insert(
+                serverActivityId: serverActivityId,
+                receivedAt: receivedAt,
+                senderId: senderId,
+                id: id,
+                content: content,
+                groupId: groupId,
+                inReplyTo: inReplyTo,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$StoredMessagesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({messageAttachmentsRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [
+                if (messageAttachmentsRefs) db.messageAttachments,
+              ],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (messageAttachmentsRefs)
+                    await $_getPrefetchedData<
+                      StoredMessageRow,
+                      $StoredMessagesTable,
+                      MessageAttachmentRow
+                    >(
+                      currentTable: table,
+                      referencedTable: $$StoredMessagesTableReferences
+                          ._messageAttachmentsRefsTable(db),
+                      managerFromTypedResult: (p0) =>
+                          $$StoredMessagesTableReferences(
+                            db,
+                            table,
+                            p0,
+                          ).messageAttachmentsRefs,
+                      referencedItemsForCurrentItem: (item, referencedItems) =>
+                          referencedItems.where(
+                            (e) => e.messageId == item.serverActivityId,
+                          ),
+                      typedResults: items,
+                    ),
+                ];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$StoredMessagesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $StoredMessagesTable,
+      StoredMessageRow,
+      $$StoredMessagesTableFilterComposer,
+      $$StoredMessagesTableOrderingComposer,
+      $$StoredMessagesTableAnnotationComposer,
+      $$StoredMessagesTableCreateCompanionBuilder,
+      $$StoredMessagesTableUpdateCompanionBuilder,
+      (StoredMessageRow, $$StoredMessagesTableReferences),
+      StoredMessageRow,
+      PrefetchHooks Function({bool messageAttachmentsRefs})
+    >;
+typedef $$MessageAttachmentsTableCreateCompanionBuilder =
+    MessageAttachmentsCompanion Function({
+      required Uri messageId,
+      required InternalId attachmentId,
+      Value<int> rowid,
+    });
+typedef $$MessageAttachmentsTableUpdateCompanionBuilder =
+    MessageAttachmentsCompanion Function({
+      Value<Uri> messageId,
+      Value<InternalId> attachmentId,
+      Value<int> rowid,
+    });
+
+final class $$MessageAttachmentsTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $MessageAttachmentsTable,
+          MessageAttachmentRow
+        > {
+  $$MessageAttachmentsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $StoredMessagesTable _messageIdTable(_$AppDatabase db) =>
+      db.storedMessages.createAlias(
+        $_aliasNameGenerator(
+          db.messageAttachments.messageId,
+          db.storedMessages.serverActivityId,
+        ),
+      );
+
+  $$StoredMessagesTableProcessedTableManager get messageId {
+    final $_column = $_itemColumn<String>('message_id')!;
+
+    final manager = $$StoredMessagesTableTableManager(
+      $_db,
+      $_db.storedMessages,
+    ).filter((f) => f.serverActivityId.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_messageIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$MessageAttachmentsTableFilterComposer
+    extends Composer<_$AppDatabase, $MessageAttachmentsTable> {
+  $$MessageAttachmentsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnWithTypeConverterFilters<InternalId, InternalId, String>
+  get attachmentId => $composableBuilder(
+    column: $table.attachmentId,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  $$StoredMessagesTableFilterComposer get messageId {
+    final $$StoredMessagesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.messageId,
+      referencedTable: $db.storedMessages,
+      getReferencedColumn: (t) => t.serverActivityId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$StoredMessagesTableFilterComposer(
+            $db: $db,
+            $table: $db.storedMessages,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$MessageAttachmentsTableOrderingComposer
+    extends Composer<_$AppDatabase, $MessageAttachmentsTable> {
+  $$MessageAttachmentsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get attachmentId => $composableBuilder(
+    column: $table.attachmentId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$StoredMessagesTableOrderingComposer get messageId {
+    final $$StoredMessagesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.messageId,
+      referencedTable: $db.storedMessages,
+      getReferencedColumn: (t) => t.serverActivityId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$StoredMessagesTableOrderingComposer(
+            $db: $db,
+            $table: $db.storedMessages,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$MessageAttachmentsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $MessageAttachmentsTable> {
+  $$MessageAttachmentsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumnWithTypeConverter<InternalId, String> get attachmentId =>
+      $composableBuilder(
+        column: $table.attachmentId,
+        builder: (column) => column,
+      );
+
+  $$StoredMessagesTableAnnotationComposer get messageId {
+    final $$StoredMessagesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.messageId,
+      referencedTable: $db.storedMessages,
+      getReferencedColumn: (t) => t.serverActivityId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$StoredMessagesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.storedMessages,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$MessageAttachmentsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $MessageAttachmentsTable,
+          MessageAttachmentRow,
+          $$MessageAttachmentsTableFilterComposer,
+          $$MessageAttachmentsTableOrderingComposer,
+          $$MessageAttachmentsTableAnnotationComposer,
+          $$MessageAttachmentsTableCreateCompanionBuilder,
+          $$MessageAttachmentsTableUpdateCompanionBuilder,
+          (MessageAttachmentRow, $$MessageAttachmentsTableReferences),
+          MessageAttachmentRow,
+          PrefetchHooks Function({bool messageId})
+        > {
+  $$MessageAttachmentsTableTableManager(
+    _$AppDatabase db,
+    $MessageAttachmentsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$MessageAttachmentsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$MessageAttachmentsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$MessageAttachmentsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<Uri> messageId = const Value.absent(),
+                Value<InternalId> attachmentId = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => MessageAttachmentsCompanion(
+                messageId: messageId,
+                attachmentId: attachmentId,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required Uri messageId,
+                required InternalId attachmentId,
+                Value<int> rowid = const Value.absent(),
+              }) => MessageAttachmentsCompanion.insert(
+                messageId: messageId,
+                attachmentId: attachmentId,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$MessageAttachmentsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({messageId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (messageId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.messageId,
+                                referencedTable:
+                                    $$MessageAttachmentsTableReferences
+                                        ._messageIdTable(db),
+                                referencedColumn:
+                                    $$MessageAttachmentsTableReferences
+                                        ._messageIdTable(db)
+                                        .serverActivityId,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$MessageAttachmentsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $MessageAttachmentsTable,
+      MessageAttachmentRow,
+      $$MessageAttachmentsTableFilterComposer,
+      $$MessageAttachmentsTableOrderingComposer,
+      $$MessageAttachmentsTableAnnotationComposer,
+      $$MessageAttachmentsTableCreateCompanionBuilder,
+      $$MessageAttachmentsTableUpdateCompanionBuilder,
+      (MessageAttachmentRow, $$MessageAttachmentsTableReferences),
+      MessageAttachmentRow,
+      PrefetchHooks Function({bool messageId})
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -2472,4 +4113,10 @@ class $AppDatabaseManager {
       $$MlsGroupsTableTableManager(_db, _db.mlsGroups);
   $$MlsEngineConfigsTableTableManager get mlsEngineConfigs =>
       $$MlsEngineConfigsTableTableManager(_db, _db.mlsEngineConfigs);
+  $$ProcessedObjectsTableTableManager get processedObjects =>
+      $$ProcessedObjectsTableTableManager(_db, _db.processedObjects);
+  $$StoredMessagesTableTableManager get storedMessages =>
+      $$StoredMessagesTableTableManager(_db, _db.storedMessages);
+  $$MessageAttachmentsTableTableManager get messageAttachments =>
+      $$MessageAttachmentsTableTableManager(_db, _db.messageAttachments);
 }

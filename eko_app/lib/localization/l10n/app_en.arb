@@ -93,6 +93,8 @@
   "newEmail" : "New Email",
   "newLines" : "New Lines",
   "newMessage" : "New message",
+  "noMessagesYet" : "No messages yet",
+  "typeAMessage" : "Type a message",
   "newPasswordMustBeDifferent" : "New Password Must be Different",
   "next" : "Next",
   "nothingToSeeHere" : "Nothing to see here!",
@@ -192,5 +194,7 @@
   "profileLoadFailed" : "Could not load this profile",
   "profileResolveFailed" : "Could not load user",
   "imageSavedToGallery" : "Image saved to gallery",
+  "today" : "Today",
+  "yesterday" : "Yesterday",
   "repostLoadFailed" : "Could not load this post"
 }

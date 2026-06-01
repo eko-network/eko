@@ -45,7 +45,7 @@ final class AsyncEcpClientProvider
   }
 }
 
-String _$asyncEcpClientHash() => r'19f9d8f1ca4b7ced1ae9f0354f5fd3dd436183f6';
+String _$asyncEcpClientHash() => r'35be1c3deed0b89d9476cdee1232eec4a61e9cf3';
 
 @ProviderFor(ecpClient)
 final ecpClientProvider = EcpClientProvider._();
@@ -87,3 +87,43 @@ final class EcpClientProvider
 }
 
 String _$ecpClientHash() => r'0a121ddf3721a3bd707a168dfde380d995742f19';
+
+@ProviderFor(inboxPolling)
+final inboxPollingProvider = InboxPollingProvider._();
+
+final class InboxPollingProvider extends $FunctionalProvider<void, void, void>
+    with $Provider<void> {
+  InboxPollingProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'inboxPollingProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$inboxPollingHash();
+
+  @$internal
+  @override
+  $ProviderElement<void> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  void create(Ref ref) {
+    return inboxPolling(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(void value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<void>(value),
+    );
+  }
+}
+
+String _$inboxPollingHash() => r'3193221289f56da9654b9fdaad827925323ee82d';

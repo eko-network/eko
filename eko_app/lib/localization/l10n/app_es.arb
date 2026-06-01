@@ -93,6 +93,8 @@
   "newEmail" : "Correo nuevo",
   "newLines" : "Lineas nuevas",
   "newMessage" : "Nuevo mensaje",
+  "noMessagesYet" : "Aún no hay mensajes",
+  "typeAMessage" : "Escribe un mensaje",
   "newPasswordMustBeDifferent" : "La nueva contraseña debe ser diferente",
   "next" : "Luego",
   "nothingToSeeHere" : "No hay nada que ver aquí!",
@@ -185,5 +187,7 @@
   "profileLoadFailed" : "No se pudo cargar este perfil",
   "profileResolveFailed" : "No se pudo cargar el usuario",
   "imageSavedToGallery" : "Imagen guardada en la galería",
+  "today" : "Hoy",
+  "yesterday" : "Ayer",
   "repostLoadFailed" : "No se pudo cargar esta publicación"
 }

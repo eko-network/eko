@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:math';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
+import 'package:ecp/ecp.dart';
 import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:path_provider/path_provider.dart';
@@ -45,6 +46,14 @@ class UuidValueConverter extends TypeConverter<UuidValue, String> {
 
   @override
   String toSql(UuidValue value) => value.toString();
+}
+
+class InternalIdConverter extends TypeConverter<InternalId, String> {
+  const InternalIdConverter();
+  @override
+  InternalId fromSql(String fromDb) => InternalId.fromSerialized(fromDb);
+  @override
+  String toSql(InternalId value) => value.serialize();
 }
 
 class JsonValueConverter extends TypeConverter<Map<String, dynamic>, String> {
@@ -95,9 +104,6 @@ class MlsGroups extends Table {
   DateTimeColumn get lastActivityAt =>
       dateTime().withDefault(currentDateAndTime)();
   BoolColumn get isActive => boolean().withDefault(const Constant(true))();
-
-  @override
-  Set<Column> get primaryKey => {id};
 }
 
 @DataClassName('MlsEngineConfigRow')
@@ -110,6 +116,36 @@ class MlsEngineConfigs extends Table {
   Set<Column> get primaryKey => {id};
 }
 
+@DataClassName('ProcessedObjectRow')
+class ProcessedObjects extends Table {
+  TextColumn get id => text().map(const UriTypeConverter())();
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+@DataClassName('StoredMessageRow')
+class StoredMessages extends Table {
+  TextColumn get serverActivityId => text().map(const UriTypeConverter())();
+  DateTimeColumn get receivedAt => dateTime()();
+  TextColumn get senderId => text().map(const UriTypeConverter())();
+  TextColumn get id => text().map(const InternalIdConverter())();
+  TextColumn get content => text().nullable()();
+  BlobColumn get groupId => blob()();
+  TextColumn get inReplyTo =>
+      text().map(const InternalIdConverter()).nullable()();
+
+  @override
+  Set<Column> get primaryKey => {serverActivityId};
+}
+
+@DataClassName('MessageAttachmentRow')
+class MessageAttachments extends Table {
+  TextColumn get messageId => text()
+      .map(const UriTypeConverter())
+      .references(StoredMessages, #serverActivityId)();
+  TextColumn get attachmentId => text().map(const InternalIdConverter())();
+}
+
 // --- Database ---
 
 @DriftDatabase(
@@ -119,6 +155,9 @@ class MlsEngineConfigs extends Table {
     MlsKeyPackages,
     MlsGroups,
     MlsEngineConfigs,
+    ProcessedObjects,
+    StoredMessages,
+    MessageAttachments,
   ],
 )
 class AppDatabase extends _$AppDatabase {

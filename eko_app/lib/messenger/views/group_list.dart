@@ -195,7 +195,7 @@ class _ConversationListState extends ConsumerState<GroupList> {
                           final isSelected = gu.group.id == widget.selectedId;
                           return GroupCard(
                             showOnlyAvatar: showOnlyAvatar,
-                            gu: gu,
+                            group: gu,
                             isSelected: isSelected,
                             onTap: () => widget.onGroupTap(gu.group.id),
                           );

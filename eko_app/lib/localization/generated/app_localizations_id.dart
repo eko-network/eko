@@ -299,6 +299,12 @@ class AppLocalizationsId extends AppLocalizations {
   String get newMessage => 'Pesan baru';
 
   @override
+  String get noMessagesYet => 'Belum ada pesan';
+
+  @override
+  String get typeAMessage => 'Ketik pesan';
+
+  @override
   String get newPasswordMustBeDifferent => 'Kata Sandi Baru Harus Berbeda';
 
   @override
@@ -566,6 +572,12 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get imageSavedToGallery => 'Gambar disimpan ke galeri';
+
+  @override
+  String get today => 'Hari ini';
+
+  @override
+  String get yesterday => 'Kemarin';
 
   @override
   String get repostLoadFailed => 'Tidak dapat memuat postingan ini';

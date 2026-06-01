@@ -303,6 +303,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get newMessage => 'Nuevo mensaje';
 
   @override
+  String get noMessagesYet => 'Aún no hay mensajes';
+
+  @override
+  String get typeAMessage => 'Escribe un mensaje';
+
+  @override
   String get newPasswordMustBeDifferent =>
       'La nueva contraseña debe ser diferente';
 
@@ -570,6 +576,12 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get imageSavedToGallery => 'Imagen guardada en la galería';
+
+  @override
+  String get today => 'Hoy';
+
+  @override
+  String get yesterday => 'Ayer';
 
   @override
   String get repostLoadFailed => 'No se pudo cargar esta publicación';

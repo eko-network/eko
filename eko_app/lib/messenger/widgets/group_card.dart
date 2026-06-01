@@ -7,18 +7,29 @@ import 'package:eko_app/utilities/constants.dart' as c;
 import 'package:eko_app/widgets/users/profile_picture.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+part '../../generated/messenger/widgets/group_card.g.dart';
 
-class _GroupTitle extends ConsumerWidget {
-  final GroupWithUsers gu;
-  final List<String> otherUsers;
-  const _GroupTitle(this.gu, this.otherUsers);
+@riverpod
+(bool, bool, List<String>) groupMeta(Ref ref, GroupWithUsers group) {
+  final myUid = ref.watch(currentUserProvider).user.uid;
+  final otherUsers = group.users.where((uid) => uid != myUid).toList();
+  final isDm = otherUsers.length == 1;
+  final isNoteToSelf =
+      group.users.length == 1 &&
+      group.users.first == ref.watch(currentUserProvider).user.uid;
+  return (isDm, isNoteToSelf, otherUsers);
+}
+
+class GroupTitle extends ConsumerWidget {
+  final GroupWithUsers group;
+  const GroupTitle({super.key, required this.group});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isDM = otherUsers.length == 1;
-    final isNoteToSelf =
-        gu.users.length == 1 &&
-        gu.users.first == ref.watch(currentUserProvider).user.uid;
+    final (isDm, isNoteToSelf, otherUsers) = ref.watch(
+      groupMetaProvider(group),
+    );
     assert(
       isNoteToSelf || otherUsers.isNotEmpty,
       'Cannot display a group with no members',
@@ -27,17 +38,17 @@ class _GroupTitle extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     final String title = isNoteToSelf
         ? l10n.noteToSelf
-        : (!isDM && gu.group.displayName != null)
-        ? gu.group.displayName!
+        : (!isDm && group.group.displayName != null)
+        ? group.group.displayName!
         : ref
               .watch(
                 userProvider(
-                  otherUsers.isNotEmpty ? otherUsers.first : gu.users.first,
+                  otherUsers.isNotEmpty ? otherUsers.first : group.users.first,
                 ),
               )
               .when(
                 data: (data) => data.username.isNotEmpty
-                    ? '@${data.username}${isDM ? '' : ' + ${otherUsers.length - 1}'}'
+                    ? '@${data.username}${isDm ? '' : ' + ${otherUsers.length - 1}'}'
                     : l10n.error,
                 error: (_, _) => l10n.error,
                 loading: () => l10n.loadingEllipsis,
@@ -51,14 +62,35 @@ class _GroupTitle extends ConsumerWidget {
   }
 }
 
+class GroupIcon extends ConsumerWidget {
+  final GroupWithUsers group;
+  const GroupIcon({super.key, required this.group});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final (isDm, isNoteToSelf, otherUsers) = ref.watch(
+      groupMetaProvider(group),
+    );
+    assert(
+      isNoteToSelf || otherUsers.isNotEmpty,
+      'Cannot display a group with no members',
+    );
+    final displayUid = otherUsers.isNotEmpty
+        ? otherUsers.first
+        : group.users.first;
+
+    return ProfilePicture(uid: displayUid);
+  }
+}
+
 class GroupCard extends ConsumerWidget {
-  final GroupWithUsers gu;
+  final GroupWithUsers group;
   final bool isSelected;
   final VoidCallback onTap;
   final bool showOnlyAvatar;
   const GroupCard({
     super.key,
-    required this.gu,
+    required this.group,
     required this.isSelected,
     required this.onTap,
     required this.showOnlyAvatar,
@@ -66,26 +98,18 @@ class GroupCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final myUid = ref.watch(currentUserProvider).user.uid;
-    final otherUsers = gu.users.where((uid) => uid != myUid).toList();
-    final displayUid = otherUsers.isNotEmpty
-        ? otherUsers.first
-        : gu.users.first;
-
-    final width = c.widthGetter(context);
-    // TODO make a better widget for this
-    final pfp = ProfilePicture(uid: displayUid, size: width * 0.115);
+    final pfp = GroupIcon(group: group);
 
     return ListTile(
       selected: isSelected,
       leading: showOnlyAvatar ? null : pfp,
-      title: showOnlyAvatar ? pfp : _GroupTitle(gu, otherUsers),
+      title: showOnlyAvatar ? pfp : GroupTitle(group: group),
       subtitle: showOnlyAvatar
           ? null
           : Text('group', maxLines: 1, overflow: TextOverflow.ellipsis),
       trailing: showOnlyAvatar
           ? null
-          : RelativeTimeWidget(time: gu.group.lastActivityAt!),
+          : RelativeTimeWidget(time: group.group.lastActivityAt!),
       onTap: () => onTap(),
     );
   }
