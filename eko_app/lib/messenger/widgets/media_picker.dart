@@ -1,5 +1,6 @@
 import 'package:eko_app/messenger/widgets/emoji_picker.dart';
 import 'package:eko_app/messenger/widgets/gif_picker.dart';
+import 'package:eko_app/utilities/api_constants.dart' as ac;
 import 'package:flutter/material.dart';
 import 'package:klipy_dart/klipy_dart.dart';
 
@@ -25,9 +26,7 @@ class _MediaPickerState extends State<MediaPicker>
   _MediaPickerState() : klipyClient = _createKlipyClient();
 
   static KlipyClient? _createKlipyClient() {
-    const apiKey = String.fromEnvironment('KLIPY_API_KEY');
-    if (apiKey.isEmpty) return null;
-    return KlipyClient(apiKey: apiKey);
+    return KlipyClient(apiKey: ac.klipyKey);
   }
 
   @override

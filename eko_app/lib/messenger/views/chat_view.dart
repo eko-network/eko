@@ -3,6 +3,7 @@ import 'package:eko_app/localization/generated/app_localizations.dart';
 import 'package:eko_app/messenger/providers/message_provider.dart';
 import 'package:eko_app/messenger/types/group.dart';
 import 'package:eko_app/messenger/widgets/group_card.dart';
+import 'package:eko_app/messenger/widgets/media_picker.dart';
 import 'package:eko_app/messenger/widgets/message.dart';
 import 'package:eko_app/providers/ecp_provider.dart';
 import 'package:eko_app/utilities/emoji_text_style.dart';
@@ -390,10 +391,10 @@ class _ChatViewState extends ConsumerState<ChatView> {
                             SizedBox(
                               width: 380,
                               height: 450,
-                              // child: MediaPicker(
-                              //   textController: _messageController,
-                              //   onGifSelected: _onGifSelected,
-                              // ),
+                              child: MediaPicker(
+                                textController: _messageController,
+                                onGifSelected: _onGifSelected,
+                              ),
                             ),
                           ],
                           child: inputRow,
