@@ -1,16 +1,43 @@
 # eko
 
-A new Flutter project.
+# Developing
+### Setup
+In order to develop with eko-messenger, you need the following setup:
+1. Clone ecp-dart-sdk one directory above `eko/`
+2. Clone eko-messenger
+3. Clone eko
 
-## Getting Started
+### Running `eko-messenger` server
+Start the db
+```
+devenv up
+```
 
-This project is a starting point for a Flutter application.
+and run the app with
+```
+cargo run -p eko
+```
 
-A few resources to get you started if this is your first Flutter project:
+The environment variables are set in flake.nix.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+### Running `eko` 
+Start the local supabase
+```
+supabase start
+```
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+On first launch or when the db changes, you need to apply the migrations with
+```
+supabase db refresh
+```
+
+Then launch the app with
+```
+./eko_app/run_dev
+```
+
+The environment variables for the db should be copied from what is printed when you run `supabase start` and put in `./.env`
+```
+SUPABASE_URL=http://127.0.0.1:54321
+SUPABASE_PUBLISHABLE_KEY=sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH
+```
