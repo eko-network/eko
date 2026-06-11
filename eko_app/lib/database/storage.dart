@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:drift/drift.dart';
 import 'package:ecp/ecp.dart';
 import 'package:flutter/foundation.dart';
@@ -19,6 +20,7 @@ class AppStorage extends Storage {
 
   @override
   Future<void> clear() async {
+    final config = await mlsEngineConfigStore.getConfig();
     await _db.transaction(() async {
       await _db.delete(_db.mlsCredentials).go();
       await _db.delete(_db.mlsKeyPackages).go();
@@ -29,6 +31,12 @@ class AppStorage extends Storage {
       await _db.delete(_db.storedMessages).go();
       await _db.delete(_db.messageAttachments).go();
     });
+    if (config != null) {
+      final file = File(config.dbPath);
+      if (await file.exists()) {
+        await file.delete();
+      }
+    }
   }
 }
 
@@ -57,6 +65,13 @@ class _DriftMlsEngineConfigStore implements MlsEngineConfigStore {
             encryptionKey: config.encryptionKey,
           ),
         );
+  }
+
+  @override
+  Future<void> clearConfig() async {
+    await (_db.delete(_db.mlsEngineConfigs)
+          ..where((t) => t.id.equals(_singleRowId)))
+        .go();
   }
 }
 

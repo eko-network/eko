@@ -205,6 +205,9 @@ Future<String> _getDbPassword() async {
 LazyDatabase _openConnection() {
   return LazyDatabase(() async {
     final dbFolder = await getApplicationSupportDirectory();
+    if (!await dbFolder.exists()) {
+      await dbFolder.create(recursive: true);
+    }
     final file = File(p.join(dbFolder.path, c.db));
 
     debugPrint('[LazyDatabase] opening db: ${file.path}');

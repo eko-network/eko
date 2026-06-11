@@ -121,7 +121,7 @@ void handleAuthError(Object e, BuildContext context) {
   }
 }
 
-@riverpod
+@Riverpod(keepAlive: true)
 class Auth extends _$Auth {
   EcpCore? _core;
   StreamSubscription? _authSub;
@@ -151,18 +151,49 @@ class Auth extends _$Auth {
       if (_core == null) {
         debugPrint('[Auth][ECP] Initilizing core');
         final storage = AppStorage(db);
-        final path = await getApplicationSupportDirectory();
+        final supportDir = await getApplicationSupportDirectory();
+        if (!await supportDir.exists()) {
+          await supportDir.create(recursive: true);
+        }
+        final mlsDbFile = File(p.join(supportDir.path, 'mls.db'));
+
+        // Check if there's a stored config with a stale path (common on iOS Simulators)
+        try {
+          final existingConfig = await storage.mlsEngineConfigStore.getConfig();
+          if (existingConfig != null &&
+              existingConfig.dbPath != mlsDbFile.path) {
+            debugPrint(
+              '[Auth][ECP] Updating stale mls.db path: ${existingConfig.dbPath} -> ${mlsDbFile.path}',
+            );
+            await storage.mlsEngineConfigStore.saveConfig(
+              MlsEngineConfig(
+                dbPath: mlsDbFile.path,
+                encryptionKey: existingConfig.encryptionKey,
+              ),
+            );
+          }
+        } catch (e) {
+          debugPrint('[Auth][ECP] Error checking/updating stale mls.db path: $e');
+        }
+
         _core = EcpCore(
           storage: storage,
           identity: EkoPerson.fromUid(u.id),
-          engineConfig: await MlsEngineConfig.fromPath(
-            File(p.join(path.path, 'mls.db')),
-            storage,
-          ),
+          engineConfig: await MlsEngineConfig.fromPath(mlsDbFile, storage),
         );
       }
       assert(_core != null, 'core cannot be null');
-      await _core!.open();
+      try {
+        await _core!.open();
+      } catch (e) {
+        if (e.toString().contains('Encryption key verification failed')) {
+          _core = null;
+          // Re-attempting once more will trigger the MlsEngineConfig.fromPath logic
+          // which now handles existing files with missing/wrong keys.
+          return _stateFromSession(session);
+        }
+        rethrow;
+      }
       debugPrint('[Auth][ECP] Core is open');
       did = didFromSession(session);
       if (did == null) {
@@ -197,13 +228,15 @@ class Auth extends _$Auth {
           return;
         }
 
+        if (state.isLoading) return;
+
         final isSameToken =
             state.value?.uid == session.user.id &&
             state.value?.email == session.user.email &&
             (platform.isWeb || state.value?.did == didFromSession(session));
 
         if (!isSameToken) {
-          state = AsyncValue.loading();
+          state = const AsyncValue.loading();
           state = await AsyncValue.guard(() => _stateFromSession(session));
         }
         if (!(data.event == AuthChangeEvent.passwordRecovery) &&
