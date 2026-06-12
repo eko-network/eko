@@ -60,6 +60,7 @@ Future<EcpClient> asyncEcpClient(Ref ref) async {
     core: core,
     did: DeviceUidService.getOrCreate(),
     client: httpClient,
+    tokenGetter: () => supabase.auth.currentSession?.accessToken ?? '',
   );
   return client;
 }
@@ -72,6 +73,9 @@ EcpClient ecpClient(Ref ref) {
 @Riverpod(keepAlive: true)
 void inboxPolling(Ref ref) {
   final client = ref.watch(asyncEcpClientProvider).requireValue;
-  final controller = MessageStreamController(client: client);
+  final controller = MessageStreamController(
+    client: client,
+    config: MessageStreamConfig(useWebSocket: true),
+  );
   controller.messages().listen((_) {});
 }
