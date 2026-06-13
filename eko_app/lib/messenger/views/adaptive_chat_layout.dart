@@ -9,15 +9,33 @@ import 'package:eko_app/messenger/widgets/resizable_panel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:eko_app/providers/nav_bar_provider.dart';
 
-class AdaptiveChat extends ConsumerWidget {
+class AdaptiveChat extends ConsumerStatefulWidget {
   final int? selectedGroupId;
   final controller = ResizablePanelController();
 
   AdaptiveChat({super.key, this.selectedGroupId});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<AdaptiveChat> createState() => _AdaptiveChatState();
+}
+
+class _AdaptiveChatState extends ConsumerState<AdaptiveChat> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (widget.selectedGroupId != null) {
+        ref.read(navBarProvider.notifier).disable();
+      } else {
+        ref.read(navBarProvider.notifier).enable();
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final groupsAsync = ref.watch(groupProvider);
     final l10n = AppLocalizations.of(context)!;
 
@@ -54,7 +72,7 @@ class AdaptiveChat extends ConsumerWidget {
     const double snapWidth = c.kConversationAvatarRadius * 2 + 20;
 
     final selectedGroup = groups.firstWhereOrNull(
-      (item) => item.group.id == selectedGroupId,
+      (item) => item.group.id == widget.selectedGroupId,
     );
 
     return ResizablePanel(
@@ -63,15 +81,18 @@ class AdaptiveChat extends ConsumerWidget {
       maxWidth: maxWidth,
       defaultWidth: defaultWidth,
       snapWidth: snapWidth,
-      controller: controller,
+      controller: widget.controller,
       firstPanel: GroupList(
         isWideScreen: true,
         groups: groups,
-        selectedId: selectedGroupId,
-        panelController: controller,
-        onGroupTap: (id) => context.go('/messages/$id'),
+        selectedId: widget.selectedGroupId,
+        panelController: widget.controller,
+        onGroupTap: (id) {
+          ref.read(navBarProvider.notifier).disable();
+          context.go('/messages/$id');
+        },
       ),
-      secondPanel: selectedGroupId == null || selectedGroup == null
+      secondPanel: widget.selectedGroupId == null || selectedGroup == null
           ? Center(
               child: Text(
                 'Select a conversation',
@@ -91,20 +112,26 @@ class AdaptiveChat extends ConsumerWidget {
     AppLocalizations l10n,
   ) {
     final selectedGroup = groups.firstWhereOrNull(
-      (item) => item.group.id == selectedGroupId,
+      (item) => item.group.id == widget.selectedGroupId,
     );
 
-    if (selectedGroupId == null || selectedGroup == null) {
+    if (widget.selectedGroupId == null || selectedGroup == null) {
       return GroupList(
         isWideScreen: false,
         groups: groups,
         selectedId: null,
-        onGroupTap: (id) => context.push('/messages/$id'),
+        onGroupTap: (id) {
+          ref.read(navBarProvider.notifier).disable();
+          context.push('/messages/$id');
+        },
       );
     } else {
       return ChatView(
         group: selectedGroup,
-        onBack: () => context.go('/messages'),
+        onBack: () {
+          ref.read(navBarProvider.notifier).enable();
+          context.go('/messages');
+        },
       );
     }
   }
