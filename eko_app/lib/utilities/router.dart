@@ -225,11 +225,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                     pageBuilder: (context, state) {
                       final id = int.tryParse(state.pathParameters['id'] ?? '');
                       if (id == null) {
-                        return NoTransitionPage(
+                        return MaterialPage(
                           child: NoMessagesForWeb(child: AdaptiveChat()),
                         );
                       }
-                      return NoTransitionPage(
+                      return MaterialPage(
                         child: NoMessagesForWeb(
                           child: AdaptiveChat(selectedGroupId: id),
                         ),

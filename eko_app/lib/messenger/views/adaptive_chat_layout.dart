@@ -126,12 +126,19 @@ class _AdaptiveChatState extends ConsumerState<AdaptiveChat> {
         },
       );
     } else {
-      return ChatView(
-        group: selectedGroup,
-        onBack: () {
-          ref.read(navBarProvider.notifier).enable();
-          context.go('/messages');
+      return PopScope(
+        canPop: true,
+        onPopInvokedWithResult: (didPop, result) {
+          if (didPop) {
+            ref.read(navBarProvider.notifier).enable();
+          }
         },
+        child: ChatView(
+          group: selectedGroup,
+          onBack: () {
+            context.pop();
+          },
+        ),
       );
     }
   }
