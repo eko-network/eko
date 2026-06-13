@@ -1760,6 +1760,21 @@ class $StoredMessagesTable extends StoredMessages
         type: DriftSqlType.string,
         requiredDuringInsert: false,
       ).withConverter<InternalId?>($StoredMessagesTable.$converterinReplyTon);
+  static const VerificationMeta _deliveredMeta = const VerificationMeta(
+    'delivered',
+  );
+  @override
+  late final GeneratedColumn<bool> delivered = GeneratedColumn<bool>(
+    'delivered',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("delivered" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     serverActivityId,
@@ -1769,6 +1784,7 @@ class $StoredMessagesTable extends StoredMessages
     content,
     groupId,
     inReplyTo,
+    delivered,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -1803,6 +1819,12 @@ class $StoredMessagesTable extends StoredMessages
       );
     } else if (isInserting) {
       context.missing(_groupIdMeta);
+    }
+    if (data.containsKey('delivered')) {
+      context.handle(
+        _deliveredMeta,
+        delivered.isAcceptableOrUnknown(data['delivered']!, _deliveredMeta),
+      );
     }
     return context;
   }
@@ -1849,6 +1871,10 @@ class $StoredMessagesTable extends StoredMessages
           data['${effectivePrefix}in_reply_to'],
         ),
       ),
+      delivered: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}delivered'],
+      )!,
     );
   }
 
@@ -1878,6 +1904,7 @@ class StoredMessageRow extends DataClass
   final String? content;
   final Uint8List groupId;
   final InternalId? inReplyTo;
+  final bool delivered;
   const StoredMessageRow({
     required this.serverActivityId,
     required this.receivedAt,
@@ -1886,6 +1913,7 @@ class StoredMessageRow extends DataClass
     this.content,
     required this.groupId,
     this.inReplyTo,
+    required this.delivered,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -1913,6 +1941,7 @@ class StoredMessageRow extends DataClass
         $StoredMessagesTable.$converterinReplyTon.toSql(inReplyTo),
       );
     }
+    map['delivered'] = Variable<bool>(delivered);
     return map;
   }
 
@@ -1929,6 +1958,7 @@ class StoredMessageRow extends DataClass
       inReplyTo: inReplyTo == null && nullToAbsent
           ? const Value.absent()
           : Value(inReplyTo),
+      delivered: Value(delivered),
     );
   }
 
@@ -1945,6 +1975,7 @@ class StoredMessageRow extends DataClass
       content: serializer.fromJson<String?>(json['content']),
       groupId: serializer.fromJson<Uint8List>(json['groupId']),
       inReplyTo: serializer.fromJson<InternalId?>(json['inReplyTo']),
+      delivered: serializer.fromJson<bool>(json['delivered']),
     );
   }
   @override
@@ -1958,6 +1989,7 @@ class StoredMessageRow extends DataClass
       'content': serializer.toJson<String?>(content),
       'groupId': serializer.toJson<Uint8List>(groupId),
       'inReplyTo': serializer.toJson<InternalId?>(inReplyTo),
+      'delivered': serializer.toJson<bool>(delivered),
     };
   }
 
@@ -1969,6 +2001,7 @@ class StoredMessageRow extends DataClass
     Value<String?> content = const Value.absent(),
     Uint8List? groupId,
     Value<InternalId?> inReplyTo = const Value.absent(),
+    bool? delivered,
   }) => StoredMessageRow(
     serverActivityId: serverActivityId ?? this.serverActivityId,
     receivedAt: receivedAt ?? this.receivedAt,
@@ -1977,6 +2010,7 @@ class StoredMessageRow extends DataClass
     content: content.present ? content.value : this.content,
     groupId: groupId ?? this.groupId,
     inReplyTo: inReplyTo.present ? inReplyTo.value : this.inReplyTo,
+    delivered: delivered ?? this.delivered,
   );
   StoredMessageRow copyWithCompanion(StoredMessagesCompanion data) {
     return StoredMessageRow(
@@ -1991,6 +2025,7 @@ class StoredMessageRow extends DataClass
       content: data.content.present ? data.content.value : this.content,
       groupId: data.groupId.present ? data.groupId.value : this.groupId,
       inReplyTo: data.inReplyTo.present ? data.inReplyTo.value : this.inReplyTo,
+      delivered: data.delivered.present ? data.delivered.value : this.delivered,
     );
   }
 
@@ -2003,7 +2038,8 @@ class StoredMessageRow extends DataClass
           ..write('id: $id, ')
           ..write('content: $content, ')
           ..write('groupId: $groupId, ')
-          ..write('inReplyTo: $inReplyTo')
+          ..write('inReplyTo: $inReplyTo, ')
+          ..write('delivered: $delivered')
           ..write(')'))
         .toString();
   }
@@ -2017,6 +2053,7 @@ class StoredMessageRow extends DataClass
     content,
     $driftBlobEquality.hash(groupId),
     inReplyTo,
+    delivered,
   );
   @override
   bool operator ==(Object other) =>
@@ -2028,7 +2065,8 @@ class StoredMessageRow extends DataClass
           other.id == this.id &&
           other.content == this.content &&
           $driftBlobEquality.equals(other.groupId, this.groupId) &&
-          other.inReplyTo == this.inReplyTo);
+          other.inReplyTo == this.inReplyTo &&
+          other.delivered == this.delivered);
 }
 
 class StoredMessagesCompanion extends UpdateCompanion<StoredMessageRow> {
@@ -2039,6 +2077,7 @@ class StoredMessagesCompanion extends UpdateCompanion<StoredMessageRow> {
   final Value<String?> content;
   final Value<Uint8List> groupId;
   final Value<InternalId?> inReplyTo;
+  final Value<bool> delivered;
   final Value<int> rowid;
   const StoredMessagesCompanion({
     this.serverActivityId = const Value.absent(),
@@ -2048,6 +2087,7 @@ class StoredMessagesCompanion extends UpdateCompanion<StoredMessageRow> {
     this.content = const Value.absent(),
     this.groupId = const Value.absent(),
     this.inReplyTo = const Value.absent(),
+    this.delivered = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   StoredMessagesCompanion.insert({
@@ -2058,6 +2098,7 @@ class StoredMessagesCompanion extends UpdateCompanion<StoredMessageRow> {
     this.content = const Value.absent(),
     required Uint8List groupId,
     this.inReplyTo = const Value.absent(),
+    this.delivered = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : serverActivityId = Value(serverActivityId),
        receivedAt = Value(receivedAt),
@@ -2072,6 +2113,7 @@ class StoredMessagesCompanion extends UpdateCompanion<StoredMessageRow> {
     Expression<String>? content,
     Expression<Uint8List>? groupId,
     Expression<String>? inReplyTo,
+    Expression<bool>? delivered,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -2082,6 +2124,7 @@ class StoredMessagesCompanion extends UpdateCompanion<StoredMessageRow> {
       if (content != null) 'content': content,
       if (groupId != null) 'group_id': groupId,
       if (inReplyTo != null) 'in_reply_to': inReplyTo,
+      if (delivered != null) 'delivered': delivered,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -2094,6 +2137,7 @@ class StoredMessagesCompanion extends UpdateCompanion<StoredMessageRow> {
     Value<String?>? content,
     Value<Uint8List>? groupId,
     Value<InternalId?>? inReplyTo,
+    Value<bool>? delivered,
     Value<int>? rowid,
   }) {
     return StoredMessagesCompanion(
@@ -2104,6 +2148,7 @@ class StoredMessagesCompanion extends UpdateCompanion<StoredMessageRow> {
       content: content ?? this.content,
       groupId: groupId ?? this.groupId,
       inReplyTo: inReplyTo ?? this.inReplyTo,
+      delivered: delivered ?? this.delivered,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -2142,6 +2187,9 @@ class StoredMessagesCompanion extends UpdateCompanion<StoredMessageRow> {
         $StoredMessagesTable.$converterinReplyTon.toSql(inReplyTo.value),
       );
     }
+    if (delivered.present) {
+      map['delivered'] = Variable<bool>(delivered.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -2158,6 +2206,7 @@ class StoredMessagesCompanion extends UpdateCompanion<StoredMessageRow> {
           ..write('content: $content, ')
           ..write('groupId: $groupId, ')
           ..write('inReplyTo: $inReplyTo, ')
+          ..write('delivered: $delivered, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -3449,6 +3498,7 @@ typedef $$StoredMessagesTableCreateCompanionBuilder =
       Value<String?> content,
       required Uint8List groupId,
       Value<InternalId?> inReplyTo,
+      Value<bool> delivered,
       Value<int> rowid,
     });
 typedef $$StoredMessagesTableUpdateCompanionBuilder =
@@ -3460,6 +3510,7 @@ typedef $$StoredMessagesTableUpdateCompanionBuilder =
       Value<String?> content,
       Value<Uint8List> groupId,
       Value<InternalId?> inReplyTo,
+      Value<bool> delivered,
       Value<int> rowid,
     });
 
@@ -3553,6 +3604,11 @@ class $$StoredMessagesTableFilterComposer
     builder: (column) => ColumnWithTypeConverterFilters(column),
   );
 
+  ColumnFilters<bool> get delivered => $composableBuilder(
+    column: $table.delivered,
+    builder: (column) => ColumnFilters(column),
+  );
+
   Expression<bool> messageAttachmentsRefs(
     Expression<bool> Function($$MessageAttachmentsTableFilterComposer f) f,
   ) {
@@ -3622,6 +3678,11 @@ class $$StoredMessagesTableOrderingComposer
     column: $table.inReplyTo,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<bool> get delivered => $composableBuilder(
+    column: $table.delivered,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$StoredMessagesTableAnnotationComposer
@@ -3658,6 +3719,9 @@ class $$StoredMessagesTableAnnotationComposer
 
   GeneratedColumnWithTypeConverter<InternalId?, String> get inReplyTo =>
       $composableBuilder(column: $table.inReplyTo, builder: (column) => column);
+
+  GeneratedColumn<bool> get delivered =>
+      $composableBuilder(column: $table.delivered, builder: (column) => column);
 
   Expression<T> messageAttachmentsRefs<T extends Object>(
     Expression<T> Function($$MessageAttachmentsTableAnnotationComposer a) f,
@@ -3723,6 +3787,7 @@ class $$StoredMessagesTableTableManager
                 Value<String?> content = const Value.absent(),
                 Value<Uint8List> groupId = const Value.absent(),
                 Value<InternalId?> inReplyTo = const Value.absent(),
+                Value<bool> delivered = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => StoredMessagesCompanion(
                 serverActivityId: serverActivityId,
@@ -3732,6 +3797,7 @@ class $$StoredMessagesTableTableManager
                 content: content,
                 groupId: groupId,
                 inReplyTo: inReplyTo,
+                delivered: delivered,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -3743,6 +3809,7 @@ class $$StoredMessagesTableTableManager
                 Value<String?> content = const Value.absent(),
                 required Uint8List groupId,
                 Value<InternalId?> inReplyTo = const Value.absent(),
+                Value<bool> delivered = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => StoredMessagesCompanion.insert(
                 serverActivityId: serverActivityId,
@@ -3752,6 +3819,7 @@ class $$StoredMessagesTableTableManager
                 content: content,
                 groupId: groupId,
                 inReplyTo: inReplyTo,
+                delivered: delivered,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0

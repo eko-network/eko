@@ -113,7 +113,11 @@ class StatusWidget extends StatelessWidget {
           if (!isReceived)
             Padding(
               padding: EdgeInsetsGeometry.only(left: 4),
-              child: StatusIcon(status: MessageStatus.sent), //fixme
+              child: StatusIcon(
+                status: message.delivered
+                    ? MessageStatus.delivered
+                    : MessageStatus.sent,
+              ),
             ),
         ],
       ),

@@ -69,9 +69,9 @@ class _DriftMlsEngineConfigStore implements MlsEngineConfigStore {
 
   @override
   Future<void> clearConfig() async {
-    await (_db.delete(_db.mlsEngineConfigs)
-          ..where((t) => t.id.equals(_singleRowId)))
-        .go();
+    await (_db.delete(
+      _db.mlsEngineConfigs,
+    )..where((t) => t.id.equals(_singleRowId))).go();
   }
 }
 
@@ -182,6 +182,7 @@ class _DriftMessageStore implements MessageStore {
               id: message.id,
               content: Value(message.content),
               inReplyTo: Value(message.inReplyTo),
+              delivered: Value(message.delivered),
             ),
           );
       for (final attachmentId in message.attachment) {
@@ -195,6 +196,19 @@ class _DriftMessageStore implements MessageStore {
             );
       }
     });
+  }
+
+  @override
+  Future<bool> markMessageDelivered(Uri serverActivityId) async {
+    final count =
+        await (_db.update(_db.storedMessages)..where(
+              (t) => t.serverActivityId.equals(serverActivityId.toString()),
+            ))
+            .write(StoredMessagesCompanion(delivered: const Value(true)));
+    debugPrint(
+      '[AppStorage] markMessageDelivered: $serverActivityId -> $count rows',
+    );
+    return count > 0;
   }
 }
 
@@ -215,5 +229,15 @@ class _DriftProcessedObjectStore implements ProcessedObjectStore {
       _db.processedObjects,
     )..where((t) => t.id.equals(id.toString()))).getSingleOrNull();
     return row != null;
+  }
+
+  @override
+  Future<bool> markDelivered(Uri id) async {
+    final exists = await (_db.select(
+      _db.processedObjects,
+    )..where((t) => t.id.equals(id.toString()))).getSingleOrNull();
+    if (exists != null) return false;
+    await _db.into(_db.processedObjects).insert(ProcessedObjectRow(id: id));
+    return true;
   }
 }

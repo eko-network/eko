@@ -133,6 +133,7 @@ class StoredMessages extends Table {
   BlobColumn get groupId => blob()();
   TextColumn get inReplyTo =>
       text().map(const InternalIdConverter()).nullable()();
+  BoolColumn get delivered => boolean().withDefault(const Constant(false))();
 
   @override
   Set<Column> get primaryKey => {serverActivityId};
@@ -164,7 +165,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration {
@@ -172,7 +173,11 @@ class AppDatabase extends _$AppDatabase {
       onCreate: (Migrator m) async {
         await m.createAll();
       },
-      onUpgrade: (Migrator m, int from, int to) async {},
+      onUpgrade: (Migrator m, int from, int to) async {
+        if (from < 2) {
+          await m.addColumn(storedMessages, storedMessages.delivered);
+        }
+      },
       beforeOpen: (details) async {
         await customStatement('PRAGMA foreign_keys = ON');
       },

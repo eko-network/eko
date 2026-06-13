@@ -35,6 +35,7 @@ extension StoredMessageRowMapper on StoredMessageRow {
       id: id,
       attachment: [],
       groupId: groupId,
+      delivered: delivered,
     );
   }
 }
