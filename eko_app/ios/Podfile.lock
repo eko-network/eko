@@ -3,6 +3,8 @@ PODS:
     - Flutter
   - camera_avfoundation (0.0.1):
     - Flutter
+  - cupertino_interactive_keyboard (0.0.1):
+    - Flutter
   - emoji_picker_flutter (0.0.1):
     - Flutter
   - eraser (0.0.1):
@@ -52,6 +54,7 @@ PODS:
 DEPENDENCIES:
   - app_links (from `.symlinks/plugins/app_links/ios`)
   - camera_avfoundation (from `.symlinks/plugins/camera_avfoundation/ios`)
+  - cupertino_interactive_keyboard (from `.symlinks/plugins/cupertino_interactive_keyboard/ios`)
   - emoji_picker_flutter (from `.symlinks/plugins/emoji_picker_flutter/ios`)
   - eraser (from `.symlinks/plugins/eraser/ios`)
   - Flutter (from `Flutter`)
@@ -80,6 +83,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/app_links/ios"
   camera_avfoundation:
     :path: ".symlinks/plugins/camera_avfoundation/ios"
+  cupertino_interactive_keyboard:
+    :path: ".symlinks/plugins/cupertino_interactive_keyboard/ios"
   emoji_picker_flutter:
     :path: ".symlinks/plugins/emoji_picker_flutter/ios"
   eraser:
@@ -118,6 +123,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   app_links: a754cbec3c255bd4bbb4d236ecc06f28cd9a7ce8
   camera_avfoundation: 5675ca25298b6f81fa0a325188e7df62cc217741
+  cupertino_interactive_keyboard: 394498b62c6807d324b1a90820715a5551fed871
   emoji_picker_flutter: ece213fc274bdddefb77d502d33080dc54e616cc
   eraser: 83a4b06985f3702aa3d8dec816f9693266012937
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467

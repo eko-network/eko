@@ -1,3 +1,4 @@
+import 'package:cupertino_interactive_keyboard/cupertino_interactive_keyboard.dart'; // FIXME remove when this issue is closed https://github.com/flutter/flutter/issues/57609
 import 'package:ecp/ecp.dart' as ecp;
 import 'package:eko_app/localization/generated/app_localizations.dart';
 import 'package:eko_app/messenger/providers/message_provider.dart';
@@ -48,6 +49,9 @@ class _ChatViewState extends ConsumerState<ChatView> {
           _showMediaPicker = false;
         });
       }
+    });
+    _messageController.addListener(() {
+      setState(() {});
     });
   }
 
@@ -112,7 +116,7 @@ class _ChatViewState extends ConsumerState<ChatView> {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.end,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Expanded(
           child: Container(
@@ -237,14 +241,15 @@ class _ChatViewState extends ConsumerState<ChatView> {
             ),
           ),
         ),
-        const SizedBox(width: 8),
-        CircleAvatar(
-          backgroundColor: colorScheme.primary,
-          child: IconButton(
-            icon: const Icon(Icons.send, color: Colors.white, size: 20),
-            onPressed: _sendMessage,
+        if (_messageController.text != '') const SizedBox(width: 8),
+        if (_messageController.text != '')
+          CircleAvatar(
+            backgroundColor: Color(0xFF115AEF),
+            child: IconButton(
+              icon: const Icon(Icons.send, color: Colors.white, size: 20),
+              onPressed: _sendMessage,
+            ),
           ),
-        ),
       ],
     );
   }
@@ -315,59 +320,61 @@ class _ChatViewState extends ConsumerState<ChatView> {
                   );
                 }
 
-                return ListView.builder(
-                  padding: const EdgeInsets.all(16),
-                  reverse: true,
-                  itemCount: messages.length,
-                  itemBuilder: (context, index) {
-                    final chronoIndex = messages.length - 1 - index;
-                    final message = messages[chronoIndex];
-                    final isReceived = message.senderId != actorId;
+                return CupertinoInteractiveKeyboard(
+                  child: ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    reverse: true,
+                    itemCount: messages.length,
+                    itemBuilder: (context, index) {
+                      final chronoIndex = messages.length - 1 - index;
+                      final message = messages[chronoIndex];
+                      final isReceived = message.senderId != actorId;
 
-                    final prevMsg = messages.getOrNull(chronoIndex - 1);
-                    final nextMsg = messages.getOrNull(chronoIndex + 1);
+                      final prevMsg = messages.getOrNull(chronoIndex - 1);
+                      final nextMsg = messages.getOrNull(chronoIndex + 1);
 
-                    final DateTime? prevTime =
-                        (prevMsg?.senderId == message.senderId)
-                        ? prevMsg?.receivedAt
-                        : null;
-                    final DateTime? nextTime =
-                        (nextMsg?.senderId == message.senderId)
-                        ? nextMsg?.receivedAt
-                        : null;
+                      final DateTime? prevTime =
+                          (prevMsg?.senderId == message.senderId)
+                          ? prevMsg?.receivedAt
+                          : null;
+                      final DateTime? nextTime =
+                          (nextMsg?.senderId == message.senderId)
+                          ? nextMsg?.receivedAt
+                          : null;
 
-                    var isFirstOfDate = false;
-                    if (prevMsg == null) {
-                      isFirstOfDate = true;
-                    } else {
-                      final d1 = message.receivedAt;
-                      final d2 = prevMsg.receivedAt;
-                      isFirstOfDate =
-                          d1.year != d2.year ||
-                          d1.month != d2.month ||
-                          d1.day != d2.day;
-                    }
+                      var isFirstOfDate = false;
+                      if (prevMsg == null) {
+                        isFirstOfDate = true;
+                      } else {
+                        final d1 = message.receivedAt;
+                        final d2 = prevMsg.receivedAt;
+                        isFirstOfDate =
+                            d1.year != d2.year ||
+                            d1.month != d2.month ||
+                            d1.day != d2.day;
+                      }
 
-                    final messageWidget = MessageWidget(
-                      isReceived: isReceived,
-                      message: message,
-                      position: _determinePosition(
-                        prevTime,
-                        message.receivedAt,
-                        nextTime,
-                      ),
-                    );
-
-                    if (isFirstOfDate) {
-                      return Column(
-                        children: [
-                          DateChip(time: message.receivedAt),
-                          messageWidget,
-                        ],
+                      final messageWidget = MessageWidget(
+                        isReceived: isReceived,
+                        message: message,
+                        position: _determinePosition(
+                          prevTime,
+                          message.receivedAt,
+                          nextTime,
+                        ),
                       );
-                    }
-                    return messageWidget;
-                  },
+
+                      if (isFirstOfDate) {
+                        return Column(
+                          children: [
+                            DateChip(time: message.receivedAt),
+                            messageWidget,
+                          ],
+                        );
+                      }
+                      return messageWidget;
+                    },
+                  ),
                 );
               },
               loading: () => const Center(child: CircularProgressIndicator()),

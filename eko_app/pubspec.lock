@@ -329,6 +329,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.9"
+  cupertino_interactive_keyboard:
+    dependency: "direct main"
+    description:
+      name: cupertino_interactive_keyboard
+      sha256: "6c184ce03224c167190398d45459ec1f4c525f452fe36a81e664af77c698076a"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0"
   dart_jsonwebtoken:
     dependency: transitive
     description:
