@@ -173,7 +173,9 @@ class Auth extends _$Auth {
             );
           }
         } catch (e) {
-          debugPrint('[Auth][ECP] Error checking/updating stale mls.db path: $e');
+          debugPrint(
+            '[Auth][ECP] Error checking/updating stale mls.db path: $e',
+          );
         }
 
         _core = EcpCore(
