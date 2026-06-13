@@ -3,7 +3,6 @@ import 'package:eko_app/messenger/types/group.dart';
 import 'package:eko_app/messenger/widgets/relative_time.dart';
 import 'package:eko_app/providers/current_user_provider.dart';
 import 'package:eko_app/providers/user_provider.dart';
-import 'package:eko_app/utilities/constants.dart' as c;
 import 'package:eko_app/widgets/users/profile_picture.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

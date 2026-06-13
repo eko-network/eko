@@ -15,6 +15,7 @@ import 'package:eko_app/widgets/search/user_search_bar.dart';
 import 'package:eko_app/widgets/users/user_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class GroupList extends ConsumerStatefulWidget {
   final bool isWideScreen;
@@ -157,7 +158,6 @@ class _ConversationListState extends ConsumerState<GroupList> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       body: SafeArea(
@@ -171,22 +171,34 @@ class _ConversationListState extends ConsumerState<GroupList> {
                 Column(
                   mainAxisSize: MainAxisSize.max,
                   children: [
-                    const SizedBox(height: 8),
-                    showOnlyAvatar
-                        ? IconButton(
-                            onPressed: onNewPressed,
-                            icon: const Icon(Icons.edit_outlined),
-                          )
-                        : Align(
-                            alignment: Alignment.centerRight,
-                            child: IconButton(
-                              onPressed: onNewPressed,
-                              icon: const Icon(Icons.edit_outlined),
-                              iconSize: 30,
-                              padding: const EdgeInsets.all(5),
-                              splashRadius: c.kConversationAvatarRadius,
-                            ),
+                    Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        Text(
+                          'Chats',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
+                        ),
+                        showOnlyAvatar
+                            ? IconButton(
+                                onPressed: onNewPressed,
+                                icon: const Icon(LucideIcons.squarePen),
+                              )
+                            : Align(
+                                alignment: Alignment.centerRight,
+                                child: IconButton(
+                                  onPressed: onNewPressed,
+                                  icon: const Icon(LucideIcons.squarePen),
+                                  iconSize: 22,
+                                  padding: const EdgeInsets.only(right: 10),
+                                  splashRadius: c.kConversationAvatarRadius,
+                                ),
+                              ),
+                      ],
+                    ),
                     Expanded(
                       child: ListView.builder(
                         itemCount: widget.groups.length,
