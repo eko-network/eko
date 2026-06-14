@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:eko_app/messenger/ecp_helpers.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:path/path.dart' as p;
 import 'dart:convert';
 import 'dart:io';
@@ -18,6 +19,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:eko_app/types/auth.dart';
 import 'package:eko_app/utilities/supabase_ref.dart';
 import 'package:eko_app/utilities/constants.dart' as c;
+import 'package:eko_app/utilities/app_group_path.dart';
 import 'package:eko_app/utilities/shared_pref_service.dart';
 import 'package:eko_app/interfaces/notification_helper.dart';
 import 'package:eko_app/interfaces/user.dart' as user;
@@ -151,11 +153,19 @@ class Auth extends _$Auth {
       if (_core == null) {
         debugPrint('[Auth][ECP] Initilizing core');
         final storage = AppStorage(db);
-        final supportDir = await getApplicationSupportDirectory();
-        if (!await supportDir.exists()) {
-          await supportDir.create(recursive: true);
+        String mlsDbDir;
+        final appGroupPath = await getAppGroupPath();
+        if (appGroupPath != null) {
+          mlsDbDir = appGroupPath;
+        } else {
+          final supportDir = await getApplicationSupportDirectory();
+          mlsDbDir = supportDir.path;
         }
-        final mlsDbFile = File(p.join(supportDir.path, 'mls.db'));
+        final mlsDbDirEntity = Directory(mlsDbDir);
+        if (!await mlsDbDirEntity.exists()) {
+          await mlsDbDirEntity.create(recursive: true);
+        }
+        final mlsDbFile = File(p.join(mlsDbDir, 'mls.db'));
 
         // Check if there's a stored config with a stale path (common on iOS Simulators)
         try {
@@ -165,11 +175,43 @@ class Auth extends _$Auth {
             debugPrint(
               '[Auth][ECP] Updating stale mls.db path: ${existingConfig.dbPath} -> ${mlsDbFile.path}',
             );
+            // Migrate existing database if it exists at old path
+            final oldFile = File(existingConfig.dbPath);
+            if (await oldFile.exists()) {
+              try {
+                if (await mlsDbFile.exists()) {
+                  await mlsDbFile.delete();
+                }
+                await mlsDbFile.writeAsBytes(await oldFile.readAsBytes());
+                debugPrint('[Auth][ECP] Migrated mls.db to new location');
+              } catch (e) {
+                debugPrint('[Auth][ECP] Failed to migrate mls.db: $e');
+              }
+            }
             await storage.mlsEngineConfigStore.saveConfig(
               MlsEngineConfig(
                 dbPath: mlsDbFile.path,
                 encryptionKey: existingConfig.encryptionKey,
               ),
+            );
+          }
+          if (existingConfig != null) {
+            const _storage = FlutterSecureStorage(
+              iOptions: IOSOptions(
+                accessibility: KeychainAccessibility.first_unlock_this_device,
+                synchronizable: false,
+                groupId: 'group.com.example.untitledApp',
+              ),
+            );
+            print("writing to storage ${existingConfig.encryptionKey}");
+            await _storage.write(
+              key: 'mls_encryption_key',
+              value: base64Encode(existingConfig.encryptionKey),
+            );
+            print("writing to storage ${existingConfig.dbPath}");
+            await _storage.write(
+              key: 'mls_db_path',
+              value: existingConfig.dbPath,
             );
           }
         } catch (e) {
