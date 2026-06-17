@@ -29,7 +29,6 @@ Future<void> addDeviceNotificationToken(String uid) async {
       final token = await NotificationHelper.waitForDeviceToken(
         forBackendSync: true,
       );
-      print("TOKEN: $token");
       if (token == null) {
         PrefsService.notificationsEnabled = false;
         PrefsService.deviceNotificationToken = null;

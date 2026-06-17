@@ -362,6 +362,7 @@ class Auth extends _$Auth {
     final uid = state.value?.uid;
     if (uid != null) {
       await user.removeDeviceNotificationToken(uid);
+      DeviceUidService.remove();
     }
     supabase.auth.signOut();
   }

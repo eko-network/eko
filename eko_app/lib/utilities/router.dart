@@ -19,6 +19,7 @@ import 'package:eko_app/views/user_settings.dart';
 import 'package:eko_app/views/compose_page.dart';
 import 'package:eko_app/views/feed_page.dart';
 import 'package:eko_app/messenger/views/adaptive_chat_layout.dart';
+import 'package:eko_app/utilities/constants.dart' as c;
 import 'package:eko_app/views/search_page.dart';
 import 'package:eko_app/views/edit_profile.dart';
 import 'package:eko_app/widgets/scaffolds/navigation_bar.dart';
@@ -224,13 +225,24 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                     name: 'message_thread',
                     pageBuilder: (context, state) {
                       final id = int.tryParse(state.pathParameters['id'] ?? '');
+                      final isWide =
+                          MediaQuery.of(context).size.width >=
+                          c.messengerWideScreen;
+
+                      Page<void> buildPage(Widget child) {
+                        if (isWide) {
+                          return NoTransitionPage(child: child);
+                        }
+                        return MaterialPage(child: child);
+                      }
+
                       if (id == null) {
-                        return MaterialPage(
-                          child: NoMessagesForWeb(child: AdaptiveChat()),
+                        return buildPage(
+                          NoMessagesForWeb(child: AdaptiveChat()),
                         );
                       }
-                      return MaterialPage(
-                        child: NoMessagesForWeb(
+                      return buildPage(
+                        NoMessagesForWeb(
                           child: AdaptiveChat(selectedGroupId: id),
                         ),
                       );

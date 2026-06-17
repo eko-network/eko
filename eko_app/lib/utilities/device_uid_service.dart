@@ -14,4 +14,8 @@ class DeviceUidService {
     PrefsService.deviceUid = created;
     return created;
   }
+
+  static void remove() {
+    PrefsService.deviceUid = null;
+  }
 }

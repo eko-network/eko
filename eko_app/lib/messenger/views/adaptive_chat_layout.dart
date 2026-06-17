@@ -26,10 +26,14 @@ class _AdaptiveChatState extends ConsumerState<AdaptiveChat> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (widget.selectedGroupId != null) {
-        ref.read(navBarProvider.notifier).disable();
-      } else {
-        ref.read(navBarProvider.notifier).enable();
+      final isWideScreen =
+          MediaQuery.of(context).size.width >= c.messengerWideScreen;
+      if (!isWideScreen) {
+        if (widget.selectedGroupId != null) {
+          ref.read(navBarProvider.notifier).disable();
+        } else {
+          ref.read(navBarProvider.notifier).enable();
+        }
       }
     });
   }
@@ -88,7 +92,6 @@ class _AdaptiveChatState extends ConsumerState<AdaptiveChat> {
         selectedId: widget.selectedGroupId,
         panelController: widget.controller,
         onGroupTap: (id) {
-          ref.read(navBarProvider.notifier).disable();
           context.go('/messages/$id');
         },
       ),
