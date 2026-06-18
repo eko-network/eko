@@ -213,6 +213,7 @@ Future<String> _getDbPassword() async {
 
 /// Write the db encryption key to a file in the App Group container
 /// FIXME should be in FlutterSecureStorage...
+/// and then the ios notification service needs to read from there
 Future<void> _writeSharedDbKeyFile(String value) async {
   final appGroupPath = await getDbPath();
   final file = File(p.join(appGroupPath, '.ecp_db_key'));

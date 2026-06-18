@@ -10,9 +10,9 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part '../../generated/messenger/widgets/group_card.g.dart';
 
 @riverpod
-(bool, bool, List<String>) groupMeta(Ref ref, GroupWithUsers group) {
+(bool, bool, Set<String>) groupMeta(Ref ref, GroupWithUsers group) {
   final myUid = ref.watch(currentUserProvider).user.uid;
-  final otherUsers = group.users.where((uid) => uid != myUid).toList();
+  final otherUsers = group.users.where((uid) => uid != myUid).toSet();
   final isDm = otherUsers.length == 1;
   final isNoteToSelf =
       group.users.length == 1 &&

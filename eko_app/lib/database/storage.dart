@@ -147,6 +147,14 @@ class _DriftGroupStore implements GroupStore {
   }
 
   @override
+  Future<MlsGroupRecord?> getGroupByGroupId(Uint8List id) async {
+    final row = await (_db.select(
+      _db.mlsGroups,
+    )..where((t) => t.groupIdBytes.equals(id))).getSingleOrNull();
+    return row?.toRecord();
+  }
+
+  @override
   Future<void> saveGroup({
     required Uint8List groupIdBytes,
     String? displayName,

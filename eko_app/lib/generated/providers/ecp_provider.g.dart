@@ -26,7 +26,7 @@ final class AsyncEcpClientProvider
         argument: null,
         retry: null,
         name: r'asyncEcpClientProvider',
-        isAutoDispose: false,
+        isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -45,7 +45,7 @@ final class AsyncEcpClientProvider
   }
 }
 
-String _$asyncEcpClientHash() => r'c98cfe2ffae593ed0a9f4d59955219dafd9c25c4';
+String _$asyncEcpClientHash() => r'f3d497e2f563efdad7bdd2ea5115f0c6607b528d';
 
 @ProviderFor(ecpClient)
 final ecpClientProvider = EcpClientProvider._();

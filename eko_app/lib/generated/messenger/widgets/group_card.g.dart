@@ -15,11 +15,11 @@ final groupMetaProvider = GroupMetaFamily._();
 final class GroupMetaProvider
     extends
         $FunctionalProvider<
-          (bool, bool, List<String>),
-          (bool, bool, List<String>),
-          (bool, bool, List<String>)
+          (bool, bool, Set<String>),
+          (bool, bool, Set<String>),
+          (bool, bool, Set<String>)
         >
-    with $Provider<(bool, bool, List<String>)> {
+    with $Provider<(bool, bool, Set<String>)> {
   GroupMetaProvider._({
     required GroupMetaFamily super.from,
     required GroupWithUsers super.argument,
@@ -43,21 +43,21 @@ final class GroupMetaProvider
 
   @$internal
   @override
-  $ProviderElement<(bool, bool, List<String>)> $createElement(
+  $ProviderElement<(bool, bool, Set<String>)> $createElement(
     $ProviderPointer pointer,
   ) => $ProviderElement(pointer);
 
   @override
-  (bool, bool, List<String>) create(Ref ref) {
+  (bool, bool, Set<String>) create(Ref ref) {
     final argument = this.argument as GroupWithUsers;
     return groupMeta(ref, argument);
   }
 
   /// {@macro riverpod.override_with_value}
-  Override overrideWithValue((bool, bool, List<String>) value) {
+  Override overrideWithValue((bool, bool, Set<String>) value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride: $SyncValueProvider<(bool, bool, List<String>)>(value),
+      providerOverride: $SyncValueProvider<(bool, bool, Set<String>)>(value),
     );
   }
 
@@ -72,10 +72,10 @@ final class GroupMetaProvider
   }
 }
 
-String _$groupMetaHash() => r'f775e1e6d1dd24740907b826f8e69112ca676e8b';
+String _$groupMetaHash() => r'c5b7f63fbc20ecff238d4ba25783a4c88ebf68d1';
 
 final class GroupMetaFamily extends $Family
-    with $FunctionalFamilyOverride<(bool, bool, List<String>), GroupWithUsers> {
+    with $FunctionalFamilyOverride<(bool, bool, Set<String>), GroupWithUsers> {
   GroupMetaFamily._()
     : super(
         retry: null,
