@@ -55,12 +55,14 @@ pkgs.flutter.buildFlutterApplication {
 
   postInstall = ''
     install -Dm644 "$src/linux/assets/logo.svg" "$out/share/icons/hicolor/scalable/apps/${pname}.svg"
-    if [ -f "build/native_assets/linux/libwebcrypto.so" ]; then
-      install -Dm755 "build/native_assets/linux/libwebcrypto.so" "$out/app/${pname}/lib/libwebcrypto.so"
-    else
-      echo "libwebcrypto.so not found at build/native_assets/linux" >&2
-      exit 1
-    fi
+    for lib in libwebcrypto.so libopenmls_frb.so; do
+      if [ -f "build/native_assets/linux/$lib" ]; then
+        install -Dm755 "build/native_assets/linux/$lib" "$out/app/${pname}/lib/$lib"
+      else
+        echo "$lib not found at build/native_assets/linux" >&2
+        exit 1
+      fi
+    done
   '';
 
   meta = {

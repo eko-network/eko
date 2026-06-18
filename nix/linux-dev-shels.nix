@@ -15,9 +15,10 @@
   androidSdk = androidComposition.androidsdk;
   sdkPath = "${androidSdk}/libexec/android-sdk";
   cmakeToolchain = pkgs.writeText "nix-toolchain.cmake" ''
+    set(OPENSSL_USE_STATIC_LIBS OFF CACHE BOOL "Use shared OpenSSL libs on Nix" FORCE)
     set(OPENSSL_SSL_LIBRARY "${pkgs.openssl.out}/lib/libssl.so" CACHE FILEPATH "OpenSSL SSL library" FORCE)
-    set(CMAKE_PREFIX_PATH "${pkgs.openssl.out};${pkgs.openssl.dev};''${CMAKE_PREFIX_PATH}" CACHE STRING "CMake prefix path" FORCE)
     set(OPENSSL_CRYPTO_LIBRARY "${pkgs.openssl.out}/lib/libcrypto.so" CACHE FILEPATH "OpenSSL crypto library" FORCE)
+    set(CMAKE_PREFIX_PATH "${pkgs.openssl.dev};${pkgs.openssl.out};''${CMAKE_PREFIX_PATH}" CACHE STRING "CMake prefix path" FORCE)
   '';
 in {
   linux = pkgs.mkShellNoCC {
@@ -35,8 +36,10 @@ in {
         dart
         pkg-config
       ]);
-    shellHook =
-      commonShellHook;
+    shellHook = ''
+      export CMAKE_TOOLCHAIN_FILE="${cmakeToolchain}"
+    ''
+    + commonShellHook;
   };
   android = pkgs.mkShellNoCC {
     ANDROID_SDK_ROOT = sdkPath;

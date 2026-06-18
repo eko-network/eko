@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+set -euo pipefail
+
+cd "$(dirname "${BASH_SOURCE[0]}")"
 
 FLUTTER_COMMAND="flutter run \
   --dart-define=USE_LOCAL=1 \
