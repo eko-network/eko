@@ -4,7 +4,6 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:path/path.dart' as p;
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:ecp/ecp.dart';
 import 'package:eko_app/database/database.dart';
 import 'package:eko_app/database/storage.dart';
@@ -19,13 +18,12 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:eko_app/types/auth.dart';
 import 'package:eko_app/utilities/supabase_ref.dart';
 import 'package:eko_app/utilities/constants.dart' as c;
-import 'package:eko_app/utilities/app_group_path.dart';
+import 'package:eko_app/utilities/ecp_db_path.dart';
 import 'package:eko_app/utilities/shared_pref_service.dart';
 import 'package:eko_app/interfaces/notification_helper.dart';
 import 'package:eko_app/interfaces/user.dart' as user;
 import 'package:eko_app/utilities/gauth/supabase_google_oauth.dart';
 import 'package:eko_app/utilities/platform.dart' as platform;
-import 'package:uuid/uuid.dart';
 part '../generated/providers/auth_provider.g.dart';
 
 Future<void>? _registerNotificationsInFlight;
@@ -153,14 +151,7 @@ class Auth extends _$Auth {
       if (_core == null) {
         debugPrint('[Auth][ECP] Initilizing core');
         final storage = AppStorage(db);
-        String mlsDbDir;
-        final appGroupPath = await getAppGroupPath();
-        if (appGroupPath != null) {
-          mlsDbDir = appGroupPath;
-        } else {
-          final supportDir = await getApplicationSupportDirectory();
-          mlsDbDir = supportDir.path;
-        }
+        final mlsDbDir = await getDbPath();
         final mlsDbDirEntity = Directory(mlsDbDir);
         if (!await mlsDbDirEntity.exists()) {
           await mlsDbDirEntity.create(recursive: true);
@@ -203,15 +194,10 @@ class Auth extends _$Auth {
                 groupId: 'group.com.example.untitledApp',
               ),
             );
-            print("writing to storage ${existingConfig.encryptionKey}");
+            // save encryption key to shared spot for ios NotificationService to access
             await _storage.write(
               key: 'mls_encryption_key',
               value: base64Encode(existingConfig.encryptionKey),
-            );
-            print("writing to storage ${existingConfig.dbPath}");
-            await _storage.write(
-              key: 'mls_db_path',
-              value: existingConfig.dbPath,
             );
           }
         } catch (e) {

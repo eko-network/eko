@@ -9,5 +9,6 @@
 #define MessengerNotificationService_Bridging_Header_h
 
 #import "openmls_push_decrypt.h"
+#import <sqlite3.h>
 
 #endif /* MessengerNotificationService_Bridging_Header_h */

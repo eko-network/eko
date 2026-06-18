@@ -36,7 +36,7 @@ import UserNotifications
             if let url = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.com.example.untitledApp") {
                 result(url.path)
             } else {
-                result(FlutterError(code: "APP_GROUP", message: "App Group container not found", details: nil))
+                result(nil)
             }
         default:
             result(FlutterMethodNotImplemented)

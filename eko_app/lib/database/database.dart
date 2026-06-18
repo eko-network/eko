@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:ecp/ecp.dart';
+import 'package:eko_app/utilities/ecp_db_path.dart';
 import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:path_provider/path_provider.dart';
@@ -199,17 +200,29 @@ Future<String> _getDbPassword() async {
   final key = c.dbKey;
   final stored = await storage.read(key: key);
   if (stored != null) {
+    // Ensure the extension can read it via shared file
+    await _writeSharedDbKeyFile(stored);
     return stored;
   }
 
   final password = base64Encode(_generateRandomBytes(32));
   await storage.write(key: key, value: password);
+  await _writeSharedDbKeyFile(password);
   return password;
+}
+
+/// Write the db encryption key to a file in the App Group container
+/// FIXME should be in FlutterSecureStorage...
+Future<void> _writeSharedDbKeyFile(String value) async {
+  final appGroupPath = await getDbPath();
+  final file = File(p.join(appGroupPath, '.ecp_db_key'));
+  await file.writeAsString(value);
 }
 
 LazyDatabase _openConnection() {
   return LazyDatabase(() async {
-    final dbFolder = await getApplicationSupportDirectory();
+    final ecpDbPath = await getDbPath();
+    final dbFolder = Directory(ecpDbPath);
     if (!await dbFolder.exists()) {
       await dbFolder.create(recursive: true);
     }

@@ -34,6 +34,7 @@ Future<void> addDeviceNotificationToken(String uid) async {
         PrefsService.deviceNotificationToken = null;
         return;
       }
+      print("token: $token");
       PrefsService.deviceNotificationToken = token;
       await _updateNotifications(token: token, isActive: true);
       PrefsService.notificationsEnabled = true;

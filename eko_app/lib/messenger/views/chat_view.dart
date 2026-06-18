@@ -353,7 +353,6 @@ class _ChatViewState extends ConsumerState<ChatView> {
                             d1.month != d2.month ||
                             d1.day != d2.day;
                       }
-
                       final messageWidget = MessageWidget(
                         isReceived: isReceived,
                         message: message,
