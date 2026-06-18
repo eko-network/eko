@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:ecp/ecp.dart';
 import 'package:eko_app/interfaces/search.dart';
 import 'package:eko_app/localization/generated/app_localizations.dart';
 import 'package:eko_app/messenger/types/group.dart';

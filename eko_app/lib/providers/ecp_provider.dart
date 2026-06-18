@@ -1,5 +1,6 @@
 import 'package:ecp/ecp.dart';
 import 'package:eko_app/providers/auth_provider.dart';
+import 'package:eko_app/providers/ecp_core_provider.dart';
 import 'package:eko_app/utilities/device_uid_service.dart';
 import 'package:eko_app/utilities/supabase_ref.dart';
 import 'package:http/http.dart' as http;
@@ -38,12 +39,13 @@ Future<EcpClient> asyncEcpClient(Ref ref) async {
     }
   });
 
-  final uid = ref.read(authProvider).value?.uid;
+  final uid = ref.watch(authProvider).value?.uid;
   if (uid == null) {
     throw StateError('EcpClient accessed before auth is ready');
   }
 
-  final core = ref.read(authProvider.notifier).core;
+  final core = ref.watch(ecpCoreHolderProvider).value;
+
   final session = supabase.auth.currentSession;
   if (core == null || session == null) {
     throw StateError('EcpClient accessed before auth or on web');

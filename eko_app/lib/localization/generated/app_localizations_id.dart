@@ -533,6 +533,20 @@ class AppLocalizationsId extends AppLocalizations {
   String get messengerSubtitle => 'eko messenger segera hadir';
 
   @override
+  String get messengerSetupBody =>
+      'Daftarkan perangkat ini untuk mengirim dan menerima pesan terenkripsi ujung ke ujung.';
+
+  @override
+  String get enableMessages => 'Aktifkan pesan';
+
+  @override
+  String get registeringDevice => 'Mendaftarkan perangkat…';
+
+  @override
+  String get deviceRegistrationFailed =>
+      'Tidak dapat menyiapkan pesan di perangkat ini.';
+
+  @override
   String get selectEmojiTitle => 'Pilih emoji';
 
   @override

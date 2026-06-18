@@ -1104,6 +1104,30 @@ abstract class AppLocalizations {
   /// **'eko messenger coming soon'**
   String get messengerSubtitle;
 
+  /// No description provided for @messengerSetupBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Register this device to send and receive end-to-end encrypted messages.'**
+  String get messengerSetupBody;
+
+  /// No description provided for @enableMessages.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable messages'**
+  String get enableMessages;
+
+  /// No description provided for @registeringDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'Registering device…'**
+  String get registeringDevice;
+
+  /// No description provided for @deviceRegistrationFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not set up messaging on this device.'**
+  String get deviceRegistrationFailed;
+
   /// No description provided for @selectEmojiTitle.
   ///
   /// In en, this message translates to:

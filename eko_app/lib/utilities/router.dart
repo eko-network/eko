@@ -1,5 +1,4 @@
 import 'package:cross_file/cross_file.dart' show XFile;
-import 'package:eko_app/messenger/views/no_web_gaurd.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -217,7 +216,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                 path: '/messages',
                 name: 'messages',
                 pageBuilder: (context, state) => NoTransitionPage(
-                  child: NoMessagesForWeb(child: AdaptiveChat()),
+                  child: MessagesGaurd(child: AdaptiveChat()),
                 ),
                 routes: [
                   GoRoute(
@@ -237,14 +236,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                       }
 
                       if (id == null) {
-                        return buildPage(
-                          NoMessagesForWeb(child: AdaptiveChat()),
-                        );
+                        return buildPage(MessagesGaurd(child: AdaptiveChat()));
                       }
                       return buildPage(
-                        NoMessagesForWeb(
-                          child: AdaptiveChat(selectedGroupId: id),
-                        ),
+                        MessagesGaurd(child: AdaptiveChat(selectedGroupId: id)),
                       );
                     },
                   ),

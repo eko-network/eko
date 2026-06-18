@@ -3,7 +3,8 @@ create table "public"."devices" (
   "created_at" timestamp with time zone not null default now(),
   "uid" uuid default gen_random_uuid(),
   "session_id" uuid default gen_random_uuid(),
-  "signer_public_key" bytea not null
+  "signer_public_key" bytea not null,
+  "approved_at" timestamp with time zone default null
 );
 
 create table "public"."key_packages" (
@@ -16,13 +17,14 @@ CREATE OR REPLACE FUNCTION public.custom_access_token_hook (event jsonb) RETURNS
 SET
   search_path = '' AS $$
 DECLARE
+  approved_at_v timestamp with time zone;
   original_claims jsonb := event -> 'claims';
   device_did      uuid;
   claim           text;
   new_claims      jsonb;
 BEGIN
   -- look up did by session_id
-  SELECT id INTO device_did
+  SELECT id, approved_at INTO device_did, approved_at_v
   FROM public.devices
   WHERE session_id = (original_claims ->> 'session_id')::uuid;
 
@@ -30,7 +32,11 @@ BEGIN
   new_claims := original_claims;
 
   IF device_did IS NOT NULL THEN
-    new_claims := jsonb_set(new_claims, '{did}', to_jsonb(device_did));
+    new_claims := jsonb_set(new_claims, '{app_metadata, did}', to_jsonb(device_did));
+  END IF;
+
+  IF approved_at_v IS NOT NULL THEN
+    new_claims := jsonb_set(new_claims, '{app_metadata, dat}', to_jsonb(approved_at_v));
   END IF;
 
   RETURN jsonb_build_object('claims', new_claims);
@@ -47,18 +53,22 @@ SET
 DECLARE
   v_uid        UUID := auth.uid();
   v_session_id UUID := (auth.jwt() ->> 'session_id')::UUID;
+  v_tofu BOOL;
   pkg          TEXT;
 BEGIN
   IF v_uid IS NULL THEN
     RAISE EXCEPTION 'Not authenticated';
   END IF;
 
-  INSERT INTO public.devices (id, uid, session_id, signer_public_key)
+  SELECT NOT EXISTS (SELECT 1 FROM public.devices WHERE uid = v_uid AND approved_at IS NOT NULL) INTO v_tofu;
+
+  INSERT INTO public.devices (id, uid, session_id, signer_public_key, approved_at)
   VALUES (
     p_did,
     v_uid,
     v_session_id,
-    CASE WHEN p_signer_public_key IS NOT NULL THEN decode(p_signer_public_key, 'base64') ELSE NULL END
+    CASE WHEN p_signer_public_key IS NOT NULL THEN decode(p_signer_public_key, 'base64') ELSE NULL END,
+    CASE WHEN v_tofu THEN now() ELSE NULL END
   )
   ON CONFLICT (id) DO UPDATE
     SET session_id          = EXCLUDED.session_id,

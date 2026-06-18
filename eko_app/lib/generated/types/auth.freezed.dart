@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$AuthModel {
 
- String? get did; String? get uid; String? get email;
+ String? get uid; String? get email; DeviceModel? get device;
 /// Create a copy of AuthModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $AuthModelCopyWith<AuthModel> get copyWith => _$AuthModelCopyWithImpl<AuthModel>
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AuthModel&&(identical(other.did, did) || other.did == did)&&(identical(other.uid, uid) || other.uid == uid)&&(identical(other.email, email) || other.email == email));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AuthModel&&(identical(other.uid, uid) || other.uid == uid)&&(identical(other.email, email) || other.email == email)&&(identical(other.device, device) || other.device == device));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,did,uid,email);
+int get hashCode => Object.hash(runtimeType,uid,email,device);
 
 @override
 String toString() {
-  return 'AuthModel(did: $did, uid: $uid, email: $email)';
+  return 'AuthModel(uid: $uid, email: $email, device: $device)';
 }
 
 
@@ -45,11 +45,11 @@ abstract mixin class $AuthModelCopyWith<$Res>  {
   factory $AuthModelCopyWith(AuthModel value, $Res Function(AuthModel) _then) = _$AuthModelCopyWithImpl;
 @useResult
 $Res call({
- String? did, String? uid, String? email
+ String? uid, String? email, DeviceModel? device
 });
 
 
-
+$DeviceModelCopyWith<$Res>? get device;
 
 }
 /// @nodoc
@@ -62,15 +62,27 @@ class _$AuthModelCopyWithImpl<$Res>
 
 /// Create a copy of AuthModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? did = freezed,Object? uid = freezed,Object? email = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? uid = freezed,Object? email = freezed,Object? device = freezed,}) {
   return _then(_self.copyWith(
-did: freezed == did ? _self.did : did // ignore: cast_nullable_to_non_nullable
-as String?,uid: freezed == uid ? _self.uid : uid // ignore: cast_nullable_to_non_nullable
+uid: freezed == uid ? _self.uid : uid // ignore: cast_nullable_to_non_nullable
 as String?,email: freezed == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,device: freezed == device ? _self.device : device // ignore: cast_nullable_to_non_nullable
+as DeviceModel?,
   ));
 }
+/// Create a copy of AuthModel
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$DeviceModelCopyWith<$Res>? get device {
+    if (_self.device == null) {
+    return null;
+  }
 
+  return $DeviceModelCopyWith<$Res>(_self.device!, (value) {
+    return _then(_self.copyWith(device: value));
+  });
+}
 }
 
 
@@ -152,10 +164,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? did,  String? uid,  String? email)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? uid,  String? email,  DeviceModel? device)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _AuthModel() when $default != null:
-return $default(_that.did,_that.uid,_that.email);case _:
+return $default(_that.uid,_that.email,_that.device);case _:
   return orElse();
 
 }
@@ -173,10 +185,10 @@ return $default(_that.did,_that.uid,_that.email);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? did,  String? uid,  String? email)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? uid,  String? email,  DeviceModel? device)  $default,) {final _that = this;
 switch (_that) {
 case _AuthModel():
-return $default(_that.did,_that.uid,_that.email);case _:
+return $default(_that.uid,_that.email,_that.device);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -193,10 +205,10 @@ return $default(_that.did,_that.uid,_that.email);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? did,  String? uid,  String? email)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? uid,  String? email,  DeviceModel? device)?  $default,) {final _that = this;
 switch (_that) {
 case _AuthModel() when $default != null:
-return $default(_that.did,_that.uid,_that.email);case _:
+return $default(_that.uid,_that.email,_that.device);case _:
   return null;
 
 }
@@ -208,12 +220,12 @@ return $default(_that.did,_that.uid,_that.email);case _:
 
 
 class _AuthModel implements AuthModel {
-  const _AuthModel({this.did, this.uid, this.email});
+  const _AuthModel({required this.uid, this.email, this.device});
   
 
-@override final  String? did;
 @override final  String? uid;
 @override final  String? email;
+@override final  DeviceModel? device;
 
 /// Create a copy of AuthModel
 /// with the given fields replaced by the non-null parameter values.
@@ -225,16 +237,16 @@ _$AuthModelCopyWith<_AuthModel> get copyWith => __$AuthModelCopyWithImpl<_AuthMo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AuthModel&&(identical(other.did, did) || other.did == did)&&(identical(other.uid, uid) || other.uid == uid)&&(identical(other.email, email) || other.email == email));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AuthModel&&(identical(other.uid, uid) || other.uid == uid)&&(identical(other.email, email) || other.email == email)&&(identical(other.device, device) || other.device == device));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,did,uid,email);
+int get hashCode => Object.hash(runtimeType,uid,email,device);
 
 @override
 String toString() {
-  return 'AuthModel(did: $did, uid: $uid, email: $email)';
+  return 'AuthModel(uid: $uid, email: $email, device: $device)';
 }
 
 
@@ -245,11 +257,11 @@ abstract mixin class _$AuthModelCopyWith<$Res> implements $AuthModelCopyWith<$Re
   factory _$AuthModelCopyWith(_AuthModel value, $Res Function(_AuthModel) _then) = __$AuthModelCopyWithImpl;
 @override @useResult
 $Res call({
- String? did, String? uid, String? email
+ String? uid, String? email, DeviceModel? device
 });
 
 
-
+@override $DeviceModelCopyWith<$Res>? get device;
 
 }
 /// @nodoc
@@ -262,16 +274,28 @@ class __$AuthModelCopyWithImpl<$Res>
 
 /// Create a copy of AuthModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? did = freezed,Object? uid = freezed,Object? email = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? uid = freezed,Object? email = freezed,Object? device = freezed,}) {
   return _then(_AuthModel(
-did: freezed == did ? _self.did : did // ignore: cast_nullable_to_non_nullable
-as String?,uid: freezed == uid ? _self.uid : uid // ignore: cast_nullable_to_non_nullable
+uid: freezed == uid ? _self.uid : uid // ignore: cast_nullable_to_non_nullable
 as String?,email: freezed == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,device: freezed == device ? _self.device : device // ignore: cast_nullable_to_non_nullable
+as DeviceModel?,
   ));
 }
 
+/// Create a copy of AuthModel
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$DeviceModelCopyWith<$Res>? get device {
+    if (_self.device == null) {
+    return null;
+  }
 
+  return $DeviceModelCopyWith<$Res>(_self.device!, (value) {
+    return _then(_self.copyWith(device: value));
+  });
+}
 }
 
 // dart format on

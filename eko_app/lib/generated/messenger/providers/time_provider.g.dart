@@ -9,12 +9,11 @@ part of '../../../messenger/providers/time_provider.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 
-@ProviderFor(currentTime)
+@ProviderFor(CurrentTime)
 final currentTimeProvider = CurrentTimeProvider._();
 
 final class CurrentTimeProvider
-    extends $FunctionalProvider<DateTime, DateTime, DateTime>
-    with $Provider<DateTime> {
+    extends $NotifierProvider<CurrentTime, DateTime> {
   CurrentTimeProvider._()
     : super(
         from: null,
@@ -31,13 +30,7 @@ final class CurrentTimeProvider
 
   @$internal
   @override
-  $ProviderElement<DateTime> $createElement($ProviderPointer pointer) =>
-      $ProviderElement(pointer);
-
-  @override
-  DateTime create(Ref ref) {
-    return currentTime(ref);
-  }
+  CurrentTime create() => CurrentTime();
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(DateTime value) {
@@ -48,4 +41,22 @@ final class CurrentTimeProvider
   }
 }
 
-String _$currentTimeHash() => r'14f8de9d3aa377b65bb064226b0a4252d143aeaa';
+String _$currentTimeHash() => r'4c7e0e9e3fd1fd05a29a01a065aead62e71738f9';
+
+abstract class _$CurrentTime extends $Notifier<DateTime> {
+  DateTime build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<DateTime, DateTime>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<DateTime, DateTime>,
+              DateTime,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
+  }
+}

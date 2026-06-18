@@ -537,6 +537,20 @@ class AppLocalizationsEs extends AppLocalizations {
   String get messengerSubtitle => 'eko messenger próximamente';
 
   @override
+  String get messengerSetupBody =>
+      'Registra este dispositivo para enviar y recibir mensajes cifrados de extremo a extremo.';
+
+  @override
+  String get enableMessages => 'Activar mensajes';
+
+  @override
+  String get registeringDevice => 'Registrando dispositivo…';
+
+  @override
+  String get deviceRegistrationFailed =>
+      'No se pudo configurar la mensajería en este dispositivo.';
+
+  @override
   String get selectEmojiTitle => 'Seleccionar emoji';
 
   @override

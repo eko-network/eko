@@ -1,24 +1,17 @@
 import 'dart:async';
-import 'package:eko_app/messenger/ecp_helpers.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:path/path.dart' as p;
-import 'dart:convert';
-import 'dart:io';
-import 'package:ecp/ecp.dart';
+import 'package:eko_app/types/device.dart';
 import 'package:eko_app/database/database.dart';
 import 'package:eko_app/database/storage.dart';
 import 'package:eko_app/localization/generated/app_localizations.dart';
 import 'package:eko_app/utilities/device_uid_service.dart';
 import 'package:eko_app/widgets/errors/snack_bar.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:eko_app/types/auth.dart';
 import 'package:eko_app/utilities/supabase_ref.dart';
 import 'package:eko_app/utilities/constants.dart' as c;
-import 'package:eko_app/utilities/ecp_db_path.dart';
 import 'package:eko_app/utilities/shared_pref_service.dart';
 import 'package:eko_app/interfaces/notification_helper.dart';
 import 'package:eko_app/interfaces/user.dart' as user;
@@ -27,53 +20,6 @@ import 'package:eko_app/utilities/platform.dart' as platform;
 part '../generated/providers/auth_provider.g.dart';
 
 Future<void>? _registerNotificationsInFlight;
-
-Map<String, dynamic>? decodeJwtPayloadMap(String? accessToken) {
-  if (accessToken == null || accessToken.isEmpty) return null;
-  final parts = accessToken.split('.');
-  if (parts.length != 3) return null;
-  try {
-    var normalized = parts[1].replaceAll('-', '+').replaceAll('_', '/');
-    final pad = normalized.length % 4;
-    if (pad == 1) return null;
-    if (pad != 0) {
-      normalized = normalized.padRight(normalized.length + (4 - pad), '=');
-    }
-    final decoded = jsonDecode(utf8.decode(base64Decode(normalized)));
-    if (decoded is! Map) return null;
-    return Map<String, dynamic>.from(decoded);
-  } catch (_) {
-    return null;
-  }
-}
-
-String? _didFromDynamic(Object? v) {
-  if (v is String && v.isNotEmpty) return v;
-  return null;
-}
-
-String? didFromAccessTokenClaims(String? accessToken) {
-  final map = decodeJwtPayloadMap(accessToken);
-  if (map == null) return null;
-  final app = map['app_metadata'];
-  if (app is Map) {
-    final nested = _didFromDynamic(app['did']);
-    if (nested != null) return nested;
-  }
-  return _didFromDynamic(map['did']);
-}
-
-String? didFromSession(Session session) {
-  final fromSdk = didFromUserAppMetadata(session.user);
-  if (fromSdk != null) return fromSdk;
-  return didFromAccessTokenClaims(session.accessToken);
-}
-
-String? didFromUserAppMetadata(User user) {
-  final v = user.appMetadata['did'];
-  if (v is String && v.isNotEmpty) return v;
-  return null;
-}
 
 class SignUpOutcome {
   const SignUpOutcome({this.errorCode, this.needsEmailVerification = false});
@@ -123,21 +69,18 @@ void handleAuthError(Object e, BuildContext context) {
 
 @Riverpod(keepAlive: true)
 class Auth extends _$Auth {
-  EcpCore? _core;
   StreamSubscription? _authSub;
-  EcpCore? get core => _core;
   @override
   Future<AuthModel> build() async {
     ref.onDispose(() {
       _authSub?.cancel();
-      _core?.close();
     });
     final session = supabase.auth.currentSession;
     final AuthModel nextState;
     if (session != null) {
       nextState = await _stateFromSession(session);
     } else {
-      nextState = AuthModel.signedOut();
+      nextState = AuthModel(uid: null);
     }
     _listenToAuthChanges();
     return nextState;
@@ -146,105 +89,16 @@ class Auth extends _$Auth {
   Future<AuthModel> _stateFromSession(Session session) async {
     debugPrint('[Auth] _stateFromSession called');
     final u = session.user;
-    String? did;
-    if (!platform.isWeb) {
-      if (_core == null) {
-        debugPrint('[Auth][ECP] Initilizing core');
-        final storage = AppStorage(db);
-        final mlsDbDir = await getDbPath();
-        final mlsDbDirEntity = Directory(mlsDbDir);
-        if (!await mlsDbDirEntity.exists()) {
-          await mlsDbDirEntity.create(recursive: true);
-        }
-        final mlsDbFile = File(p.join(mlsDbDir, 'mls.db'));
-
-        // Check if there's a stored config with a stale path (common on iOS Simulators)
-        try {
-          final existingConfig = await storage.mlsEngineConfigStore.getConfig();
-          if (existingConfig != null &&
-              existingConfig.dbPath != mlsDbFile.path) {
-            debugPrint(
-              '[Auth][ECP] Updating stale mls.db path: ${existingConfig.dbPath} -> ${mlsDbFile.path}',
-            );
-            // Migrate existing database if it exists at old path
-            final oldFile = File(existingConfig.dbPath);
-            if (await oldFile.exists()) {
-              try {
-                if (await mlsDbFile.exists()) {
-                  await mlsDbFile.delete();
-                }
-                await mlsDbFile.writeAsBytes(await oldFile.readAsBytes());
-                debugPrint('[Auth][ECP] Migrated mls.db to new location');
-              } catch (e) {
-                debugPrint('[Auth][ECP] Failed to migrate mls.db: $e');
-              }
-            }
-            await storage.mlsEngineConfigStore.saveConfig(
-              MlsEngineConfig(
-                dbPath: mlsDbFile.path,
-                encryptionKey: existingConfig.encryptionKey,
-              ),
-            );
-          }
-          if (existingConfig != null) {
-            const _storage = FlutterSecureStorage(
-              iOptions: IOSOptions(
-                accessibility: KeychainAccessibility.first_unlock_this_device,
-                synchronizable: false,
-                groupId: 'group.com.example.untitledApp',
-              ),
-            );
-            // save encryption key to shared spot for ios NotificationService to access
-            await _storage.write(
-              key: 'mls_encryption_key',
-              value: base64Encode(existingConfig.encryptionKey),
-            );
-          }
-        } catch (e) {
-          debugPrint(
-            '[Auth][ECP] Error checking/updating stale mls.db path: $e',
-          );
-        }
-
-        _core = EcpCore(
-          storage: storage,
-          identity: EkoPerson.fromUid(u.id),
-          engineConfig: await MlsEngineConfig.fromPath(mlsDbFile, storage),
-        );
-      }
-      assert(_core != null, 'core cannot be null');
-      try {
-        await _core!.open();
-      } catch (e) {
-        if (e.toString().contains('Encryption key verification failed')) {
-          _core = null;
-          // Re-attempting once more will trigger the MlsEngineConfig.fromPath logic
-          // which now handles existing files with missing/wrong keys.
-          return _stateFromSession(session);
-        }
-        rethrow;
-      }
-      debugPrint('[Auth][ECP] Core is open');
-      did = didFromSession(session);
-      if (did == null) {
-        debugPrint('[Auth][ECP] Registering device');
-        final (credential, keyPackages) = await _core!.createIdentity();
-        await supabase.rpc(
-          'register_device',
-          params: {
-            'p_did': DeviceUidService.getOrCreate(),
-            'p_signer_public_key': base64Encode(credential.signerPublicKey),
-            'p_key_packages': keyPackages
-                .map((it) => base64Encode(it.keyPackageBytes))
-                .toList(),
-          },
-        );
-        await supabase.auth.refreshSession();
-      }
-    }
-
     registerNotificationsIfNeeded(u.id);
-    return AuthModel(uid: u.id, did: did, email: u.email);
+    final model = AuthModel(
+      uid: u.id,
+      email: u.email,
+      device: DeviceModel.fromSession(session),
+    );
+    debugPrint(
+      '[Auth] _stateFromSession called\n\tuid: ${model.uid}\n\t\tdid: ${model.device?.did ?? 'null'}\n\t\tdat: ${model.device?.dat ?? 'null'}',
+    );
+    return model;
   }
 
   void _listenToAuthChanges() {
@@ -263,7 +117,8 @@ class Auth extends _$Auth {
         final isSameToken =
             state.value?.uid == session.user.id &&
             state.value?.email == session.user.email &&
-            (platform.isWeb || state.value?.did == didFromSession(session));
+            (platform.isWeb ||
+                DeviceModel.fromSession(session) == state.value?.device);
 
         if (!isSameToken) {
           state = const AsyncValue.loading();
@@ -355,11 +210,6 @@ class Auth extends _$Auth {
 
   Future<void> _cleanAfterSignOut() async {
     await AppStorage(db).clear();
-    final core = _core;
-    _core = null;
-    if (core != null) {
-      await core.close();
-    }
     state = AsyncValue.data(AuthModel.signedOut());
   }
 

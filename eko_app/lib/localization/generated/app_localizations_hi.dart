@@ -532,6 +532,20 @@ class AppLocalizationsHi extends AppLocalizations {
   String get messengerSubtitle => 'eko messenger जल्द आ रहा है';
 
   @override
+  String get messengerSetupBody =>
+      'एंड-टू-एंड एन्क्रिप्टेड संदेश भेजने और प्राप्त करने के लिए इस डिवाइस को पंजीकृत करें।';
+
+  @override
+  String get enableMessages => 'संदेश सक्षम करें';
+
+  @override
+  String get registeringDevice => 'डिवाइस पंजीकृत हो रहा है…';
+
+  @override
+  String get deviceRegistrationFailed =>
+      'इस डिवाइस पर मैसेजिंग सेट अप नहीं हो सकी।';
+
+  @override
   String get selectEmojiTitle => 'इमोजी चुनें';
 
   @override
