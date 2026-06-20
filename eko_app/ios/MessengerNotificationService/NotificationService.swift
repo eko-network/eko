@@ -37,24 +37,17 @@ class NotificationService: UNNotificationServiceExtension {
             debugBody("DEBUG: \(msg). got: \(userInfo["mls_message"] ?? "nil")")
             return
         }
-        guard let groupIdB64 = userInfo["group_id"] as? String else {
-            let msg = "group_id missing"
-            logger.debug("[didReceive] \(msg)")
-            debugBody("DEBUG: \(msg). got: \(userInfo["group_id"] ?? "nil")")
-            return
-        }
         guard let ciphertext = Data(base64Encoded: ciphertextB64) else {
             let msg = "mls_message b64 decode failed"
             logger.debug("[didReceive] \(msg)")
             debugBody("DEBUG: \(msg): \(String(ciphertextB64.prefix(40)))...")
             return
         }
-        guard let groupId = Data(base64Encoded: groupIdB64) else {
-            let msg = "group_id b64 decode failed"
+        guard let serverMessageId = userInfo["object_id"] as? String else {let msg = "object_id missing"
             logger.debug("[didReceive] \(msg)")
-            debugBody("DEBUG: \(msg): \(String(groupIdB64.prefix(40)))...")
-            return
-        }
+            debugBody("DEBUG: \(msg). got: \(userInfo["object_id"] ?? "nil")")
+            return}
+
         guard let dbPath = FileManager.default
                 .containerURL(forSecurityApplicationGroupIdentifier: "group.com.example.untitledApp")?
                 .appendingPathComponent("mls.db").path
@@ -87,26 +80,31 @@ class NotificationService: UNNotificationServiceExtension {
         
         var pt: UnsafeMutablePointer<UInt8>?
         var ptLen: Int = 0
+
+        var gid: UnsafeMutablePointer<UInt8>?
+        var gidLen: Int = 0
         
-        let rc = groupId.withUnsafeBytes { gid in
+        let rc = 
             ciphertext.withUnsafeBytes { msg in
                 openmls_push_decrypt_message(
                     engine,
-                    gid.baseAddress!, gid.count,
                     msg.baseAddress!, msg.count,
-                    &pt, &ptLen, nil, &err
+                    &pt, &ptLen, nil, 
+                    &gid, &gidLen,
+                    &err
                 )
-            }
         }
         
         if rc == 0, let pt = pt {
             let plaintext = Data(bytes: pt, count: ptLen)
+            let groupId = Data(bytes: gid!, count: gidLen)
             let body = String(data: plaintext, encoding: .utf8) ?? "New message"
             openmls_push_decrypt_free_bytes(pt, ptLen)
+            openmls_push_decrypt_free_bytes(gid!, gidLen)
             logger.debug("[didReceive] decrypted \(ptLen)B plaintext")
 
             // store decrypted message in ecp.db so the app has when opend
-            storeDecryptedMessageInAppDb(groupId: groupId, plaintext: plaintext)
+            storeDecryptedMessageInAppDb(groupId: groupId, serverMessageId: serverMessageId, plaintext: plaintext)
 
             // try to extract message content from ActivityPub JSON
             if let json = try? JSONSerialization.jsonObject(with: plaintext) as? [String: Any],
@@ -148,7 +146,7 @@ class NotificationService: UNNotificationServiceExtension {
     }
     
     /// open ecp.db via SQLCipher and insert the decrypted message + mark as processed.
-    private func storeDecryptedMessageInAppDb(groupId: Data, plaintext: Data) {
+    private func storeDecryptedMessageInAppDb(groupId: Data, serverMessageId: String, plaintext: Data) {
         let tag = "[storeDecryptedMessageInAppDb]"
         guard let appGroup = FileManager.default
                 .containerURL(forSecurityApplicationGroupIdentifier: "group.com.example.untitledApp")
@@ -192,13 +190,17 @@ class NotificationService: UNNotificationServiceExtension {
 
         // parse ActivityPub JSON payload
         let json = try? JSONSerialization.jsonObject(with: plaintext) as? [String: Any]
+        if let json = json {
+            logger.debug("\(tag) full payload: \(json, privacy: .public)")
+        }
         let serverActivityId = json?["id"] as? String ?? UUID().uuidString
+        logger.debug("processing serverActivityId=\(serverActivityId, privacy: .public)")
         let senderId = json?["actor"] as? String ?? ""
         let obj = json?["object"] as? [String: Any]
         let content = obj?["content"] as? String
         let inReplyTo = obj?["inReplyTo"] as? String
         let messageId = obj?["id"] as? String ?? UUID().uuidString
-        logger.debug("\(tag) processing msg serverActivityId=\(serverActivityId, privacy: .public)")
+        logger.debug("\(tag) processing msg messageId=\(messageId, privacy: .public)")
 
         // Drift stores DateTime as seconds since epoch
         let receivedAt = Int64(Date().timeIntervalSince1970)
@@ -276,7 +278,7 @@ class NotificationService: UNNotificationServiceExtension {
             return
         }
 
-        sqlite3_bind_text(markStmt, 1, (serverActivityId as NSString).utf8String, -1, nil)
+        sqlite3_bind_text(markStmt, 1, (serverMessageId as NSString).utf8String, -1, nil)
         if sqlite3_step(markStmt) == SQLITE_DONE {
             logger.debug("\(tag) marked processed_objects")
         }
