@@ -174,11 +174,21 @@ class _DriftMessageStore implements MessageStore {
   final AppDatabase _db;
   _DriftMessageStore(this._db);
 
+  final _pendingDeliveries = <Uri>{};
+
   @override
   Future<void> saveMessage(StoredMessage message) async {
     debugPrint('[AppStorage] saving message with content: ${message.content}');
+    debugPrint(
+      '[AppStorage] saving message with serverActivityId: ${message.serverActivityId}',
+    );
+    debugPrint('[AppStorage] saving message with id: ${message.id}');
 
     await _db.transaction(() async {
+      final isDelivered =
+          message.delivered ||
+          _pendingDeliveries.remove(message.serverActivityId);
+
       await _db
           .into(_db.storedMessages)
           .insertOnConflictUpdate(
@@ -190,7 +200,7 @@ class _DriftMessageStore implements MessageStore {
               id: message.id,
               content: Value(message.content),
               inReplyTo: Value(message.inReplyTo),
-              delivered: Value(message.delivered),
+              delivered: Value(isDelivered),
             ),
           );
       for (final attachmentId in message.attachment) {
@@ -208,11 +218,17 @@ class _DriftMessageStore implements MessageStore {
 
   @override
   Future<bool> markMessageDelivered(Uri serverActivityId) async {
+    // TODO there exists interleavings where the queue is empty when the message comes in and then the delivery message is added to the queue and the delivered query happens before the message is inserted. i dont want to introduce locks bc thats scary. and delivered markings are not very important.
+    _pendingDeliveries.add(serverActivityId);
+
     final count =
         await (_db.update(_db.storedMessages)..where(
               (t) => t.serverActivityId.equals(serverActivityId.toString()),
             ))
             .write(StoredMessagesCompanion(delivered: const Value(true)));
+    if (count > 0) {
+      _pendingDeliveries.remove(serverActivityId);
+    }
     debugPrint(
       '[AppStorage] markMessageDelivered: $serverActivityId -> $count rows',
     );
@@ -236,6 +252,7 @@ class _DriftProcessedObjectStore implements ProcessedObjectStore {
     final row = await (_db.select(
       _db.processedObjects,
     )..where((t) => t.id.equals(id.toString()))).getSingleOrNull();
+    print("checking if message id: $id exists: $row");
     return row != null;
   }
 
