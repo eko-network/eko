@@ -66,7 +66,7 @@ final class MessageProvider
   }
 }
 
-String _$messageHash() => r'dde4508dfd09c667ee1883f3d630f48bf444e9ea';
+String _$messageHash() => r'e19ef42a7fdea8653862ee6f8ae7d9df0fd1e4c0';
 
 final class MessageFamily extends $Family
     with $FunctionalFamilyOverride<Stream<List<StoredMessage>>, Uint8List> {

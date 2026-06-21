@@ -33,7 +33,7 @@ final class EcpCoreHolderProvider
   EcpCoreHolder create() => EcpCoreHolder();
 }
 
-String _$ecpCoreHolderHash() => r'423e5cf0c53502bf3655fe77de07e76eeab93da1';
+String _$ecpCoreHolderHash() => r'88fc63af6330a612032ed36e42a821514b1c79eb';
 
 abstract class _$EcpCoreHolder extends $AsyncNotifier<EcpCore?> {
   FutureOr<EcpCore?> build();
