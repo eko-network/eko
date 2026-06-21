@@ -91,27 +91,31 @@ class EcpCoreHolder extends _$EcpCoreHolder {
             ),
           );
         }
-        if (existingConfig != null) {
-          const secureStorage = FlutterSecureStorage(
-            iOptions: IOSOptions(
-              accessibility: KeychainAccessibility.first_unlock_this_device,
-              synchronizable: false,
-              groupId: 'group.com.example.untitledApp',
-            ),
-          );
-          await secureStorage.write(
-            key: 'mls_encryption_key',
-            value: base64Encode(existingConfig.encryptionKey),
-          );
-        }
       } catch (e) {
         debugPrint('[EcpCore] Error checking/updating stale mls.db path: $e');
+      }
+
+      final engineConfig = await MlsEngineConfig.fromPath(mlsDbFile, storage);
+
+      // for ios add key to storage so NotificationService can read it securely
+      if (platform.isIOS) {
+        const secureStorage = FlutterSecureStorage(
+          iOptions: IOSOptions(
+            accessibility: KeychainAccessibility.first_unlock_this_device,
+            synchronizable: false,
+            groupId: 'group.com.example.untitledApp',
+          ),
+        );
+        await secureStorage.write(
+          key: 'mls_encryption_key',
+          value: base64Encode(engineConfig.encryptionKey),
+        );
       }
 
       _core = EcpCore(
         storage: storage,
         identity: EkoPerson.fromUid(u.id),
-        engineConfig: await MlsEngineConfig.fromPath(mlsDbFile, storage),
+        engineConfig: engineConfig,
       );
     }
 
