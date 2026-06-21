@@ -33,7 +33,8 @@ class ChatView extends ConsumerStatefulWidget {
   ConsumerState<ChatView> createState() => _ChatViewState();
 }
 
-class _ChatViewState extends ConsumerState<ChatView> {
+class _ChatViewState extends ConsumerState<ChatView>
+    with WidgetsBindingObserver {
   final TextEditingController _messageController = TextEditingController();
   final MenuController _menuController = MenuController();
   final FocusNode _focusNode = FocusNode();
@@ -43,6 +44,7 @@ class _ChatViewState extends ConsumerState<ChatView> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _focusNode.addListener(() {
       if (_focusNode.hasFocus) {
         setState(() {
@@ -57,9 +59,17 @@ class _ChatViewState extends ConsumerState<ChatView> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _focusNode.dispose();
     _messageController.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      ref.invalidate(messageProvider(widget.group.group.groupIdBytes));
+    }
   }
 
   void _onGifSelected(KlipyResultObject gif) {
