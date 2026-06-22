@@ -296,6 +296,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get newLines => 'New Lines';
 
   @override
+  String get chats => 'Chats';
+
+  @override
   String get newMessage => 'New message';
 
   @override

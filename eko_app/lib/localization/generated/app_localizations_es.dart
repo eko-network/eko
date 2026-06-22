@@ -300,6 +300,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get newLines => 'Lineas nuevas';
 
   @override
+  String get chats => 'Chats';
+
+  @override
   String get newMessage => 'Nuevo mensaje';
 
   @override

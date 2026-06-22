@@ -41,6 +41,7 @@ Future<void> _sendPendingDeliveryAcks(
     } catch (e) {
       debugPrint('sendPendingDeliveryAcks failed: $e');
     }
+    // if it fails, for whatever reason, just mark it delivered anyways so it doesnt retry
     await client.core.storage.messageStore.markMessageDelivered(
       message.serverActivityId,
     );

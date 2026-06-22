@@ -295,6 +295,9 @@ class AppLocalizationsHi extends AppLocalizations {
   String get newLines => 'नई पंक्तियाँ';
 
   @override
+  String get chats => 'Chats';
+
+  @override
   String get newMessage => 'नया संदेश';
 
   @override

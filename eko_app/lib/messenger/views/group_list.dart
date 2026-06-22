@@ -174,7 +174,7 @@ class _ConversationListState extends ConsumerState<GroupList> {
                       alignment: Alignment.center,
                       children: [
                         Text(
-                          'Chats',
+                          l10n.chats,
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 20,
@@ -218,39 +218,78 @@ class _ConversationListState extends ConsumerState<GroupList> {
                 Column(
                   mainAxisSize: MainAxisSize.max,
                   children: [
-                    const SizedBox(height: 8),
                     if (!showOnlyAvatar)
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
+                      Stack(
+                        alignment: Alignment.center,
                         children: [
-                          const SizedBox(width: 16),
-                          SizedBox(
-                            width: c.kConversationAvatarRadius * 2,
-                            height: c.kConversationAvatarRadius * 2,
-                            child: IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  newChatScreen = false;
-                                  searchController.clear();
-                                  searchData.clear();
-                                  searchIsEnd = false;
-                                  lastSearchVal = '';
-                                });
-                              },
-                              icon: const Icon(Icons.chevron_left),
-                              iconSize: 30,
-                              padding: const EdgeInsets.all(5),
-                              splashRadius: c.kConversationAvatarRadius,
-                            ),
-                          ),
-                          const SizedBox(width: 16),
+                          showOnlyAvatar
+                              ? IconButton(
+                                  onPressed: onNewPressed,
+                                  icon: const Icon(LucideIcons.squarePen),
+                                )
+                              : Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: SizedBox(
+                                    width: c.kConversationAvatarRadius * 2,
+                                    height: c.kConversationAvatarRadius * 2,
+                                    child: IconButton(
+                                      onPressed: () {
+                                        setState(() {
+                                          newChatScreen = false;
+                                          searchController.clear();
+                                          searchData.clear();
+                                          searchIsEnd = false;
+                                          lastSearchVal = '';
+                                        });
+                                      },
+                                      icon: const Icon(Icons.chevron_left),
+                                      iconSize: 30,
+                                      padding: const EdgeInsets.all(5),
+                                      splashRadius: c.kConversationAvatarRadius,
+                                    ),
+                                  ),
+                                ),
                           Text(
                             l10n.newMessage,
-                            style: Theme.of(context).textTheme.titleLarge,
-                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
                           ),
                         ],
                       ),
+                    // Row(
+                    //   crossAxisAlignment: CrossAxisAlignment.center,
+                    //   children: [
+                    //     const SizedBox(width: 16),
+                    //     SizedBox(
+                    //       width: c.kConversationAvatarRadius * 2,
+                    //       height: c.kConversationAvatarRadius * 2,
+                    //       child: IconButton(
+                    //         onPressed: () {
+                    //           setState(() {
+                    //             newChatScreen = false;
+                    //             searchController.clear();
+                    //             searchData.clear();
+                    //             searchIsEnd = false;
+                    //             lastSearchVal = '';
+                    //           });
+                    //         },
+                    //         icon: const Icon(Icons.chevron_left),
+                    //         iconSize: 30,
+                    //         padding: const EdgeInsets.all(5),
+                    //         splashRadius: c.kConversationAvatarRadius,
+                    //       ),
+                    //     ),
+                    //     const SizedBox(width: 16),
+                    //     Text(
+                    //       l10n.newMessage,
+                    //       style: Theme.of(context).textTheme.titleLarge,
+                    //       overflow: TextOverflow.ellipsis,
+                    //     ),
+                    //   ],
+                    // ),
                     Expanded(
                       child: GestureDetector(
                         onPanDown: (details) =>

@@ -296,6 +296,9 @@ class AppLocalizationsId extends AppLocalizations {
   String get newLines => 'Baris Baru';
 
   @override
+  String get chats => 'Chats';
+
+  @override
   String get newMessage => 'Pesan baru';
 
   @override

@@ -654,6 +654,12 @@ abstract class AppLocalizations {
   /// **'New Lines'**
   String get newLines;
 
+  /// No description provided for @chats.
+  ///
+  /// In en, this message translates to:
+  /// **'Chats'**
+  String get chats;
+
   /// No description provided for @newMessage.
   ///
   /// In en, this message translates to:
