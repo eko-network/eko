@@ -171,6 +171,8 @@
   "enableMessages" : "Aktifkan pesan",
   "registeringDevice" : "Mendaftarkan perangkat…",
   "deviceRegistrationFailed" : "Tidak dapat menyiapkan pesan di perangkat ini.",
+  "messengerServerUnavailableTitle" : "Server pesan tidak tersedia",
+  "messengerServerUnavailableBody" : "Tidak dapat terhubung ke server pesan. Pastikan server berjalan dan coba lagi.",
   "selectEmojiTitle" : "Pilih emoji",
   "pushDistributorPickerTitle" : "Pilih distributor",
   "pushOpenNotification" : "Buka notifikasi",

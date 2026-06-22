@@ -30,6 +30,7 @@ class EcpCoreHolder extends _$EcpCoreHolder {
     });
 
     ref.listen(authProvider, (previous, next) {
+      if (next.isLoading) return;
       final prevUid = previous?.value?.uid;
       final nextUid = next.value?.uid;
       if (nextUid == null) {
@@ -46,7 +47,13 @@ class EcpCoreHolder extends _$EcpCoreHolder {
       return null;
     }
 
-    final did = ref.watch(authProvider).value?.device?.did;
+    final auth = ref.watch(authProvider);
+    if (auth.isLoading) {
+      if (_core != null) return _core;
+      return null;
+    }
+
+    final did = auth.value?.device?.did;
     if (did == null || did.isEmpty) {
       return null;
     }

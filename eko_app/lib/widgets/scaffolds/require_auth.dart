@@ -1,3 +1,5 @@
+import 'package:eko_app/messenger/utilities/messages_server_errors.dart';
+import 'package:eko_app/messenger/views/messages_server_unavailable_page.dart';
 import 'package:eko_app/messenger/views/messenger_setup_page.dart';
 import 'package:eko_app/providers/ecp_core_provider.dart';
 import 'package:eko_app/providers/ecp_provider.dart';
@@ -68,15 +70,16 @@ class MessagesGaurd extends ConsumerWidget {
     }
 
     final ecp = ref.watch(asyncEcpClientProvider);
-    if (ecp.isLoading) {
-      debugPrint('[RequireEcp] ecpProvider loading');
+    if (ecp.isLoading && !ecp.hasError) {
       return const Center(child: LoadingSpinner());
     }
     if (ecp.hasError) {
-      debugPrint('[RequireEcp] ecpProvider error');
+      debugPrint('[MessagesGuard] ecpProvider error: ${ecp.error}');
+      if (isMessagesServerUnavailable(ecp.error!)) {
+        return const MessagesServerUnavailablePage();
+      }
       return _e(context);
     }
-    debugPrint('[RequireEcp] ecpProvider satisfied');
     ref.watch(inboxPollingProvider);
     return child;
   }
@@ -89,15 +92,15 @@ class RequireEcp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final ecp = ref.watch(asyncEcpClientProvider);
-    if (ecp.isLoading) {
-      debugPrint('[RequireEcp] ecpProvider loading');
+    if (ecp.isLoading && !ecp.hasError) {
       return const Center(child: LoadingSpinner());
     }
     if (ecp.hasError) {
-      debugPrint('[RequireEcp] ecpProvider error');
+      if (isMessagesServerUnavailable(ecp.error!)) {
+        return const MessagesServerUnavailablePage();
+      }
       return _e(context);
     }
-    debugPrint('[RequireEcp] ecpProvider satisfied');
     ref.watch(inboxPollingProvider);
     return child;
   }

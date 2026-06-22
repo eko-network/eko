@@ -550,6 +550,13 @@ class AppLocalizationsId extends AppLocalizations {
       'Tidak dapat menyiapkan pesan di perangkat ini.';
 
   @override
+  String get messengerServerUnavailableTitle => 'Server pesan tidak tersedia';
+
+  @override
+  String get messengerServerUnavailableBody =>
+      'Tidak dapat terhubung ke server pesan. Pastikan server berjalan dan coba lagi.';
+
+  @override
   String get selectEmojiTitle => 'Pilih emoji';
 
   @override

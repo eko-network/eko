@@ -549,6 +549,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'Could not set up messaging on this device.';
 
   @override
+  String get messengerServerUnavailableTitle => 'Messages server unavailable';
+
+  @override
+  String get messengerServerUnavailableBody =>
+      'Could not reach the messages server. Check that it is running and try again.';
+
+  @override
   String get selectEmojiTitle => 'Select emoji';
 
   @override

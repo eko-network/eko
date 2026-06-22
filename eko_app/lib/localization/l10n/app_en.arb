@@ -179,6 +179,8 @@
   "enableMessages" : "Enable messages",
   "registeringDevice" : "Registering device…",
   "deviceRegistrationFailed" : "Could not set up messaging on this device.",
+  "messengerServerUnavailableTitle" : "Messages server unavailable",
+  "messengerServerUnavailableBody" : "Could not reach the messages server. Check that it is running and try again.",
   "selectEmojiTitle" : "Select emoji",
   "pushDistributorPickerTitle" : "Select a distributor",
   "pushOpenNotification" : "Open notification",

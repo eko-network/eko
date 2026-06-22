@@ -1134,6 +1134,18 @@ abstract class AppLocalizations {
   /// **'Could not set up messaging on this device.'**
   String get deviceRegistrationFailed;
 
+  /// No description provided for @messengerServerUnavailableTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Messages server unavailable'**
+  String get messengerServerUnavailableTitle;
+
+  /// No description provided for @messengerServerUnavailableBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not reach the messages server. Check that it is running and try again.'**
+  String get messengerServerUnavailableBody;
+
   /// No description provided for @selectEmojiTitle.
   ///
   /// In en, this message translates to:

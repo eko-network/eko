@@ -549,6 +549,13 @@ class AppLocalizationsHi extends AppLocalizations {
       'इस डिवाइस पर मैसेजिंग सेट अप नहीं हो सकी।';
 
   @override
+  String get messengerServerUnavailableTitle => 'मैसेज सर्वर उपलब्ध नहीं है';
+
+  @override
+  String get messengerServerUnavailableBody =>
+      'मैसेज सर्वर तक पहुँच नहीं हो सकी। जाँचें कि सर्वर चल रहा है और फिर से प्रयास करें।';
+
+  @override
   String get selectEmojiTitle => 'इमोजी चुनें';
 
   @override

@@ -554,6 +554,14 @@ class AppLocalizationsEs extends AppLocalizations {
       'No se pudo configurar la mensajería en este dispositivo.';
 
   @override
+  String get messengerServerUnavailableTitle =>
+      'Servidor de mensajes no disponible';
+
+  @override
+  String get messengerServerUnavailableBody =>
+      'No se pudo conectar con el servidor de mensajes. Comprueba que esté en ejecución e inténtalo de nuevo.';
+
+  @override
   String get selectEmojiTitle => 'Seleccionar emoji';
 
   @override
