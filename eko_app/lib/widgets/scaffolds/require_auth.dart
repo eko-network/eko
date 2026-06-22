@@ -85,7 +85,6 @@ class MessagesGaurd extends ConsumerWidget {
       }
       return _e(context);
     }
-    ref.watch(inboxPollingProvider);
     return child;
   }
 }
@@ -106,7 +105,6 @@ class RequireEcp extends ConsumerWidget {
       }
       return _e(context);
     }
-    ref.watch(inboxPollingProvider);
     return child;
   }
 }

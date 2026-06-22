@@ -32,6 +32,7 @@ import 'package:eko_app/views/following.dart';
 import 'package:eko_app/views/recent_activity.dart';
 import 'package:eko_app/views/view_likes_page.dart';
 import 'package:eko_app/widgets/posts/gifs.dart';
+import 'package:eko_app/widgets/scaffolds/messenger_bootstrap.dart';
 import 'package:eko_app/widgets/scaffolds/require_auth.dart';
 import 'package:eko_app/widgets/scaffolds/require_no_auth.dart';
 import 'package:eko_app/views/profile_redirect_page.dart';
@@ -113,10 +114,12 @@ final goRouterProvider = Provider<GoRouter>((ref) {
               if (didPop) return;
               navigationShell.goBranch(0);
             },
-            child: NotificationHandler(
-              child: RequireAuth(
-                child: ScaffoldWithNestedNavigation(
-                  navigationShell: navigationShell,
+            child: RequireAuth(
+              child: MessengerBootstrap(
+                child: NotificationHandler(
+                  child: ScaffoldWithNestedNavigation(
+                    navigationShell: navigationShell,
+                  ),
                 ),
               ),
             ),
