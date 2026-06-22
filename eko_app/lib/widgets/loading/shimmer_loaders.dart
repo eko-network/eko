@@ -110,45 +110,49 @@ class _BlankUser extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final width = c.widthGetter(context);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Container(
-            width: width * 0.115,
-            height: width * 0.115,
-            decoration: const BoxDecoration(
-              color: Colors.black,
-              shape: BoxShape.circle,
-            ),
-          ),
-          const SizedBox(width: 7),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final availableWidth = constraints.maxWidth;
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Container(
-                width: width * 0.55,
-                height: width * 0.043,
-                decoration: BoxDecoration(
+                width: availableWidth * 0.115,
+                height: availableWidth * 0.115,
+                decoration: const BoxDecoration(
                   color: Colors.black,
-                  borderRadius: BorderRadius.circular(16),
+                  shape: BoxShape.circle,
                 ),
               ),
-              const SizedBox(height: 10),
-              Container(
-                width: width * 0.7,
-                height: width * 0.043,
-                decoration: BoxDecoration(
-                  color: Colors.black,
-                  borderRadius: BorderRadius.circular(16),
-                ),
+              const SizedBox(width: 7),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: availableWidth * 0.55,
+                    height: availableWidth * 0.043,
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Container(
+                    width: availableWidth * 0.45,
+                    height: availableWidth * 0.043,
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                ],
               ),
             ],
-          ),
-        ],
+          );
+        },
       ),
     );
   }

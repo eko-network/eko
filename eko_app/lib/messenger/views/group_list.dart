@@ -173,14 +173,15 @@ class _ConversationListState extends ConsumerState<GroupList> {
                     Stack(
                       alignment: Alignment.center,
                       children: [
-                        Text(
-                          l10n.chats,
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20,
-                            color: Theme.of(context).colorScheme.onSurface,
+                        if (!showOnlyAvatar)
+                          Text(
+                            l10n.chats,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
                           ),
-                        ),
                         showOnlyAvatar
                             ? IconButton(
                                 onPressed: onNewPressed,
@@ -244,7 +245,7 @@ class _ConversationListState extends ConsumerState<GroupList> {
                                       },
                                       icon: const Icon(Icons.chevron_left),
                                       iconSize: 30,
-                                      padding: const EdgeInsets.all(5),
+                                      padding: const EdgeInsets.only(left: 10),
                                       splashRadius: c.kConversationAvatarRadius,
                                     ),
                                   ),
