@@ -218,6 +218,16 @@ class _InfiniteScrollyCore<T> extends State<InfiniteScrollyCore<T>> {
   }
 
   @override
+  void didUpdateWidget(InfiniteScrollyCore<T> oldWidget) {
+    // retrigger the loading if the widget already exists, but was cleared
+    // this may happen, for example, in an indexed stack
+    super.didUpdateWidget(oldWidget);
+    if (widget.list.isEmpty && !widget.isEnd) {
+      _loadMore();
+    }
+  }
+
+  @override
   void dispose() {
     scrollController.removeListener(onScroll);
     if (widget.controller == null) {
