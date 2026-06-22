@@ -557,6 +557,22 @@ class AppLocalizationsId extends AppLocalizations {
       'Tidak dapat terhubung ke server pesan. Pastikan server berjalan dan coba lagi.';
 
   @override
+  String get messengerWaitForApprovalTitle => 'Perangkat belum disetujui';
+
+  @override
+  String get messengerWaitForApprovalBody =>
+      'Perangkat ini belum disetujui. Notifikasi telah dikirim ke perangkat aktif Anda.';
+
+  @override
+  String get messengerDevicePublicKey => 'Kunci publik';
+
+  @override
+  String get messengerDeviceCode => 'Kode perangkat';
+
+  @override
+  String get messengerResendApprovalNotification => 'Kirim ulang notifikasi';
+
+  @override
   String get selectEmojiTitle => 'Pilih emoji';
 
   @override

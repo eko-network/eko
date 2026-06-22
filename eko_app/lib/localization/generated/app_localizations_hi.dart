@@ -556,6 +556,22 @@ class AppLocalizationsHi extends AppLocalizations {
       'मैसेज सर्वर तक पहुँच नहीं हो सकी। जाँचें कि सर्वर चल रहा है और फिर से प्रयास करें।';
 
   @override
+  String get messengerWaitForApprovalTitle => 'डिवाइस स्वीकृत नहीं है';
+
+  @override
+  String get messengerWaitForApprovalBody =>
+      'यह डिवाइस अभी तक स्वीकृत नहीं हुआ है। आपके सक्रिय डिवाइसों को एक सूचना भेजी गई है।';
+
+  @override
+  String get messengerDevicePublicKey => 'सार्वजनिक कुंजी';
+
+  @override
+  String get messengerDeviceCode => 'डिवाइस कोड';
+
+  @override
+  String get messengerResendApprovalNotification => 'सूचना पुनः भेजें';
+
+  @override
   String get selectEmojiTitle => 'इमोजी चुनें';
 
   @override

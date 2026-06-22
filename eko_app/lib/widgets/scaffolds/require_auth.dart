@@ -1,4 +1,5 @@
 import 'package:eko_app/messenger/utilities/messages_server_errors.dart';
+import 'package:eko_app/messenger/views/wait_for_approval.dart';
 import 'package:eko_app/messenger/views/messages_server_unavailable_page.dart';
 import 'package:eko_app/messenger/views/messenger_setup_page.dart';
 import 'package:eko_app/providers/ecp_core_provider.dart';
@@ -63,6 +64,10 @@ class MessagesGaurd extends ConsumerWidget {
     final did = auth.value?.device?.did;
     if (did == null || did.isEmpty) {
       return const MessengerSetupPage();
+    }
+    final dat = auth.value?.device?.dat;
+    if (dat == null) {
+      return const WaitForApproval();
     }
     final core = ref.watch(ecpCoreHolderProvider);
     if (core.isLoading) {

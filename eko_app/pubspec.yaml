@@ -27,6 +27,7 @@ dependencies:
   go_router: ^17.2.3
   shimmer: ^3.0.0
   collection: ^1.17.1
+  crypto: ^3.0.7
   characters: ^1.4.0
   klipy_dart: ^0.0.2
   shared_preferences: ^2.5.3

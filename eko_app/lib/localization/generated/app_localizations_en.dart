@@ -556,6 +556,22 @@ class AppLocalizationsEn extends AppLocalizations {
       'Could not reach the messages server. Check that it is running and try again.';
 
   @override
+  String get messengerWaitForApprovalTitle => 'Device not approved';
+
+  @override
+  String get messengerWaitForApprovalBody =>
+      'This device hasn\'t been approved yet. A notification has been sent to your active devices.';
+
+  @override
+  String get messengerDevicePublicKey => 'Public key';
+
+  @override
+  String get messengerDeviceCode => 'Device code';
+
+  @override
+  String get messengerResendApprovalNotification => 'Resend notification';
+
+  @override
   String get selectEmojiTitle => 'Select emoji';
 
   @override

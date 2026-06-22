@@ -1146,6 +1146,36 @@ abstract class AppLocalizations {
   /// **'Could not reach the messages server. Check that it is running and try again.'**
   String get messengerServerUnavailableBody;
 
+  /// No description provided for @messengerWaitForApprovalTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Device not approved'**
+  String get messengerWaitForApprovalTitle;
+
+  /// No description provided for @messengerWaitForApprovalBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This device hasn\'t been approved yet. A notification has been sent to your active devices.'**
+  String get messengerWaitForApprovalBody;
+
+  /// No description provided for @messengerDevicePublicKey.
+  ///
+  /// In en, this message translates to:
+  /// **'Public key'**
+  String get messengerDevicePublicKey;
+
+  /// No description provided for @messengerDeviceCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Device code'**
+  String get messengerDeviceCode;
+
+  /// No description provided for @messengerResendApprovalNotification.
+  ///
+  /// In en, this message translates to:
+  /// **'Resend notification'**
+  String get messengerResendApprovalNotification;
+
   /// No description provided for @selectEmojiTitle.
   ///
   /// In en, this message translates to:

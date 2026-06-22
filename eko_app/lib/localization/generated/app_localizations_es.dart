@@ -562,6 +562,22 @@ class AppLocalizationsEs extends AppLocalizations {
       'No se pudo conectar con el servidor de mensajes. Comprueba que esté en ejecución e inténtalo de nuevo.';
 
   @override
+  String get messengerWaitForApprovalTitle => 'Dispositivo no aprobado';
+
+  @override
+  String get messengerWaitForApprovalBody =>
+      'Este dispositivo aún no ha sido aprobado. Se ha enviado una notificación a tus dispositivos activos.';
+
+  @override
+  String get messengerDevicePublicKey => 'Clave pública';
+
+  @override
+  String get messengerDeviceCode => 'Código del dispositivo';
+
+  @override
+  String get messengerResendApprovalNotification => 'Reenviar notificación';
+
+  @override
   String get selectEmojiTitle => 'Seleccionar emoji';
 
   @override
