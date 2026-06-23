@@ -80,10 +80,31 @@ EcpClient ecpClient(Ref ref) {
 
 @Riverpod(keepAlive: true)
 void inboxPolling(Ref ref) {
-  final client = ref.watch(asyncEcpClientProvider).requireValue;
-  final controller = MessageStreamController(
-    client: client,
-    config: MessageStreamConfig(useWebSocket: true),
-  );
-  controller.messages().listen((_) {});
+  StreamSubscription<dynamic>? subscription;
+  MessageStreamController? controller;
+
+  void stop() {
+    subscription?.cancel();
+    subscription = null;
+    controller = null;
+  }
+
+  void start(EcpClient client) {
+    stop();
+    controller = MessageStreamController(
+      client: client,
+      config: MessageStreamConfig(useWebSocket: true),
+    );
+    subscription = controller!.messages().listen((_) {});
+  }
+
+  ref.listen(asyncEcpClientProvider, (previous, next) {
+    if (next.hasValue) {
+      start(next.requireValue);
+    } else if (next.hasError) {
+      stop();
+    }
+  }, fireImmediately: true);
+
+  ref.onDispose(stop);
 }

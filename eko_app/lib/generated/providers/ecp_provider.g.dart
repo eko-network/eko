@@ -126,4 +126,4 @@ final class InboxPollingProvider extends $FunctionalProvider<void, void, void>
   }
 }
 
-String _$inboxPollingHash() => r'ae06285d8e6973e2419e7737b54c28f98ad4533f';
+String _$inboxPollingHash() => r'0957860c39dc75a9a61f6a91583814604f714a61';
