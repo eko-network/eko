@@ -178,7 +178,7 @@ class _ConversationListState extends ConsumerState<GroupList> {
                             l10n.chats,
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              fontSize: 20,
+                              fontSize: 22,
                               color: Theme.of(context).colorScheme.onSurface,
                             ),
                           ),
@@ -192,8 +192,7 @@ class _ConversationListState extends ConsumerState<GroupList> {
                                 child: IconButton(
                                   onPressed: onNewPressed,
                                   icon: const Icon(LucideIcons.squarePen),
-                                  iconSize: 22,
-                                  padding: const EdgeInsets.only(right: 10),
+                                  iconSize: 24,
                                   splashRadius: c.kConversationAvatarRadius,
                                 ),
                               ),
@@ -223,74 +222,37 @@ class _ConversationListState extends ConsumerState<GroupList> {
                       Stack(
                         alignment: Alignment.center,
                         children: [
-                          showOnlyAvatar
-                              ? IconButton(
-                                  onPressed: onNewPressed,
-                                  icon: const Icon(LucideIcons.squarePen),
-                                )
-                              : Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: SizedBox(
-                                    width: c.kConversationAvatarRadius * 2,
-                                    height: c.kConversationAvatarRadius * 2,
-                                    child: IconButton(
-                                      onPressed: () {
-                                        setState(() {
-                                          newChatScreen = false;
-                                          searchController.clear();
-                                          searchData.clear();
-                                          searchIsEnd = false;
-                                          lastSearchVal = '';
-                                        });
-                                      },
-                                      icon: const Icon(Icons.chevron_left),
-                                      iconSize: 30,
-                                      padding: const EdgeInsets.only(left: 10),
-                                      splashRadius: c.kConversationAvatarRadius,
-                                    ),
-                                  ),
-                                ),
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: SizedBox(
+                              width: c.kConversationAvatarRadius * 2,
+                              height: c.kConversationAvatarRadius * 2,
+                              child: IconButton(
+                                onPressed: () {
+                                  setState(() {
+                                    newChatScreen = false;
+                                    searchController.clear();
+                                    searchData.clear();
+                                    searchIsEnd = false;
+                                    lastSearchVal = '';
+                                  });
+                                },
+                                icon: const Icon(Icons.chevron_left),
+                                iconSize: 24,
+                                splashRadius: c.kConversationAvatarRadius,
+                              ),
+                            ),
+                          ),
                           Text(
                             l10n.newMessage,
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              fontSize: 20,
+                              fontSize: 22,
                               color: Theme.of(context).colorScheme.onSurface,
                             ),
                           ),
                         ],
                       ),
-                    // Row(
-                    //   crossAxisAlignment: CrossAxisAlignment.center,
-                    //   children: [
-                    //     const SizedBox(width: 16),
-                    //     SizedBox(
-                    //       width: c.kConversationAvatarRadius * 2,
-                    //       height: c.kConversationAvatarRadius * 2,
-                    //       child: IconButton(
-                    //         onPressed: () {
-                    //           setState(() {
-                    //             newChatScreen = false;
-                    //             searchController.clear();
-                    //             searchData.clear();
-                    //             searchIsEnd = false;
-                    //             lastSearchVal = '';
-                    //           });
-                    //         },
-                    //         icon: const Icon(Icons.chevron_left),
-                    //         iconSize: 30,
-                    //         padding: const EdgeInsets.all(5),
-                    //         splashRadius: c.kConversationAvatarRadius,
-                    //       ),
-                    //     ),
-                    //     const SizedBox(width: 16),
-                    //     Text(
-                    //       l10n.newMessage,
-                    //       style: Theme.of(context).textTheme.titleLarge,
-                    //       overflow: TextOverflow.ellipsis,
-                    //     ),
-                    //   ],
-                    // ),
                     Expanded(
                       child: GestureDetector(
                         onPanDown: (details) =>
@@ -309,6 +271,7 @@ class _ConversationListState extends ConsumerState<GroupList> {
                             onCardPressed: onUserSelected,
                           ),
                           header: UserSearchBar(controller: searchController),
+                          fixedHeader: true,
                         ),
                       ),
                     ),

@@ -49,6 +49,9 @@ class InfiniteScrolly<K, V> extends StatefulWidget {
   /// Optional widget displayed above the list (but below the app bar).
   final Widget? header;
 
+  /// Whether the [header] should stay fixed at the top while the list scrolls.
+  final bool fixedHeader;
+
   /// Optional widget shown when more items are being loaded.
   final Widget? loadingWidget;
 
@@ -68,6 +71,7 @@ class InfiniteScrolly<K, V> extends StatefulWidget {
     this.appBar,
     this.controller,
     this.header,
+    this.fixedHeader = false,
     this.loadingWidget,
     this.initialLoadingWidget,
     this.emptySetNotice,
@@ -110,6 +114,7 @@ class _InfiniteScrollyState<K, V> extends State<InfiniteScrolly<K, V>> {
     return InfiniteScrollyCore<K>(
       appBar: widget.appBar,
       header: widget.header,
+      fixedHeader: widget.fixedHeader,
       initialLoadingWidget: widget.initialLoadingWidget,
       onRefresh: onRefresh,
       getter: onScroll,
@@ -143,6 +148,9 @@ class InfiniteScrollyCore<T> extends StatefulWidget {
   /// Optional widget displayed above the list (but below the app bar).
   final Widget? header;
 
+  /// Whether the [header] should stay fixed at the top while the list scrolls.
+  final bool fixedHeader;
+
   /// Optional widget shown when more items are being loaded.
   final Widget? loadingWidget;
 
@@ -164,6 +172,7 @@ class InfiniteScrollyCore<T> extends StatefulWidget {
     this.onRefresh,
     this.appBar,
     this.header,
+    this.fixedHeader = false,
     this.loadingWidget,
     this.initialLoadingWidget,
     this.emptySetNotice,
@@ -239,76 +248,89 @@ class _InfiniteScrollyCore<T> extends State<InfiniteScrollyCore<T>> {
   @override
   Widget build(BuildContext context) {
     final isEmptySet = widget.list.isEmpty && widget.isEnd;
-    return RefreshIndicator(
-      onRefresh: widget.onRefresh ?? () async {},
-      child: CustomScrollView(
-        // shrinkWrap: true,
-        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-        physics: const AlwaysScrollableScrollPhysics(),
-        controller: scrollController,
-        slivers: [
-          if (widget.appBar != null) widget.appBar!,
-          SliverList.builder(
-            itemCount: widget.list.length + 2,
-            itemBuilder: (BuildContext context, int index) {
-              // build header
-              if (index == 0) {
-                return widget.header == null
-                    ? const SizedBox()
-                    : MaxWidthContent(child: widget.header!);
-              }
-              //normal case put cards
-              if (widget.list.isNotEmpty && index < widget.list.length + 1) {
-                return MaxWidthContent(
-                  child: widget.widget(widget.list[index - 1]),
-                );
-              }
-              //what to return if dataset is empty
-              if (isEmptySet) {
-                return MaxWidthContent(
-                  child:
-                      widget.emptySetNotice ??
-                      Padding(
-                        padding: EdgeInsets.all(10),
-                        child: Center(
-                          child: Text(
-                            AppLocalizations.of(context)!.nothingToSeeHere,
-                          ),
-                        ),
-                      ),
-                );
-              }
-              //what to return if dataset is under initial load sequence
-              if (!widget.isEnd && widget.list.isEmpty) {
-                return MaxWidthContent(
-                  child:
-                      widget.initialLoadingWidget ??
-                      const _DefaultInitialLoader(),
-                );
-              }
-              //end of feed
-              if (widget.isEnd && widget.list.isNotEmpty) {
-                return const MaxWidthContent(child: SizedBox());
-              }
-              // new posts are loading
+    final headerOffset = widget.fixedHeader ? 0 : 1;
+    final itemCount = widget.list.length + headerOffset + 1;
+
+    Widget scrollView = CustomScrollView(
+      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+      physics: const AlwaysScrollableScrollPhysics(),
+      controller: scrollController,
+      slivers: [
+        if (widget.appBar != null) widget.appBar!,
+        SliverList.builder(
+          itemCount: itemCount,
+          itemBuilder: (BuildContext context, int index) {
+            if (!widget.fixedHeader && index == 0) {
+              return widget.header == null
+                  ? const SizedBox()
+                  : MaxWidthContent(child: widget.header!);
+            }
+            final itemIndex = index - headerOffset;
+            if (widget.list.isNotEmpty && itemIndex < widget.list.length) {
+              return MaxWidthContent(
+                child: widget.widget(widget.list[itemIndex]),
+              );
+            }
+            if (isEmptySet) {
               return MaxWidthContent(
                 child:
-                    widget.loadingWidget ??
-                    const Center(
-                      child: Padding(
-                        padding: EdgeInsets.all(10),
-                        child: CircularProgressIndicator(),
+                    widget.emptySetNotice ??
+                    Padding(
+                      padding: EdgeInsets.all(10),
+                      child: Center(
+                        child: Text(
+                          AppLocalizations.of(context)!.nothingToSeeHere,
+                        ),
                       ),
                     ),
               );
-            },
-          ),
-          const SliverFillRemaining(
-            hasScrollBody: false,
-            child: SizedBox.shrink(),
+            }
+            if (!widget.isEnd && widget.list.isEmpty) {
+              return MaxWidthContent(
+                child:
+                    widget.initialLoadingWidget ??
+                    const _DefaultInitialLoader(),
+              );
+            }
+            if (widget.isEnd && widget.list.isNotEmpty) {
+              return const MaxWidthContent(child: SizedBox());
+            }
+            return MaxWidthContent(
+              child:
+                  widget.loadingWidget ??
+                  const Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(10),
+                      child: CircularProgressIndicator(),
+                    ),
+                  ),
+            );
+          },
+        ),
+        const SliverFillRemaining(
+          hasScrollBody: false,
+          child: SizedBox.shrink(),
+        ),
+      ],
+    );
+
+    if (widget.fixedHeader && widget.header != null) {
+      return Column(
+        children: [
+          MaxWidthContent(child: widget.header!),
+          Expanded(
+            child: RefreshIndicator(
+              onRefresh: widget.onRefresh ?? () async {},
+              child: scrollView,
+            ),
           ),
         ],
-      ),
+      );
+    }
+
+    return RefreshIndicator(
+      onRefresh: widget.onRefresh ?? () async {},
+      child: scrollView,
     );
   }
 }

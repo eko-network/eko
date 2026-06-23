@@ -113,6 +113,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
           initialLoadingWidget: UserLoader(),
           widget: userCardBuilder,
           header: UserSearchBar(controller: controller),
+          fixedHeader: true,
         ),
       ),
     );
