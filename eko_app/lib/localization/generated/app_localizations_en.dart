@@ -585,7 +585,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get messengerApproveDevice => 'Approve';
 
   @override
-  String get messengerDenyDevice => 'Deny';
+  String get messengerIgnoreDevice => 'Ignore';
 
   @override
   String get messengerInvalidDeviceCode => 'Invalid device code';

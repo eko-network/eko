@@ -182,7 +182,7 @@
   "messengerApproveDeviceBody" : "Un nuevo dispositivo solicita acceso. Verifica que la clave pública coincida y luego introduce el código del dispositivo que se muestra en él.",
   "messengerEnterDeviceCode" : "Introduce el código del dispositivo",
   "messengerApproveDevice" : "Aprobar",
-  "messengerDenyDevice" : "Rechazar",
+  "messengerIgnoreDevice" : "Ignorar",
   "messengerInvalidDeviceCode" : "Código de dispositivo no válido",
   "selectEmojiTitle" : "Seleccionar emoji",
   "pushDistributorPickerTitle" : "Seleccione un distribuidor",

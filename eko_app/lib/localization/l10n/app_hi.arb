@@ -182,7 +182,7 @@
   "messengerApproveDeviceBody" : "एक नया डिवाइस एक्सेस का अनुरोध कर रहा है। सार्वजनिक कुंजी मिलान सत्यापित करें, फिर उस डिवाइस पर दिखाया गया डिवाइस कोड दर्ज करें।",
   "messengerEnterDeviceCode" : "डिवाइस कोड दर्ज करें",
   "messengerApproveDevice" : "स्वीकृत करें",
-  "messengerDenyDevice" : "अस्वीकार करें",
+  "messengerIgnoreDevice" : "अनदेखा करें",
   "messengerInvalidDeviceCode" : "अमान्य डिवाइस कोड",
   "selectEmojiTitle" : "इमोजी चुनें",
   "pushDistributorPickerTitle" : "एक वितरक चुनें",

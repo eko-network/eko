@@ -182,7 +182,7 @@
   "messengerApproveDeviceBody" : "Perangkat baru meminta akses. Verifikasi kunci publik cocok, lalu masukkan kode perangkat yang ditampilkan di perangkat tersebut.",
   "messengerEnterDeviceCode" : "Masukkan kode perangkat",
   "messengerApproveDevice" : "Setujui",
-  "messengerDenyDevice" : "Tolak",
+  "messengerIgnoreDevice" : "Abaikan",
   "messengerInvalidDeviceCode" : "Kode perangkat tidak valid",
   "selectEmojiTitle" : "Pilih emoji",
   "pushDistributorPickerTitle" : "Pilih distributor",

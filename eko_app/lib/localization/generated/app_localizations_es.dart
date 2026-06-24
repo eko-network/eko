@@ -591,7 +591,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get messengerApproveDevice => 'Aprobar';
 
   @override
-  String get messengerDenyDevice => 'Rechazar';
+  String get messengerIgnoreDevice => 'Ignorar';
 
   @override
   String get messengerInvalidDeviceCode => 'Código de dispositivo no válido';

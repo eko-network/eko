@@ -1200,11 +1200,11 @@ abstract class AppLocalizations {
   /// **'Approve'**
   String get messengerApproveDevice;
 
-  /// No description provided for @messengerDenyDevice.
+  /// No description provided for @messengerIgnoreDevice.
   ///
   /// In en, this message translates to:
-  /// **'Deny'**
-  String get messengerDenyDevice;
+  /// **'Ignore'**
+  String get messengerIgnoreDevice;
 
   /// No description provided for @messengerInvalidDeviceCode.
   ///

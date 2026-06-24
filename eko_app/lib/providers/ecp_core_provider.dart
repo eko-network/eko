@@ -5,6 +5,7 @@ import 'package:ecp/ecp.dart';
 import 'package:eko_app/database/database.dart';
 import 'package:eko_app/database/storage.dart';
 import 'package:eko_app/messenger/ecp_helpers.dart';
+import 'package:eko_app/messenger/utilities/authenticated_http_client.dart';
 import 'package:eko_app/providers/auth_provider.dart';
 import 'package:eko_app/types/device.dart';
 import 'package:eko_app/utilities/device_uid_service.dart';
@@ -175,20 +176,57 @@ class EcpCoreHolder extends _$EcpCoreHolder {
               .toList(),
         },
       );
-      await supabase.auth.refreshSession();
-
-      // final refreshed = supabase.auth.currentSession;
-      // final did = refreshed != null
-      //     ? DeviceModel.fromSession(refreshed).did
-      //     : null;
-      // if (did == null) {
-      //   throw StateError('Device registration succeeded but JWT has no did');
-      // }
+      final refreshed = await supabase.auth.refreshSession();
+      final device = refreshed.session != null
+          ? DeviceModel.fromSession(refreshed.session!)
+          : DeviceModel.idle();
+      if (device.dat == null && device.did != null) {
+        await sendApprovalRequest();
+      }
 
       state = AsyncValue.data(_core!);
     } catch (e, st) {
       debugPrint('[EcpCore] registerDevice error: $e\n$st');
       state = AsyncValue.error(e, st);
+    }
+  }
+
+  Future<void> sendApprovalRequest() async {
+    final core = _core ?? state.value;
+    if (core == null) {
+      throw StateError('ECP core not initialized');
+    }
+
+    final did = ref.read(authProvider).value?.device?.did;
+    if (did == null || did.isEmpty) {
+      throw StateError('Device id not available');
+    }
+
+    final credential = await AppStorage(db).mlsCredentialStore.getCredential();
+    if (credential == null) {
+      throw StateError('MLS credential not available');
+    }
+
+    final client = AuthenticatedClient(
+      () => supabase.auth.currentSession?.accessToken,
+    );
+
+    try {
+      final handler = MessageHandler(
+        core: core,
+        client: client,
+        activitySender: ActivitySender(
+          client: client,
+          did: DeviceUidService.getOrCreate(),
+          core: core,
+        ),
+      );
+      await handler.sendApprovalRequest(
+        publicKey: credential.signerPublicKey,
+        did: did,
+      );
+    } finally {
+      client.close();
     }
   }
 

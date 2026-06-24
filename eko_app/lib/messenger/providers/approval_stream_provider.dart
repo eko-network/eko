@@ -3,6 +3,7 @@ import 'package:ecp/ecp.dart';
 import 'package:eko_app/database/database.dart';
 import 'package:eko_app/utilities/constants.dart' as c;
 import 'package:eko_app/utilities/supabase_ref.dart';
+import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part '../../generated/messenger/providers/approval_stream_provider.g.dart';
@@ -46,8 +47,10 @@ class ValidatedApproval extends _$ValidatedApproval {
     StoredApprovalRequest request,
     DateTime createdAt,
   ) async {
+    debugPrint('[ValidatedApproval] Proccessing Message');
     final age = DateTime.now().difference(createdAt);
     if (age.inMinutes > c.maxAgeInMinutesOfApproval) {
+      debugPrint('[ValidatedApproval] Too Old');
       await _deleteOldRequests();
       return;
     }
@@ -63,10 +66,12 @@ class ValidatedApproval extends _$ValidatedApproval {
       if (isValid) {
         state = request;
       } else {
+        debugPrint('[ValidatedApproval] Not Pending');
         state = null;
         await deleteRequest(request.did);
       }
     } catch (e) {
+      debugPrint('Error: ${e.toString()}');
       state = null;
       await deleteRequest(request.did);
     } finally {

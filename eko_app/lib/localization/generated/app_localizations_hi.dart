@@ -585,7 +585,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get messengerApproveDevice => 'स्वीकृत करें';
 
   @override
-  String get messengerDenyDevice => 'अस्वीकार करें';
+  String get messengerIgnoreDevice => 'अनदेखा करें';
 
   @override
   String get messengerInvalidDeviceCode => 'अमान्य डिवाइस कोड';

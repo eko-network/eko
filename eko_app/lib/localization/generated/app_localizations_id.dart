@@ -586,7 +586,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get messengerApproveDevice => 'Setujui';
 
   @override
-  String get messengerDenyDevice => 'Tolak';
+  String get messengerIgnoreDevice => 'Abaikan';
 
   @override
   String get messengerInvalidDeviceCode => 'Kode perangkat tidak valid';

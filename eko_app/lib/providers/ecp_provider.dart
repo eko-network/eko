@@ -1,39 +1,15 @@
 import 'dart:async';
 
 import 'package:ecp/ecp.dart';
+import 'package:eko_app/messenger/utilities/authenticated_http_client.dart';
 import 'package:eko_app/providers/auth_provider.dart';
 import 'package:eko_app/providers/ecp_core_provider.dart';
 import 'package:eko_app/utilities/device_uid_service.dart';
 import 'package:eko_app/utilities/supabase_ref.dart';
-import 'package:http/http.dart' as http;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 part '../generated/providers/ecp_provider.g.dart';
 
-const _messagesServerTimeout = Duration(seconds: 10);
-
 Duration? _asyncEcpClientNoRetry(int retryCount, Object error) => null;
-
-class AuthenticatedClient extends http.BaseClient {
-  final String? Function() _getToken;
-  final http.Client _inner;
-
-  AuthenticatedClient(this._getToken) : _inner = http.Client();
-
-  @override
-  Future<http.StreamedResponse> send(http.BaseRequest request) async {
-    final token = _getToken();
-    if (token != null && token.isNotEmpty) {
-      request.headers['Authorization'] = 'Bearer $token';
-    }
-    return _inner.send(request).timeout(_messagesServerTimeout);
-  }
-
-  @override
-  void close() {
-    _inner.close();
-    super.close();
-  }
-}
 
 @Riverpod(keepAlive: true, retry: _asyncEcpClientNoRetry)
 Future<EcpClient> asyncEcpClient(Ref ref) async {

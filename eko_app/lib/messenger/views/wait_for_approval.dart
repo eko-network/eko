@@ -1,9 +1,10 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:eko_app/messenger/utilities/device_public_key.dart';
 import 'package:eko_app/database/database.dart';
 import 'package:eko_app/database/storage.dart';
+import 'package:eko_app/messenger/widgets/pub_key.dart';
+import 'package:eko_app/providers/ecp_core_provider.dart';
 import 'package:eko_app/localization/generated/app_localizations.dart';
 import 'package:eko_app/utilities/constants.dart' as c;
 import 'package:eko_app/utilities/supabase_ref.dart';
@@ -23,9 +24,10 @@ class WaitForApproval extends ConsumerStatefulWidget {
 }
 
 class _WaitForApprovalState extends ConsumerState<WaitForApproval> {
-  String? _publicKey;
+  Uint8List? _publicKey;
   String? _deviceCode;
   bool _loadingKey = true;
+  bool _sendingNotification = false;
   Timer? _refreshTimer;
 
   @override
@@ -48,7 +50,7 @@ class _WaitForApprovalState extends ConsumerState<WaitForApproval> {
     if (!mounted) return;
     setState(() {
       if (credential != null) {
-        _publicKey = base64Encode(credential.signerPublicKey);
+        _publicKey = credential.signerPublicKey;
         _deviceCode = devicePublicKeyCode(credential.signerPublicKey);
       } else {
         _publicKey = null;
@@ -56,6 +58,9 @@ class _WaitForApprovalState extends ConsumerState<WaitForApproval> {
       }
       _loadingKey = false;
     });
+    if (credential != null) {
+      unawaited(_sendApprovalNotification());
+    }
   }
 
   void _copyText(String? text) {
@@ -67,13 +72,27 @@ class _WaitForApprovalState extends ConsumerState<WaitForApproval> {
     );
   }
 
-  void _copyPublicKey() => _copyText(_publicKey);
-
   void _copyDeviceCode() => _copyText(_deviceCode);
 
-  void _resendNotification() {
-    // TODO: resend approval notification to active devices
+  Future<void> _sendApprovalNotification() async {
+    if (_sendingNotification) return;
+
+    setState(() => _sendingNotification = true);
+    try {
+      await ref.read(ecpCoreHolderProvider.notifier).sendApprovalRequest();
+    } catch (_) {
+      if (!mounted) return;
+      showSnackBar(
+        text: AppLocalizations.of(context)!.deviceRegistrationFailed,
+        context: context,
+        variant: SnackBarVariant.destructive,
+      );
+    } finally {
+      if (mounted) setState(() => _sendingNotification = false);
+    }
   }
+
+  void _resendNotification() => unawaited(_sendApprovalNotification());
 
   @override
   Widget build(BuildContext context) {
@@ -109,7 +128,7 @@ class _WaitForApprovalState extends ConsumerState<WaitForApproval> {
                     style: theme.textTheme.bodyLarge,
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 24),
                   if (_loadingKey)
                     const Padding(
                       padding: EdgeInsets.symmetric(vertical: 24),
@@ -160,52 +179,14 @@ class _WaitForApprovalState extends ConsumerState<WaitForApproval> {
                       ),
                     ),
                     const SizedBox(height: 24),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        l10n.messengerDevicePublicKey,
-                        style: theme.textTheme.titleSmall?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    DecoratedBox(
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.surfaceContainerHighest,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(12),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
-                              child: SelectableText(
-                                _publicKey ?? '—',
-                                style: theme.textTheme.bodyMedium?.copyWith(
-                                  fontFamily: 'monospace',
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ),
-                            if (_publicKey != null) ...[
-                              const SizedBox(width: 8),
-                              IconButton(
-                                tooltip: l10n.copyLink,
-                                icon: const Icon(Icons.copy_outlined, size: 20),
-                                onPressed: _copyPublicKey,
-                                visualDensity: VisualDensity.compact,
-                              ),
-                            ],
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 40),
+                    if (_publicKey != null) PubKey(publicKey: _publicKey!),
+                    const SizedBox(height: 32),
                     AuthButton.secondary(
                       label: l10n.messengerResendApprovalNotification,
-                      onPressed: _resendNotification,
+                      onPressed: _sendingNotification
+                          ? null
+                          : _resendNotification,
+                      isLoading: _sendingNotification,
                     ),
                   ],
                 ],

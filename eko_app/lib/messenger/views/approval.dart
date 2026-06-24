@@ -4,6 +4,7 @@ import 'package:ecp/ecp.dart';
 import 'package:eko_app/localization/generated/app_localizations.dart';
 import 'package:eko_app/messenger/providers/approval_stream_provider.dart';
 import 'package:eko_app/messenger/utilities/device_public_key.dart';
+import 'package:eko_app/messenger/widgets/pub_key.dart';
 import 'package:eko_app/utilities/constants.dart' as c;
 import 'package:eko_app/utilities/supabase_ref.dart';
 import 'package:eko_app/widgets/auth/auth_button.dart';
@@ -26,12 +27,12 @@ class ApprovalView extends ConsumerStatefulWidget {
 class _ApprovalViewState extends ConsumerState<ApprovalView> {
   final TextEditingController controller = TextEditingController();
   bool _isApproving = false;
-  bool _isDenying = false;
+  bool _isIgnoring = false;
 
   String get _publicKey => base64Encode(widget.request.publicKey);
 
   bool get _canApprove =>
-      !_isApproving && !_isDenying && controller.text.trim().isNotEmpty;
+      !_isApproving && !_isIgnoring && controller.text.trim().isNotEmpty;
 
   @override
   void initState() {
@@ -54,13 +55,13 @@ class _ApprovalViewState extends ConsumerState<ApprovalView> {
         .deleteRequest(widget.request.did);
   }
 
-  Future<void> _onDeny() async {
-    if (_isDenying || _isApproving) return;
-    setState(() => _isDenying = true);
+  Future<void> _onIgnore() async {
+    if (_isIgnoring || _isApproving) return;
+    setState(() => _isIgnoring = true);
     try {
       await delete();
     } finally {
-      if (mounted) setState(() => _isDenying = false);
+      if (mounted) setState(() => _isIgnoring = false);
     }
   }
 
@@ -79,13 +80,16 @@ class _ApprovalViewState extends ConsumerState<ApprovalView> {
     try {
       await approve();
     } on _InvalidCodeException {
+      debugPrint('[Approval Screen] Invalid Code');
       if (!mounted) return;
       showSnackBar(
         text: AppLocalizations.of(context)!.messengerInvalidDeviceCode,
         context: context,
         variant: SnackBarVariant.destructive,
       );
-    } catch (_) {
+    } catch (e) {
+      debugPrint('[Approval Screen] Error: $e');
+
       if (!mounted) return;
       showSnackBar(
         text: AppLocalizations.of(context)!.deviceRegistrationFailed,
@@ -95,14 +99,6 @@ class _ApprovalViewState extends ConsumerState<ApprovalView> {
     } finally {
       if (mounted) setState(() => _isApproving = false);
     }
-  }
-
-  void _copyPublicKey() {
-    Clipboard.setData(ClipboardData(text: _publicKey));
-    showSnackBar(
-      text: AppLocalizations.of(context)!.copiedToClipboard,
-      context: context,
-    );
   }
 
   @override
@@ -139,47 +135,6 @@ class _ApprovalViewState extends ConsumerState<ApprovalView> {
                     style: theme.textTheme.bodyLarge,
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 32),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      l10n.messengerDevicePublicKey,
-                      style: theme.textTheme.titleSmall?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.surfaceContainerHighest,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(12),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: SelectableText(
-                              _publicKey,
-                              style: theme.textTheme.bodyMedium?.copyWith(
-                                fontFamily: 'monospace',
-                                fontSize: 12,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          IconButton(
-                            tooltip: l10n.copyLink,
-                            icon: const Icon(Icons.copy_outlined, size: 20),
-                            onPressed: _copyPublicKey,
-                            visualDensity: VisualDensity.compact,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
                   const SizedBox(height: 24),
                   Align(
                     alignment: Alignment.centerLeft,
@@ -199,11 +154,11 @@ class _ApprovalViewState extends ConsumerState<ApprovalView> {
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 12,
-                        vertical: 4,
+                        vertical: 8,
                       ),
                       child: TextField(
                         controller: controller,
-                        enabled: !_isApproving && !_isDenying,
+                        enabled: !_isApproving && !_isIgnoring,
                         keyboardType: TextInputType.number,
                         textInputAction: TextInputAction.done,
                         maxLength: 6,
@@ -224,7 +179,9 @@ class _ApprovalViewState extends ConsumerState<ApprovalView> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 24),
+                  PubKey(publicKey: widget.request.publicKey),
+                  const SizedBox(height: 32),
                   AuthButton.primary(
                     label: l10n.messengerApproveDevice,
                     onPressed: _canApprove ? _onApprove : null,
@@ -232,9 +189,9 @@ class _ApprovalViewState extends ConsumerState<ApprovalView> {
                   ),
                   const SizedBox(height: 12),
                   AuthButton.secondary(
-                    label: l10n.messengerDenyDevice,
-                    onPressed: _isApproving || _isDenying ? null : _onDeny,
-                    isLoading: _isDenying,
+                    label: l10n.messengerIgnoreDevice,
+                    onPressed: _isApproving || _isIgnoring ? null : _onIgnore,
+                    isLoading: _isIgnoring,
                   ),
                 ],
               ),

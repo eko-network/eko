@@ -190,7 +190,7 @@
   "messengerApproveDeviceBody" : "A new device is requesting access. Verify the public key matches, then enter the device code shown on that device.",
   "messengerEnterDeviceCode" : "Enter device code",
   "messengerApproveDevice" : "Approve",
-  "messengerDenyDevice" : "Deny",
+  "messengerIgnoreDevice" : "Ignore",
   "messengerInvalidDeviceCode" : "Invalid device code",
   "selectEmojiTitle" : "Select emoji",
   "pushDistributorPickerTitle" : "Select a distributor",

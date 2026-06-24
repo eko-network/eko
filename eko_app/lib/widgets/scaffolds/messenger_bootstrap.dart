@@ -2,7 +2,7 @@ import 'package:eko_app/messenger/providers/approval_stream_provider.dart';
 import 'package:eko_app/messenger/views/approval.dart';
 import 'package:eko_app/providers/auth_provider.dart';
 import 'package:eko_app/providers/ecp_provider.dart';
-import 'package:ekrovalView();o_app/utilities/platform.dart' as platform;
+import 'package:eko_app/utilities/platform.dart' as platform;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
