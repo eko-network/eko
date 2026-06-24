@@ -572,6 +572,25 @@ class AppLocalizationsHi extends AppLocalizations {
   String get messengerResendApprovalNotification => 'सूचना पुनः भेजें';
 
   @override
+  String get messengerApproveDeviceTitle => 'नया डिवाइस स्वीकृत करें';
+
+  @override
+  String get messengerApproveDeviceBody =>
+      'एक नया डिवाइस एक्सेस का अनुरोध कर रहा है। सार्वजनिक कुंजी मिलान सत्यापित करें, फिर उस डिवाइस पर दिखाया गया डिवाइस कोड दर्ज करें।';
+
+  @override
+  String get messengerEnterDeviceCode => 'डिवाइस कोड दर्ज करें';
+
+  @override
+  String get messengerApproveDevice => 'स्वीकृत करें';
+
+  @override
+  String get messengerDenyDevice => 'अस्वीकार करें';
+
+  @override
+  String get messengerInvalidDeviceCode => 'अमान्य डिवाइस कोड';
+
+  @override
   String get selectEmojiTitle => 'इमोजी चुनें';
 
   @override

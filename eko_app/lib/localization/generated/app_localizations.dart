@@ -1176,6 +1176,42 @@ abstract class AppLocalizations {
   /// **'Resend notification'**
   String get messengerResendApprovalNotification;
 
+  /// No description provided for @messengerApproveDeviceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Approve new device'**
+  String get messengerApproveDeviceTitle;
+
+  /// No description provided for @messengerApproveDeviceBody.
+  ///
+  /// In en, this message translates to:
+  /// **'A new device is requesting access. Verify the public key matches, then enter the device code shown on that device.'**
+  String get messengerApproveDeviceBody;
+
+  /// No description provided for @messengerEnterDeviceCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter device code'**
+  String get messengerEnterDeviceCode;
+
+  /// No description provided for @messengerApproveDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'Approve'**
+  String get messengerApproveDevice;
+
+  /// No description provided for @messengerDenyDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'Deny'**
+  String get messengerDenyDevice;
+
+  /// No description provided for @messengerInvalidDeviceCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid device code'**
+  String get messengerInvalidDeviceCode;
+
   /// No description provided for @selectEmojiTitle.
   ///
   /// In en, this message translates to:

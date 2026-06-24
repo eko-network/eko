@@ -144,6 +144,23 @@ BEGIN
 END;
 $$;
 
+CREATE OR REPLACE FUNCTION public.ensure_pending_approval (did UUID) RETURNS BOOL LANGUAGE sql
+SET
+  search_path = '' AS $$
+  RETURN EXISTS (
+    SELECT 1
+    FROM public.devices
+    WHERE id = did
+      AND approved_at IS NULL
+  );
+$$;
+
+CREATE OR REPLACE FUNCTION public.approve_device (did UUID) RETURNS NULL LANGUAGE sql
+SET
+  search_path = '' AS $$
+  UPDATE public.devices SET approved_at = now() WHERE id = did AND approved_at IS NULL;
+$$;
+
 alter table "public"."devices" enable row level security;
 
 CREATE UNIQUE INDEX devices_pkey ON public.devices USING btree (id);

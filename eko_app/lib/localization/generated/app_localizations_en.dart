@@ -572,6 +572,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String get messengerResendApprovalNotification => 'Resend notification';
 
   @override
+  String get messengerApproveDeviceTitle => 'Approve new device';
+
+  @override
+  String get messengerApproveDeviceBody =>
+      'A new device is requesting access. Verify the public key matches, then enter the device code shown on that device.';
+
+  @override
+  String get messengerEnterDeviceCode => 'Enter device code';
+
+  @override
+  String get messengerApproveDevice => 'Approve';
+
+  @override
+  String get messengerDenyDevice => 'Deny';
+
+  @override
+  String get messengerInvalidDeviceCode => 'Invalid device code';
+
+  @override
   String get selectEmojiTitle => 'Select emoji';
 
   @override

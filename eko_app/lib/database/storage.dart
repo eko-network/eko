@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:drift/drift.dart';
 import 'package:ecp/ecp.dart';
+import 'package:eko_app/utilities/constants.dart' as c;
 import 'package:flutter/foundation.dart';
 import 'database.dart';
 import 'mappers.dart';
@@ -16,6 +17,7 @@ class AppStorage extends Storage {
         groupStore: _DriftGroupStore(_db),
         messageStore: _DriftMessageStore(_db),
         processedObjectStore: _DriftProcessedObjectStore(_db),
+        approvalRequestStore: _DriftApprovalRequestStore(_db),
       );
 
   @override
@@ -37,6 +39,23 @@ class AppStorage extends Storage {
         await file.delete();
       }
     }
+  }
+}
+
+class _DriftApprovalRequestStore implements ApprovalRequestStore {
+  final AppDatabase _db;
+  _DriftApprovalRequestStore(this._db);
+
+  @override
+  Future<void> saveApprovalRequest(StoredApprovalRequest request) async {
+    await _db
+        .into(_db.approvalRequest)
+        .insertOnConflictUpdate(
+          ApprovalRequestCompanion(
+            publicKey: Value(request.publicKey),
+            did: Value(request.did),
+          ),
+        );
   }
 }
 

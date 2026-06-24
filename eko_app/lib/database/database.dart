@@ -107,6 +107,16 @@ class MlsGroups extends Table {
   BoolColumn get isActive => boolean().withDefault(const Constant(true))();
 }
 
+@DataClassName('ApprovalRequestRow')
+class ApprovalRequest extends Table {
+  BlobColumn get publicKey => blob()();
+  TextColumn get did => text()();
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+
+  @override
+  Set<Column> get primaryKey => {did};
+}
+
 @DataClassName('MlsEngineConfigRow')
 class MlsEngineConfigs extends Table {
   IntColumn get id => integer().withDefault(const Constant(1))();
@@ -149,9 +159,9 @@ class MessageAttachments extends Table {
 }
 
 // --- Database ---
-
 @DriftDatabase(
   tables: [
+    ApprovalRequest,
     Capabilities,
     MlsCredentials,
     MlsKeyPackages,
@@ -166,7 +176,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 1;
 
   @override
   MigrationStrategy get migration {
@@ -174,11 +184,7 @@ class AppDatabase extends _$AppDatabase {
       onCreate: (Migrator m) async {
         await m.createAll();
       },
-      onUpgrade: (Migrator m, int from, int to) async {
-        if (from < 2) {
-          await m.addColumn(storedMessages, storedMessages.delivered);
-        }
-      },
+      onUpgrade: (Migrator m, int from, int to) async {},
       beforeOpen: (details) async {
         await customStatement('PRAGMA foreign_keys = ON');
       },

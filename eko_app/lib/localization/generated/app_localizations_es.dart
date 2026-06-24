@@ -578,6 +578,25 @@ class AppLocalizationsEs extends AppLocalizations {
   String get messengerResendApprovalNotification => 'Reenviar notificación';
 
   @override
+  String get messengerApproveDeviceTitle => 'Aprobar nuevo dispositivo';
+
+  @override
+  String get messengerApproveDeviceBody =>
+      'Un nuevo dispositivo solicita acceso. Verifica que la clave pública coincida y luego introduce el código del dispositivo que se muestra en él.';
+
+  @override
+  String get messengerEnterDeviceCode => 'Introduce el código del dispositivo';
+
+  @override
+  String get messengerApproveDevice => 'Aprobar';
+
+  @override
+  String get messengerDenyDevice => 'Rechazar';
+
+  @override
+  String get messengerInvalidDeviceCode => 'Código de dispositivo no válido';
+
+  @override
   String get selectEmojiTitle => 'Seleccionar emoji';
 
   @override

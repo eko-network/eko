@@ -3,6 +3,273 @@
 part of '../../database/database.dart';
 
 // ignore_for_file: type=lint
+class $ApprovalRequestTable extends ApprovalRequest
+    with TableInfo<$ApprovalRequestTable, ApprovalRequestRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ApprovalRequestTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _publicKeyMeta = const VerificationMeta(
+    'publicKey',
+  );
+  @override
+  late final GeneratedColumn<Uint8List> publicKey = GeneratedColumn<Uint8List>(
+    'public_key',
+    aliasedName,
+    false,
+    type: DriftSqlType.blob,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _didMeta = const VerificationMeta('did');
+  @override
+  late final GeneratedColumn<String> did = GeneratedColumn<String>(
+    'did',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [publicKey, did, createdAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'approval_request';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ApprovalRequestRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('public_key')) {
+      context.handle(
+        _publicKeyMeta,
+        publicKey.isAcceptableOrUnknown(data['public_key']!, _publicKeyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_publicKeyMeta);
+    }
+    if (data.containsKey('did')) {
+      context.handle(
+        _didMeta,
+        did.isAcceptableOrUnknown(data['did']!, _didMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_didMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {did};
+  @override
+  ApprovalRequestRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ApprovalRequestRow(
+      publicKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.blob,
+        data['${effectivePrefix}public_key'],
+      )!,
+      did: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}did'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $ApprovalRequestTable createAlias(String alias) {
+    return $ApprovalRequestTable(attachedDatabase, alias);
+  }
+}
+
+class ApprovalRequestRow extends DataClass
+    implements Insertable<ApprovalRequestRow> {
+  final Uint8List publicKey;
+  final String did;
+  final DateTime createdAt;
+  const ApprovalRequestRow({
+    required this.publicKey,
+    required this.did,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['public_key'] = Variable<Uint8List>(publicKey);
+    map['did'] = Variable<String>(did);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  ApprovalRequestCompanion toCompanion(bool nullToAbsent) {
+    return ApprovalRequestCompanion(
+      publicKey: Value(publicKey),
+      did: Value(did),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory ApprovalRequestRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ApprovalRequestRow(
+      publicKey: serializer.fromJson<Uint8List>(json['publicKey']),
+      did: serializer.fromJson<String>(json['did']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'publicKey': serializer.toJson<Uint8List>(publicKey),
+      'did': serializer.toJson<String>(did),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  ApprovalRequestRow copyWith({
+    Uint8List? publicKey,
+    String? did,
+    DateTime? createdAt,
+  }) => ApprovalRequestRow(
+    publicKey: publicKey ?? this.publicKey,
+    did: did ?? this.did,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  ApprovalRequestRow copyWithCompanion(ApprovalRequestCompanion data) {
+    return ApprovalRequestRow(
+      publicKey: data.publicKey.present ? data.publicKey.value : this.publicKey,
+      did: data.did.present ? data.did.value : this.did,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ApprovalRequestRow(')
+          ..write('publicKey: $publicKey, ')
+          ..write('did: $did, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash($driftBlobEquality.hash(publicKey), did, createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ApprovalRequestRow &&
+          $driftBlobEquality.equals(other.publicKey, this.publicKey) &&
+          other.did == this.did &&
+          other.createdAt == this.createdAt);
+}
+
+class ApprovalRequestCompanion extends UpdateCompanion<ApprovalRequestRow> {
+  final Value<Uint8List> publicKey;
+  final Value<String> did;
+  final Value<DateTime> createdAt;
+  final Value<int> rowid;
+  const ApprovalRequestCompanion({
+    this.publicKey = const Value.absent(),
+    this.did = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ApprovalRequestCompanion.insert({
+    required Uint8List publicKey,
+    required String did,
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : publicKey = Value(publicKey),
+       did = Value(did);
+  static Insertable<ApprovalRequestRow> custom({
+    Expression<Uint8List>? publicKey,
+    Expression<String>? did,
+    Expression<DateTime>? createdAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (publicKey != null) 'public_key': publicKey,
+      if (did != null) 'did': did,
+      if (createdAt != null) 'created_at': createdAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ApprovalRequestCompanion copyWith({
+    Value<Uint8List>? publicKey,
+    Value<String>? did,
+    Value<DateTime>? createdAt,
+    Value<int>? rowid,
+  }) {
+    return ApprovalRequestCompanion(
+      publicKey: publicKey ?? this.publicKey,
+      did: did ?? this.did,
+      createdAt: createdAt ?? this.createdAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (publicKey.present) {
+      map['public_key'] = Variable<Uint8List>(publicKey.value);
+    }
+    if (did.present) {
+      map['did'] = Variable<String>(did.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ApprovalRequestCompanion(')
+          ..write('publicKey: $publicKey, ')
+          ..write('did: $did, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $CapabilitiesTable extends Capabilities
     with TableInfo<$CapabilitiesTable, CapabilityRow> {
   @override
@@ -2439,6 +2706,9 @@ class MessageAttachmentsCompanion
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
+  late final $ApprovalRequestTable approvalRequest = $ApprovalRequestTable(
+    this,
+  );
   late final $CapabilitiesTable capabilities = $CapabilitiesTable(this);
   late final $MlsCredentialsTable mlsCredentials = $MlsCredentialsTable(this);
   late final $MlsKeyPackagesTable mlsKeyPackages = $MlsKeyPackagesTable(this);
@@ -2457,6 +2727,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities => [
+    approvalRequest,
     capabilities,
     mlsCredentials,
     mlsKeyPackages,
@@ -2468,6 +2739,178 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   ];
 }
 
+typedef $$ApprovalRequestTableCreateCompanionBuilder =
+    ApprovalRequestCompanion Function({
+      required Uint8List publicKey,
+      required String did,
+      Value<DateTime> createdAt,
+      Value<int> rowid,
+    });
+typedef $$ApprovalRequestTableUpdateCompanionBuilder =
+    ApprovalRequestCompanion Function({
+      Value<Uint8List> publicKey,
+      Value<String> did,
+      Value<DateTime> createdAt,
+      Value<int> rowid,
+    });
+
+class $$ApprovalRequestTableFilterComposer
+    extends Composer<_$AppDatabase, $ApprovalRequestTable> {
+  $$ApprovalRequestTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<Uint8List> get publicKey => $composableBuilder(
+    column: $table.publicKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get did => $composableBuilder(
+    column: $table.did,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$ApprovalRequestTableOrderingComposer
+    extends Composer<_$AppDatabase, $ApprovalRequestTable> {
+  $$ApprovalRequestTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<Uint8List> get publicKey => $composableBuilder(
+    column: $table.publicKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get did => $composableBuilder(
+    column: $table.did,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$ApprovalRequestTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ApprovalRequestTable> {
+  $$ApprovalRequestTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<Uint8List> get publicKey =>
+      $composableBuilder(column: $table.publicKey, builder: (column) => column);
+
+  GeneratedColumn<String> get did =>
+      $composableBuilder(column: $table.did, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+}
+
+class $$ApprovalRequestTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ApprovalRequestTable,
+          ApprovalRequestRow,
+          $$ApprovalRequestTableFilterComposer,
+          $$ApprovalRequestTableOrderingComposer,
+          $$ApprovalRequestTableAnnotationComposer,
+          $$ApprovalRequestTableCreateCompanionBuilder,
+          $$ApprovalRequestTableUpdateCompanionBuilder,
+          (
+            ApprovalRequestRow,
+            BaseReferences<
+              _$AppDatabase,
+              $ApprovalRequestTable,
+              ApprovalRequestRow
+            >,
+          ),
+          ApprovalRequestRow,
+          PrefetchHooks Function()
+        > {
+  $$ApprovalRequestTableTableManager(
+    _$AppDatabase db,
+    $ApprovalRequestTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ApprovalRequestTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ApprovalRequestTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ApprovalRequestTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<Uint8List> publicKey = const Value.absent(),
+                Value<String> did = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ApprovalRequestCompanion(
+                publicKey: publicKey,
+                did: did,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required Uint8List publicKey,
+                required String did,
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ApprovalRequestCompanion.insert(
+                publicKey: publicKey,
+                did: did,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$ApprovalRequestTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ApprovalRequestTable,
+      ApprovalRequestRow,
+      $$ApprovalRequestTableFilterComposer,
+      $$ApprovalRequestTableOrderingComposer,
+      $$ApprovalRequestTableAnnotationComposer,
+      $$ApprovalRequestTableCreateCompanionBuilder,
+      $$ApprovalRequestTableUpdateCompanionBuilder,
+      (
+        ApprovalRequestRow,
+        BaseReferences<
+          _$AppDatabase,
+          $ApprovalRequestTable,
+          ApprovalRequestRow
+        >,
+      ),
+      ApprovalRequestRow,
+      PrefetchHooks Function()
+    >;
 typedef $$CapabilitiesTableCreateCompanionBuilder =
     CapabilitiesCompanion Function({
       Value<int> id,
@@ -4171,6 +4614,8 @@ typedef $$MessageAttachmentsTableProcessedTableManager =
 class $AppDatabaseManager {
   final _$AppDatabase _db;
   $AppDatabaseManager(this._db);
+  $$ApprovalRequestTableTableManager get approvalRequest =>
+      $$ApprovalRequestTableTableManager(_db, _db.approvalRequest);
   $$CapabilitiesTableTableManager get capabilities =>
       $$CapabilitiesTableTableManager(_db, _db.capabilities);
   $$MlsCredentialsTableTableManager get mlsCredentials =>

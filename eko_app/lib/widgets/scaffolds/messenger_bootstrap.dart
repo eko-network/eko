@@ -1,6 +1,8 @@
+import 'package:eko_app/messenger/providers/approval_stream_provider.dart';
+import 'package:eko_app/messenger/views/approval.dart';
 import 'package:eko_app/providers/auth_provider.dart';
 import 'package:eko_app/providers/ecp_provider.dart';
-import 'package:eko_app/utilities/platform.dart' as platform;
+import 'package:ekrovalView();o_app/utilities/platform.dart' as platform;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -18,11 +20,26 @@ class MessengerBootstrap extends ConsumerWidget {
     final device = ref.watch(authProvider).value?.device;
     final did = device?.did;
     final dat = device?.dat;
+    final ecpInitialized = did != null && did.isNotEmpty && dat != null;
 
-    if (did != null && did.isNotEmpty && dat != null) {
+    if (ecpInitialized) {
       ref.watch(inboxPollingProvider);
     }
 
-    return child;
+    return ecpInitialized ? ApprovalRequestHandler(child: child) : child;
+  }
+}
+
+class ApprovalRequestHandler extends ConsumerWidget {
+  final Widget child;
+  const ApprovalRequestHandler({super.key, required this.child});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final request = ref.watch(validatedApprovalProvider);
+    if (request == null) {
+      return child;
+    }
+    return ApprovalView(request: request);
   }
 }

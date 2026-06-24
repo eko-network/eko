@@ -573,6 +573,25 @@ class AppLocalizationsId extends AppLocalizations {
   String get messengerResendApprovalNotification => 'Kirim ulang notifikasi';
 
   @override
+  String get messengerApproveDeviceTitle => 'Setujui perangkat baru';
+
+  @override
+  String get messengerApproveDeviceBody =>
+      'Perangkat baru meminta akses. Verifikasi kunci publik cocok, lalu masukkan kode perangkat yang ditampilkan di perangkat tersebut.';
+
+  @override
+  String get messengerEnterDeviceCode => 'Masukkan kode perangkat';
+
+  @override
+  String get messengerApproveDevice => 'Setujui';
+
+  @override
+  String get messengerDenyDevice => 'Tolak';
+
+  @override
+  String get messengerInvalidDeviceCode => 'Kode perangkat tidak valid';
+
+  @override
   String get selectEmojiTitle => 'Pilih emoji';
 
   @override
