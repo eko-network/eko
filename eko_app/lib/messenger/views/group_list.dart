@@ -325,10 +325,7 @@ class _NewChatOptionTile extends StatelessWidget {
   final IconData icon;
   final String label;
 
-  const _NewChatOptionTile({
-    required this.icon,
-    required this.label,
-  });
+  const _NewChatOptionTile({required this.icon, required this.label});
 
   @override
   Widget build(BuildContext context) {

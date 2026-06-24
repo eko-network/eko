@@ -7,6 +7,47 @@ create table "public"."devices" (
   "approved_at" timestamp with time zone default null
 );
 
+create policy "Users can approve their own pending devices" on "public"."devices" as permissive
+for update
+  to authenticated using (
+    (
+      (
+        SELECT
+          auth.uid () AS uid
+      ) = uid
+    )
+    AND approved_at IS NULL
+  )
+with
+  check (
+    (
+      (
+        SELECT
+          auth.uid () AS uid
+      ) = uid
+    )
+  );
+
+create policy "Enable users to view their own data only" on "public"."devices" as permissive for
+select
+  to authenticated using (
+    (
+      (
+        SELECT
+          auth.uid () AS uid
+      ) = uid
+    )
+  );
+
+CREATE OR REPLACE FUNCTION public.approve_device (did uuid) RETURNS void LANGUAGE sql
+SET
+  search_path TO '' AS $function$
+  UPDATE public.devices
+  SET approved_at = now()
+  WHERE id = did
+    AND approved_at IS NULL;
+$function$;
+
 create table "public"."key_packages" (
   "id" uuid not null default gen_random_uuid(),
   "device_id" uuid not null,
@@ -153,12 +194,6 @@ SET
     WHERE id = did
       AND approved_at IS NULL
   );
-$$;
-
-CREATE OR REPLACE FUNCTION public.approve_device (did UUID) RETURNS VOID LANGUAGE sql
-SET
-  search_path = '' AS $$
-  UPDATE public.devices SET approved_at = now() WHERE id = did AND approved_at IS NULL;
 $$;
 
 alter table "public"."devices" enable row level security;
