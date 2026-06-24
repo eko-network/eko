@@ -25,7 +25,7 @@ class UserSearchBar extends StatelessWidget {
           filled: true,
           fillColor: Theme.of(context).colorScheme.outlineVariant,
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10.0),
+            borderRadius: BorderRadius.circular(15.0),
             borderSide: BorderSide.none,
           ),
         ),

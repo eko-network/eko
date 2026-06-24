@@ -215,72 +215,150 @@ class _ConversationListState extends ConsumerState<GroupList> {
                     ),
                   ],
                 ),
-                Column(
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    if (!showOnlyAvatar)
-                      Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: SizedBox(
-                              width: c.kConversationAvatarRadius * 2,
-                              height: c.kConversationAvatarRadius * 2,
-                              child: IconButton(
-                                onPressed: () {
-                                  setState(() {
-                                    newChatScreen = false;
-                                    searchController.clear();
-                                    searchData.clear();
-                                    searchIsEnd = false;
-                                    lastSearchVal = '';
-                                  });
-                                },
-                                icon: const Icon(Icons.chevron_left),
-                                iconSize: 24,
-                                splashRadius: c.kConversationAvatarRadius,
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: constraints.maxWidth * 0.05,
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      if (!showOnlyAvatar)
+                        Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: SizedBox(
+                                width: c.kConversationAvatarRadius * 2,
+                                height: c.kConversationAvatarRadius * 2,
+                                child: IconButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      newChatScreen = false;
+                                      searchController.clear();
+                                      searchData.clear();
+                                      searchIsEnd = false;
+                                      lastSearchVal = '';
+                                    });
+                                  },
+                                  icon: const Icon(Icons.chevron_left),
+                                  iconSize: 24,
+                                  splashRadius: c.kConversationAvatarRadius,
+                                ),
                               ),
                             ),
-                          ),
-                          Text(
-                            l10n.newMessage,
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 22,
-                              color: Theme.of(context).colorScheme.onSurface,
+                            Text(
+                              l10n.newMessage,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 22,
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+                            ),
+                          ],
+                        ),
+                      Expanded(
+                        child: GestureDetector(
+                          onPanDown: (details) =>
+                              FocusManager.instance.primaryFocus?.unfocus(),
+                          onTap: () =>
+                              FocusManager.instance.primaryFocus?.unfocus(),
+                          child: InfiniteScrollyCore<String>(
+                            onRefresh: onSearchRefresh,
+                            list: searchData.map((item) => item.key).toList(),
+                            isEnd: searchIsEnd,
+                            getter: onSearchLoadMore,
+                            initialLoadingWidget: const UserLoader(),
+                            widget: (uid) => UserCard(
+                              actionWidget: (_) => SizedBox.shrink(),
+                              uid: uid,
+                              onCardPressed: onUserSelected,
+                            ),
+                            header: Column(
+                              children: [
+                                SizedBox(height: 15),
+                                DecoratedBox(
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.outlineVariant,
+                                    borderRadius: BorderRadius.circular(15),
+                                  ),
+
+                                  child: Column(
+                                    children: [
+                                      _NewChatOptionTile(
+                                        icon: LucideIcons.users,
+                                        label: 'New Group',
+                                      ),
+                                      _NewChatOptionTile(
+                                        icon: LucideIcons.atSign,
+                                        label: 'Find by Username',
+                                      ),
+                                      _NewChatOptionTile(
+                                        icon: LucideIcons.qrCode,
+                                        label: 'Find by QR code',
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(height: 15),
+                                UserSearchBar(controller: searchController),
+                              ],
                             ),
                           ),
-                        ],
-                      ),
-                    Expanded(
-                      child: GestureDetector(
-                        onPanDown: (details) =>
-                            FocusManager.instance.primaryFocus?.unfocus(),
-                        onTap: () =>
-                            FocusManager.instance.primaryFocus?.unfocus(),
-                        child: InfiniteScrollyCore<String>(
-                          onRefresh: onSearchRefresh,
-                          list: searchData.map((item) => item.key).toList(),
-                          isEnd: searchIsEnd,
-                          getter: onSearchLoadMore,
-                          initialLoadingWidget: const UserLoader(),
-                          widget: (uid) => UserCard(
-                            actionWidget: (_) => SizedBox.shrink(),
-                            uid: uid,
-                            onCardPressed: onUserSelected,
-                          ),
-                          header: UserSearchBar(controller: searchController),
-                          fixedHeader: true,
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ],
             );
           },
         ),
+      ),
+    );
+  }
+}
+
+class _NewChatOptionTile extends StatelessWidget {
+  final IconData icon;
+  final String label;
+
+  const _NewChatOptionTile({
+    required this.icon,
+    required this.label,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(
+            color: Theme.of(context).colorScheme.surfaceContainer,
+          ),
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(icon),
+          const SizedBox(width: 15),
+          Expanded(
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 20,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+            ),
+          ),
+          Icon(
+            LucideIcons.chevronRight,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
+        ],
       ),
     );
   }
