@@ -33,8 +33,10 @@ supabase db refresh
 
 Then launch the app with
 ```
-./eko_app/run_dev
+./eko_app/run_dev.sh
 ```
+
+Messages use the eko-messenger server at `http://localhost:3000` by default; set `MESSENGER_URL` to override (e.g. `http://10.0.2.2:3000` for the Android emulator). Release builds use `https://messages.eko-app.com`.
 
 The environment variables for the db should be copied from what is printed when you run `supabase start` and put in `./.env`
 ```

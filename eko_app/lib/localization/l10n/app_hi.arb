@@ -206,5 +206,6 @@
   "imageSavedToGallery" : "छवि गैलरी में सहेजी गई",
   "today" : "आज",
   "yesterday" : "कल",
-  "repostLoadFailed" : "यह पोस्ट लोड नहीं हो सकी"
+  "repostLoadFailed" : "यह पोस्ट लोड नहीं हो सकी",
+  "messageSendFailed" : "आपका संदेश भेजा नहीं जा सका।"
 }

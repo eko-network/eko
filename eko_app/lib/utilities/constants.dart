@@ -156,6 +156,5 @@ const String db = 'ecp.db';
 const String dbKey = 'db_key';
 const double messengerWideScreen = 700;
 const double kConversationAvatarRadius = 20.0;
-final Uri messengerDefaultServerUrl = Uri.parse('http://localhost:3000');
 
 const maxAgeInMinutesOfApproval = 10;

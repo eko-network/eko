@@ -640,4 +640,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get repostLoadFailed => 'Tidak dapat memuat postingan ini';
+
+  @override
+  String get messageSendFailed => 'Pesanmu tidak dapat dikirim.';
 }

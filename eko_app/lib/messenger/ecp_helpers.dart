@@ -1,8 +1,8 @@
 import 'package:ecp/ecp.dart';
-import 'package:eko_app/utilities/constants.dart' as c;
+import 'package:eko_app/utilities/api_constants.dart' as api;
 
 Uri actorIdFromUid(String supabaseUid) {
-  final base = c.messengerDefaultServerUrl;
+  final base = api.messengerUrl;
   return base.replace(
     pathSegments: [
       ...base.pathSegments.where((s) => s.isNotEmpty),

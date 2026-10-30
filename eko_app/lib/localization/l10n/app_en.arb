@@ -214,5 +214,6 @@
   "imageSavedToGallery" : "Image saved to gallery",
   "today" : "Today",
   "yesterday" : "Yesterday",
-  "repostLoadFailed" : "Could not load this post"
+  "repostLoadFailed" : "Could not load this post",
+  "messageSendFailed" : "Your message couldn't be sent."
 }

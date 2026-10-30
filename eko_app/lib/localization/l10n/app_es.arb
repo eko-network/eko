@@ -206,5 +206,6 @@
   "imageSavedToGallery" : "Imagen guardada en la galería",
   "today" : "Hoy",
   "yesterday" : "Ayer",
-  "repostLoadFailed" : "No se pudo cargar esta publicación"
+  "repostLoadFailed" : "No se pudo cargar esta publicación",
+  "messageSendFailed" : "No se pudo enviar tu mensaje."
 }

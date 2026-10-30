@@ -645,4 +645,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get repostLoadFailed => 'No se pudo cargar esta publicación';
+
+  @override
+  String get messageSendFailed => 'No se pudo enviar tu mensaje.';
 }
