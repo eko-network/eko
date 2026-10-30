@@ -639,4 +639,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get repostLoadFailed => 'यह पोस्ट लोड नहीं हो सकी';
+
+  @override
+  String get messageSendFailed => 'आपका संदेश भेजा नहीं जा सका।';
 }

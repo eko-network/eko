@@ -9,6 +9,7 @@ import 'package:eko_app/messenger/widgets/message.dart';
 import 'package:eko_app/providers/ecp_provider.dart';
 import 'package:eko_app/utilities/emoji_text_style.dart';
 import 'package:eko_app/utilities/platform.dart' as platform;
+import 'package:eko_app/widgets/errors/snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -113,13 +114,23 @@ class _ChatViewState extends ConsumerState<ChatView>
   }
 
   Future<void> _dispatchMessage(ecp.ActivityPubObject object) async {
-    await ref
-        .read(ecpClientProvider)
-        .messages
-        .sendMessage(
-          ecp.Activity.newCreate(object: object),
-          widget.group.group.groupIdBytes,
-        );
+    try {
+      await ref
+          .read(ecpClientProvider)
+          .messages
+          .sendMessage(
+            ecp.Activity.newCreate(object: object),
+            widget.group.group.groupIdBytes,
+          );
+    } catch (e) {
+      debugPrint('[ChatView] send failed: $e');
+      if (!mounted) return;
+      showSnackBar(
+        text: AppLocalizations.of(context)!.messageSendFailed,
+        context: context,
+        variant: SnackBarVariant.destructive,
+      );
+    }
   }
 
   Widget _buildInputRow(BuildContext context) {

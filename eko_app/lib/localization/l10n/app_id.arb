@@ -206,5 +206,6 @@
   "imageSavedToGallery" : "Gambar disimpan ke galeri",
   "today" : "Hari ini",
   "yesterday" : "Kemarin",
-  "repostLoadFailed" : "Tidak dapat memuat postingan ini"
+  "repostLoadFailed" : "Tidak dapat memuat postingan ini",
+  "messageSendFailed" : "Pesanmu tidak dapat dikirim."
 }

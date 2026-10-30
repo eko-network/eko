@@ -1307,6 +1307,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Could not load this post'**
   String get repostLoadFailed;
+
+  /// No description provided for @messageSendFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Your message couldn\'t be sent.'**
+  String get messageSendFailed;
 }
 
 class _AppLocalizationsDelegate

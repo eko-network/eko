@@ -6,7 +6,8 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 FLUTTER_COMMAND="flutter run \
   --dart-define=USE_LOCAL=1 \
   --dart-define=SUPABASE_URL=\"$SUPABASE_URL\" \
-  --dart-define=SUPABASE_PUBLISHABLE_KEY=\"$SUPABASE_PUBLISHABLE_KEY\""
+  --dart-define=SUPABASE_PUBLISHABLE_KEY=\"$SUPABASE_PUBLISHABLE_KEY\" \
+  ${MESSENGER_URL:+--dart-define=MESSENGER_URL=\"$MESSENGER_URL\"}"
 
 PLATFORM="${1:-}"
 PROFILE="${2:-}"

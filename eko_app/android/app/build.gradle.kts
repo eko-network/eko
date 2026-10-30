@@ -58,6 +58,8 @@ flutter {
 
 configurations.all {
     exclude(group = "com.google.protobuf", module = "protobuf-java")
+    // tink-android (from flutter_secure_storage) provides the same classes
+    exclude(group = "com.google.crypto.tink", module = "tink")
     dependencies {
         implementation("org.unifiedpush.android:embedded-fcm-distributor:3.0.0")
     }
