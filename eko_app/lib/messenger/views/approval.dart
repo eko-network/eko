@@ -5,6 +5,7 @@ import 'package:eko_app/localization/generated/app_localizations.dart';
 import 'package:eko_app/messenger/providers/approval_stream_provider.dart';
 import 'package:eko_app/messenger/utilities/device_public_key.dart';
 import 'package:eko_app/messenger/widgets/pub_key.dart';
+import 'package:eko_app/providers/ecp_provider.dart';
 import 'package:eko_app/utilities/constants.dart' as c;
 import 'package:eko_app/utilities/supabase_ref.dart';
 import 'package:eko_app/widgets/auth/auth_button.dart';
@@ -72,6 +73,24 @@ class _ApprovalViewState extends ConsumerState<ApprovalView> {
     }
     await supabase.rpc('approve_device', params: {'did': widget.request.did});
     await delete();
+    try {
+      await ref
+          .read(ecpClientProvider)
+          .groups
+          .addOwnDevice(
+            did: widget.request.did,
+            publicKey: widget.request.publicKey,
+          );
+    } catch (e) {
+      // the device is approved either way, it just misses some chats
+      debugPrint('[Approval Screen] Adding device to chats failed: $e');
+      if (!mounted) return;
+      showSnackBar(
+        text: AppLocalizations.of(context)!.messengerDeviceChatsSyncFailed,
+        context: context,
+        variant: SnackBarVariant.destructive,
+      );
+    }
   }
 
   Future<void> _onApprove() async {

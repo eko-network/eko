@@ -174,6 +174,14 @@ class _DriftGroupStore implements GroupStore {
   }
 
   @override
+  Future<List<MlsGroupRecord>> getActiveGroups() async {
+    final rows = await (_db.select(
+      _db.mlsGroups,
+    )..where((t) => t.isActive.equals(true))).get();
+    return rows.map((r) => r.toRecord()).toList();
+  }
+
+  @override
   Future<void> saveGroup({
     required Uint8List groupIdBytes,
     String? displayName,
@@ -222,13 +230,19 @@ class _DriftMessageStore implements MessageStore {
               delivered: Value(isDelivered),
             ),
           );
-      for (final attachmentId in message.attachment) {
+      await (_db.delete(_db.messageAttachments)..where(
+            (t) => t.messageId.equals(message.serverActivityId.toString()),
+          ))
+          .go();
+      for (final (index, attachment) in message.attachment.indexed) {
         await _db
             .into(_db.messageAttachments)
             .insert(
               MessageAttachmentsCompanion.insert(
                 messageId: message.serverActivityId,
-                attachmentId: attachmentId,
+                attachmentId: attachment.id,
+                position: Value(index),
+                object: Value(attachment.toJson()),
               ),
             );
       }

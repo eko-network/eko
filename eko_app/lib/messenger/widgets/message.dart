@@ -261,26 +261,41 @@ class _TextBubbleContent extends StatelessWidget {
   }
 }
 
+/// Hosts remote media may be loaded from. Loading an arbitrary url from a
+/// message would reveal the recipient's IP address to whoever chose it.
+bool _isAllowedMediaUrl(Uri url) {
+  if (url.scheme != 'https') return false;
+  final host = url.host.toLowerCase();
+  return host == 'klipy.com' || host.endsWith('.klipy.com');
+}
+
 class _AttachmentGrid extends StatelessWidget {
-  final List<ecp.InternalId> attachments;
+  final List<ecp.ActivityPubObject> attachments;
   const _AttachmentGrid({required this.attachments});
 
   @override
   Widget build(BuildContext context) {
-    // if (attachments.length == 1) {
-    //   return Image.network(
-    //     attachments.first.url.toString(),
-    //     fit: BoxFit.cover,
-    //     width: double.infinity, // Let parent constraints decide
-    //   );
-    // }
+    final images = attachments.whereType<ecp.Image>().toList();
+    if (images.isEmpty) return const SizedBox.shrink();
+
+    if (images.length == 1) {
+      final image = images.first;
+      final width = image.width;
+      final height = image.height;
+      return AspectRatio(
+        aspectRatio: width != null && height != null && width > 0 && height > 0
+            ? width / height
+            : 1,
+        child: _AttachmentImage(image: image),
+      );
+    }
 
     return StaggeredGrid.count(
       crossAxisCount: 2,
       mainAxisSpacing: 4,
       crossAxisSpacing: 4,
-      children: List.generate(attachments.length, (index) {
-        final isFirstFullWidth = attachments.length % 2 != 0 && index == 0;
+      children: List.generate(images.length, (index) {
+        final isFirstFullWidth = images.length % 2 != 0 && index == 0;
         final crossAxisCount = isFirstFullWidth ? 2 : 1;
 
         return StaggeredGridTile.count(
@@ -288,15 +303,41 @@ class _AttachmentGrid extends StatelessWidget {
           mainAxisCellCount: isFirstFullWidth ? 1.2 : 1,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(8),
-            child: SizedBox(),
-
-            // Image.network(
-            //   attachments[index].url.toString(),
-            //   fit: BoxFit.cover,
-            // ),
+            child: _AttachmentImage(image: images[index]),
           ),
         );
       }),
+    );
+  }
+}
+
+class _AttachmentImage extends StatelessWidget {
+  final ecp.Image image;
+  const _AttachmentImage({required this.image});
+
+  @override
+  Widget build(BuildContext context) {
+    final placeholder = ColoredBox(
+      color: const Color(0xFF2A2A2A),
+      child: Center(
+        child: Icon(LucideIcons.imageOff, color: Colors.white38, size: 20),
+      ),
+    );
+    if (!_isAllowedMediaUrl(image.url)) return placeholder;
+
+    return Semantics(
+      label: image.name,
+      image: true,
+      child: Image.network(
+        image.url.toString(),
+        fit: BoxFit.cover,
+        width: double.infinity,
+        height: double.infinity,
+        loadingBuilder: (context, child, progress) => progress == null
+            ? child
+            : const ColoredBox(color: Color(0xFF2A2A2A)),
+        errorBuilder: (context, error, stackTrace) => placeholder,
+      ),
     );
   }
 }

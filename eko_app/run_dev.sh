@@ -20,6 +20,16 @@ elif [ "$PLATFORM" == "linux" ]; then
   elif [ -n "$PROFILE" ]; then
     export XDG_DATA_HOME="$HOME/.local/share/eko-$PROFILE"
   fi
+  # plugins dlopen their libraries (e.g. libwebcrypto.so) by bare name, which
+  # does not search the executable's $ORIGIN/lib
+  export LD_LIBRARY_PATH="$PWD/build/linux/x64/debug/bundle/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+  # use the dev shell's mesa so EGL loads against the app's glibc
+  if [ -n "${EKO_GL_MESA:-}" ]; then
+    export LD_LIBRARY_PATH="$EKO_GL_LIBGLVND/lib:$EKO_GL_MESA/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+    export __EGL_VENDOR_LIBRARY_FILENAMES="$EKO_GL_MESA/share/glvnd/egl_vendor.d/50_mesa.json"
+    export LIBGL_DRIVERS_PATH="$EKO_GL_MESA/lib/dri"
+    export GBM_BACKENDS_PATH="$EKO_GL_MESA/lib/gbm"
+  fi
   FLUTTER_COMMAND="$FLUTTER_COMMAND -d linux"
 elif [ -n "$PLATFORM" ]; then
   FLUTTER_COMMAND="$FLUTTER_COMMAND -d $PLATFORM"

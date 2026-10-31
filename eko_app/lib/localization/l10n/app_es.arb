@@ -207,5 +207,16 @@
   "today" : "Hoy",
   "yesterday" : "Ayer",
   "repostLoadFailed" : "No se pudo cargar esta publicación",
-  "messageSendFailed" : "No se pudo enviar tu mensaje."
+  "messageSendFailed" : "No se pudo enviar tu mensaje.",
+  "messengerDeviceChatsSyncFailed" : "Dispositivo aprobado, pero no se pudo añadir a algunos de tus chats.",
+  "messengerDevicesTitle" : "Dispositivos de mensajería",
+  "messengerThisDevice" : "Este dispositivo",
+  "messengerDevicePending" : "Pendiente de aprobación",
+  "messengerDeviceName" : "Dispositivo {code}",
+  "messengerDeviceAdded" : "Añadido {date}",
+  "messengerRemoveDevice" : "Eliminar",
+  "messengerRemoveDeviceTitle" : "¿Eliminar dispositivo?",
+  "messengerRemoveDeviceBody" : "Este dispositivo perderá el acceso a tus chats y tendrá que ser aprobado de nuevo para usar la mensajería.",
+  "messengerRemoveDeviceFailed" : "No se pudo eliminar este dispositivo.",
+  "messengerDevicesLoadFailed" : "No se pudieron cargar tus dispositivos."
 }

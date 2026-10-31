@@ -201,8 +201,19 @@ class Auth extends _$Auth {
 
   Future<void> signOut() async {
     final uid = state.value?.uid;
+    final did = state.value?.device?.did;
     if (uid != null) {
       await user.removeDeviceNotificationToken(uid);
+      // local messenger keys are wiped on sign out, so the device record has
+      // to go too. Otherwise it stays approved forever and the next sign in
+      // waits on an approval nobody can give.
+      if (did != null) {
+        try {
+          await supabase.rpc('remove_device', params: {'p_did': did});
+        } catch (e) {
+          debugPrint('[Auth] remove_device failed: $e');
+        }
+      }
       DeviceUidService.remove();
     }
     supabase.auth.signOut();

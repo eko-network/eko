@@ -7,27 +7,6 @@ create table "public"."devices" (
   "approved_at" timestamp with time zone default null
 );
 
-create policy "Users can approve their own pending devices" on "public"."devices" as permissive
-for update
-  to authenticated using (
-    (
-      (
-        SELECT
-          auth.uid () AS uid
-      ) = uid
-    )
-    AND approved_at IS NULL
-  )
-with
-  check (
-    (
-      (
-        SELECT
-          auth.uid () AS uid
-      ) = uid
-    )
-  );
-
 create policy "Enable users to view their own data only" on "public"."devices" as permissive for
 select
   to authenticated using (
@@ -39,14 +18,36 @@ select
     )
   );
 
-CREATE OR REPLACE FUNCTION public.approve_device (did uuid) RETURNS void LANGUAGE sql
+-- approval has to come from a different, already approved device of the same user
+CREATE OR REPLACE FUNCTION public.approve_device (did uuid) RETURNS void LANGUAGE plpgsql SECURITY DEFINER
 SET
-  search_path TO '' AS $function$
+  search_path = '' AS $$
+DECLARE
+  v_uid        UUID := auth.uid();
+  v_caller_did UUID := NULLIF(auth.jwt() -> 'app_metadata' ->> 'did', '')::UUID;
+BEGIN
+  IF v_uid IS NULL THEN
+    RAISE EXCEPTION 'Not authenticated';
+  END IF;
+
+  IF v_caller_did IS NULL OR v_caller_did = approve_device.did THEN
+    RAISE EXCEPTION 'A device cannot approve itself';
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM public.devices
+    WHERE id = v_caller_did AND uid = v_uid AND approved_at IS NOT NULL
+  ) THEN
+    RAISE EXCEPTION 'Calling device is not approved';
+  END IF;
+
   UPDATE public.devices
   SET approved_at = now()
-  WHERE id = did
+  WHERE id = approve_device.did
+    AND uid = v_uid
     AND approved_at IS NULL;
-$function$;
+END;
+$$;
 
 create table "public"."key_packages" (
   "id" uuid not null default gen_random_uuid(),
@@ -84,6 +85,7 @@ BEGIN
 END;
 $$;
 
+-- re-registering a device id from a different session drops its approval and key packages
 CREATE OR REPLACE FUNCTION public.register_device (
   p_did UUID,
   p_signer_public_key TEXT DEFAULT NULL,
@@ -101,7 +103,19 @@ BEGIN
     RAISE EXCEPTION 'Not authenticated';
   END IF;
 
-  SELECT NOT EXISTS (SELECT 1 FROM public.devices WHERE uid = v_uid AND approved_at IS NOT NULL) INTO v_tofu;
+  -- the device being re-registered counts too, otherwise taking over the only
+  -- approved device id would be trusted on first use
+  SELECT NOT EXISTS (
+    SELECT 1 FROM public.devices
+    WHERE uid = v_uid AND approved_at IS NOT NULL
+  ) INTO v_tofu;
+
+  DELETE FROM public.key_packages
+  WHERE device_id = p_did
+    AND EXISTS (
+      SELECT 1 FROM public.devices
+      WHERE id = p_did AND uid = v_uid AND session_id IS DISTINCT FROM v_session_id
+    );
 
   INSERT INTO public.devices (id, uid, session_id, signer_public_key, approved_at)
   VALUES (
@@ -114,6 +128,11 @@ BEGIN
   ON CONFLICT (id) DO UPDATE
     SET session_id          = EXCLUDED.session_id,
         signer_public_key   = COALESCE(EXCLUDED.signer_public_key, public.devices.signer_public_key),
+        approved_at         = CASE
+                                WHEN public.devices.session_id IS NOT DISTINCT FROM EXCLUDED.session_id
+                                  THEN public.devices.approved_at
+                                ELSE EXCLUDED.approved_at
+                              END,
         created_at          = now()
   WHERE public.devices.uid = v_uid;
 
@@ -156,6 +175,30 @@ BEGIN
 END;
 $$;
 
+-- a device can always remove itself (sign out), removing another requires an approved caller
+CREATE OR REPLACE FUNCTION public.remove_device (p_did UUID) RETURNS VOID LANGUAGE plpgsql SECURITY DEFINER
+SET
+  search_path = '' AS $$
+DECLARE
+  v_uid        UUID := auth.uid();
+  v_caller_did UUID := NULLIF(auth.jwt() -> 'app_metadata' ->> 'did', '')::UUID;
+BEGIN
+  IF v_uid IS NULL THEN
+    RAISE EXCEPTION 'Not authenticated';
+  END IF;
+
+  IF v_caller_did IS DISTINCT FROM p_did AND NOT EXISTS (
+    SELECT 1 FROM public.devices
+    WHERE id = v_caller_did AND uid = v_uid AND approved_at IS NOT NULL
+  ) THEN
+    RAISE EXCEPTION 'Calling device is not approved';
+  END IF;
+
+  DELETE FROM public.devices WHERE id = p_did AND uid = v_uid;
+END;
+$$;
+
+-- pending devices must not be added to groups
 CREATE OR REPLACE FUNCTION public.take_key_package (p_device_id UUID) RETURNS BYTEA LANGUAGE plpgsql SECURITY DEFINER
 SET
   search_path = '' AS $$
@@ -163,6 +206,13 @@ DECLARE
     v_ids UUID[];
     v_packages BYTEA[];
 BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM public.devices
+        WHERE id = p_device_id AND approved_at IS NOT NULL
+    ) THEN
+        RAISE EXCEPTION 'Device % is not approved', p_device_id;
+    END IF;
+
     SELECT array_agg(id), array_agg(key_package)
     INTO v_ids, v_packages
     FROM (

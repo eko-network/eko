@@ -109,7 +109,7 @@ class NotificationService: UNNotificationServiceExtension {
             // try to extract message content from ActivityPub JSON
             if let json = try? JSONSerialization.jsonObject(with: plaintext) as? [String: Any],
                let obj = json["object"] as? [String: Any],
-               let content = obj["content"] as? String {
+               let content = Self.notificationBody(of: obj) {
                 bestAttemptContent?.body = content
                 // use sender's name from actor field if available
                 if let actor = json["actor"] as? String,
@@ -266,6 +266,10 @@ class NotificationService: UNNotificationServiceExtension {
         sqlite3_finalize(insertStmt)
         logger.debug("\(tag) inserted stored_message")
 
+        if let obj = obj {
+            insertAttachments(db: db, messageId: serverActivityId, attachments: Self.attachments(of: obj))
+        }
+
         // mark as processed
         let markSQL = "INSERT OR IGNORE INTO processed_objects (id) VALUES (?);"
         var markStmt: OpaquePointer?
@@ -284,6 +288,52 @@ class NotificationService: UNNotificationServiceExtension {
         }
         sqlite3_finalize(markStmt)
         sqlite3_close(db)
+    }
+
+    /// the text of a decrypted object, or a label when it only carries attachments
+    private static func notificationBody(of obj: [String: Any]) -> String? {
+        if let content = obj["content"] as? String, !content.isEmpty {
+            return content
+        }
+        return attachments(of: obj).isEmpty ? nil : "GIF"
+    }
+
+    /// attachments of a decrypted object: an Image is sent on its own, a Note carries a list
+    private static func attachments(of obj: [String: Any]) -> [[String: Any]] {
+        if obj["type"] as? String == "Image" {
+            return [obj]
+        }
+        return obj["attachments"] as? [[String: Any]] ?? []
+    }
+
+    /// mirrors _DriftMessageStore.saveMessage so the app can render the attachments
+    private func insertAttachments(db: OpaquePointer, messageId: String, attachments: [[String: Any]]) {
+        let tag = "[insertAttachments]"
+        let sql = "INSERT INTO message_attachments (message_id, attachment_id, position, object) VALUES (?, ?, ?, ?);"
+        for (index, attachment) in attachments.enumerated() {
+            guard let attachmentId = attachment["id"] as? String,
+                  let data = try? JSONSerialization.data(withJSONObject: attachment),
+                  let objectJson = String(data: data, encoding: .utf8)
+            else { continue }
+
+            var stmt: OpaquePointer?
+            guard sqlite3_prepare_v2(db, sql, -1, &stmt, nil) == SQLITE_OK,
+                  let stmt = stmt
+            else {
+                let msg = String(cString: sqlite3_errmsg(db))
+                logger.debug("\(tag) prepare failed: \(msg, privacy: .public)")
+                return
+            }
+            sqlite3_bind_text(stmt, 1, (messageId as NSString).utf8String, -1, nil)
+            sqlite3_bind_text(stmt, 2, (attachmentId as NSString).utf8String, -1, nil)
+            sqlite3_bind_int64(stmt, 3, Int64(index))
+            sqlite3_bind_text(stmt, 4, (objectJson as NSString).utf8String, -1, nil)
+            if sqlite3_step(stmt) != SQLITE_DONE {
+                let msg = String(cString: sqlite3_errmsg(db))
+                logger.debug("\(tag) insert failed: \(msg, privacy: .public)")
+            }
+            sqlite3_finalize(stmt)
+        }
     }
 
     /// read the ecp.db encryption key from the shared .ecp_db_key file in the App Group container.

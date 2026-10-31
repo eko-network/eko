@@ -66,3 +66,6 @@ devenv.local.yaml
 
 # pre-commit
 .pre-commit-config.yaml
+
+# scripts/dev.sh state (logs, pids, app device data)
+/.dev/

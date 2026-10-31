@@ -207,5 +207,16 @@
   "today" : "Hari ini",
   "yesterday" : "Kemarin",
   "repostLoadFailed" : "Tidak dapat memuat postingan ini",
-  "messageSendFailed" : "Pesanmu tidak dapat dikirim."
+  "messageSendFailed" : "Pesanmu tidak dapat dikirim.",
+  "messengerDeviceChatsSyncFailed" : "Perangkat disetujui, tetapi tidak dapat ditambahkan ke beberapa obrolanmu.",
+  "messengerDevicesTitle" : "Perangkat messenger",
+  "messengerThisDevice" : "Perangkat ini",
+  "messengerDevicePending" : "Menunggu persetujuan",
+  "messengerDeviceName" : "Perangkat {code}",
+  "messengerDeviceAdded" : "Ditambahkan {date}",
+  "messengerRemoveDevice" : "Hapus",
+  "messengerRemoveDeviceTitle" : "Hapus perangkat?",
+  "messengerRemoveDeviceBody" : "Perangkat ini akan kehilangan akses ke obrolanmu dan perlu disetujui lagi untuk menggunakan messenger.",
+  "messengerRemoveDeviceFailed" : "Tidak dapat menghapus perangkat ini.",
+  "messengerDevicesLoadFailed" : "Tidak dapat memuat perangkatmu."
 }

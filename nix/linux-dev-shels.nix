@@ -38,6 +38,10 @@ in {
       ]);
     shellHook = ''
       export CMAKE_TOOLCHAIN_FILE="${cmakeToolchain}"
+      # The Linux app links this nixpkgs' glibc, the host's mesa may need a newer
+      # one. run_dev.sh / scripts/dev.sh point EGL at a mesa from this nixpkgs.
+      export EKO_GL_MESA="${pkgs.mesa}"
+      export EKO_GL_LIBGLVND="${pkgs.libglvnd}"
     ''
     + commonShellHook;
   };
