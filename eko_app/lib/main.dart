@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:eko_app/providers/theme_provider.dart';
+import 'package:eko_app/utilities/dev_auto_login.dart';
 import 'package:eko_app/utilities/logo_service.dart';
 import 'package:eko_app/utilities/provider_debugger.dart';
 import 'package:eko_app/utilities/shared_pref_service.dart';
@@ -59,6 +60,8 @@ Future<void> main(List<String> args) async {
   // setupLocator();
   //protected/dependent services
   await Future.wait([_checkFirstInstall(), LogoService.init()]);
+  // login from env when in debug mode
+  await devAutoLogin();
 
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,

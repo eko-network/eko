@@ -215,5 +215,18 @@
   "today" : "Today",
   "yesterday" : "Yesterday",
   "repostLoadFailed" : "Could not load this post",
-  "messageSendFailed" : "Your message couldn't be sent."
+  "messageSendFailed" : "Your message couldn't be sent.",
+  "messengerDeviceChatsSyncFailed" : "Device approved, but it couldn't be added to some of your chats.",
+  "messengerDevicesTitle" : "Messenger devices",
+  "messengerThisDevice" : "This device",
+  "messengerDevicePending" : "Pending approval",
+  "messengerDeviceName" : "Device {code}",
+  "@messengerDeviceName" : { "placeholders" : { "code" : { "type" : "String" } } },
+  "messengerDeviceAdded" : "Added {date}",
+  "@messengerDeviceAdded" : { "placeholders" : { "date" : { "type" : "String" } } },
+  "messengerRemoveDevice" : "Remove",
+  "messengerRemoveDeviceTitle" : "Remove device?",
+  "messengerRemoveDeviceBody" : "This device will lose access to your chats and will need to be approved again to use messenger.",
+  "messengerRemoveDeviceFailed" : "Couldn't remove this device.",
+  "messengerDevicesLoadFailed" : "Couldn't load your devices."
 }

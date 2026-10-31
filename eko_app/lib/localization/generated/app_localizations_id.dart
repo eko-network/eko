@@ -643,4 +643,44 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get messageSendFailed => 'Pesanmu tidak dapat dikirim.';
+
+  @override
+  String get messengerDeviceChatsSyncFailed =>
+      'Perangkat disetujui, tetapi tidak dapat ditambahkan ke beberapa obrolanmu.';
+
+  @override
+  String get messengerDevicesTitle => 'Perangkat messenger';
+
+  @override
+  String get messengerThisDevice => 'Perangkat ini';
+
+  @override
+  String get messengerDevicePending => 'Menunggu persetujuan';
+
+  @override
+  String messengerDeviceName(String code) {
+    return 'Perangkat $code';
+  }
+
+  @override
+  String messengerDeviceAdded(String date) {
+    return 'Ditambahkan $date';
+  }
+
+  @override
+  String get messengerRemoveDevice => 'Hapus';
+
+  @override
+  String get messengerRemoveDeviceTitle => 'Hapus perangkat?';
+
+  @override
+  String get messengerRemoveDeviceBody =>
+      'Perangkat ini akan kehilangan akses ke obrolanmu dan perlu disetujui lagi untuk menggunakan messenger.';
+
+  @override
+  String get messengerRemoveDeviceFailed =>
+      'Tidak dapat menghapus perangkat ini.';
+
+  @override
+  String get messengerDevicesLoadFailed => 'Tidak dapat memuat perangkatmu.';
 }

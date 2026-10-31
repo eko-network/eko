@@ -642,4 +642,43 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get messageSendFailed => 'आपका संदेश भेजा नहीं जा सका।';
+
+  @override
+  String get messengerDeviceChatsSyncFailed =>
+      'डिवाइस स्वीकृत हो गया, लेकिन इसे आपकी कुछ चैट में नहीं जोड़ा जा सका।';
+
+  @override
+  String get messengerDevicesTitle => 'मैसेंजर डिवाइस';
+
+  @override
+  String get messengerThisDevice => 'यह डिवाइस';
+
+  @override
+  String get messengerDevicePending => 'स्वीकृति लंबित';
+
+  @override
+  String messengerDeviceName(String code) {
+    return 'डिवाइस $code';
+  }
+
+  @override
+  String messengerDeviceAdded(String date) {
+    return '$date को जोड़ा गया';
+  }
+
+  @override
+  String get messengerRemoveDevice => 'हटाएं';
+
+  @override
+  String get messengerRemoveDeviceTitle => 'डिवाइस हटाएं?';
+
+  @override
+  String get messengerRemoveDeviceBody =>
+      'यह डिवाइस आपकी चैट तक पहुंच खो देगा और मैसेंजर का उपयोग करने के लिए इसे फिर से स्वीकृत करना होगा।';
+
+  @override
+  String get messengerRemoveDeviceFailed => 'यह डिवाइस हटाया नहीं जा सका।';
+
+  @override
+  String get messengerDevicesLoadFailed => 'आपके डिवाइस लोड नहीं हो सके।';
 }

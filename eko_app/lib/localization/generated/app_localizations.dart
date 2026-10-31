@@ -1313,6 +1313,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your message couldn\'t be sent.'**
   String get messageSendFailed;
+
+  /// No description provided for @messengerDeviceChatsSyncFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Device approved, but it couldn\'t be added to some of your chats.'**
+  String get messengerDeviceChatsSyncFailed;
+
+  /// No description provided for @messengerDevicesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Messenger devices'**
+  String get messengerDevicesTitle;
+
+  /// No description provided for @messengerThisDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'This device'**
+  String get messengerThisDevice;
+
+  /// No description provided for @messengerDevicePending.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending approval'**
+  String get messengerDevicePending;
+
+  /// No description provided for @messengerDeviceName.
+  ///
+  /// In en, this message translates to:
+  /// **'Device {code}'**
+  String messengerDeviceName(String code);
+
+  /// No description provided for @messengerDeviceAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'Added {date}'**
+  String messengerDeviceAdded(String date);
+
+  /// No description provided for @messengerRemoveDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get messengerRemoveDevice;
+
+  /// No description provided for @messengerRemoveDeviceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove device?'**
+  String get messengerRemoveDeviceTitle;
+
+  /// No description provided for @messengerRemoveDeviceBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This device will lose access to your chats and will need to be approved again to use messenger.'**
+  String get messengerRemoveDeviceBody;
+
+  /// No description provided for @messengerRemoveDeviceFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t remove this device.'**
+  String get messengerRemoveDeviceFailed;
+
+  /// No description provided for @messengerDevicesLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load your devices.'**
+  String get messengerDevicesLoadFailed;
 }
 
 class _AppLocalizationsDelegate

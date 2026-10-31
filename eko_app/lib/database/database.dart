@@ -156,6 +156,9 @@ class MessageAttachments extends Table {
       .map(const UriTypeConverter())
       .references(StoredMessages, #serverActivityId)();
   TextColumn get attachmentId => text().map(const InternalIdConverter())();
+  IntColumn get position => integer().withDefault(const Constant(0))();
+  // the full ActivityPub object, needed to render it (url, size, media type)
+  TextColumn get object => text().map(const JsonValueConverter()).nullable()();
 }
 
 // --- Database ---

@@ -26,14 +26,15 @@ extension MlsGroupRowMapper on MlsGroupRow {
 }
 
 extension StoredMessageRowMapper on StoredMessageRow {
-  StoredMessage toMessage() {
+  StoredMessage toMessage([List<ActivityPubObject> attachment = const []]) {
     return StoredMessage(
       content: content,
       serverActivityId: serverActivityId,
       receivedAt: receivedAt,
       senderId: senderId,
       id: id,
-      attachment: [],
+      inReplyTo: inReplyTo,
+      attachment: attachment,
       groupId: groupId,
       delivered: delivered,
     );

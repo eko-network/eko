@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:eko_app/widgets/scaffolds/app_safe_area.dart';
 import 'package:eko_app/interfaces/notification_helper.dart';
 import 'package:eko_app/views/blocked_users_page.dart';
+import 'package:eko_app/messenger/views/devices_page.dart';
 import 'package:eko_app/views/change_email_page.dart';
 import 'package:eko_app/views/change_password_page.dart';
 import 'package:eko_app/views/download_page.dart';
@@ -374,6 +375,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                         path: 'change_password',
                         name: 'change_password',
                         builder: (context, state) => const ChangePasswordPage(),
+                      ),
+                      GoRoute(
+                        path: 'messenger_devices',
+                        name: 'messenger_devices',
+                        builder: (context, state) => const DevicesPage(),
                       ),
                     ],
                   ),

@@ -2509,13 +2509,58 @@ class $MessageAttachmentsTable extends MessageAttachments
       ).withConverter<InternalId>(
         $MessageAttachmentsTable.$converterattachmentId,
       );
+  static const VerificationMeta _positionMeta = const VerificationMeta(
+    'position',
+  );
   @override
-  List<GeneratedColumn> get $columns => [messageId, attachmentId];
+  late final GeneratedColumn<int> position = GeneratedColumn<int>(
+    'position',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<Map<String, dynamic>?, String>
+  object =
+      GeneratedColumn<String>(
+        'object',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      ).withConverter<Map<String, dynamic>?>(
+        $MessageAttachmentsTable.$converterobjectn,
+      );
+  @override
+  List<GeneratedColumn> get $columns => [
+    messageId,
+    attachmentId,
+    position,
+    object,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
   static const String $name = 'message_attachments';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<MessageAttachmentRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('position')) {
+      context.handle(
+        _positionMeta,
+        position.isAcceptableOrUnknown(data['position']!, _positionMeta),
+      );
+    }
+    return context;
+  }
+
   @override
   Set<GeneratedColumn> get $primaryKey => const {};
   @override
@@ -2534,6 +2579,16 @@ class $MessageAttachmentsTable extends MessageAttachments
           data['${effectivePrefix}attachment_id'],
         )!,
       ),
+      position: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}position'],
+      )!,
+      object: $MessageAttachmentsTable.$converterobjectn.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}object'],
+        ),
+      ),
     );
   }
 
@@ -2546,15 +2601,23 @@ class $MessageAttachmentsTable extends MessageAttachments
       const UriTypeConverter();
   static TypeConverter<InternalId, String> $converterattachmentId =
       const InternalIdConverter();
+  static TypeConverter<Map<String, dynamic>, String> $converterobject =
+      const JsonValueConverter();
+  static TypeConverter<Map<String, dynamic>?, String?> $converterobjectn =
+      NullAwareTypeConverter.wrap($converterobject);
 }
 
 class MessageAttachmentRow extends DataClass
     implements Insertable<MessageAttachmentRow> {
   final Uri messageId;
   final InternalId attachmentId;
+  final int position;
+  final Map<String, dynamic>? object;
   const MessageAttachmentRow({
     required this.messageId,
     required this.attachmentId,
+    required this.position,
+    this.object,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -2569,6 +2632,12 @@ class MessageAttachmentRow extends DataClass
         $MessageAttachmentsTable.$converterattachmentId.toSql(attachmentId),
       );
     }
+    map['position'] = Variable<int>(position);
+    if (!nullToAbsent || object != null) {
+      map['object'] = Variable<String>(
+        $MessageAttachmentsTable.$converterobjectn.toSql(object),
+      );
+    }
     return map;
   }
 
@@ -2576,6 +2645,10 @@ class MessageAttachmentRow extends DataClass
     return MessageAttachmentsCompanion(
       messageId: Value(messageId),
       attachmentId: Value(attachmentId),
+      position: Value(position),
+      object: object == null && nullToAbsent
+          ? const Value.absent()
+          : Value(object),
     );
   }
 
@@ -2587,6 +2660,8 @@ class MessageAttachmentRow extends DataClass
     return MessageAttachmentRow(
       messageId: serializer.fromJson<Uri>(json['messageId']),
       attachmentId: serializer.fromJson<InternalId>(json['attachmentId']),
+      position: serializer.fromJson<int>(json['position']),
+      object: serializer.fromJson<Map<String, dynamic>?>(json['object']),
     );
   }
   @override
@@ -2595,20 +2670,30 @@ class MessageAttachmentRow extends DataClass
     return <String, dynamic>{
       'messageId': serializer.toJson<Uri>(messageId),
       'attachmentId': serializer.toJson<InternalId>(attachmentId),
+      'position': serializer.toJson<int>(position),
+      'object': serializer.toJson<Map<String, dynamic>?>(object),
     };
   }
 
-  MessageAttachmentRow copyWith({Uri? messageId, InternalId? attachmentId}) =>
-      MessageAttachmentRow(
-        messageId: messageId ?? this.messageId,
-        attachmentId: attachmentId ?? this.attachmentId,
-      );
+  MessageAttachmentRow copyWith({
+    Uri? messageId,
+    InternalId? attachmentId,
+    int? position,
+    Value<Map<String, dynamic>?> object = const Value.absent(),
+  }) => MessageAttachmentRow(
+    messageId: messageId ?? this.messageId,
+    attachmentId: attachmentId ?? this.attachmentId,
+    position: position ?? this.position,
+    object: object.present ? object.value : this.object,
+  );
   MessageAttachmentRow copyWithCompanion(MessageAttachmentsCompanion data) {
     return MessageAttachmentRow(
       messageId: data.messageId.present ? data.messageId.value : this.messageId,
       attachmentId: data.attachmentId.present
           ? data.attachmentId.value
           : this.attachmentId,
+      position: data.position.present ? data.position.value : this.position,
+      object: data.object.present ? data.object.value : this.object,
     );
   }
 
@@ -2616,45 +2701,59 @@ class MessageAttachmentRow extends DataClass
   String toString() {
     return (StringBuffer('MessageAttachmentRow(')
           ..write('messageId: $messageId, ')
-          ..write('attachmentId: $attachmentId')
+          ..write('attachmentId: $attachmentId, ')
+          ..write('position: $position, ')
+          ..write('object: $object')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(messageId, attachmentId);
+  int get hashCode => Object.hash(messageId, attachmentId, position, object);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is MessageAttachmentRow &&
           other.messageId == this.messageId &&
-          other.attachmentId == this.attachmentId);
+          other.attachmentId == this.attachmentId &&
+          other.position == this.position &&
+          other.object == this.object);
 }
 
 class MessageAttachmentsCompanion
     extends UpdateCompanion<MessageAttachmentRow> {
   final Value<Uri> messageId;
   final Value<InternalId> attachmentId;
+  final Value<int> position;
+  final Value<Map<String, dynamic>?> object;
   final Value<int> rowid;
   const MessageAttachmentsCompanion({
     this.messageId = const Value.absent(),
     this.attachmentId = const Value.absent(),
+    this.position = const Value.absent(),
+    this.object = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   MessageAttachmentsCompanion.insert({
     required Uri messageId,
     required InternalId attachmentId,
+    this.position = const Value.absent(),
+    this.object = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : messageId = Value(messageId),
        attachmentId = Value(attachmentId);
   static Insertable<MessageAttachmentRow> custom({
     Expression<String>? messageId,
     Expression<String>? attachmentId,
+    Expression<int>? position,
+    Expression<String>? object,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (messageId != null) 'message_id': messageId,
       if (attachmentId != null) 'attachment_id': attachmentId,
+      if (position != null) 'position': position,
+      if (object != null) 'object': object,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -2662,11 +2761,15 @@ class MessageAttachmentsCompanion
   MessageAttachmentsCompanion copyWith({
     Value<Uri>? messageId,
     Value<InternalId>? attachmentId,
+    Value<int>? position,
+    Value<Map<String, dynamic>?>? object,
     Value<int>? rowid,
   }) {
     return MessageAttachmentsCompanion(
       messageId: messageId ?? this.messageId,
       attachmentId: attachmentId ?? this.attachmentId,
+      position: position ?? this.position,
+      object: object ?? this.object,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -2686,6 +2789,14 @@ class MessageAttachmentsCompanion
         ),
       );
     }
+    if (position.present) {
+      map['position'] = Variable<int>(position.value);
+    }
+    if (object.present) {
+      map['object'] = Variable<String>(
+        $MessageAttachmentsTable.$converterobjectn.toSql(object.value),
+      );
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -2697,6 +2808,8 @@ class MessageAttachmentsCompanion
     return (StringBuffer('MessageAttachmentsCompanion(')
           ..write('messageId: $messageId, ')
           ..write('attachmentId: $attachmentId, ')
+          ..write('position: $position, ')
+          ..write('object: $object, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -4329,12 +4442,16 @@ typedef $$MessageAttachmentsTableCreateCompanionBuilder =
     MessageAttachmentsCompanion Function({
       required Uri messageId,
       required InternalId attachmentId,
+      Value<int> position,
+      Value<Map<String, dynamic>?> object,
       Value<int> rowid,
     });
 typedef $$MessageAttachmentsTableUpdateCompanionBuilder =
     MessageAttachmentsCompanion Function({
       Value<Uri> messageId,
       Value<InternalId> attachmentId,
+      Value<int> position,
+      Value<Map<String, dynamic>?> object,
       Value<int> rowid,
     });
 
@@ -4389,6 +4506,21 @@ class $$MessageAttachmentsTableFilterComposer
     builder: (column) => ColumnWithTypeConverterFilters(column),
   );
 
+  ColumnFilters<int> get position => $composableBuilder(
+    column: $table.position,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<
+    Map<String, dynamic>?,
+    Map<String, dynamic>,
+    String
+  >
+  get object => $composableBuilder(
+    column: $table.object,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
   $$StoredMessagesTableFilterComposer get messageId {
     final $$StoredMessagesTableFilterComposer composer = $composerBuilder(
       composer: this,
@@ -4424,6 +4556,16 @@ class $$MessageAttachmentsTableOrderingComposer
   });
   ColumnOrderings<String> get attachmentId => $composableBuilder(
     column: $table.attachmentId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get position => $composableBuilder(
+    column: $table.position,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get object => $composableBuilder(
+    column: $table.object,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -4465,6 +4607,12 @@ class $$MessageAttachmentsTableAnnotationComposer
         column: $table.attachmentId,
         builder: (column) => column,
       );
+
+  GeneratedColumn<int> get position =>
+      $composableBuilder(column: $table.position, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<Map<String, dynamic>?, String> get object =>
+      $composableBuilder(column: $table.object, builder: (column) => column);
 
   $$StoredMessagesTableAnnotationComposer get messageId {
     final $$StoredMessagesTableAnnotationComposer composer = $composerBuilder(
@@ -4525,20 +4673,28 @@ class $$MessageAttachmentsTableTableManager
               ({
                 Value<Uri> messageId = const Value.absent(),
                 Value<InternalId> attachmentId = const Value.absent(),
+                Value<int> position = const Value.absent(),
+                Value<Map<String, dynamic>?> object = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => MessageAttachmentsCompanion(
                 messageId: messageId,
                 attachmentId: attachmentId,
+                position: position,
+                object: object,
                 rowid: rowid,
               ),
           createCompanionCallback:
               ({
                 required Uri messageId,
                 required InternalId attachmentId,
+                Value<int> position = const Value.absent(),
+                Value<Map<String, dynamic>?> object = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => MessageAttachmentsCompanion.insert(
                 messageId: messageId,
                 attachmentId: attachmentId,
+                position: position,
+                object: object,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0

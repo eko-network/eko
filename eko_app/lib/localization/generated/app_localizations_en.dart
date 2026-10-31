@@ -642,4 +642,43 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get messageSendFailed => 'Your message couldn\'t be sent.';
+
+  @override
+  String get messengerDeviceChatsSyncFailed =>
+      'Device approved, but it couldn\'t be added to some of your chats.';
+
+  @override
+  String get messengerDevicesTitle => 'Messenger devices';
+
+  @override
+  String get messengerThisDevice => 'This device';
+
+  @override
+  String get messengerDevicePending => 'Pending approval';
+
+  @override
+  String messengerDeviceName(String code) {
+    return 'Device $code';
+  }
+
+  @override
+  String messengerDeviceAdded(String date) {
+    return 'Added $date';
+  }
+
+  @override
+  String get messengerRemoveDevice => 'Remove';
+
+  @override
+  String get messengerRemoveDeviceTitle => 'Remove device?';
+
+  @override
+  String get messengerRemoveDeviceBody =>
+      'This device will lose access to your chats and will need to be approved again to use messenger.';
+
+  @override
+  String get messengerRemoveDeviceFailed => 'Couldn\'t remove this device.';
+
+  @override
+  String get messengerDevicesLoadFailed => 'Couldn\'t load your devices.';
 }

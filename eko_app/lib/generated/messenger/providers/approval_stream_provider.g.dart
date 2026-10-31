@@ -82,7 +82,7 @@ final class ValidatedApprovalProvider
   }
 }
 
-String _$validatedApprovalHash() => r'0862a2f90cdce2274937f34bd85aadcf991e0a12';
+String _$validatedApprovalHash() => r'4630df258e073dfb9415452c194b4a5eaf53bd1c';
 
 abstract class _$ValidatedApproval extends $Notifier<StoredApprovalRequest?> {
   StoredApprovalRequest? build();

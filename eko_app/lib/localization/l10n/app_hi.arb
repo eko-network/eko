@@ -207,5 +207,16 @@
   "today" : "आज",
   "yesterday" : "कल",
   "repostLoadFailed" : "यह पोस्ट लोड नहीं हो सकी",
-  "messageSendFailed" : "आपका संदेश भेजा नहीं जा सका।"
+  "messageSendFailed" : "आपका संदेश भेजा नहीं जा सका।",
+  "messengerDeviceChatsSyncFailed" : "डिवाइस स्वीकृत हो गया, लेकिन इसे आपकी कुछ चैट में नहीं जोड़ा जा सका।",
+  "messengerDevicesTitle" : "मैसेंजर डिवाइस",
+  "messengerThisDevice" : "यह डिवाइस",
+  "messengerDevicePending" : "स्वीकृति लंबित",
+  "messengerDeviceName" : "डिवाइस {code}",
+  "messengerDeviceAdded" : "{date} को जोड़ा गया",
+  "messengerRemoveDevice" : "हटाएं",
+  "messengerRemoveDeviceTitle" : "डिवाइस हटाएं?",
+  "messengerRemoveDeviceBody" : "यह डिवाइस आपकी चैट तक पहुंच खो देगा और मैसेंजर का उपयोग करने के लिए इसे फिर से स्वीकृत करना होगा।",
+  "messengerRemoveDeviceFailed" : "यह डिवाइस हटाया नहीं जा सका।",
+  "messengerDevicesLoadFailed" : "आपके डिवाइस लोड नहीं हो सके।"
 }
