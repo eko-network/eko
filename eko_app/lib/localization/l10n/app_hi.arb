@@ -218,5 +218,8 @@
   "messengerRemoveDeviceTitle" : "डिवाइस हटाएं?",
   "messengerRemoveDeviceBody" : "यह डिवाइस आपकी चैट तक पहुंच खो देगा और मैसेंजर का उपयोग करने के लिए इसे फिर से स्वीकृत करना होगा।",
   "messengerRemoveDeviceFailed" : "यह डिवाइस हटाया नहीं जा सका।",
-  "messengerDevicesLoadFailed" : "आपके डिवाइस लोड नहीं हो सके।"
+  "messengerDevicesLoadFailed" : "आपके डिवाइस लोड नहीं हो सके।",
+  "messengerDevicesChangedTitle" : "{name} के डिवाइस बदल गए",
+  "messengerDevicesChangedBody" : "उनके डिवाइस रीसेट हो गए हैं, उदाहरण के लिए क्योंकि वे खो गए या उन्होंने हर जगह से साइन आउट किया। अगर आपको इसकी उम्मीद नहीं थी, तो पहले उनसे पुष्टि करें: कोई और आपके संदेश पढ़ने की कोशिश कर सकता है।",
+  "messengerDevicesChangedContinue" : "जारी रखें"
 }

@@ -18,6 +18,7 @@ class AppStorage extends Storage {
         messageStore: _DriftMessageStore(_db),
         processedObjectStore: _DriftProcessedObjectStore(_db),
         approvalRequestStore: _DriftApprovalRequestStore(_db),
+        deviceChainStore: _DriftDeviceChainStore(_db),
       );
 
   @override
@@ -32,6 +33,7 @@ class AppStorage extends Storage {
       await _db.delete(_db.processedObjects).go();
       await _db.delete(_db.storedMessages).go();
       await _db.delete(_db.messageAttachments).go();
+      await _db.delete(_db.deviceChainPins).go();
     });
     if (config != null) {
       final file = File(config.dbPath);
@@ -55,6 +57,28 @@ class _DriftApprovalRequestStore implements ApprovalRequestStore {
             publicKey: Value(request.publicKey),
             did: Value(request.did),
           ),
+        );
+  }
+}
+
+class _DriftDeviceChainStore implements DeviceChainStore {
+  final AppDatabase _db;
+  _DriftDeviceChainStore(this._db);
+
+  @override
+  Future<Uint8List?> getPinnedHead(Uri actor) async {
+    final row = await (_db.select(
+      _db.deviceChainPins,
+    )..where((t) => t.actor.equals(actor.toString()))).getSingleOrNull();
+    return row?.head;
+  }
+
+  @override
+  Future<void> pinHead(Uri actor, Uint8List head) async {
+    await _db
+        .into(_db.deviceChainPins)
+        .insertOnConflictUpdate(
+          DeviceChainPinsCompanion(actor: Value(actor), head: Value(head)),
         );
   }
 }

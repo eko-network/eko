@@ -1,8 +1,11 @@
 import 'dart:async';
+import 'package:ecp/ecp.dart';
 import 'package:eko_app/types/device.dart';
 import 'package:eko_app/database/database.dart';
 import 'package:eko_app/database/storage.dart';
 import 'package:eko_app/localization/generated/app_localizations.dart';
+import 'package:eko_app/messenger/providers/devices_provider.dart';
+import 'package:eko_app/providers/ecp_provider.dart';
 import 'package:eko_app/utilities/device_uid_service.dart';
 import 'package:eko_app/widgets/errors/snack_bar.dart';
 import 'package:flutter/cupertino.dart';
@@ -209,7 +212,12 @@ class Auth extends _$Auth {
       // waits on an approval nobody can give.
       if (did != null) {
         try {
-          await supabase.rpc('remove_device', params: {'p_did': did});
+          // revoking the device in the chain needs its keys, so the client
+          // has to be up even if the messenger was never opened
+          final client = await ref
+              .read(asyncEcpClientProvider.future)
+              .then<EcpClient?>((c) => c, onError: (_) => null);
+          await removeMessengerDevice(client, did);
         } catch (e) {
           debugPrint('[Auth] remove_device failed: $e');
         }

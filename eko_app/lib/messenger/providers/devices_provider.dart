@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:ecp/ecp.dart';
 import 'package:eko_app/utilities/supabase_ref.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -40,6 +42,21 @@ Uint8List _decodeBytea(String value) {
     bytes[i] = int.parse(hex.substring(i * 2, i * 2 + 2), radix: 16);
   }
   return bytes;
+}
+
+/// Removes one of the current user's devices, this one included. An approved
+/// device is revoked in the device chain, which takes [client]: without it
+/// only a pending device can be removed.
+Future<void> removeMessengerDevice(EcpClient? client, String did) async {
+  final entry = await client?.devices.revoke(did: did);
+  await supabase.rpc(
+    'remove_device',
+    params: {
+      'p_did': did,
+      if (entry != null) 'p_entry': entry.toJson(),
+      if (entry != null) 'p_hash': base64Encode(entry.hash),
+    },
+  );
 }
 
 /// The current user's messenger devices, oldest first. Row level security

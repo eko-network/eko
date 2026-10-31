@@ -681,4 +681,16 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get messengerDevicesLoadFailed => 'आपके डिवाइस लोड नहीं हो सके।';
+
+  @override
+  String messengerDevicesChangedTitle(String name) {
+    return '$name के डिवाइस बदल गए';
+  }
+
+  @override
+  String get messengerDevicesChangedBody =>
+      'उनके डिवाइस रीसेट हो गए हैं, उदाहरण के लिए क्योंकि वे खो गए या उन्होंने हर जगह से साइन आउट किया। अगर आपको इसकी उम्मीद नहीं थी, तो पहले उनसे पुष्टि करें: कोई और आपके संदेश पढ़ने की कोशिश कर सकता है।';
+
+  @override
+  String get messengerDevicesChangedContinue => 'जारी रखें';
 }

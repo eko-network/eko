@@ -218,5 +218,8 @@
   "messengerRemoveDeviceTitle" : "Hapus perangkat?",
   "messengerRemoveDeviceBody" : "Perangkat ini akan kehilangan akses ke obrolanmu dan perlu disetujui lagi untuk menggunakan messenger.",
   "messengerRemoveDeviceFailed" : "Tidak dapat menghapus perangkat ini.",
-  "messengerDevicesLoadFailed" : "Tidak dapat memuat perangkatmu."
+  "messengerDevicesLoadFailed" : "Tidak dapat memuat perangkatmu.",
+  "messengerDevicesChangedTitle" : "Perangkat {name} berubah",
+  "messengerDevicesChangedBody" : "Perangkat mereka direset, misalnya karena hilang atau mereka keluar dari semua perangkat. Jika kamu tidak menduganya, pastikan dulu dengan mereka: orang lain mungkin mencoba membaca pesanmu.",
+  "messengerDevicesChangedContinue" : "Lanjutkan"
 }

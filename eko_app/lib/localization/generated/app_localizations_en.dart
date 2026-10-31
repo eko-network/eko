@@ -681,4 +681,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get messengerDevicesLoadFailed => 'Couldn\'t load your devices.';
+
+  @override
+  String messengerDevicesChangedTitle(String name) {
+    return '$name\'s devices changed';
+  }
+
+  @override
+  String get messengerDevicesChangedBody =>
+      'Their devices were reset, for example because they lost them or signed out everywhere. If you didn\'t expect this, check with them first: someone else could be trying to read your messages.';
+
+  @override
+  String get messengerDevicesChangedContinue => 'Continue';
 }

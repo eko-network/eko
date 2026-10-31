@@ -157,12 +157,19 @@ class SimDevice {
     await core.open();
     final (cred, keyPackages) = await core.createIdentity();
     credential = cred;
+    final genesis = await DeviceChainEntry.genesis(
+      actor: person.id,
+      did: did,
+      credential: cred,
+    );
     await rpc('register_device', {
       'p_did': did,
       'p_signer_public_key': base64Encode(cred.signerPublicKey),
       'p_key_packages': keyPackages
           .map((k) => base64Encode(k.keyPackageBytes))
           .toList(),
+      'p_chain_entry': genesis.toJson(),
+      'p_chain_hash': base64Encode(genesis.hash),
     });
     await refreshSession();
     client = await EcpClient.build(
@@ -181,9 +188,35 @@ class SimDevice {
   /// Pull the inbox and return the messages it produced.
   Future<List<StoredMessage>> sync() => client.getInbox();
 
+  /// Approves another device of this user, what the approval screen does.
+  Future<void> approve(String otherDid, Uint8List publicKey) async {
+    final entry = await client.devices.approve(
+      did: otherDid,
+      publicKey: publicKey,
+    );
+    await rpc('approve_device', {
+      'did': otherDid,
+      'p_entry': entry.toJson(),
+      'p_hash': base64Encode(entry.hash),
+    });
+  }
+
+  /// Removes a device of this user, this one included, revoking it in the
+  /// chain when it was approved.
+  Future<void> removeDevice(String otherDid) async {
+    final entry = await client.devices.revoke(did: otherDid);
+    await rpc('remove_device', {
+      'p_did': otherDid,
+      if (entry != null) ...{
+        'p_entry': entry.toJson(),
+        'p_hash': base64Encode(entry.hash),
+      },
+    });
+  }
+
   /// What the app does on sign out.
   Future<void> signOut() async {
-    await rpc('remove_device', {'p_did': did});
+    await removeDevice(did);
     await close();
   }
 

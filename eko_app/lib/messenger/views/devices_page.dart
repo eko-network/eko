@@ -3,7 +3,6 @@ import 'package:eko_app/messenger/providers/devices_provider.dart';
 import 'package:eko_app/messenger/utilities/device_public_key.dart';
 import 'package:eko_app/providers/auth_provider.dart';
 import 'package:eko_app/providers/ecp_provider.dart';
-import 'package:eko_app/utilities/supabase_ref.dart';
 import 'package:eko_app/widgets/errors/dialogs.dart';
 import 'package:eko_app/widgets/errors/snack_bar.dart';
 import 'package:eko_app/widgets/loading/loading_spinner.dart';
@@ -46,10 +45,11 @@ class _DevicesPageState extends ConsumerState<DevicesPage> {
   Future<void> _remove(MessengerDevice device) async {
     setState(() => _removingId = device.id);
     try {
-      // drop the record first so the server stops routing to the device, then
-      // take it out of the groups this device can commit to
-      await supabase.rpc('remove_device', params: {'p_did': device.id});
+      // revoke it in the device chain and drop the record so the server stops
+      // routing to the device, then take it out of the groups this device can
+      // commit to
       final client = ref.read(asyncEcpClientProvider).value;
+      await removeMessengerDevice(client, device.id);
       if (client != null) {
         try {
           await client.groups.removeDeviceFromGroups(

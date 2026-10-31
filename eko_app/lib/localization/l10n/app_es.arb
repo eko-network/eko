@@ -218,5 +218,8 @@
   "messengerRemoveDeviceTitle" : "¿Eliminar dispositivo?",
   "messengerRemoveDeviceBody" : "Este dispositivo perderá el acceso a tus chats y tendrá que ser aprobado de nuevo para usar la mensajería.",
   "messengerRemoveDeviceFailed" : "No se pudo eliminar este dispositivo.",
-  "messengerDevicesLoadFailed" : "No se pudieron cargar tus dispositivos."
+  "messengerDevicesLoadFailed" : "No se pudieron cargar tus dispositivos.",
+  "messengerDevicesChangedTitle" : "Los dispositivos de {name} cambiaron",
+  "messengerDevicesChangedBody" : "Sus dispositivos se restablecieron, por ejemplo porque los perdió o cerró sesión en todos. Si no lo esperabas, confírmalo primero con esa persona: alguien más podría intentar leer tus mensajes.",
+  "messengerDevicesChangedContinue" : "Continuar"
 }

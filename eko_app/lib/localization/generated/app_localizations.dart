@@ -1379,6 +1379,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Couldn\'t load your devices.'**
   String get messengerDevicesLoadFailed;
+
+  /// No description provided for @messengerDevicesChangedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}\'s devices changed'**
+  String messengerDevicesChangedTitle(String name);
+
+  /// No description provided for @messengerDevicesChangedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Their devices were reset, for example because they lost them or signed out everywhere. If you didn\'t expect this, check with them first: someone else could be trying to read your messages.'**
+  String get messengerDevicesChangedBody;
+
+  /// No description provided for @messengerDevicesChangedContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get messengerDevicesChangedContinue;
 }
 
 class _AppLocalizationsDelegate

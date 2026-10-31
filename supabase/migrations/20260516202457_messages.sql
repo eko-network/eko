@@ -18,8 +18,76 @@ select
     )
   );
 
+-- Signed AddDevice/RevokeDevice entries forming each user's device hash chain.
+-- Clients sign and verify the entries, the server only stores them in order
+-- and keeps them in step with approved_at, so it cannot add a device clients
+-- would accept. hash is the client computed hash of the entry, what the next
+-- entry's prev has to match.
+create table "public"."device_chain" (
+  "uid" uuid not null,
+  "seq" integer not null,
+  "entry" jsonb not null,
+  "hash" bytea not null
+);
+
+alter table "public"."device_chain" enable row level security;
+
+alter table "public"."device_chain"
+add constraint "device_chain_pkey" PRIMARY KEY (uid, seq);
+
+alter table "public"."device_chain"
+add constraint "device_chain_uid_fkey" FOREIGN KEY (uid) REFERENCES public.users (id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+grant all on table "public"."device_chain" to "service_role";
+
+-- appends an entry signed by the calling device on top of the user's chain,
+-- concurrent appends on the same head fail instead of forking the chain
+CREATE OR REPLACE FUNCTION public.append_device_chain (
+  p_uid UUID,
+  p_caller_did UUID,
+  p_entry JSONB,
+  p_hash TEXT
+) RETURNS VOID LANGUAGE plpgsql SECURITY DEFINER
+SET
+  search_path = '' AS $$
+DECLARE
+  v_seq  INTEGER;
+  v_hash BYTEA;
+BEGIN
+  PERFORM pg_advisory_xact_lock(hashtextextended(p_uid::text, 0));
+
+  SELECT seq, hash INTO v_seq, v_hash
+  FROM public.device_chain
+  WHERE uid = p_uid
+  ORDER BY seq DESC
+  LIMIT 1;
+
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'User % has no device chain', p_uid;
+  END IF;
+
+  IF p_entry ->> 'prev' IS DISTINCT FROM encode(v_hash, 'base64') THEN
+    RAISE EXCEPTION 'Device chain entry does not extend the current head';
+  END IF;
+
+  IF p_entry ->> 'signer' IS DISTINCT FROM p_caller_did::text THEN
+    RAISE EXCEPTION 'Device chain entry is not signed by the calling device';
+  END IF;
+
+  INSERT INTO public.device_chain (uid, seq, entry, hash)
+  VALUES (p_uid, v_seq + 1, p_entry, decode(p_hash, 'base64'));
+END;
+$$;
+
+REVOKE ALL ON FUNCTION public.append_device_chain (UUID, UUID, JSONB, TEXT)
+FROM
+  PUBLIC,
+  anon,
+  authenticated;
+
 -- approval has to come from a different, already approved device of the same user
-CREATE OR REPLACE FUNCTION public.approve_device (did uuid) RETURNS void LANGUAGE plpgsql SECURITY DEFINER
+-- p_entry is the AddDevice chain entry for it, signed by the calling device
+CREATE OR REPLACE FUNCTION public.approve_device (did uuid, p_entry jsonb, p_hash text) RETURNS void LANGUAGE plpgsql SECURITY DEFINER
 SET
   search_path = '' AS $$
 DECLARE
@@ -41,11 +109,24 @@ BEGIN
     RAISE EXCEPTION 'Calling device is not approved';
   END IF;
 
+  IF NOT EXISTS (
+    SELECT 1 FROM public.devices
+    WHERE id = approve_device.did
+      AND uid = v_uid
+      AND approved_at IS NULL
+      AND p_entry ->> 'type' = 'AddDevice'
+      AND p_entry ->> 'did' = approve_device.did::text
+      AND decode(p_entry ->> 'identityKey', 'base64') = signer_public_key
+  ) THEN
+    RAISE EXCEPTION 'No pending device matches the chain entry';
+  END IF;
+
+  PERFORM public.append_device_chain(v_uid, v_caller_did, p_entry, p_hash);
+
   UPDATE public.devices
   SET approved_at = now()
   WHERE id = approve_device.did
-    AND uid = v_uid
-    AND approved_at IS NULL;
+    AND uid = v_uid;
 END;
 $$;
 
@@ -85,11 +166,15 @@ BEGIN
 END;
 $$;
 
--- re-registering a device id from a different session drops its approval and key packages
+-- re-registering a device id from a different session drops its approval and key packages.
+-- p_chain_entry is the device's self-signed AddDevice entry, used when it is
+-- trusted on first use and so starts a new device chain for the user
 CREATE OR REPLACE FUNCTION public.register_device (
   p_did UUID,
   p_signer_public_key TEXT DEFAULT NULL,
-  p_key_packages TEXT[] DEFAULT NULL
+  p_key_packages TEXT[] DEFAULT NULL,
+  p_chain_entry JSONB DEFAULT NULL,
+  p_chain_hash TEXT DEFAULT NULL
 ) RETURNS UUID LANGUAGE plpgsql SECURITY DEFINER
 SET
   search_path = '' AS $$
@@ -109,6 +194,25 @@ BEGIN
     SELECT 1 FROM public.devices
     WHERE uid = v_uid AND approved_at IS NOT NULL
   ) INTO v_tofu;
+
+  -- no device is left to vouch for the old chain, so it is replaced, which
+  -- other users' clients see as the user's devices being reset
+  IF v_tofu THEN
+    IF p_chain_entry IS NULL
+      OR p_chain_entry ->> 'type' IS DISTINCT FROM 'AddDevice'
+      OR p_chain_entry ->> 'did' IS DISTINCT FROM p_did::text
+      OR p_chain_entry ->> 'signer' IS DISTINCT FROM p_did::text
+      OR p_chain_entry ->> 'prev' IS NOT NULL
+      OR p_chain_entry ->> 'identityKey' IS DISTINCT FROM p_signer_public_key
+    THEN
+      RAISE EXCEPTION 'A first device needs a self-signed device chain entry';
+    END IF;
+
+    PERFORM pg_advisory_xact_lock(hashtextextended(v_uid::text, 0));
+    DELETE FROM public.device_chain WHERE uid = v_uid;
+    INSERT INTO public.device_chain (uid, seq, entry, hash)
+    VALUES (v_uid, 0, p_chain_entry, decode(p_chain_hash, 'base64'));
+  END IF;
 
   DELETE FROM public.key_packages
   WHERE device_id = p_did
@@ -175,8 +279,14 @@ BEGIN
 END;
 $$;
 
--- a device can always remove itself (sign out), removing another requires an approved caller
-CREATE OR REPLACE FUNCTION public.remove_device (p_did UUID) RETURNS VOID LANGUAGE plpgsql SECURITY DEFINER
+-- a device can always remove itself (sign out), removing another requires an approved caller.
+-- p_entry is the RevokeDevice chain entry, signed by the calling device, and
+-- is required for a device in the chain, it is null for a pending one
+CREATE OR REPLACE FUNCTION public.remove_device (
+  p_did UUID,
+  p_entry JSONB DEFAULT NULL,
+  p_hash TEXT DEFAULT NULL
+) RETURNS VOID LANGUAGE plpgsql SECURITY DEFINER
 SET
   search_path = '' AS $$
 DECLARE
@@ -192,6 +302,20 @@ BEGIN
     WHERE id = v_caller_did AND uid = v_uid AND approved_at IS NOT NULL
   ) THEN
     RAISE EXCEPTION 'Calling device is not approved';
+  END IF;
+
+  IF p_entry IS NOT NULL THEN
+    IF p_entry ->> 'type' IS DISTINCT FROM 'RevokeDevice'
+      OR p_entry ->> 'did' IS DISTINCT FROM p_did::text
+    THEN
+      RAISE EXCEPTION 'Chain entry does not revoke device %', p_did;
+    END IF;
+    PERFORM public.append_device_chain(v_uid, v_caller_did, p_entry, p_hash);
+  ELSIF EXISTS (
+    SELECT 1 FROM public.devices
+    WHERE id = p_did AND uid = v_uid AND approved_at IS NOT NULL
+  ) THEN
+    RAISE EXCEPTION 'Removing an approved device needs a chain entry';
   END IF;
 
   DELETE FROM public.devices WHERE id = p_did AND uid = v_uid;

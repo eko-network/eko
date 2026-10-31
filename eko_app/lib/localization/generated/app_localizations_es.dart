@@ -689,4 +689,16 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get messengerDevicesLoadFailed =>
       'No se pudieron cargar tus dispositivos.';
+
+  @override
+  String messengerDevicesChangedTitle(String name) {
+    return 'Los dispositivos de $name cambiaron';
+  }
+
+  @override
+  String get messengerDevicesChangedBody =>
+      'Sus dispositivos se restablecieron, por ejemplo porque los perdió o cerró sesión en todos. Si no lo esperabas, confírmalo primero con esa persona: alguien más podría intentar leer tus mensajes.';
+
+  @override
+  String get messengerDevicesChangedContinue => 'Continuar';
 }

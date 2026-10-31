@@ -165,15 +165,24 @@ class EcpCoreHolder extends _$EcpCoreHolder {
       }
 
       final (credential, keyPackages) = await _core!.createIdentity();
+      final did = DeviceUidService.getOrCreate();
+      // only used when the server trusts this device on first use
+      final genesis = await DeviceChainEntry.genesis(
+        actor: _core!.identity.id,
+        did: did,
+        credential: credential,
+      );
       debugPrint('[EcpCore] calling RPC');
       await supabase.rpc(
         'register_device',
         params: {
-          'p_did': DeviceUidService.getOrCreate(),
+          'p_did': did,
           'p_signer_public_key': base64Encode(credential.signerPublicKey),
           'p_key_packages': keyPackages
               .map((it) => base64Encode(it.keyPackageBytes))
               .toList(),
+          'p_chain_entry': genesis.toJson(),
+          'p_chain_hash': base64Encode(genesis.hash),
         },
       );
       final refreshed = await supabase.auth.refreshSession();
