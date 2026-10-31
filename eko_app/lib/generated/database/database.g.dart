@@ -525,6 +525,217 @@ class CapabilitiesCompanion extends UpdateCompanion<CapabilityRow> {
   }
 }
 
+class $DeviceChainPinsTable extends DeviceChainPins
+    with TableInfo<$DeviceChainPinsTable, DeviceChainPinRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $DeviceChainPinsTable(this.attachedDatabase, [this._alias]);
+  @override
+  late final GeneratedColumnWithTypeConverter<Uri, String> actor =
+      GeneratedColumn<String>(
+        'actor',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<Uri>($DeviceChainPinsTable.$converteractor);
+  static const VerificationMeta _headMeta = const VerificationMeta('head');
+  @override
+  late final GeneratedColumn<Uint8List> head = GeneratedColumn<Uint8List>(
+    'head',
+    aliasedName,
+    false,
+    type: DriftSqlType.blob,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [actor, head];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'device_chain_pins';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<DeviceChainPinRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('head')) {
+      context.handle(
+        _headMeta,
+        head.isAcceptableOrUnknown(data['head']!, _headMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_headMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {actor};
+  @override
+  DeviceChainPinRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return DeviceChainPinRow(
+      actor: $DeviceChainPinsTable.$converteractor.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}actor'],
+        )!,
+      ),
+      head: attachedDatabase.typeMapping.read(
+        DriftSqlType.blob,
+        data['${effectivePrefix}head'],
+      )!,
+    );
+  }
+
+  @override
+  $DeviceChainPinsTable createAlias(String alias) {
+    return $DeviceChainPinsTable(attachedDatabase, alias);
+  }
+
+  static TypeConverter<Uri, String> $converteractor = const UriTypeConverter();
+}
+
+class DeviceChainPinRow extends DataClass
+    implements Insertable<DeviceChainPinRow> {
+  final Uri actor;
+  final Uint8List head;
+  const DeviceChainPinRow({required this.actor, required this.head});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    {
+      map['actor'] = Variable<String>(
+        $DeviceChainPinsTable.$converteractor.toSql(actor),
+      );
+    }
+    map['head'] = Variable<Uint8List>(head);
+    return map;
+  }
+
+  DeviceChainPinsCompanion toCompanion(bool nullToAbsent) {
+    return DeviceChainPinsCompanion(actor: Value(actor), head: Value(head));
+  }
+
+  factory DeviceChainPinRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return DeviceChainPinRow(
+      actor: serializer.fromJson<Uri>(json['actor']),
+      head: serializer.fromJson<Uint8List>(json['head']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'actor': serializer.toJson<Uri>(actor),
+      'head': serializer.toJson<Uint8List>(head),
+    };
+  }
+
+  DeviceChainPinRow copyWith({Uri? actor, Uint8List? head}) =>
+      DeviceChainPinRow(actor: actor ?? this.actor, head: head ?? this.head);
+  DeviceChainPinRow copyWithCompanion(DeviceChainPinsCompanion data) {
+    return DeviceChainPinRow(
+      actor: data.actor.present ? data.actor.value : this.actor,
+      head: data.head.present ? data.head.value : this.head,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DeviceChainPinRow(')
+          ..write('actor: $actor, ')
+          ..write('head: $head')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(actor, $driftBlobEquality.hash(head));
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is DeviceChainPinRow &&
+          other.actor == this.actor &&
+          $driftBlobEquality.equals(other.head, this.head));
+}
+
+class DeviceChainPinsCompanion extends UpdateCompanion<DeviceChainPinRow> {
+  final Value<Uri> actor;
+  final Value<Uint8List> head;
+  final Value<int> rowid;
+  const DeviceChainPinsCompanion({
+    this.actor = const Value.absent(),
+    this.head = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  DeviceChainPinsCompanion.insert({
+    required Uri actor,
+    required Uint8List head,
+    this.rowid = const Value.absent(),
+  }) : actor = Value(actor),
+       head = Value(head);
+  static Insertable<DeviceChainPinRow> custom({
+    Expression<String>? actor,
+    Expression<Uint8List>? head,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (actor != null) 'actor': actor,
+      if (head != null) 'head': head,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  DeviceChainPinsCompanion copyWith({
+    Value<Uri>? actor,
+    Value<Uint8List>? head,
+    Value<int>? rowid,
+  }) {
+    return DeviceChainPinsCompanion(
+      actor: actor ?? this.actor,
+      head: head ?? this.head,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (actor.present) {
+      map['actor'] = Variable<String>(
+        $DeviceChainPinsTable.$converteractor.toSql(actor.value),
+      );
+    }
+    if (head.present) {
+      map['head'] = Variable<Uint8List>(head.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DeviceChainPinsCompanion(')
+          ..write('actor: $actor, ')
+          ..write('head: $head, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $MlsCredentialsTable extends MlsCredentials
     with TableInfo<$MlsCredentialsTable, MlsCredentialRow> {
   @override
@@ -2823,6 +3034,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     this,
   );
   late final $CapabilitiesTable capabilities = $CapabilitiesTable(this);
+  late final $DeviceChainPinsTable deviceChainPins = $DeviceChainPinsTable(
+    this,
+  );
   late final $MlsCredentialsTable mlsCredentials = $MlsCredentialsTable(this);
   late final $MlsKeyPackagesTable mlsKeyPackages = $MlsKeyPackagesTable(this);
   late final $MlsGroupsTable mlsGroups = $MlsGroupsTable(this);
@@ -2842,6 +3056,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   List<DatabaseSchemaEntity> get allSchemaEntities => [
     approvalRequest,
     capabilities,
+    deviceChainPins,
     mlsCredentials,
     mlsKeyPackages,
     mlsGroups,
@@ -3186,6 +3401,156 @@ typedef $$CapabilitiesTableProcessedTableManager =
         BaseReferences<_$AppDatabase, $CapabilitiesTable, CapabilityRow>,
       ),
       CapabilityRow,
+      PrefetchHooks Function()
+    >;
+typedef $$DeviceChainPinsTableCreateCompanionBuilder =
+    DeviceChainPinsCompanion Function({
+      required Uri actor,
+      required Uint8List head,
+      Value<int> rowid,
+    });
+typedef $$DeviceChainPinsTableUpdateCompanionBuilder =
+    DeviceChainPinsCompanion Function({
+      Value<Uri> actor,
+      Value<Uint8List> head,
+      Value<int> rowid,
+    });
+
+class $$DeviceChainPinsTableFilterComposer
+    extends Composer<_$AppDatabase, $DeviceChainPinsTable> {
+  $$DeviceChainPinsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnWithTypeConverterFilters<Uri, Uri, String> get actor =>
+      $composableBuilder(
+        column: $table.actor,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
+  ColumnFilters<Uint8List> get head => $composableBuilder(
+    column: $table.head,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$DeviceChainPinsTableOrderingComposer
+    extends Composer<_$AppDatabase, $DeviceChainPinsTable> {
+  $$DeviceChainPinsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get actor => $composableBuilder(
+    column: $table.actor,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<Uint8List> get head => $composableBuilder(
+    column: $table.head,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$DeviceChainPinsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $DeviceChainPinsTable> {
+  $$DeviceChainPinsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumnWithTypeConverter<Uri, String> get actor =>
+      $composableBuilder(column: $table.actor, builder: (column) => column);
+
+  GeneratedColumn<Uint8List> get head =>
+      $composableBuilder(column: $table.head, builder: (column) => column);
+}
+
+class $$DeviceChainPinsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $DeviceChainPinsTable,
+          DeviceChainPinRow,
+          $$DeviceChainPinsTableFilterComposer,
+          $$DeviceChainPinsTableOrderingComposer,
+          $$DeviceChainPinsTableAnnotationComposer,
+          $$DeviceChainPinsTableCreateCompanionBuilder,
+          $$DeviceChainPinsTableUpdateCompanionBuilder,
+          (
+            DeviceChainPinRow,
+            BaseReferences<
+              _$AppDatabase,
+              $DeviceChainPinsTable,
+              DeviceChainPinRow
+            >,
+          ),
+          DeviceChainPinRow,
+          PrefetchHooks Function()
+        > {
+  $$DeviceChainPinsTableTableManager(
+    _$AppDatabase db,
+    $DeviceChainPinsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$DeviceChainPinsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$DeviceChainPinsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$DeviceChainPinsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<Uri> actor = const Value.absent(),
+                Value<Uint8List> head = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => DeviceChainPinsCompanion(
+                actor: actor,
+                head: head,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required Uri actor,
+                required Uint8List head,
+                Value<int> rowid = const Value.absent(),
+              }) => DeviceChainPinsCompanion.insert(
+                actor: actor,
+                head: head,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$DeviceChainPinsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $DeviceChainPinsTable,
+      DeviceChainPinRow,
+      $$DeviceChainPinsTableFilterComposer,
+      $$DeviceChainPinsTableOrderingComposer,
+      $$DeviceChainPinsTableAnnotationComposer,
+      $$DeviceChainPinsTableCreateCompanionBuilder,
+      $$DeviceChainPinsTableUpdateCompanionBuilder,
+      (
+        DeviceChainPinRow,
+        BaseReferences<_$AppDatabase, $DeviceChainPinsTable, DeviceChainPinRow>,
+      ),
+      DeviceChainPinRow,
       PrefetchHooks Function()
     >;
 typedef $$MlsCredentialsTableCreateCompanionBuilder =
@@ -4774,6 +5139,8 @@ class $AppDatabaseManager {
       $$ApprovalRequestTableTableManager(_db, _db.approvalRequest);
   $$CapabilitiesTableTableManager get capabilities =>
       $$CapabilitiesTableTableManager(_db, _db.capabilities);
+  $$DeviceChainPinsTableTableManager get deviceChainPins =>
+      $$DeviceChainPinsTableTableManager(_db, _db.deviceChainPins);
   $$MlsCredentialsTableTableManager get mlsCredentials =>
       $$MlsCredentialsTableTableManager(_db, _db.mlsCredentials);
   $$MlsKeyPackagesTableTableManager get mlsKeyPackages =>

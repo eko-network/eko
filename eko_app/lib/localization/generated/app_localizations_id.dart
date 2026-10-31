@@ -683,4 +683,16 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get messengerDevicesLoadFailed => 'Tidak dapat memuat perangkatmu.';
+
+  @override
+  String messengerDevicesChangedTitle(String name) {
+    return 'Perangkat $name berubah';
+  }
+
+  @override
+  String get messengerDevicesChangedBody =>
+      'Perangkat mereka direset, misalnya karena hilang atau mereka keluar dari semua perangkat. Jika kamu tidak menduganya, pastikan dulu dengan mereka: orang lain mungkin mencoba membaca pesanmu.';
+
+  @override
+  String get messengerDevicesChangedContinue => 'Lanjutkan';
 }

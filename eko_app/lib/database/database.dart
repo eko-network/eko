@@ -117,6 +117,16 @@ class ApprovalRequest extends Table {
   Set<Column> get primaryKey => {did};
 }
 
+/// Head of each user's device chain last verified, see [DeviceChainStore].
+@DataClassName('DeviceChainPinRow')
+class DeviceChainPins extends Table {
+  TextColumn get actor => text().map(const UriTypeConverter())();
+  BlobColumn get head => blob()();
+
+  @override
+  Set<Column> get primaryKey => {actor};
+}
+
 @DataClassName('MlsEngineConfigRow')
 class MlsEngineConfigs extends Table {
   IntColumn get id => integer().withDefault(const Constant(1))();
@@ -166,6 +176,7 @@ class MessageAttachments extends Table {
   tables: [
     ApprovalRequest,
     Capabilities,
+    DeviceChainPins,
     MlsCredentials,
     MlsKeyPackages,
     MlsGroups,

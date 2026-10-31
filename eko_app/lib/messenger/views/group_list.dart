@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:ecp/ecp.dart';
 import 'package:eko_app/interfaces/search.dart';
 import 'package:eko_app/localization/generated/app_localizations.dart';
 import 'package:eko_app/messenger/types/group.dart';
@@ -103,12 +104,43 @@ class _ConversationListState extends ConsumerState<GroupList> {
     });
   }
 
+  /// Asks whether to go ahead with [user] although their device chain no
+  /// longer extends the one seen before.
+  Future<bool> _confirmDevicesChanged(UserModel user) async {
+    final l10n = AppLocalizations.of(context)!;
+    final accepted = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.messengerDevicesChangedTitle(user.name)),
+        content: Text(l10n.messengerDevicesChangedBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(l10n.cancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(l10n.messengerDevicesChangedContinue),
+          ),
+        ],
+      ),
+    );
+    return accepted ?? false;
+  }
+
   Future<void> onUserSelected(UserModel user) async {
     final l10n = AppLocalizations.of(context)!;
 
     try {
       final peer = EkoPerson.fromUid(user.uid);
-      await ref.watch(ecpClientProvider).groups.createGroup([peer]);
+      final client = ref.read(ecpClientProvider);
+      try {
+        await client.groups.createGroup([peer]);
+      } on EcpDeviceChainChangedException {
+        if (!mounted || !await _confirmDevicesChanged(user)) return;
+        await client.devices.trust(peer);
+        await client.groups.createGroup([peer]);
+      }
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,

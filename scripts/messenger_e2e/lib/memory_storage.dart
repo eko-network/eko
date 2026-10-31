@@ -13,6 +13,7 @@ class MemoryStorage extends Storage {
         messageStore: _MessageStore(),
         processedObjectStore: _ProcessedObjectStore(),
         approvalRequestStore: _ApprovalRequestStore(),
+        deviceChainStore: _DeviceChainStore(),
       );
 
   List<StoredMessage> get messages => (messageStore as _MessageStore).messages;
@@ -25,6 +26,7 @@ class MemoryStorage extends Storage {
     messages.clear();
     groups.clear();
     approvalRequests.clear();
+    (deviceChainStore as _DeviceChainStore).heads.clear();
   }
 }
 
@@ -134,4 +136,14 @@ bool bytesEqual(List<int> a, List<int> b) {
     if (a[i] != b[i]) return false;
   }
   return true;
+}
+
+class _DeviceChainStore implements DeviceChainStore {
+  final heads = <Uri, Uint8List>{};
+
+  @override
+  Future<Uint8List?> getPinnedHead(Uri actor) async => heads[actor];
+
+  @override
+  Future<void> pinHead(Uri actor, Uint8List head) async => heads[actor] = head;
 }

@@ -71,16 +71,25 @@ class _ApprovalViewState extends ConsumerState<ApprovalView> {
     if (deviceCode != controller.text.trim()) {
       throw _InvalidCodeException();
     }
-    await supabase.rpc('approve_device', params: {'did': widget.request.did});
+    final client = ref.read(ecpClientProvider);
+    final entry = await client.devices.approve(
+      did: widget.request.did,
+      publicKey: widget.request.publicKey,
+    );
+    await supabase.rpc(
+      'approve_device',
+      params: {
+        'did': widget.request.did,
+        'p_entry': entry.toJson(),
+        'p_hash': base64Encode(entry.hash),
+      },
+    );
     await delete();
     try {
-      await ref
-          .read(ecpClientProvider)
-          .groups
-          .addOwnDevice(
-            did: widget.request.did,
-            publicKey: widget.request.publicKey,
-          );
+      await client.groups.addOwnDevice(
+        did: widget.request.did,
+        publicKey: widget.request.publicKey,
+      );
     } catch (e) {
       // the device is approved either way, it just misses some chats
       debugPrint('[Approval Screen] Adding device to chats failed: $e');

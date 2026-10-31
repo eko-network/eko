@@ -1,5 +1,6 @@
 // Headless multi-device test of the messenger: device approval, own devices
-// in chats, device removal and GIF messages, against local Supabase and a
+// in chats, device removal, GIF messages and the device chain holding up
+// against a server that tries to add devices, against local Supabase and a
 // local eko-messenger server. Run through scripts/dev.sh e2e, or directly:
 //
 //   SUPABASE_URL=http://127.0.0.1:54321 SUPABASE_ANON_KEY=... \
@@ -7,6 +8,7 @@
 //   dart run bin/messenger_e2e.dart
 //
 // Uses the seeded accounts from supabase/seed.sql.
+import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -61,7 +63,13 @@ Future<void> main() async {
   });
 
   await step('a pending device cannot approve itself', () async {
-    await rejects(() => alice2.rpc('approve_device', {'did': alice2.did}));
+    await rejects(
+      () => alice2.rpc('approve_device', {
+        'did': alice2.did,
+        'p_entry': <String, dynamic>{},
+        'p_hash': '',
+      }),
+    );
     final rows = await alice2.selectDevices();
     final row = rows.firstWhere((r) => r['id'] == alice2.did);
     check(row['approved_at'] == null, 'approved_at should still be null');
@@ -101,7 +109,7 @@ Future<void> main() async {
       bytesEqual(request.publicKey, alice2.credential.signerPublicKey),
       'request key should be alice-2 signer key',
     );
-    await alice1.rpc('approve_device', {'did': request.did});
+    await alice1.approve(request.did, request.publicKey);
     await alice1.client.groups.addOwnDevice(
       did: request.did,
       publicKey: request.publicKey,
@@ -193,12 +201,17 @@ Future<void> main() async {
   });
 
   await step('an approved device can remove another', () async {
-    await alice1.rpc('remove_device', {'p_did': alice2.did});
+    await alice1.removeDevice(alice2.did);
     await alice1.client.groups.removeDeviceFromGroups(
       publicKey: alice2.credential.signerPublicKey,
     );
     final rows = await alice1.selectDevices();
     check(rows.every((r) => r['id'] != alice2.did), 'record should be gone');
+    final chain = await bob1.client.devices.fetch(bob1.personFor(alice1.uid));
+    check(
+      chain.devices.map((d) => d.did).join() == alice1.did,
+      'alice-2 should be revoked in the chain',
+    );
 
     await until('bob applies the remove commit', () async {
       await bob1.sync();
@@ -221,6 +234,135 @@ Future<void> main() async {
     }
   });
 
+  // the service role key stands in for a malicious server: it can write any
+  // row, but holds none of the users' device keys
+  final carol = bob1.personFor(carol1.uid);
+  final fake = await _fakeDevice(carol);
+
+  await step('a device the server adds is not trusted', () async {
+    await _service(
+      'POST',
+      'devices',
+      body: {
+        'id': fake.did,
+        'uid': carol1.uid,
+        'signer_public_key': _bytea(fake.credential.signerPublicKey),
+        'approved_at': DateTime.now().toUtc().toIso8601String(),
+      },
+    );
+    await _service(
+      'POST',
+      'key_packages',
+      body: {'device_id': fake.did, 'key_package': _bytea(fake.keyPackage)},
+    );
+    final chain = await bob1.client.devices.fetch(carol);
+    check(
+      chain.devices.map((d) => d.did).join() == carol1.did,
+      'only carol-1 should be trusted, got ${chain.devices.map((d) => d.did)}',
+    );
+    final (group, _) = await bob1.client.groups.createGroup([carol]);
+    final members = await bob1.core.memberIndicesForKey(
+      group.groupId,
+      fake.credential.signerPublicKey,
+    );
+    check(members.isEmpty, 'the fake device was added to the chat');
+    await bob1.sendText(group.groupId, 'only for carol');
+    await receives(carol1, (m) => m.content == 'only for carol');
+  });
+
+  await step('a chain entry the server forges is rejected', () async {
+    final rows =
+        await _service(
+              'GET',
+              'device_chain',
+              query: {'uid': 'eq.${carol1.uid}', 'order': 'seq'},
+            )
+            as List;
+    final last = rows.last as Map<String, dynamic>;
+    final forged = await _forgedAdd(
+      carol,
+      fake,
+      signer: carol1.did,
+      prev: _unbytea(last['hash'] as String),
+    );
+    await _service(
+      'POST',
+      'device_chain',
+      body: {
+        'uid': carol1.uid,
+        'seq': (last['seq'] as int) + 1,
+        'entry': forged.toJson(),
+        'hash': _bytea(forged.hash),
+      },
+    );
+    try {
+      await bob1.client.devices.fetch(carol);
+      throw _CheckFailed('the forged chain was accepted');
+    } on EcpDeviceChainException {
+      // expected
+    } finally {
+      await _service(
+        'DELETE',
+        'device_chain',
+        query: {
+          'uid': 'eq.${carol1.uid}',
+          'seq': 'eq.${(last['seq'] as int) + 1}',
+        },
+      );
+    }
+  });
+
+  await step("a key package for another key is rejected", () async {
+    await _service(
+      'DELETE',
+      'key_packages',
+      query: {'device_id': 'eq.${carol1.did}'},
+    );
+    await _service(
+      'POST',
+      'key_packages',
+      body: {'device_id': carol1.did, 'key_package': _bytea(fake.keyPackage)},
+    );
+    final device = (await bob1.client.devices.fetch(
+      carol,
+    )).deviceFor(carol1.did)!;
+    try {
+      await bob1.client.devices.requestKey(carol, device);
+      throw _CheckFailed('the swapped key package was accepted');
+    } on EcpDeviceChainException {
+      // expected
+    }
+  });
+
+  await step('a chain the server replaces is noticed', () async {
+    await _service(
+      'DELETE',
+      'device_chain',
+      query: {'uid': 'eq.${carol1.uid}'},
+    );
+    final genesis = await DeviceChainEntry.genesis(
+      actor: carol.id,
+      did: fake.did,
+      credential: fake.credential,
+    );
+    await _service(
+      'POST',
+      'device_chain',
+      body: {
+        'uid': carol1.uid,
+        'seq': 0,
+        'entry': genesis.toJson(),
+        'hash': _bytea(genesis.hash),
+      },
+    );
+    try {
+      await bob1.client.devices.fetch(carol);
+      throw _CheckFailed('the replaced chain was accepted');
+    } on EcpDeviceChainChangedException catch (e) {
+      check(e.actor == carol.id, 'wrong actor ${e.actor}');
+    }
+  });
+
   await step(
     'after the last device signs out, sign-in is trusted again',
     () async {
@@ -229,6 +371,22 @@ Future<void> main() async {
       check(bob2.approved, 'bob-2 should be trusted on first use');
     },
   );
+
+  await step("contacts notice the reset and can accept it", () async {
+    final bob = alice1.personFor(bob2.uid);
+    try {
+      await alice1.client.devices.fetch(bob);
+      throw _CheckFailed('the reset chain was accepted silently');
+    } on EcpDeviceChainChangedException {
+      // expected
+    }
+    final chain = await alice1.client.devices.trust(bob);
+    check(
+      chain.devices.map((d) => d.did).join() == bob2.did,
+      'the new chain should list bob-2',
+    );
+    await alice1.client.devices.fetch(bob);
+  });
 
   for (final d in [alice1, alice2, bob2, carol1]) {
     await d.close().catchError((_) {});
@@ -249,26 +407,115 @@ String _env(String key, [String? fallback]) {
   return value;
 }
 
-/// Device records from earlier runs would make the first devices pending, so
-/// the seeded users start from none, and are left with none afterwards.
+/// Device records and chains from earlier runs would make the first devices
+/// pending, so the seeded users start from none, and are left with none
+/// afterwards.
 Future<void> _removeTestDevices(Env env) async {
-  final serviceKey = _env('SUPABASE_SERVICE_ROLE_KEY');
-  final res = await http.delete(
-    env.supabaseUrl.replace(
-      path: '/rest/v1/devices',
-      queryParameters: {
-        'uid':
-            'in.(a11ce000-0000-4000-8000-000000000001,'
-            'b0b00000-0000-4000-8000-000000000002,'
-            'ca201000-0000-4000-8000-000000000003)',
-      },
-    ),
-    headers: {'apikey': serviceKey, 'Authorization': 'Bearer $serviceKey'},
-  );
-  if (res.statusCode >= 300) {
-    stderr.writeln('could not clear test devices: ${res.body}');
+  const uids =
+      'in.(a11ce000-0000-4000-8000-000000000001,'
+      'b0b00000-0000-4000-8000-000000000002,'
+      'ca201000-0000-4000-8000-000000000003)';
+  try {
+    await _service('DELETE', 'devices', query: {'uid': uids});
+    await _service('DELETE', 'device_chain', query: {'uid': uids});
+  } on RpcException catch (e) {
+    stderr.writeln('could not clear test devices: $e');
     exit(2);
   }
+}
+
+/// A PostgREST request with the service role, which bypasses row level
+/// security like the server's own database access does.
+Future<dynamic> _service(
+  String method,
+  String table, {
+  Map<String, String>? query,
+  Object? body,
+}) async {
+  final serviceKey = _env('SUPABASE_SERVICE_ROLE_KEY');
+  final request = http.Request(
+    method,
+    _runEnv.supabaseUrl.replace(
+      path: '/rest/v1/$table',
+      queryParameters: query,
+    ),
+  );
+  request.headers.addAll({
+    'apikey': serviceKey,
+    'Authorization': 'Bearer $serviceKey',
+    'Content-Type': 'application/json',
+  });
+  if (body != null) request.body = jsonEncode(body);
+  final res = await http.Response.fromStream(await request.send());
+  if (res.statusCode >= 300) throw RpcException(res.statusCode, res.body);
+  return res.body.isEmpty ? null : jsonDecode(res.body);
+}
+
+String _bytea(List<int> bytes) =>
+    '\\x${bytes.map((b) => b.toRadixString(16).padLeft(2, '0')).join()}';
+
+Uint8List _unbytea(String value) {
+  final hex = value.substring(2);
+  return Uint8List.fromList([
+    for (var i = 0; i < hex.length; i += 2)
+      int.parse(hex.substring(i, i + 2), radix: 16),
+  ]);
+}
+
+/// A device the server makes up for [person]: a key pair and a key package
+/// that name the person, but no approval from any of their devices.
+Future<({String did, MlsCredentialRecord credential, Uint8List keyPackage})>
+_fakeDevice(Person person) async {
+  final signer = MlsSignatureKeyPair.generate(
+    ciphersuite: MlsCiphersuite.mls128DhkemX25519Aes128GcmSha256Ed25519,
+  );
+  final identity = Uint8List.fromList(utf8.encode(person.id.toString()));
+  final credential = MlsCredentialRecord(
+    credentialIdentity: identity,
+    credentialBytes: MlsCredential.basic(identity: identity).serialize(),
+    signerBytes: serializeSigner(
+      ciphersuite: MlsCiphersuite.mls128DhkemX25519Aes128GcmSha256Ed25519,
+      privateKey: signer.privateKey(),
+      publicKey: signer.publicKey(),
+    ),
+    signerPublicKey: signer.publicKey(),
+  );
+  final engine = await MlsEngine.create(
+    dbPath: ':memory:',
+    encryptionKey: Uint8List(32),
+  );
+  final keyPackage = await engine.createKeyPackage(
+    ciphersuite: MlsCiphersuite.mls128DhkemX25519Aes128GcmSha256Ed25519,
+    signerBytes: credential.signerBytes,
+    credentialIdentity: credential.credentialIdentity,
+    signerPublicKey: credential.signerPublicKey,
+    credentialBytes: credential.credentialBytes,
+  );
+  return (
+    did: '00000000-0000-4000-8000-00000000fa4e',
+    credential: credential,
+    keyPackage: keyPackage.keyPackageBytes,
+  );
+}
+
+/// An AddDevice entry for [fake] that claims to be signed by [signer] but is
+/// signed with the fake device's own key, the best the server can do.
+Future<DeviceChainEntry> _forgedAdd(
+  Person person,
+  ({String did, MlsCredentialRecord credential, Uint8List keyPackage}) fake, {
+  required String signer,
+  required Uint8List prev,
+}) async {
+  // sign a genuine entry with the fake key, then relabel signer and prev
+  final selfSigned = await DeviceChainEntry.genesis(
+    actor: person.id,
+    did: fake.did,
+    credential: fake.credential,
+  );
+  final json = selfSigned.toJson()
+    ..['signer'] = signer
+    ..['prev'] = base64Encode(prev);
+  return DeviceChainEntry.fromJson(json);
 }
 
 class _CheckFailed implements Exception {

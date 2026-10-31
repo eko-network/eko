@@ -228,5 +228,15 @@
   "messengerRemoveDeviceTitle" : "Remove device?",
   "messengerRemoveDeviceBody" : "This device will lose access to your chats and will need to be approved again to use messenger.",
   "messengerRemoveDeviceFailed" : "Couldn't remove this device.",
-  "messengerDevicesLoadFailed" : "Couldn't load your devices."
+  "messengerDevicesLoadFailed" : "Couldn't load your devices.",
+  "messengerDevicesChangedTitle" : "{name}'s devices changed",
+  "@messengerDevicesChangedTitle" : {
+    "placeholders" : {
+      "name" : {
+        "type" : "String"
+      }
+    }
+  },
+  "messengerDevicesChangedBody" : "Their devices were reset, for example because they lost them or signed out everywhere. If you didn't expect this, check with them first: someone else could be trying to read your messages.",
+  "messengerDevicesChangedContinue" : "Continue"
 }
