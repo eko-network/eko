@@ -221,5 +221,8 @@
   "messengerDevicesLoadFailed" : "No se pudieron cargar tus dispositivos.",
   "messengerDevicesChangedTitle" : "Los dispositivos de {name} cambiaron",
   "messengerDevicesChangedBody" : "Sus dispositivos se restablecieron, por ejemplo porque los perdió o cerró sesión en todos. Si no lo esperabas, confírmalo primero con esa persona: alguien más podría intentar leer tus mensajes.",
-  "messengerDevicesChangedContinue" : "Continuar"
+  "messengerDevicesChangedContinue" : "Continuar",
+  "messengerUnknownDeviceTitle" : "Dispositivo desconocido en un chat",
+  "messengerUnknownDeviceAddedBody" : "{adder} agregó a un chat un dispositivo que no es de {owner}. Se eliminará. Si vuelve a pasar, confírmalo con esa persona: alguien en el chat podría intentar leer tus mensajes.",
+  "messengerUnknownDeviceBody" : "Hay en un chat un dispositivo que no es uno de los dispositivos actuales de {owner}. Se eliminará."
 }

@@ -695,4 +695,17 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get messengerDevicesChangedContinue => 'Lanjutkan';
+
+  @override
+  String get messengerUnknownDeviceTitle => 'Perangkat tak dikenal di chat';
+
+  @override
+  String messengerUnknownDeviceAddedBody(String adder, String owner) {
+    return '$adder menambahkan perangkat ke sebuah chat yang bukan milik $owner. Perangkat itu akan dihapus. Jika ini terjadi lagi, pastikan dengan mereka: seseorang di chat mungkin mencoba membaca pesanmu.';
+  }
+
+  @override
+  String messengerUnknownDeviceBody(String owner) {
+    return 'Ada perangkat di sebuah chat yang bukan salah satu perangkat $owner saat ini. Perangkat itu akan dihapus.';
+  }
 }

@@ -221,5 +221,8 @@
   "messengerDevicesLoadFailed" : "Tidak dapat memuat perangkatmu.",
   "messengerDevicesChangedTitle" : "Perangkat {name} berubah",
   "messengerDevicesChangedBody" : "Perangkat mereka direset, misalnya karena hilang atau mereka keluar dari semua perangkat. Jika kamu tidak menduganya, pastikan dulu dengan mereka: orang lain mungkin mencoba membaca pesanmu.",
-  "messengerDevicesChangedContinue" : "Lanjutkan"
+  "messengerDevicesChangedContinue" : "Lanjutkan",
+  "messengerUnknownDeviceTitle" : "Perangkat tak dikenal di chat",
+  "messengerUnknownDeviceAddedBody" : "{adder} menambahkan perangkat ke sebuah chat yang bukan milik {owner}. Perangkat itu akan dihapus. Jika ini terjadi lagi, pastikan dengan mereka: seseorang di chat mungkin mencoba membaca pesanmu.",
+  "messengerUnknownDeviceBody" : "Ada perangkat di sebuah chat yang bukan salah satu perangkat {owner} saat ini. Perangkat itu akan dihapus."
 }

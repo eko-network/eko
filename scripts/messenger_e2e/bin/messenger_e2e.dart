@@ -1,7 +1,8 @@
 // Headless multi-device test of the messenger: device approval, own devices
 // in chats, device removal, GIF messages and the device chain holding up
-// against a server that tries to add devices, against local Supabase and a
-// local eko-messenger server. Run through scripts/dev.sh e2e, or directly:
+// against a server or a group member that tries to add devices, against
+// local Supabase and a local eko-messenger server. Run through
+// scripts/dev.sh e2e, or directly:
 //
 //   SUPABASE_URL=http://127.0.0.1:54321 SUPABASE_ANON_KEY=... \
 //   SUPABASE_SERVICE_ROLE_KEY=... MESSENGER_URL=http://127.0.0.1:3000 \
@@ -39,6 +40,7 @@ Future<void> main() async {
   final bob2 = SimDevice(env, 'bob-2', 'bob@test.local');
   final carol1 = SimDevice(env, 'carol-1', 'carol@test.local');
   late Uint8List dm;
+  late Uint8List carolChat;
 
   await step('first devices are trusted on first use', () async {
     for (final d in [alice1, bob1, carol1]) {
@@ -54,6 +56,17 @@ Future<void> main() async {
     dm = group.groupId;
     await alice1.sendText(dm, 'hi bob');
     await receives(bob1, (m) => m.content == 'hi bob');
+  });
+
+  await step('starting the DM again, from either side, reuses it', () async {
+    final (again, _) = await alice1.client.groups.createGroup([
+      alice1.personFor(bob1.uid),
+    ]);
+    check(bytesEqual(again.groupId, dm), 'alice-1 started a second DM');
+    final (fromBob, _) = await bob1.client.groups.createGroup([
+      bob1.personFor(alice1.uid),
+    ]);
+    check(bytesEqual(fromBob.groupId, dm), 'bob-1 started a second DM');
   });
 
   await step('a second device signs in pending', () async {
@@ -195,7 +208,8 @@ Future<void> main() async {
     final (group, _) = await alice1.client.groups.createGroup([
       alice1.personFor(carol1.uid),
     ]);
-    await alice1.sendText(group.groupId, 'hi carol');
+    carolChat = group.groupId;
+    await alice1.sendText(carolChat, 'hi carol');
     await receives(carol1, (m) => m.content == 'hi carol');
     await receives(alice2, (m) => m.content == 'hi carol');
   });
@@ -268,6 +282,99 @@ Future<void> main() async {
     check(members.isEmpty, 'the fake device was added to the chat');
     await bob1.sendText(group.groupId, 'only for carol');
     await receives(carol1, (m) => m.content == 'only for carol');
+  });
+
+  await step("commits need a claim on the group's current epoch", () async {
+    final senders = alice1.client.messages.activitySender;
+    final epoch = await alice1.core.engine.groupEpoch(groupIdBytes: carolChat);
+    Future<void> commitTo(BigInt epoch) => _sendCommit(alice1, carolChat, [
+      carol,
+    ], _commitFraming(carolChat, epoch));
+
+    await conflicts(() => commitTo(epoch));
+    await carol1.client.messages.activitySender.claimEpoch(carolChat, epoch);
+    await conflicts(() => senders.claimEpoch(carolChat, epoch));
+    await carol1.client.messages.activitySender.releaseEpoch(carolChat);
+    await senders.claimEpoch(carolChat, epoch);
+    await conflicts(() => senders.claimEpoch(carolChat, epoch - BigInt.one));
+    await conflicts(() => commitTo(epoch - BigInt.one));
+    await senders.releaseEpoch(carolChat);
+  });
+
+  // alice-1 stands in for a malicious member: it can commit to its groups,
+  // but has no say in other users' device chains
+  await step("a device a member adds for someone else is removed", () async {
+    final warnings = <GroupDeviceWarning>[];
+    final sub = carol1.client.groups.deviceWarnings.listen(warnings.add);
+    try {
+      await alice1.client.messages.activitySender.claimEpoch(
+        carolChat,
+        await alice1.core.engine.groupEpoch(groupIdBytes: carolChat),
+      );
+      final result = await alice1.core.addMembers(carolChat, [fake.keyPackage]);
+      await _sendCommit(alice1, carolChat, [carol], result.commit);
+      // both remove the fake device at once, the server lets one commit
+      // through and the other device catches up instead of splitting the
+      // group
+      await (
+        until('carol-1 flags the fake device', () async {
+          await carol1.sync();
+          return warnings.isNotEmpty;
+        }),
+        alice1.client.groups.removeDeviceFromGroups(
+          publicKey: fake.credential.signerPublicKey,
+        ),
+      ).wait;
+      final warning = warnings.single;
+      check(warning.owner == carol.id, 'owner ${warning.owner}');
+      check(warning.addedBy == alice1.person.id, 'by ${warning.addedBy}');
+      check(!warning.unverified, 'the fake device should be unknown');
+      for (final d in [alice1, carol1]) {
+        await _removedBy(d, carolChat, fake.credential.signerPublicKey);
+      }
+    } finally {
+      await sub.cancel();
+    }
+    final epochs = await Future.wait([
+      for (final d in [alice1, carol1])
+        d.core.engine.groupEpoch(groupIdBytes: carolChat),
+    ]);
+    check(epochs[0] == epochs[1], 'the group split at epochs $epochs');
+    await alice1.sendText(carolChat, 'after the fake device');
+    await receives(carol1, (m) => m.content == 'after the fake device');
+    await carol1.sendText(carolChat, 'carol after the fake device');
+    await receives(alice1, (m) => m.content == 'carol after the fake device');
+  });
+
+  await step("a device in a member's welcome is removed", () async {
+    final warnings = <GroupDeviceWarning>[];
+    final sub = carol1.client.groups.deviceWarnings.listen(warnings.add);
+    try {
+      final group = await alice1.core.createGroup(null);
+      final carolDevice = (await alice1.client.devices.fetch(
+        carol,
+      )).deviceFor(carol1.did)!;
+      final carolKey = await alice1.client.devices.requestKey(
+        carol,
+        carolDevice,
+      );
+      final result = await alice1.core.addMembers(group.groupId, [
+        carolKey.key,
+        fake.keyPackage,
+      ]);
+      await alice1.client.groups.sendWelcomes([carol], result);
+      await until('carol-1 joins and flags the fake device', () async {
+        await carol1.sync();
+        return warnings.isNotEmpty;
+      });
+      check(
+        warnings.single.addedBy == alice1.person.id,
+        'by ${warnings.single.addedBy}',
+      );
+      await _removedBy(alice1, group.groupId, fake.credential.signerPublicKey);
+    } finally {
+      await sub.cancel();
+    }
   });
 
   await step('a chain entry the server forges is rejected', () async {
@@ -372,6 +479,23 @@ Future<void> main() async {
     },
   );
 
+  await step("a chat with a reset contact warns and keeps them", () async {
+    final warnings = <GroupDeviceWarning>[];
+    final sub = alice1.client.groups.deviceWarnings.listen(warnings.add);
+    try {
+      await alice1.client.groups.verifyGroup(dm);
+      await until('alice-1 warns', () async => warnings.isNotEmpty);
+      check(warnings.single.unverified, 'the chain change should be flagged');
+      final indices = await alice1.core.memberIndicesForKey(
+        dm,
+        bob1.credential.signerPublicKey,
+      );
+      check(indices.isNotEmpty, "bob-1 shouldn't be removed before accepting");
+    } finally {
+      await sub.cancel();
+    }
+  });
+
   await step("contacts notice the reset and can accept it", () async {
     final bob = alice1.personFor(bob2.uid);
     try {
@@ -386,6 +510,15 @@ Future<void> main() async {
       'the new chain should list bob-2',
     );
     await alice1.client.devices.fetch(bob);
+  });
+
+  await step("once accepted, the contact's old devices leave chats", () async {
+    await alice1.client.groups.verifyGroup(dm);
+    final indices = await alice1.core.memberIndicesForKey(
+      dm,
+      bob1.credential.signerPublicKey,
+    );
+    check(indices.isEmpty, 'bob-1 should be removed from the dm');
   });
 
   for (final d in [alice1, alice2, bob2, carol1]) {
@@ -450,6 +583,47 @@ Future<dynamic> _service(
   if (res.statusCode >= 300) throw RpcException(res.statusCode, res.body);
   return res.body.isEmpty ? null : jsonDecode(res.body);
 }
+
+/// Sends a commit [device] already merged, bypassing the checks
+/// [GroupManager] does before committing.
+Future<void> _sendCommit(
+  SimDevice device,
+  Uint8List groupId,
+  List<Person> to,
+  Uint8List commit,
+) async {
+  final ids = to.map((p) => p.id).toList();
+  await device.client.messages.activitySender.sendActivity(
+    WireCreate(
+      actor: device.person.id,
+      to: ids,
+      object: PrivateMessage(actor: device.person.id, to: ids, content: commit),
+    ),
+  );
+}
+
+/// The unencrypted framing of an MLS private message carrying a commit to
+/// [epoch] of [groupId], all the server reads of one.
+Uint8List _commitFraming(Uint8List groupId, BigInt epoch) {
+  final epochBytes = ByteData(8)..setUint64(0, epoch.toInt());
+  return Uint8List.fromList([
+    0, 1, 0, 2, // mls10, private message
+    groupId.length, ...groupId, // a one byte size prefix, ids are short
+    ...epochBytes.buffer.asUint8List(),
+    3, // commit
+    0, 0, 0, // authenticated data, sender data, ciphertext
+  ]);
+}
+
+/// Waits for [device] to apply a commit removing [signatureKey]'s leaves.
+Future<void> _removedBy(
+  SimDevice device,
+  Uint8List groupId,
+  Uint8List signatureKey,
+) => until('${device.name} applies the removal', () async {
+  await device.sync();
+  return (await device.core.memberIndicesForKey(groupId, signatureKey)).isEmpty;
+});
 
 String _bytea(List<int> bytes) =>
     '\\x${bytes.map((b) => b.toRadixString(16).padLeft(2, '0')).join()}';
@@ -551,6 +725,15 @@ Future<void> rejects(Future<dynamic> Function() call) async {
     return;
   }
   throw _CheckFailed('expected the call to be rejected');
+}
+
+Future<void> conflicts(Future<void> Function() call) async {
+  try {
+    await call();
+  } on EcpEpochConflictException {
+    return;
+  }
+  throw _CheckFailed('expected an epoch conflict');
 }
 
 Future<void> until(String what, Future<bool> Function() condition) async {

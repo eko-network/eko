@@ -221,5 +221,8 @@
   "messengerDevicesLoadFailed" : "आपके डिवाइस लोड नहीं हो सके।",
   "messengerDevicesChangedTitle" : "{name} के डिवाइस बदल गए",
   "messengerDevicesChangedBody" : "उनके डिवाइस रीसेट हो गए हैं, उदाहरण के लिए क्योंकि वे खो गए या उन्होंने हर जगह से साइन आउट किया। अगर आपको इसकी उम्मीद नहीं थी, तो पहले उनसे पुष्टि करें: कोई और आपके संदेश पढ़ने की कोशिश कर सकता है।",
-  "messengerDevicesChangedContinue" : "जारी रखें"
+  "messengerDevicesChangedContinue" : "जारी रखें",
+  "messengerUnknownDeviceTitle" : "चैट में अज्ञात डिवाइस",
+  "messengerUnknownDeviceAddedBody" : "{adder} ने एक चैट में ऐसा डिवाइस जोड़ा जो {owner} का नहीं है। इसे हटा दिया जाएगा। अगर ऐसा फिर हो, तो उनसे पुष्टि करें: चैट में कोई आपके संदेश पढ़ने की कोशिश कर सकता है।",
+  "messengerUnknownDeviceBody" : "एक चैट में ऐसा डिवाइस है जो {owner} के मौजूदा डिवाइसों में से नहीं है। इसे हटा दिया जाएगा।"
 }

@@ -1397,6 +1397,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Continue'**
   String get messengerDevicesChangedContinue;
+
+  /// No description provided for @messengerUnknownDeviceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown device in a chat'**
+  String get messengerUnknownDeviceTitle;
+
+  /// No description provided for @messengerUnknownDeviceAddedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{adder} added a device to a chat that isn\'t one of {owner}\'s devices. It will be removed. If this happens again, check with them: someone in the chat could be trying to read your messages.'**
+  String messengerUnknownDeviceAddedBody(String adder, String owner);
+
+  /// No description provided for @messengerUnknownDeviceBody.
+  ///
+  /// In en, this message translates to:
+  /// **'A device that isn\'t one of {owner}\'s current devices is in a chat. It will be removed.'**
+  String messengerUnknownDeviceBody(String owner);
 }
 
 class _AppLocalizationsDelegate
