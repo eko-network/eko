@@ -56,6 +56,24 @@ class _ChatViewState extends ConsumerState<ChatView>
     _messageController.addListener(() {
       setState(() {});
     });
+    _verifyMembers();
+  }
+
+  @override
+  void didUpdateWidget(ChatView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.group.group.id != widget.group.group.id) _verifyMembers();
+  }
+
+  /// Checks the chat's devices against their users' device chains, problems
+  /// show up through DeviceWarningHandler.
+  void _verifyMembers() {
+    final groupId = widget.group.group.groupIdBytes;
+    ref
+        .read(ecpClientProvider)
+        .groups
+        .verifyGroup(groupId)
+        .catchError((Object e) => debugPrint('[ChatView] verifyGroup: $e'));
   }
 
   @override

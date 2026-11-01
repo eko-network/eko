@@ -693,4 +693,17 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get messengerDevicesChangedContinue => 'जारी रखें';
+
+  @override
+  String get messengerUnknownDeviceTitle => 'चैट में अज्ञात डिवाइस';
+
+  @override
+  String messengerUnknownDeviceAddedBody(String adder, String owner) {
+    return '$adder ने एक चैट में ऐसा डिवाइस जोड़ा जो $owner का नहीं है। इसे हटा दिया जाएगा। अगर ऐसा फिर हो, तो उनसे पुष्टि करें: चैट में कोई आपके संदेश पढ़ने की कोशिश कर सकता है।';
+  }
+
+  @override
+  String messengerUnknownDeviceBody(String owner) {
+    return 'एक चैट में ऐसा डिवाइस है जो $owner के मौजूदा डिवाइसों में से नहीं है। इसे हटा दिया जाएगा।';
+  }
 }

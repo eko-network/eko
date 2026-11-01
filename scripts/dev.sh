@@ -103,7 +103,7 @@ cmd_down() {
 cmd_reset() {
   supabase db reset --workdir "$ROOT"
   # the inbox refers to devices that no longer exist
-  port_open 5432 && in_messenger_shell bash -c 'psql "$DATABASE_URL" -qc "TRUNCATE entries, messages CASCADE"' >/dev/null
+  port_open 5432 && in_messenger_shell bash -c 'psql "$DATABASE_URL" -qc "TRUNCATE entries, messages, group_epochs CASCADE"' >/dev/null
   rm -rf "$STATE/devices"
 }
 

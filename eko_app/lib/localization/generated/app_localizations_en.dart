@@ -693,4 +693,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get messengerDevicesChangedContinue => 'Continue';
+
+  @override
+  String get messengerUnknownDeviceTitle => 'Unknown device in a chat';
+
+  @override
+  String messengerUnknownDeviceAddedBody(String adder, String owner) {
+    return '$adder added a device to a chat that isn\'t one of $owner\'s devices. It will be removed. If this happens again, check with them: someone in the chat could be trying to read your messages.';
+  }
+
+  @override
+  String messengerUnknownDeviceBody(String owner) {
+    return 'A device that isn\'t one of $owner\'s current devices is in a chat. It will be removed.';
+  }
 }

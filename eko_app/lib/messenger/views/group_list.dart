@@ -3,6 +3,7 @@ import 'package:ecp/ecp.dart';
 import 'package:eko_app/interfaces/search.dart';
 import 'package:eko_app/localization/generated/app_localizations.dart';
 import 'package:eko_app/messenger/types/group.dart';
+import 'package:eko_app/messenger/views/device_warning.dart';
 import 'package:eko_app/messenger/widgets/group_card.dart';
 import 'package:eko_app/providers/ecp_provider.dart';
 import 'package:eko_app/types/user.dart';
@@ -104,30 +105,6 @@ class _ConversationListState extends ConsumerState<GroupList> {
     });
   }
 
-  /// Asks whether to go ahead with [user] although their device chain no
-  /// longer extends the one seen before.
-  Future<bool> _confirmDevicesChanged(UserModel user) async {
-    final l10n = AppLocalizations.of(context)!;
-    final accepted = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.messengerDevicesChangedTitle(user.name)),
-        content: Text(l10n.messengerDevicesChangedBody),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text(l10n.cancel),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: Text(l10n.messengerDevicesChangedContinue),
-          ),
-        ],
-      ),
-    );
-    return accepted ?? false;
-  }
-
   Future<void> onUserSelected(UserModel user) async {
     final l10n = AppLocalizations.of(context)!;
 
@@ -137,7 +114,9 @@ class _ConversationListState extends ConsumerState<GroupList> {
       try {
         await client.groups.createGroup([peer]);
       } on EcpDeviceChainChangedException {
-        if (!mounted || !await _confirmDevicesChanged(user)) return;
+        if (!mounted || !await confirmDevicesChanged(context, user.name)) {
+          return;
+        }
         await client.devices.trust(peer);
         await client.groups.createGroup([peer]);
       }

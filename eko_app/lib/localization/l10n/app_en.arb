@@ -238,5 +238,25 @@
     }
   },
   "messengerDevicesChangedBody" : "Their devices were reset, for example because they lost them or signed out everywhere. If you didn't expect this, check with them first: someone else could be trying to read your messages.",
-  "messengerDevicesChangedContinue" : "Continue"
+  "messengerDevicesChangedContinue" : "Continue",
+  "messengerUnknownDeviceTitle" : "Unknown device in a chat",
+  "messengerUnknownDeviceAddedBody" : "{adder} added a device to a chat that isn't one of {owner}'s devices. It will be removed. If this happens again, check with them: someone in the chat could be trying to read your messages.",
+  "@messengerUnknownDeviceAddedBody" : {
+    "placeholders" : {
+      "adder" : {
+        "type" : "String"
+      },
+      "owner" : {
+        "type" : "String"
+      }
+    }
+  },
+  "messengerUnknownDeviceBody" : "A device that isn't one of {owner}'s current devices is in a chat. It will be removed.",
+  "@messengerUnknownDeviceBody" : {
+    "placeholders" : {
+      "owner" : {
+        "type" : "String"
+      }
+    }
+  }
 }
