@@ -8,8 +8,6 @@ abstract class UserModel with _$UserModel {
     required String username,
     required String profilePicture,
     required String bio,
-    required List<String> followers,
-    required List<String> following,
     required String uid,
     required bool isVerified,
     String? verificationUrl,
@@ -24,8 +22,6 @@ abstract class UserModel with _$UserModel {
       name: '',
       profilePicture: '',
       bio: '',
-      followers: [],
-      following: [],
       uid: '',
       shareOnlineStatus: false,
       isFollowing: false,
@@ -46,21 +42,18 @@ abstract class UserModel with _$UserModel {
         ? Map<String, dynamic>.from(profileDataRaw)
         : <String, dynamic>{};
 
-    final profilePicture = profileData['profilePicture'] ??
+    final profilePicture =
+        profileData['profilePicture'] ??
         profileData['profile_picture'] ??
         json['profile_picture'] ??
         '';
     final bio = profileData['bio'] ?? json['bio'] ?? '';
-    final followers = asStrList(profileData['followers'] ?? json['followers']);
-    final following = asStrList(profileData['following'] ?? json['following']);
 
     return UserModel(
       name: json['name'] ?? '',
       username: json['username'] ?? '',
       profilePicture: '$profilePicture',
       bio: '$bio',
-      followers: followers,
-      following: following,
       uid: '${json['uid'] ?? json['id'] ?? ''}',
       isVerified: json['isVerified'] ?? json['is_verified'] ?? false,
       shareOnlineStatus:

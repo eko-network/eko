@@ -9,14 +9,14 @@ typedef ProfilePostListState = (List<int>, bool);
 
 enum ProfilePostSort { newest, popular }
 
-class ProfilePostListNotifier extends StateNotifier<ProfilePostListState> {
-  ProfilePostListNotifier(this.ref) : super(([], false));
-
-  final Ref ref;
+class ProfilePostListNotifier extends Notifier<ProfilePostListState> {
   final List<MapEntry<int, String>> _newestCursors = [];
   final List<MapEntry<int, int>> _popularCursors = [];
   final Set<int> _set = {};
   ProfilePostSort _sort = ProfilePostSort.newest;
+
+  @override
+  ProfilePostListState build() => ([], false);
 
   Future<void> setSort(ProfilePostSort sort) async {
     if (_sort == sort) {
@@ -87,15 +87,17 @@ class ProfilePostListNotifier extends StateNotifier<ProfilePostListState> {
   }
 }
 
-class OtherProfilePostListNotifier extends StateNotifier<ProfilePostListState> {
-  OtherProfilePostListNotifier(this.ref, this.uid) : super(([], false));
+class OtherProfilePostListNotifier extends Notifier<ProfilePostListState> {
+  OtherProfilePostListNotifier(this.uid);
 
-  final Ref ref;
   final String uid;
   final List<MapEntry<int, String>> _newestCursors = [];
   final List<MapEntry<int, int>> _popularCursors = [];
   final Set<int> _set = {};
   ProfilePostSort _sort = ProfilePostSort.newest;
+
+  @override
+  ProfilePostListState build() => ([], false);
 
   Future<void> setSort(ProfilePostSort sort) async {
     if (_sort == sort) {
@@ -157,20 +159,31 @@ class OtherProfilePostListNotifier extends StateNotifier<ProfilePostListState> {
 }
 
 final profilePostListProvider =
-    StateNotifierProvider<ProfilePostListNotifier, ProfilePostListState>(
-  (ref) => ProfilePostListNotifier(ref),
-);
+    NotifierProvider<ProfilePostListNotifier, ProfilePostListState>(
+      ProfilePostListNotifier.new,
+    );
 
-final otherProfilePostListProvider = StateNotifierProvider.family<
-    OtherProfilePostListNotifier,
-    ProfilePostListState,
-    String>((ref, uid) => OtherProfilePostListNotifier(ref, uid));
+final otherProfilePostListProvider =
+    NotifierProvider.family<
+      OtherProfilePostListNotifier,
+      ProfilePostListState,
+      String
+    >((uid) => OtherProfilePostListNotifier(uid));
 
-final profilePostSortProvider = StateProvider<ProfilePostSort>(
-  (ref) => ProfilePostSort.newest,
-);
+class _ProfilePostSort extends Notifier<ProfilePostSort> {
+  @override
+  ProfilePostSort build() => ProfilePostSort.newest;
+}
+
+final profilePostSortProvider =
+    NotifierProvider<_ProfilePostSort, ProfilePostSort>(_ProfilePostSort.new);
+
+class _OtherProfilePostSort extends Notifier<ProfilePostSort> {
+  @override
+  ProfilePostSort build() => ProfilePostSort.newest;
+}
 
 final otherProfilePostSortProvider =
-    StateProvider.family<ProfilePostSort, String>(
-  (ref, uid) => ProfilePostSort.newest,
-);
+    NotifierProvider.family<_OtherProfilePostSort, ProfilePostSort, String>(
+      (_) => _OtherProfilePostSort(),
+    );

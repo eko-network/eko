@@ -21,9 +21,11 @@ in
       cp -R ${app}/app/${pname}/* "$release_root/"
       cp -r ${app}/share "$staging_dir/"
 
-      if [ -f "${app}/build/native_assets/linux/libwebcrypto.so" ]; then
-        cp "${app}/build/native_assets/linux/libwebcrypto.so" "$release_root/lib/"
-      fi
+      for lib in libwebcrypto.so libopenmls_frb.so; do
+        if [ -f "${app}/build/native_assets/linux/$lib" ]; then
+          cp "${app}/build/native_assets/linux/$lib" "$release_root/lib/"
+        fi
+      done
 
 
       chmod -R +w "$staging_dir"

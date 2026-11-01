@@ -49,6 +49,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     try {
       await ref.read(authProvider.notifier).signInWithGoogle();
     } on AuthException catch (e) {
+      debugPrint(e.toString());
       if (!mounted) return;
       showSnackBar(
         text: '${AppLocalizations.of(context)!.error}: ${e.message}',
@@ -58,7 +59,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     } catch (e, st) {
       debugPrint('Google SignIn Error: $e\n$st');
       if (!mounted) return;
-      if (ref.read(authProvider).uid != null) return;
+      if (ref.read(authProvider).value?.uid != null) return;
       // url_launcher throws a PlatformException on iOS if the Safari View Controller is closed
       if (e.toString().contains('PlatformException')) return;
       showSnackBar(
@@ -85,7 +86,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         isLoading = true;
       });
       try {
-        await ref.read(authProvider.notifier).signIn(
+        await ref
+            .read(authProvider.notifier)
+            .signIn(
               email: emailController.text.trim(),
               password: passwordController.text,
             );
@@ -135,9 +138,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         debugPrint(e.toString());
         if (mounted) {
           showSnackBar(
-              text: AppLocalizations.of(context)!.defaultErrorTitle,
-              context: context,
-              variant: SnackBarVariant.destructive);
+            text: AppLocalizations.of(context)!.defaultErrorTitle,
+            context: context,
+            variant: SnackBarVariant.destructive,
+          );
         }
       } finally {
         if (mounted) {

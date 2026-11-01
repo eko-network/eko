@@ -100,9 +100,10 @@ class _SignUpState extends ConsumerState<SignUp> {
         break;
       case 'invalid-email':
         showSnackBar(
-            text: l10n.invalidEmailBody,
-            context: context,
-            variant: SnackBarVariant.destructive);
+          text: l10n.invalidEmailBody,
+          context: context,
+          variant: SnackBarVariant.destructive,
+        );
         break;
       case 'weak-password':
         _showWeakPassword(context);
@@ -136,7 +137,9 @@ class _SignUpState extends ConsumerState<SignUp> {
   Future<bool> signUp() async {
     ref.read(navBarProvider.notifier).enable();
     if (await isUsernameAvailable(usernameController.text.trim())) {
-      final outcome = await ref.read(authProvider.notifier).signUp(
+      final outcome = await ref
+          .read(authProvider.notifier)
+          .signUp(
             email: emailController.text.trim(),
             password: passwordController.text,
             username: usernameController.text.trim(),
@@ -174,7 +177,7 @@ class _SignUpState extends ConsumerState<SignUp> {
     } catch (e, st) {
       debugPrint('Google SignIn Error: $e\n$st');
       if (!mounted) return;
-      if (ref.read(authProvider).uid != null) return;
+      if (ref.read(authProvider).value?.uid != null) return;
       // url_launcher throws a PlatformException on iOS if the Safari View Controller is closed
       if (e.toString().contains('PlatformException')) return;
       showSnackBar(
@@ -429,8 +432,8 @@ class _SignupInfoState extends State<SignupInfo> {
               child: Text(
                 l10n.createAnAccount,
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),
@@ -630,8 +633,8 @@ class _GetPasswordState extends State<GetPassword> {
               child: Text(
                 l10n.createAPassword,
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
             const AuthDivider(indent: 20, endIndent: 20),

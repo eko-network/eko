@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 
-enum SnackBarVariant {
-  primary,
-  destructive,
-}
+enum SnackBarVariant { primary, destructive }
 
 void showSnackBar({
   String text = '',
@@ -40,9 +37,7 @@ void showSnackBar({
         left: horizontalMargin,
       ),
       padding: EdgeInsets.zero,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       dismissDirection: DismissDirection.down,
     ),
   );
@@ -76,13 +71,10 @@ class _ToastContentState extends State<_ToastContent>
       duration: const Duration(milliseconds: 300),
       vsync: this,
     );
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 1),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeOut,
-    ));
+    _slideAnimation = Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero)
+        .animate(
+          CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
+        );
     _animationController.forward();
   }
 
@@ -111,19 +103,13 @@ class _ToastContentState extends State<_ToastContent>
         onEnter: (_) => setState(() => _isHovered = true),
         onExit: (_) => setState(() => _isHovered = false),
         child: Container(
-          constraints: const BoxConstraints(
-            minWidth: 300,
-            maxWidth: 420,
-          ),
+          constraints: const BoxConstraints(minWidth: 300, maxWidth: 420),
           decoration: BoxDecoration(
             color: backgroundColor,
             borderRadius: BorderRadius.circular(12),
             border: widget.variant == SnackBarVariant.destructive
                 ? null
-                : Border.all(
-                    color: colorScheme.outline,
-                    width: 1,
-                  ),
+                : Border.all(color: colorScheme.outline, width: 1),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.1),
@@ -139,7 +125,6 @@ class _ToastContentState extends State<_ToastContent>
           ),
           child: Stack(
             children: [
-              // Main content
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: Row(
@@ -156,12 +141,10 @@ class _ToastContentState extends State<_ToastContent>
                         ),
                       ),
                     ),
-                    // Spacing for close button
                     const SizedBox(width: 32),
                   ],
                 ),
               ),
-              // Close button (visible on hover)
               Positioned(
                 top: 8,
                 right: 8,

@@ -4,9 +4,4 @@ enum NotificationType {
   web_push,
 }
 
-enum DeviceType {
-  ios,
-  android,
-  linux,
-  browser,
-}
+enum DeviceType { ios, android, linux, browser }

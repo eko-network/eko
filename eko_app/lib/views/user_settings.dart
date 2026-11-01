@@ -5,6 +5,7 @@ import 'package:eko_app/widgets/errors/dialogs.dart';
 import 'package:eko_app/interfaces/user.dart';
 import 'package:eko_app/localization/generated/app_localizations.dart';
 import 'package:eko_app/utilities/shared_pref_service.dart';
+import 'package:eko_app/utilities/platform.dart' as platform;
 import 'package:eko_app/providers/auth_provider.dart';
 import 'package:eko_app/providers/current_user_provider.dart';
 import 'package:eko_app/providers/nav_bar_provider.dart';
@@ -34,7 +35,8 @@ class _UserSettingsState extends ConsumerState<UserSettings> {
       await addDeviceNotificationToken(ref.read(currentUserProvider).user.uid);
     } else {
       await removeDeviceNotificationToken(
-          ref.read(currentUserProvider).user.uid);
+        ref.read(currentUserProvider).user.uid,
+      );
     }
   }
 
@@ -126,6 +128,16 @@ class _UserSettingsState extends ConsumerState<UserSettings> {
               },
             ),
           ),
+          if (!platform.isWeb)
+            ListTile(
+              title: Text(AppLocalizations.of(context)!.messengerDevicesTitle),
+              leading: const Icon(Icons.devices_outlined),
+              trailing: const Icon(Icons.arrow_forward_ios_rounded),
+              onTap: () => context.pushNamed(
+                'messenger_devices',
+                pathParameters: _userProfilePathParams(),
+              ),
+            ),
           TextButton(
             onPressed: () async {
               await ref.read(currentUserProvider.notifier).signOut();

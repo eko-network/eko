@@ -167,8 +167,8 @@ class NotificationHelper {
   }
 }
 
-typedef NotificationPayloadHandler = Future<void> Function(
-    BuildContext context, Map<String, dynamic> data);
+typedef NotificationPayloadHandler =
+    Future<void> Function(BuildContext context, Map<String, dynamic> data);
 
 abstract class NotificationPlatformAdapter {
   const NotificationPlatformAdapter();

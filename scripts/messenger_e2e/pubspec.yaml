@@ -1,0 +1,17 @@
+name: messenger_e2e
+description: Headless multi-device test of the messenger against local Supabase and eko-messenger.
+publish_to: none
+
+environment:
+  sdk: ^3.10.0
+
+dependencies:
+  ecp:
+    path: ../../../ecp-dart-sdk
+  http: ^1.4.0
+  uuid: ^4.4.2
+
+# match eko_app/pubspec.lock so the test runs the same native openmls build
+dependency_overrides:
+  openmls: 1.3.0
+  flutter_rust_bridge: 2.12.0

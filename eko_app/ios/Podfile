@@ -40,6 +40,11 @@ target 'Runner' do
   end
 end
 
+target 'MessengerNotificationService' do
+  use_frameworks!
+  pod 'SQLCipher', '~> 4.10.0'
+end
+
 # uncomment for not using ccache
 post_install do |installer|
   installer.pods_project.targets.each do |target|

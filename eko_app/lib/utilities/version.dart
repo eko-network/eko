@@ -19,8 +19,10 @@ class Version {
 
   Future<void> getAppVersion() async {
     if (platform.isMobile) {
-      minimumVersion = await supabase.rpc('get_min_version',
-          params: {'p_platform': platform.isIOS ? 'ios' : 'android'});
+      minimumVersion = await supabase.rpc(
+        'get_min_version',
+        params: {'p_platform': platform.isIOS ? 'ios' : 'android'},
+      );
     } else {
       minimumVersion = '0.0.0';
       return;

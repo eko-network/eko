@@ -6,19 +6,56 @@ part of '../../providers/nav_bar_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+
+@ProviderFor(NavBar)
+final navBarProvider = NavBarProvider._();
+
+final class NavBarProvider extends $NotifierProvider<NavBar, bool> {
+  NavBarProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'navBarProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$navBarHash();
+
+  @$internal
+  @override
+  NavBar create() => NavBar();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(bool value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<bool>(value),
+    );
+  }
+}
+
 String _$navBarHash() => r'a25d84dda5b03559146c374a6a19f825e291e643';
 
-/// See also [NavBar].
-@ProviderFor(NavBar)
-final navBarProvider = NotifierProvider<NavBar, bool>.internal(
-  NavBar.new,
-  name: r'navBarProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$navBarHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef _$NavBar = Notifier<bool>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+abstract class _$NavBar extends $Notifier<bool> {
+  bool build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<bool, bool>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<bool, bool>,
+              bool,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
+  }
+}

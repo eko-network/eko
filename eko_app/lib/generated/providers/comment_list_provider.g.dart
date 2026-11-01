@@ -6,171 +6,102 @@ part of '../../providers/comment_list_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$commentListHash() => r'bca825d1244663f507f28c7a977efed927677311';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// Copied from Dart SDK
-class _SystemHash {
-  _SystemHash._();
-
-  static int combine(int hash, int value) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + value);
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x0007ffff & hash) << 10));
-    return hash ^ (hash >> 6);
-  }
-
-  static int finish(int hash) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x03ffffff & hash) << 3));
-    // ignore: parameter_assignments
-    hash = hash ^ (hash >> 11);
-    return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
-  }
-}
-
-abstract class _$CommentList
-    extends BuildlessAutoDisposeNotifier<(List<int>, bool)> {
-  late final int postId;
-
-  (List<int>, bool) build(
-    int postId,
-  );
-}
-
-/// See also [CommentList].
 @ProviderFor(CommentList)
-const commentListProvider = CommentListFamily();
+final commentListProvider = CommentListFamily._();
 
-/// See also [CommentList].
-class CommentListFamily extends Family<(List<int>, bool)> {
-  /// See also [CommentList].
-  const CommentListFamily();
+final class CommentListProvider
+    extends $NotifierProvider<CommentList, (List<int>, bool)> {
+  CommentListProvider._({
+    required CommentListFamily super.from,
+    required int super.argument,
+  }) : super(
+         retry: null,
+         name: r'commentListProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
 
-  /// See also [CommentList].
-  CommentListProvider call(
-    int postId,
-  ) {
-    return CommentListProvider(
-      postId,
-    );
+  @override
+  String debugGetCreateSourceHash() => _$commentListHash();
+
+  @override
+  String toString() {
+    return r'commentListProvider'
+        ''
+        '($argument)';
   }
 
+  @$internal
   @override
-  CommentListProvider getProviderOverride(
-    covariant CommentListProvider provider,
-  ) {
-    return call(
-      provider.postId,
-    );
-  }
+  CommentList create() => CommentList();
 
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'commentListProvider';
-}
-
-/// See also [CommentList].
-class CommentListProvider
-    extends AutoDisposeNotifierProviderImpl<CommentList, (List<int>, bool)> {
-  /// See also [CommentList].
-  CommentListProvider(
-    int postId,
-  ) : this._internal(
-          () => CommentList()..postId = postId,
-          from: commentListProvider,
-          name: r'commentListProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$commentListHash,
-          dependencies: CommentListFamily._dependencies,
-          allTransitiveDependencies:
-              CommentListFamily._allTransitiveDependencies,
-          postId: postId,
-        );
-
-  CommentListProvider._internal(
-    super._createNotifier, {
-    required super.name,
-    required super.dependencies,
-    required super.allTransitiveDependencies,
-    required super.debugGetCreateSourceHash,
-    required super.from,
-    required this.postId,
-  }) : super.internal();
-
-  final int postId;
-
-  @override
-  (List<int>, bool) runNotifierBuild(
-    covariant CommentList notifier,
-  ) {
-    return notifier.build(
-      postId,
-    );
-  }
-
-  @override
-  Override overrideWith(CommentList Function() create) {
-    return ProviderOverride(
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue((List<int>, bool) value) {
+    return $ProviderOverride(
       origin: this,
-      override: CommentListProvider._internal(
-        () => create()..postId = postId,
-        from: from,
-        name: null,
-        dependencies: null,
-        allTransitiveDependencies: null,
-        debugGetCreateSourceHash: null,
-        postId: postId,
-      ),
+      providerOverride: $SyncValueProvider<(List<int>, bool)>(value),
     );
-  }
-
-  @override
-  AutoDisposeNotifierProviderElement<CommentList, (List<int>, bool)>
-      createElement() {
-    return _CommentListProviderElement(this);
   }
 
   @override
   bool operator ==(Object other) {
-    return other is CommentListProvider && other.postId == postId;
+    return other is CommentListProvider && other.argument == argument;
   }
 
   @override
   int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, postId.hashCode);
-
-    return _SystemHash.finish(hash);
+    return argument.hashCode;
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-mixin CommentListRef on AutoDisposeNotifierProviderRef<(List<int>, bool)> {
-  /// The parameter `postId` of this provider.
-  int get postId;
-}
+String _$commentListHash() => r'bca825d1244663f507f28c7a977efed927677311';
 
-class _CommentListProviderElement
-    extends AutoDisposeNotifierProviderElement<CommentList, (List<int>, bool)>
-    with CommentListRef {
-  _CommentListProviderElement(super.provider);
+final class CommentListFamily extends $Family
+    with
+        $ClassFamilyOverride<
+          CommentList,
+          (List<int>, bool),
+          (List<int>, bool),
+          (List<int>, bool),
+          int
+        > {
+  CommentListFamily._()
+    : super(
+        retry: null,
+        name: r'commentListProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  CommentListProvider call(int postId) =>
+      CommentListProvider._(argument: postId, from: this);
 
   @override
-  int get postId => (origin as CommentListProvider).postId;
+  String toString() => r'commentListProvider';
 }
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+
+abstract class _$CommentList extends $Notifier<(List<int>, bool)> {
+  late final _$args = ref.$arg as int;
+  int get postId => _$args;
+
+  (List<int>, bool) build(int postId);
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<(List<int>, bool), (List<int>, bool)>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<(List<int>, bool), (List<int>, bool)>,
+              (List<int>, bool),
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, () => build(_$args));
+  }
+}

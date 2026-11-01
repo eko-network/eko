@@ -30,8 +30,9 @@ void main() {
     expect(currentRouterUri(container).queryParameters['uid'], testUid);
   });
 
-  testWidgets('profile stack: edit_profile, share_profile, user_settings',
-      (tester) async {
+  testWidgets('profile stack: edit_profile, share_profile, user_settings', (
+    tester,
+  ) async {
     final container = await pumpNavigationApp(
       tester,
       overrides: signedInNavigationOverrides(),
@@ -58,9 +59,7 @@ void main() {
     );
     final router = goRouter(container);
 
-    router.go(
-      '/users/$testUsername/user_settings/change_email?uid=$testUid',
-    );
+    router.go('/users/$testUsername/user_settings/change_email?uid=$testUid');
     await pumpNavFrames(tester);
     expect(find.byType(ChangeEmailPage), findsOneWidget);
 
@@ -70,9 +69,7 @@ void main() {
     await pumpNavFrames(tester);
     expect(find.byType(ChangePasswordPage), findsOneWidget);
 
-    router.go(
-      '/users/$testUsername/user_settings/blocked_users?uid=$testUid',
-    );
+    router.go('/users/$testUsername/user_settings/blocked_users?uid=$testUid');
     await pumpNavFrames(tester);
     expect(find.byType(BlockedUsersPage), findsOneWidget);
   });

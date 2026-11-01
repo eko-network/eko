@@ -10,8 +10,12 @@ class DeviceUidService {
       return existing;
     }
 
-    final created = _uuid.v4();
+    final created = _uuid.v7();
     PrefsService.deviceUid = created;
     return created;
+  }
+
+  static void remove() {
+    PrefsService.deviceUid = null;
   }
 }

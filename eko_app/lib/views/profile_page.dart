@@ -72,6 +72,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         }
       });
     } catch (e) {
+      debugPrint(e.toString());
       if (!mounted) return;
       setState(() {
         _error = AppLocalizations.of(context)!.profileResolveFailed;
@@ -87,7 +88,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
     final bool isMyOwnProfile =
         (widget.uid != null && widget.uid == currentUserId) ||
-            (widget.uid == null && widget.username == currentUsername);
+        (widget.uid == null && widget.username == currentUsername);
 
     Widget? buildLeadingWidget(BuildContext context, bool isMyProfile) {
       if (isMyProfile) {
@@ -137,8 +138,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               Text(
                 AppLocalizations.of(context)!.userNotFound,
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ],
           ),
@@ -150,17 +151,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     final width = c.widthGetter(context);
     final userAsync = ref.watch(userProvider(uid));
     final currentUser = ref.watch(currentUserProvider);
-    final isBlockedByMe = userAsync.when(
-      data: (profileUser) => currentUser.blockedUsers.contains(profileUser.uid),
-      loading: () => false,
-      error: (_, __) => false,
-    );
-
-    final blocksMe = userAsync.when(
-      data: (profileUser) => currentUser.blockedBy.contains(profileUser.uid),
-      loading: () => false,
-      error: (_, __) => false,
-    );
     final bool isCurrentUser = currentUser.user.uid == uid;
     final selectedSort = isCurrentUser
         ? ref.watch(profilePostSortProvider)
@@ -205,7 +195,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         futures.add(ref.read(profilePostListProvider.notifier).refresh());
       } else {
         futures.add(
-            ref.read(otherProfilePostListProvider(uid).notifier).refresh());
+          ref.read(otherProfilePostListProvider(uid).notifier).refresh(),
+        );
       }
       await Future.wait(futures);
     }
@@ -236,43 +227,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     return PopScope(
       canPop: true,
       child: AppScaffold(
-        appBar: userAsync.when(
-          data: (profileUser) => (isBlockedByMe || blocksMe)
-              ? EkoAppBar(
-                  title: _ProfileAppBarContent(
-                    leading: buildLeadingWidget(context, isCurrentUser),
-                    title: const SizedBox(),
-                    actions: const [],
-                  ),
-                )
-              : null,
-          loading: () => EkoAppBar(
-            title: _ProfileAppBarContent(
-              leading: buildLeadingWidget(context, isCurrentUser),
-              title: const SizedBox(),
-              actions: const [],
-            ),
-          ),
-          error: (_, __) => EkoAppBar(
-            title: _ProfileAppBarContent(
-              leading: buildLeadingWidget(context, isCurrentUser),
-              title: const SizedBox(),
-              actions: const [],
-            ),
-          ),
-        ),
         body: userAsync.when(
           data: (profileUser) {
-            if (isBlockedByMe || blocksMe) {
-              return Center(
-                child: SizedBox(
-                  width: width * 0.7,
-                  child: Text(
-                    AppLocalizations.of(context)!.blockedByUserMessage,
-                  ),
-                ),
-              );
-            }
             return InfiniteScrollyCore<int>(
               getter: loadMorePosts,
               list: postListState.$1,
@@ -361,8 +317,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                           child: Icon(
                             Icons.more_vert,
                             size: 20,
-                            color:
-                                Theme.of(context).colorScheme.onSurfaceVariant,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurfaceVariant,
                           ),
                         ),
                       ),
@@ -381,9 +338,12 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
             );
           },
           loading: () => const Center(child: LoadingSpinner()),
-          error: (error, stack) => Center(
-            child: Text(AppLocalizations.of(context)!.profileLoadFailed),
-          ),
+          error: (error, stack) {
+            debugPrint(error.toString());
+            return Center(
+              child: Text(AppLocalizations.of(context)!.profileLoadFailed),
+            );
+          },
         ),
       ),
     );
@@ -444,14 +404,11 @@ class _Header extends ConsumerWidget {
     final actionButtonWidth = (width * 0.45).clamp(120.0, 170.0).toDouble();
     final actionButtonHeight = (width * 0.09).clamp(38.0, 44.0).toDouble();
     final userState = ref.watch(userProvider(user.uid));
-    final isFollowing = userState.valueOrNull?.isFollowing ?? user.isFollowing;
+    final isFollowing = userState.value?.isFollowing ?? user.isFollowing;
 
     return Column(
       children: [
-        ProfileHeader(
-          user: user,
-          loggedIn: true,
-        ),
+        ProfileHeader(user: user, loggedIn: true),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 15),
           child: isCurrentUser

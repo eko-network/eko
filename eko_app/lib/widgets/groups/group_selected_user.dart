@@ -36,7 +36,7 @@ class SelectedUser extends ConsumerWidget {
                 asyncUser.when(
                   data: (user) =>
                       user.name.isNotEmpty ? user.name : user.username,
-                  error: (_, __) => '',
+                  error: (_, _) => '',
                   loading: () => '',
                 ),
               ),

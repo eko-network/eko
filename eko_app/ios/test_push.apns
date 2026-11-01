@@ -1,0 +1,11 @@
+{
+  "aps": {
+    "alert": {
+      "title": "New message",
+      "body": "Encrypted message"
+    },
+    "mutable-content": 1
+  },
+  "mls_message": "AAEAAhCfw3eF572eTbpayR4yJZlxAAAAAAAAAAEBABzgPe6edz6VFN6ErujSjrlLViAFhVfm8CxcOlDRQR9iiWUiKrNkI3pHnjRs9zwTvFZe4mKv1Ve5DdM/SQd8DW0BX9da8F5nURAfDtC2yIU2NSNL/zyXoZdItWoQk5xQyKb/IzlY7QrGgMJjo9R8szKHGDoo5rOogsMHWrd8Zueyeq8SBSRPLMX1L0qG3yd2U15uvlzfbR8c+N+wpDUM5Zl0JU6eYqIfMPwTzmJk0wq5Mw+lDoTSDg0W6R6478JXjp+hKn0pacgserbjlDdfuLxdKIMgsi5cckg6Oft+EKOslkRiC5LkRVV8AlAKe+l1HmTFes4Iahfmfgjgzf2Od9P1yefhv/XKbctruXfuKs8ObUf6ved8NN6zgE+Csq1K7gLQCGJnMYlisGpIBGaehFr6NMQYS5wfe+a1QDtYPA==",
+  "group_id": "n8N3hee9nk26WskeMiWZcQ=="
+}

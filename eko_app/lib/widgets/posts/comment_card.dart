@@ -69,7 +69,8 @@ class _CommentCardState extends ConsumerState<CommentCard> {
 
   void onScrollEnd(WidgetRef ref, CommentModel comment) async {
     Timer(const Duration(milliseconds: 1), () {
-      final scrollPercentage = scrollController.position.pixels /
+      final scrollPercentage =
+          scrollController.position.pixels /
           scrollController.position.maxScrollExtent;
       if (comment.uid == ref.watch(currentUserProvider).user.uid) {
         if (scrollPercentage >= 0.8) {
@@ -152,10 +153,6 @@ class _CommentCardState extends ConsumerState<CommentCard> {
 
     return asyncComment.when(
       data: (comment) {
-        if (currentUser.blockedUsers.contains(comment.uid) ||
-            currentUser.blockedBy.contains(comment.uid)) {
-          return SizedBox.shrink();
-        }
         return TapRegion(
           onTapOutside: (v) => scrollToStart(),
           child: NotificationListener<ScrollEndNotification>(
@@ -220,6 +217,7 @@ class _CommentCardState extends ConsumerState<CommentCard> {
         );
       },
       error: (error, stackTrace) {
+        debugPrint(error.toString());
         return _Error();
       },
       loading: () {
@@ -297,8 +295,9 @@ class _Card extends ConsumerWidget {
                             onPressed: () {
                               if (comment.uid !=
                                   ref.read(currentUserProvider).user.uid) {
-                                final user =
-                                    ref.read(userProvider(comment.uid)).value;
+                                final user = ref
+                                    .read(userProvider(comment.uid))
+                                    .value;
                                 if (user != null) {
                                   context.push(
                                     '/users/${user.username}?uid=${user.uid}',

@@ -64,7 +64,7 @@ const _klipyKey = [
   113,
   117,
   73,
-  76
+  76,
 ];
 final _supabaseKey = [
   115,
@@ -112,7 +112,7 @@ final _supabaseKey = [
   73,
   118,
   104,
-  50
+  50,
 ];
 const _useLocal = kDebugMode && (String.fromEnvironment('USE_LOCAL') == '1');
 const supabaseUrl = _useLocal
@@ -122,5 +122,18 @@ final supabaseKey = _useLocal
     ? String.fromEnvironment('SUPABASE_PUBLISHABLE_KEY')
     : String.fromCharCodes(_supabaseKey);
 final klipyKey = String.fromCharCodes(_klipyKey);
+
+/// eko-messenger server; override with --dart-define=MESSENGER_URL=...
+final messengerUrl = Uri.parse(
+  _useLocal
+      ? const String.fromEnvironment(
+          'MESSENGER_URL',
+          defaultValue: 'http://localhost:3000',
+        )
+      : const String.fromEnvironment(
+          'MESSENGER_URL',
+          defaultValue: 'https://messages.eko-app.com',
+        ),
+);
 const vapidPublicKey =
     'BFo24IYjHDx-wf82zp7ngoj1Bmm_xrtnF38DzgD2HqEJOoeJhOKipVcC7bwqNwrcHXL01ERh2HWktpKsiiRtZi4';

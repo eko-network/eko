@@ -89,15 +89,9 @@ class _FeedPageState extends ConsumerState<FeedPage> {
           appBar: appBar,
         );
       case 1:
-        return _NewFeed(
-          controller: newScrollController,
-          appBar: appBar,
-        );
+        return _NewFeed(controller: newScrollController, appBar: appBar);
       case 2:
-        return _PopularFeed(
-          controller: popScrollController,
-          appBar: appBar,
-        );
+        return _PopularFeed(controller: popScrollController, appBar: appBar);
       default:
         return _FollowingFeed(
           controller: followingScrollController,

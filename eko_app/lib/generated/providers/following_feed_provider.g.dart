@@ -6,21 +6,57 @@ part of '../../providers/following_feed_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+
+@ProviderFor(FollowingFeed)
+final followingFeedProvider = FollowingFeedProvider._();
+
+final class FollowingFeedProvider
+    extends $NotifierProvider<FollowingFeed, (List<int>, bool)> {
+  FollowingFeedProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'followingFeedProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$followingFeedHash();
+
+  @$internal
+  @override
+  FollowingFeed create() => FollowingFeed();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue((List<int>, bool) value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<(List<int>, bool)>(value),
+    );
+  }
+}
+
 String _$followingFeedHash() => r'62358eefda9d57e522d7e37d82188841f95e83df';
 
-/// See also [FollowingFeed].
-@ProviderFor(FollowingFeed)
-final followingFeedProvider =
-    AutoDisposeNotifierProvider<FollowingFeed, (List<int>, bool)>.internal(
-  FollowingFeed.new,
-  name: r'followingFeedProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$followingFeedHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef _$FollowingFeed = AutoDisposeNotifier<(List<int>, bool)>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+abstract class _$FollowingFeed extends $Notifier<(List<int>, bool)> {
+  (List<int>, bool) build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<(List<int>, bool), (List<int>, bool)>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<(List<int>, bool), (List<int>, bool)>,
+              (List<int>, bool),
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
+  }
+}

@@ -1,31 +1,13 @@
+import 'package:eko_app/types/device.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 part '../generated/types/auth.freezed.dart';
 
 @freezed
 abstract class AuthModel with _$AuthModel {
   const factory AuthModel({
-    String? uid,
+    required String? uid,
     String? email,
-    required bool isLoading,
-    bool? emailVerified,
-    DateTime? creationTime,
-    @Default(false) bool pendingPasswordRecovery,
+    DeviceModel? device,
   }) = _AuthModel;
-  factory AuthModel.loading() => const AuthModel(
-        uid: null,
-        email: null,
-        isLoading: true,
-        emailVerified: null,
-        creationTime: null,
-        pendingPasswordRecovery: false,
-      );
-
-  factory AuthModel.signedOut() => const AuthModel(
-        uid: null,
-        email: null,
-        isLoading: false,
-        emailVerified: null,
-        creationTime: null,
-        pendingPasswordRecovery: false,
-      );
+  factory AuthModel.signedOut() => AuthModel(uid: null, email: null);
 }

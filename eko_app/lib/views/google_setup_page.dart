@@ -169,7 +169,9 @@ class _GoogleSetupPageState extends ConsumerState<GoogleSetupPage> {
     try {
       final birthdayStr =
           '${monthController.text}/${dayController.text}/${yearController.text}';
-      final outcome = await ref.read(authProvider.notifier).createGoogleProfile(
+      final outcome = await ref
+          .read(authProvider.notifier)
+          .createGoogleProfile(
             username: usernameController.text.trim(),
             name: nameController.text.trim(),
             birthday: birthdayStr,
@@ -218,9 +220,7 @@ class _GoogleSetupPageState extends ConsumerState<GoogleSetupPage> {
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: AppScaffold(
-        appBar: EkoAppBar(
-          onBack: _cancel,
-        ),
+        appBar: EkoAppBar(onBack: _cancel),
         body: Center(
           child: SizedBox(
             width: width,
@@ -238,12 +238,8 @@ class _GoogleSetupPageState extends ConsumerState<GoogleSetupPage> {
                     child: Align(
                       child: Text(
                         l10n.createAnAccount,
-                        style: Theme.of(context)
-                            .textTheme
-                            .headlineMedium
-                            ?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
+                        style: Theme.of(context).textTheme.headlineMedium
+                            ?.copyWith(fontWeight: FontWeight.bold),
                       ),
                     ),
                   ),
@@ -303,8 +299,9 @@ class _GoogleSetupPageState extends ConsumerState<GoogleSetupPage> {
                           ],
                         ),
                         Padding(
-                          padding:
-                              EdgeInsets.symmetric(horizontal: width * 0.03),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: width * 0.03,
+                          ),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             crossAxisAlignment: CrossAxisAlignment.start,

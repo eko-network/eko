@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:shimmer/shimmer.dart';
+import 'package:shimmer/shimmer.dart' as s;
 import 'package:eko_app/utilities/constants.dart' as c;
 import 'package:eko_app/widgets/common/divider.dart';
 
@@ -9,7 +9,7 @@ class PostLoader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _Shimmer(
+    return Shimmer(
       child: Column(
         children: List.generate(length * 2, (index) {
           if (index % 2 == 0) {
@@ -29,7 +29,7 @@ class UserLoader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _Shimmer(
+    return Shimmer(
       child: Column(
         children: List.generate(length, (_) {
           return _BlankUser();
@@ -110,57 +110,61 @@ class _BlankUser extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final width = c.widthGetter(context);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Container(
-            width: width * 0.115,
-            height: width * 0.115,
-            decoration: const BoxDecoration(
-              color: Colors.black,
-              shape: BoxShape.circle,
-            ),
-          ),
-          const SizedBox(width: 7),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final availableWidth = constraints.maxWidth;
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Container(
-                width: width * 0.55,
-                height: width * 0.043,
-                decoration: BoxDecoration(
+                width: availableWidth * 0.115,
+                height: availableWidth * 0.115,
+                decoration: const BoxDecoration(
                   color: Colors.black,
-                  borderRadius: BorderRadius.circular(16),
+                  shape: BoxShape.circle,
                 ),
               ),
-              const SizedBox(height: 10),
-              Container(
-                width: width * 0.7,
-                height: width * 0.043,
-                decoration: BoxDecoration(
-                  color: Colors.black,
-                  borderRadius: BorderRadius.circular(16),
-                ),
+              const SizedBox(width: 7),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: availableWidth * 0.55,
+                    height: availableWidth * 0.043,
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Container(
+                    width: availableWidth * 0.45,
+                    height: availableWidth * 0.043,
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                ],
               ),
             ],
-          ),
-        ],
+          );
+        },
       ),
     );
   }
 }
 
-class _Shimmer extends StatelessWidget {
+class Shimmer extends StatelessWidget {
   final Widget child;
-  const _Shimmer({required this.child});
+  const Shimmer({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {
-    return Shimmer(
+    return s.Shimmer(
       gradient: LinearGradient(
         colors: Theme.of(context).brightness == Brightness.dark
             ? c.darkModeGradient

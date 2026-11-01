@@ -87,11 +87,7 @@ class GoogleSignInButton extends StatelessWidget {
                         height: _gLogoSize,
                       ),
                       const SizedBox(width: _gapAfterLogo),
-                      Text(
-                        label,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                      Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
                     ],
                   ),
           ),

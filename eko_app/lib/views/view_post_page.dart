@@ -55,10 +55,12 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
   }
 
   KeyEventResult _handleCommentFieldKey(FocusNode _, KeyEvent event) {
-    final isMobileApp = !kIsWeb &&
+    final isMobileApp =
+        !kIsWeb &&
         (defaultTargetPlatform == TargetPlatform.android ||
             defaultTargetPlatform == TargetPlatform.iOS);
-    final isEnter = event.logicalKey == LogicalKeyboardKey.enter ||
+    final isEnter =
+        event.logicalKey == LogicalKeyboardKey.enter ||
         event.logicalKey == LogicalKeyboardKey.numpadEnter;
     if (isMobileApp ||
         event is! KeyDownEvent ||
@@ -303,16 +305,6 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
 
     return asyncPost.when(
       data: (post) {
-        final currentUser = ref.watch(currentUserProvider);
-        if (currentUser.blockedUsers.contains(post.uid) ||
-            currentUser.blockedBy.contains(post.uid)) {
-          return Center(
-            child: SizedBox(
-              width: width * 0.7,
-              child: Text(AppLocalizations.of(context)!.blockedByUserMessage),
-            ),
-          );
-        }
         return GestureDetector(
           onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
           child: AppScaffold(
@@ -408,16 +400,18 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
                           onKeyEvent: _handleCommentFieldKey,
                           child: TextField(
                             textCapitalization: TextCapitalization.sentences,
-                            cursorColor:
-                                Theme.of(context).colorScheme.onSurface,
+                            cursorColor: Theme.of(
+                              context,
+                            ).colorScheme.onSurface,
                             focusNode: commentFieldFocus,
                             maxLines: null,
                             controller: commentField,
                             keyboardType: TextInputType.text,
                             decoration: InputDecoration(
                               contentPadding: EdgeInsets.all(height * 0.01),
-                              hintText:
-                                  AppLocalizations.of(context)!.addComment,
+                              hintText: AppLocalizations.of(
+                                context,
+                              )!.addComment,
                               fillColor: Theme.of(
                                 context,
                               ).colorScheme.outlineVariant,

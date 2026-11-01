@@ -70,11 +70,8 @@ class _ChangePasswordPageState extends ConsumerState<ChangePasswordPage> {
     if (!mounted) return;
     final username = ref.read(currentUserProvider).user.username;
     showSnackBar(text: l10n.passwordChangedBody, context: context);
-    ref.read(authProvider.notifier).clearPasswordRecovery();
-    context.goNamed(
-      'user_settings',
-      pathParameters: {'username': username},
-    );
+    // ref.read(authProvider.notifier).clearPasswordRecovery();
+    context.goNamed('user_settings', pathParameters: {'username': username});
     return;
   }
 
@@ -103,8 +100,8 @@ class _ChangePasswordPageState extends ConsumerState<ChangePasswordPage> {
                   child: Text(
                     l10n.changePassword,
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),

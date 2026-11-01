@@ -249,6 +249,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get iveVerifiedMyEmail => 'He verificado mi email';
 
   @override
+  String get keyExchangeFailed => 'Intercambio de claves fallido';
+
+  @override
+  String get keysExchanged => 'Claves intercambiadas';
+
+  @override
   String get likes => 'Up-ekos';
 
   @override
@@ -294,6 +300,18 @@ class AppLocalizationsEs extends AppLocalizations {
   String get newLines => 'Lineas nuevas';
 
   @override
+  String get chats => 'Chats';
+
+  @override
+  String get newMessage => 'Nuevo mensaje';
+
+  @override
+  String get noMessagesYet => 'Aún no hay mensajes';
+
+  @override
+  String get typeAMessage => 'Escribe un mensaje';
+
+  @override
   String get newPasswordMustBeDifferent =>
       'La nueva contraseña debe ser diferente';
 
@@ -302,6 +320,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get nothingToSeeHere => 'No hay nada que ver aquí!';
+
+  @override
+  String get noteToSelf => 'Nota personal';
 
   @override
   String get ok => 'Ok';
@@ -465,6 +486,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get usernameTakenBody => 'Por favor escoja otro nombre de usario';
 
   @override
+  String get userMayNotHaveDeviceRegistered =>
+      'Es posible que el usuario no tenga un dispositivo registrado.';
+
+  @override
   String get userNotFound => 'Usuario no encontrado';
 
   @override
@@ -515,6 +540,63 @@ class AppLocalizationsEs extends AppLocalizations {
   String get messengerSubtitle => 'eko messenger próximamente';
 
   @override
+  String get messengerSetupBody =>
+      'Registra este dispositivo para enviar y recibir mensajes cifrados de extremo a extremo.';
+
+  @override
+  String get enableMessages => 'Activar mensajes';
+
+  @override
+  String get registeringDevice => 'Registrando dispositivo…';
+
+  @override
+  String get deviceRegistrationFailed =>
+      'No se pudo configurar la mensajería en este dispositivo.';
+
+  @override
+  String get messengerServerUnavailableTitle =>
+      'Servidor de mensajes no disponible';
+
+  @override
+  String get messengerServerUnavailableBody =>
+      'No se pudo conectar con el servidor de mensajes. Comprueba que esté en ejecución e inténtalo de nuevo.';
+
+  @override
+  String get messengerWaitForApprovalTitle => 'Dispositivo no aprobado';
+
+  @override
+  String get messengerWaitForApprovalBody =>
+      'Este dispositivo aún no ha sido aprobado. Se ha enviado una notificación a tus dispositivos activos.';
+
+  @override
+  String get messengerDevicePublicKey => 'Clave pública';
+
+  @override
+  String get messengerDeviceCode => 'Código del dispositivo';
+
+  @override
+  String get messengerResendApprovalNotification => 'Reenviar notificación';
+
+  @override
+  String get messengerApproveDeviceTitle => 'Aprobar nuevo dispositivo';
+
+  @override
+  String get messengerApproveDeviceBody =>
+      'Un nuevo dispositivo solicita acceso. Verifica que la clave pública coincida y luego introduce el código del dispositivo que se muestra en él.';
+
+  @override
+  String get messengerEnterDeviceCode => 'Introduce el código del dispositivo';
+
+  @override
+  String get messengerApproveDevice => 'Aprobar';
+
+  @override
+  String get messengerIgnoreDevice => 'Ignorar';
+
+  @override
+  String get messengerInvalidDeviceCode => 'Código de dispositivo no válido';
+
+  @override
   String get selectEmojiTitle => 'Seleccionar emoji';
 
   @override
@@ -556,5 +638,81 @@ class AppLocalizationsEs extends AppLocalizations {
   String get imageSavedToGallery => 'Imagen guardada en la galería';
 
   @override
+  String get today => 'Hoy';
+
+  @override
+  String get yesterday => 'Ayer';
+
+  @override
   String get repostLoadFailed => 'No se pudo cargar esta publicación';
+
+  @override
+  String get messageSendFailed => 'No se pudo enviar tu mensaje.';
+
+  @override
+  String get messengerDeviceChatsSyncFailed =>
+      'Dispositivo aprobado, pero no se pudo añadir a algunos de tus chats.';
+
+  @override
+  String get messengerDevicesTitle => 'Dispositivos de mensajería';
+
+  @override
+  String get messengerThisDevice => 'Este dispositivo';
+
+  @override
+  String get messengerDevicePending => 'Pendiente de aprobación';
+
+  @override
+  String messengerDeviceName(String code) {
+    return 'Dispositivo $code';
+  }
+
+  @override
+  String messengerDeviceAdded(String date) {
+    return 'Añadido $date';
+  }
+
+  @override
+  String get messengerRemoveDevice => 'Eliminar';
+
+  @override
+  String get messengerRemoveDeviceTitle => '¿Eliminar dispositivo?';
+
+  @override
+  String get messengerRemoveDeviceBody =>
+      'Este dispositivo perderá el acceso a tus chats y tendrá que ser aprobado de nuevo para usar la mensajería.';
+
+  @override
+  String get messengerRemoveDeviceFailed =>
+      'No se pudo eliminar este dispositivo.';
+
+  @override
+  String get messengerDevicesLoadFailed =>
+      'No se pudieron cargar tus dispositivos.';
+
+  @override
+  String messengerDevicesChangedTitle(String name) {
+    return 'Los dispositivos de $name cambiaron';
+  }
+
+  @override
+  String get messengerDevicesChangedBody =>
+      'Sus dispositivos se restablecieron, por ejemplo porque los perdió o cerró sesión en todos. Si no lo esperabas, confírmalo primero con esa persona: alguien más podría intentar leer tus mensajes.';
+
+  @override
+  String get messengerDevicesChangedContinue => 'Continuar';
+
+  @override
+  String get messengerUnknownDeviceTitle =>
+      'Dispositivo desconocido en un chat';
+
+  @override
+  String messengerUnknownDeviceAddedBody(String adder, String owner) {
+    return '$adder agregó a un chat un dispositivo que no es de $owner. Se eliminará. Si vuelve a pasar, confírmalo con esa persona: alguien en el chat podría intentar leer tus mensajes.';
+  }
+
+  @override
+  String messengerUnknownDeviceBody(String owner) {
+    return 'Hay en un chat un dispositivo que no es uno de los dispositivos actuales de $owner. Se eliminará.';
+  }
 }

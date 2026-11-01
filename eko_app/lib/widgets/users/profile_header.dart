@@ -17,8 +17,8 @@ class ProfileHeader extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final followInfo = ref.watch(followInfoProvider(user.uid));
-    final followersCount = followInfo.valueOrNull?.followers ?? 0;
-    final followingCount = followInfo.valueOrNull?.following ?? 0;
+    final followersCount = followInfo.value?.followers ?? 0;
+    final followingCount = followInfo.value?.following ?? 0;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15),
       child: Column(

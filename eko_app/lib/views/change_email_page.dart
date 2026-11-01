@@ -40,7 +40,7 @@ class _ChangeEmailPageState extends ConsumerState<ChangeEmailPage> {
   Future<void> _submit() async {
     FocusManager.instance.primaryFocus?.unfocus();
     final l10n = AppLocalizations.of(context)!;
-    final authEmail = ref.read(authProvider).email;
+    final authEmail = ref.read(authProvider).value?.email;
     if (authEmail == null || authEmail.isEmpty) {
       showSnackBar(
         text: l10n.defaultErrorBody,
@@ -104,6 +104,7 @@ class _ChangeEmailPageState extends ConsumerState<ChangeEmailPage> {
       );
       return;
     } catch (e) {
+      debugPrint(e.toString());
       if (!mounted) return;
       setState(() => isLoading = false);
       showSnackBar(
@@ -120,7 +121,7 @@ class _ChangeEmailPageState extends ConsumerState<ChangeEmailPage> {
     final height = MediaQuery.sizeOf(context).height;
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    final currentEmail = ref.watch(authProvider).email;
+    final currentEmail = ref.watch(authProvider).value?.email;
 
     return AppScaffold(
       contrainBody: true,
@@ -141,8 +142,8 @@ class _ChangeEmailPageState extends ConsumerState<ChangeEmailPage> {
                   child: Text(
                     l10n.changeEmail,
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),

@@ -76,6 +76,8 @@
   "invalidEmailBody" : "Please check your email and try again.",
   "invalidUserName" : "Username does not meet requirements",
   "iveVerifiedMyEmail" : "I've verified my email",
+  "keyExchangeFailed" : "Key exchange failed",
+  "keysExchanged" : "Keys exchanged",
   "likes" : "Up-ekos",
   "logIn" : "Login",
   "loginFailedBody" : "Please check your email and password and try again.",
@@ -90,9 +92,14 @@
   "newActivityNotifications" : "New Activity Notifications",
   "newEmail" : "New Email",
   "newLines" : "New Lines",
+  "chats" : "Chats",
+  "newMessage" : "New message",
+  "noMessagesYet" : "No messages yet",
+  "typeAMessage" : "Type a message",
   "newPasswordMustBeDifferent" : "New Password Must be Different",
   "next" : "Next",
   "nothingToSeeHere" : "Nothing to see here!",
+  "noteToSelf": "Note to Self",
   "ok" : "Ok",
   "option" : "Option",
   "password" : "Password",
@@ -151,6 +158,7 @@
   "usernameInUse" : "Username Unavailable",
   "usernameReqs" : "Usernames must be between 3 and 24 characters. Usernames can only contain lowercase letters, numbers, and underscores.",
   "usernameTakenBody" : "Please go back and choose a different username.",
+  "userMayNotHaveDeviceRegistered" : "User may not have a device registered.",
   "userNotFound" : "User Not Found",
   "verificationUrl" : "Verification Url",
   "verifyEmailBody" : "We sent a verification link to your email. Check your inbox and spam folder, then click the link to verify your account.",
@@ -167,6 +175,23 @@
   "feedTabPopular" : "Popular",
   "messengerTitle" : "eko messenger",
   "messengerSubtitle" : "eko messenger coming soon",
+  "messengerSetupBody" : "Register this device to send and receive end-to-end encrypted messages.",
+  "enableMessages" : "Enable messages",
+  "registeringDevice" : "Registering device…",
+  "deviceRegistrationFailed" : "Could not set up messaging on this device.",
+  "messengerServerUnavailableTitle" : "Messages server unavailable",
+  "messengerServerUnavailableBody" : "Could not reach the messages server. Check that it is running and try again.",
+  "messengerWaitForApprovalTitle" : "Device not approved",
+  "messengerWaitForApprovalBody" : "This device hasn't been approved yet. A notification has been sent to your active devices.",
+  "messengerDevicePublicKey" : "Public key",
+  "messengerDeviceCode" : "Device code",
+  "messengerResendApprovalNotification" : "Resend notification",
+  "messengerApproveDeviceTitle" : "Approve new device",
+  "messengerApproveDeviceBody" : "A new device is requesting access. Verify the public key matches, then enter the device code shown on that device.",
+  "messengerEnterDeviceCode" : "Enter device code",
+  "messengerApproveDevice" : "Approve",
+  "messengerIgnoreDevice" : "Ignore",
+  "messengerInvalidDeviceCode" : "Invalid device code",
   "selectEmojiTitle" : "Select emoji",
   "pushDistributorPickerTitle" : "Select a distributor",
   "pushOpenNotification" : "Open notification",
@@ -187,5 +212,51 @@
   "profileLoadFailed" : "Could not load this profile",
   "profileResolveFailed" : "Could not load user",
   "imageSavedToGallery" : "Image saved to gallery",
-  "repostLoadFailed" : "Could not load this post"
+  "today" : "Today",
+  "yesterday" : "Yesterday",
+  "repostLoadFailed" : "Could not load this post",
+  "messageSendFailed" : "Your message couldn't be sent.",
+  "messengerDeviceChatsSyncFailed" : "Device approved, but it couldn't be added to some of your chats.",
+  "messengerDevicesTitle" : "Messenger devices",
+  "messengerThisDevice" : "This device",
+  "messengerDevicePending" : "Pending approval",
+  "messengerDeviceName" : "Device {code}",
+  "@messengerDeviceName" : { "placeholders" : { "code" : { "type" : "String" } } },
+  "messengerDeviceAdded" : "Added {date}",
+  "@messengerDeviceAdded" : { "placeholders" : { "date" : { "type" : "String" } } },
+  "messengerRemoveDevice" : "Remove",
+  "messengerRemoveDeviceTitle" : "Remove device?",
+  "messengerRemoveDeviceBody" : "This device will lose access to your chats and will need to be approved again to use messenger.",
+  "messengerRemoveDeviceFailed" : "Couldn't remove this device.",
+  "messengerDevicesLoadFailed" : "Couldn't load your devices.",
+  "messengerDevicesChangedTitle" : "{name}'s devices changed",
+  "@messengerDevicesChangedTitle" : {
+    "placeholders" : {
+      "name" : {
+        "type" : "String"
+      }
+    }
+  },
+  "messengerDevicesChangedBody" : "Their devices were reset, for example because they lost them or signed out everywhere. If you didn't expect this, check with them first: someone else could be trying to read your messages.",
+  "messengerDevicesChangedContinue" : "Continue",
+  "messengerUnknownDeviceTitle" : "Unknown device in a chat",
+  "messengerUnknownDeviceAddedBody" : "{adder} added a device to a chat that isn't one of {owner}'s devices. It will be removed. If this happens again, check with them: someone in the chat could be trying to read your messages.",
+  "@messengerUnknownDeviceAddedBody" : {
+    "placeholders" : {
+      "adder" : {
+        "type" : "String"
+      },
+      "owner" : {
+        "type" : "String"
+      }
+    }
+  },
+  "messengerUnknownDeviceBody" : "A device that isn't one of {owner}'s current devices is in a chat. It will be removed.",
+  "@messengerUnknownDeviceBody" : {
+    "placeholders" : {
+      "owner" : {
+        "type" : "String"
+      }
+    }
+  }
 }

@@ -11,433 +11,291 @@ part of '../../types/auth.dart';
 
 // dart format off
 T _$identity<T>(T value) => value;
-
 /// @nodoc
 mixin _$AuthModel {
-  String? get uid;
-  String? get email;
-  bool get isLoading;
-  bool? get emailVerified;
-  DateTime? get creationTime;
-  bool get pendingPasswordRecovery;
 
-  /// Create a copy of AuthModel
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @pragma('vm:prefer-inline')
-  $AuthModelCopyWith<AuthModel> get copyWith =>
-      _$AuthModelCopyWithImpl<AuthModel>(this as AuthModel, _$identity);
+ String? get uid; String? get email; DeviceModel? get device;
+/// Create a copy of AuthModel
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$AuthModelCopyWith<AuthModel> get copyWith => _$AuthModelCopyWithImpl<AuthModel>(this as AuthModel, _$identity);
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is AuthModel &&
-            (identical(other.uid, uid) || other.uid == uid) &&
-            (identical(other.email, email) || other.email == email) &&
-            (identical(other.isLoading, isLoading) ||
-                other.isLoading == isLoading) &&
-            (identical(other.emailVerified, emailVerified) ||
-                other.emailVerified == emailVerified) &&
-            (identical(other.creationTime, creationTime) ||
-                other.creationTime == creationTime) &&
-            (identical(
-                    other.pendingPasswordRecovery, pendingPasswordRecovery) ||
-                other.pendingPasswordRecovery == pendingPasswordRecovery));
-  }
 
-  @override
-  int get hashCode => Object.hash(runtimeType, uid, email, isLoading,
-      emailVerified, creationTime, pendingPasswordRecovery);
 
-  @override
-  String toString() {
-    return 'AuthModel(uid: $uid, email: $email, isLoading: $isLoading, emailVerified: $emailVerified, creationTime: $creationTime, pendingPasswordRecovery: $pendingPasswordRecovery)';
-  }
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AuthModel&&(identical(other.uid, uid) || other.uid == uid)&&(identical(other.email, email) || other.email == email)&&(identical(other.device, device) || other.device == device));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,uid,email,device);
+
+@override
+String toString() {
+  return 'AuthModel(uid: $uid, email: $email, device: $device)';
+}
+
+
 }
 
 /// @nodoc
-abstract mixin class $AuthModelCopyWith<$Res> {
-  factory $AuthModelCopyWith(AuthModel value, $Res Function(AuthModel) _then) =
-      _$AuthModelCopyWithImpl;
-  @useResult
-  $Res call(
-      {String? uid,
-      String? email,
-      bool isLoading,
-      bool? emailVerified,
-      DateTime? creationTime,
-      bool pendingPasswordRecovery});
-}
+abstract mixin class $AuthModelCopyWith<$Res>  {
+  factory $AuthModelCopyWith(AuthModel value, $Res Function(AuthModel) _then) = _$AuthModelCopyWithImpl;
+@useResult
+$Res call({
+ String? uid, String? email, DeviceModel? device
+});
 
+
+$DeviceModelCopyWith<$Res>? get device;
+
+}
 /// @nodoc
-class _$AuthModelCopyWithImpl<$Res> implements $AuthModelCopyWith<$Res> {
+class _$AuthModelCopyWithImpl<$Res>
+    implements $AuthModelCopyWith<$Res> {
   _$AuthModelCopyWithImpl(this._self, this._then);
 
   final AuthModel _self;
   final $Res Function(AuthModel) _then;
 
-  /// Create a copy of AuthModel
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? uid = freezed,
-    Object? email = freezed,
-    Object? isLoading = null,
-    Object? emailVerified = freezed,
-    Object? creationTime = freezed,
-    Object? pendingPasswordRecovery = null,
-  }) {
-    return _then(_self.copyWith(
-      uid: freezed == uid
-          ? _self.uid
-          : uid // ignore: cast_nullable_to_non_nullable
-              as String?,
-      email: freezed == email
-          ? _self.email
-          : email // ignore: cast_nullable_to_non_nullable
-              as String?,
-      isLoading: null == isLoading
-          ? _self.isLoading
-          : isLoading // ignore: cast_nullable_to_non_nullable
-              as bool,
-      emailVerified: freezed == emailVerified
-          ? _self.emailVerified
-          : emailVerified // ignore: cast_nullable_to_non_nullable
-              as bool?,
-      creationTime: freezed == creationTime
-          ? _self.creationTime
-          : creationTime // ignore: cast_nullable_to_non_nullable
-              as DateTime?,
-      pendingPasswordRecovery: null == pendingPasswordRecovery
-          ? _self.pendingPasswordRecovery
-          : pendingPasswordRecovery // ignore: cast_nullable_to_non_nullable
-              as bool,
-    ));
-  }
+/// Create a copy of AuthModel
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? uid = freezed,Object? email = freezed,Object? device = freezed,}) {
+  return _then(_self.copyWith(
+uid: freezed == uid ? _self.uid : uid // ignore: cast_nullable_to_non_nullable
+as String?,email: freezed == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
+as String?,device: freezed == device ? _self.device : device // ignore: cast_nullable_to_non_nullable
+as DeviceModel?,
+  ));
 }
+/// Create a copy of AuthModel
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$DeviceModelCopyWith<$Res>? get device {
+    if (_self.device == null) {
+    return null;
+  }
+
+  return $DeviceModelCopyWith<$Res>(_self.device!, (value) {
+    return _then(_self.copyWith(device: value));
+  });
+}
+}
+
 
 /// Adds pattern-matching-related methods to [AuthModel].
 extension AuthModelPatterns on AuthModel {
-  /// A variant of `map` that fallback to returning `orElse`.
-  ///
-  /// It is equivalent to doing:
-  /// ```dart
-  /// switch (sealedClass) {
-  ///   case final Subclass value:
-  ///     return ...;
-  ///   case _:
-  ///     return orElse();
-  /// }
-  /// ```
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
 
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>(
-    TResult Function(_AuthModel value)? $default, {
-    required TResult orElse(),
-  }) {
-    final _that = this;
-    switch (_that) {
-      case _AuthModel() when $default != null:
-        return $default(_that);
-      case _:
-        return orElse();
-    }
-  }
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _AuthModel value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _AuthModel() when $default != null:
+return $default(_that);case _:
+  return orElse();
 
-  /// A `switch`-like method, using callbacks.
-  ///
-  /// Callbacks receives the raw object, upcasted.
-  /// It is equivalent to doing:
-  /// ```dart
-  /// switch (sealedClass) {
-  ///   case final Subclass value:
-  ///     return ...;
-  ///   case final Subclass2 value:
-  ///     return ...;
-  /// }
-  /// ```
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
 
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>(
-    TResult Function(_AuthModel value) $default,
-  ) {
-    final _that = this;
-    switch (_that) {
-      case _AuthModel():
-        return $default(_that);
-      case _:
-        throw StateError('Unexpected subclass');
-    }
-  }
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _AuthModel value)  $default,){
+final _that = this;
+switch (_that) {
+case _AuthModel():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
 
-  /// A variant of `map` that fallback to returning `null`.
-  ///
-  /// It is equivalent to doing:
-  /// ```dart
-  /// switch (sealedClass) {
-  ///   case final Subclass value:
-  ///     return ...;
-  ///   case _:
-  ///     return null;
-  /// }
-  /// ```
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
 
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>(
-    TResult? Function(_AuthModel value)? $default,
-  ) {
-    final _that = this;
-    switch (_that) {
-      case _AuthModel() when $default != null:
-        return $default(_that);
-      case _:
-        return null;
-    }
-  }
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _AuthModel value)?  $default,){
+final _that = this;
+switch (_that) {
+case _AuthModel() when $default != null:
+return $default(_that);case _:
+  return null;
 
-  /// A variant of `when` that fallback to an `orElse` callback.
-  ///
-  /// It is equivalent to doing:
-  /// ```dart
-  /// switch (sealedClass) {
-  ///   case Subclass(:final field):
-  ///     return ...;
-  ///   case _:
-  ///     return orElse();
-  /// }
-  /// ```
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
 
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>(
-    TResult Function(
-            String? uid,
-            String? email,
-            bool isLoading,
-            bool? emailVerified,
-            DateTime? creationTime,
-            bool pendingPasswordRecovery)?
-        $default, {
-    required TResult orElse(),
-  }) {
-    final _that = this;
-    switch (_that) {
-      case _AuthModel() when $default != null:
-        return $default(
-            _that.uid,
-            _that.email,
-            _that.isLoading,
-            _that.emailVerified,
-            _that.creationTime,
-            _that.pendingPasswordRecovery);
-      case _:
-        return orElse();
-    }
-  }
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? uid,  String? email,  DeviceModel? device)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _AuthModel() when $default != null:
+return $default(_that.uid,_that.email,_that.device);case _:
+  return orElse();
 
-  /// A `switch`-like method, using callbacks.
-  ///
-  /// As opposed to `map`, this offers destructuring.
-  /// It is equivalent to doing:
-  /// ```dart
-  /// switch (sealedClass) {
-  ///   case Subclass(:final field):
-  ///     return ...;
-  ///   case Subclass2(:final field2):
-  ///     return ...;
-  /// }
-  /// ```
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
 
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>(
-    TResult Function(
-            String? uid,
-            String? email,
-            bool isLoading,
-            bool? emailVerified,
-            DateTime? creationTime,
-            bool pendingPasswordRecovery)
-        $default,
-  ) {
-    final _that = this;
-    switch (_that) {
-      case _AuthModel():
-        return $default(
-            _that.uid,
-            _that.email,
-            _that.isLoading,
-            _that.emailVerified,
-            _that.creationTime,
-            _that.pendingPasswordRecovery);
-      case _:
-        throw StateError('Unexpected subclass');
-    }
-  }
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? uid,  String? email,  DeviceModel? device)  $default,) {final _that = this;
+switch (_that) {
+case _AuthModel():
+return $default(_that.uid,_that.email,_that.device);case _:
+  throw StateError('Unexpected subclass');
 
-  /// A variant of `when` that fallback to returning `null`
-  ///
-  /// It is equivalent to doing:
-  /// ```dart
-  /// switch (sealedClass) {
-  ///   case Subclass(:final field):
-  ///     return ...;
-  ///   case _:
-  ///     return null;
-  /// }
-  /// ```
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
 
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(
-            String? uid,
-            String? email,
-            bool isLoading,
-            bool? emailVerified,
-            DateTime? creationTime,
-            bool pendingPasswordRecovery)?
-        $default,
-  ) {
-    final _that = this;
-    switch (_that) {
-      case _AuthModel() when $default != null:
-        return $default(
-            _that.uid,
-            _that.email,
-            _that.isLoading,
-            _that.emailVerified,
-            _that.creationTime,
-            _that.pendingPasswordRecovery);
-      case _:
-        return null;
-    }
-  }
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? uid,  String? email,  DeviceModel? device)?  $default,) {final _that = this;
+switch (_that) {
+case _AuthModel() when $default != null:
+return $default(_that.uid,_that.email,_that.device);case _:
+  return null;
+
+}
+}
+
 }
 
 /// @nodoc
+
 
 class _AuthModel implements AuthModel {
-  const _AuthModel(
-      {this.uid,
-      this.email,
-      required this.isLoading,
-      this.emailVerified,
-      this.creationTime,
-      this.pendingPasswordRecovery = false});
+  const _AuthModel({required this.uid, this.email, this.device});
+  
 
-  @override
-  final String? uid;
-  @override
-  final String? email;
-  @override
-  final bool isLoading;
-  @override
-  final bool? emailVerified;
-  @override
-  final DateTime? creationTime;
-  @override
-  @JsonKey()
-  final bool pendingPasswordRecovery;
+@override final  String? uid;
+@override final  String? email;
+@override final  DeviceModel? device;
 
-  /// Create a copy of AuthModel
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @pragma('vm:prefer-inline')
-  _$AuthModelCopyWith<_AuthModel> get copyWith =>
-      __$AuthModelCopyWithImpl<_AuthModel>(this, _$identity);
+/// Create a copy of AuthModel
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$AuthModelCopyWith<_AuthModel> get copyWith => __$AuthModelCopyWithImpl<_AuthModel>(this, _$identity);
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _AuthModel &&
-            (identical(other.uid, uid) || other.uid == uid) &&
-            (identical(other.email, email) || other.email == email) &&
-            (identical(other.isLoading, isLoading) ||
-                other.isLoading == isLoading) &&
-            (identical(other.emailVerified, emailVerified) ||
-                other.emailVerified == emailVerified) &&
-            (identical(other.creationTime, creationTime) ||
-                other.creationTime == creationTime) &&
-            (identical(
-                    other.pendingPasswordRecovery, pendingPasswordRecovery) ||
-                other.pendingPasswordRecovery == pendingPasswordRecovery));
-  }
 
-  @override
-  int get hashCode => Object.hash(runtimeType, uid, email, isLoading,
-      emailVerified, creationTime, pendingPasswordRecovery);
 
-  @override
-  String toString() {
-    return 'AuthModel(uid: $uid, email: $email, isLoading: $isLoading, emailVerified: $emailVerified, creationTime: $creationTime, pendingPasswordRecovery: $pendingPasswordRecovery)';
-  }
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AuthModel&&(identical(other.uid, uid) || other.uid == uid)&&(identical(other.email, email) || other.email == email)&&(identical(other.device, device) || other.device == device));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,uid,email,device);
+
+@override
+String toString() {
+  return 'AuthModel(uid: $uid, email: $email, device: $device)';
+}
+
+
 }
 
 /// @nodoc
-abstract mixin class _$AuthModelCopyWith<$Res>
-    implements $AuthModelCopyWith<$Res> {
-  factory _$AuthModelCopyWith(
-          _AuthModel value, $Res Function(_AuthModel) _then) =
-      __$AuthModelCopyWithImpl;
-  @override
-  @useResult
-  $Res call(
-      {String? uid,
-      String? email,
-      bool isLoading,
-      bool? emailVerified,
-      DateTime? creationTime,
-      bool pendingPasswordRecovery});
-}
+abstract mixin class _$AuthModelCopyWith<$Res> implements $AuthModelCopyWith<$Res> {
+  factory _$AuthModelCopyWith(_AuthModel value, $Res Function(_AuthModel) _then) = __$AuthModelCopyWithImpl;
+@override @useResult
+$Res call({
+ String? uid, String? email, DeviceModel? device
+});
 
+
+@override $DeviceModelCopyWith<$Res>? get device;
+
+}
 /// @nodoc
-class __$AuthModelCopyWithImpl<$Res> implements _$AuthModelCopyWith<$Res> {
+class __$AuthModelCopyWithImpl<$Res>
+    implements _$AuthModelCopyWith<$Res> {
   __$AuthModelCopyWithImpl(this._self, this._then);
 
   final _AuthModel _self;
   final $Res Function(_AuthModel) _then;
 
-  /// Create a copy of AuthModel
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $Res call({
-    Object? uid = freezed,
-    Object? email = freezed,
-    Object? isLoading = null,
-    Object? emailVerified = freezed,
-    Object? creationTime = freezed,
-    Object? pendingPasswordRecovery = null,
-  }) {
-    return _then(_AuthModel(
-      uid: freezed == uid
-          ? _self.uid
-          : uid // ignore: cast_nullable_to_non_nullable
-              as String?,
-      email: freezed == email
-          ? _self.email
-          : email // ignore: cast_nullable_to_non_nullable
-              as String?,
-      isLoading: null == isLoading
-          ? _self.isLoading
-          : isLoading // ignore: cast_nullable_to_non_nullable
-              as bool,
-      emailVerified: freezed == emailVerified
-          ? _self.emailVerified
-          : emailVerified // ignore: cast_nullable_to_non_nullable
-              as bool?,
-      creationTime: freezed == creationTime
-          ? _self.creationTime
-          : creationTime // ignore: cast_nullable_to_non_nullable
-              as DateTime?,
-      pendingPasswordRecovery: null == pendingPasswordRecovery
-          ? _self.pendingPasswordRecovery
-          : pendingPasswordRecovery // ignore: cast_nullable_to_non_nullable
-              as bool,
-    ));
+/// Create a copy of AuthModel
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? uid = freezed,Object? email = freezed,Object? device = freezed,}) {
+  return _then(_AuthModel(
+uid: freezed == uid ? _self.uid : uid // ignore: cast_nullable_to_non_nullable
+as String?,email: freezed == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
+as String?,device: freezed == device ? _self.device : device // ignore: cast_nullable_to_non_nullable
+as DeviceModel?,
+  ));
+}
+
+/// Create a copy of AuthModel
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$DeviceModelCopyWith<$Res>? get device {
+    if (_self.device == null) {
+    return null;
   }
+
+  return $DeviceModelCopyWith<$Res>(_self.device!, (value) {
+    return _then(_self.copyWith(device: value));
+  });
+}
 }
 
 // dart format on

@@ -15,13 +15,14 @@ class MaxWidthAppBar extends StatelessWidget implements PreferredSizeWidget {
 }
 
 class AppScaffold extends StatelessWidget {
-  const AppScaffold(
-      {super.key,
-      this.appBar,
-      required this.body,
-      this.floatingActionButton,
-      this.floatingActionButtonLocation,
-      this.contrainBody = false});
+  const AppScaffold({
+    super.key,
+    this.appBar,
+    required this.body,
+    this.floatingActionButton,
+    this.floatingActionButtonLocation,
+    this.contrainBody = false,
+  });
 
   final PreferredSizeWidget? appBar;
   final Widget body;

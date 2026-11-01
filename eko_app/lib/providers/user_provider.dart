@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:eko_app/providers/auth_provider.dart';
 import 'package:eko_app/providers/current_user_provider.dart';
 import 'package:eko_app/providers/follow_info_provider.dart';
 import 'package:eko_app/providers/pool_providers.dart';
@@ -36,7 +35,7 @@ class User extends _$User {
     });
     // ********************************************* //
 
-    if (ref.watch(authProvider).uid == uid) {
+    if (ref.watch(currentUserProvider).user.uid == uid) {
       return ref.watch(currentUserProvider).user;
     }
 
@@ -49,8 +48,10 @@ class User extends _$User {
 
   Future<UserModel> _fetchUserModel(String uid) async {
     try {
-      final response =
-          await supabase.rpc('get_user_by_id', params: {'p_uid': uid});
+      final response = await supabase.rpc(
+        'get_user_by_id',
+        params: {'p_uid': uid},
+      );
       if (response is! List || response.isEmpty) {
         return UserModel.userNotFound();
       }
@@ -60,12 +61,6 @@ class User extends _$User {
     } catch (_) {
       return UserModel.userNotFound();
     }
-  }
-
-  void updateFollowers(List<String> newFollowers) {
-    state.whenData((user) {
-      state = AsyncData(user.copyWith(followers: newFollowers));
-    });
   }
 
   Future<void> toggleFollow() async {
@@ -81,18 +76,20 @@ class User extends _$User {
   }
 
   Future<void> _followInner(bool isFollow) async {
-    final user = state.valueOrNull;
+    final user = state.value;
     if (user == null || _isFollowAction) {
       return;
     }
     _isFollowAction = true;
     try {
       state = AsyncData(user.copyWith(isFollowing: isFollow));
-      await supabase.rpc('change_follow_state',
-          params: {'p_uid': user.uid, 'p_is_follow': isFollow});
+      await supabase.rpc(
+        'change_follow_state',
+        params: {'p_uid': user.uid, 'p_is_follow': isFollow},
+      );
       ref.invalidate(followInfoProvider(user.uid));
-      final actorUid = ref.read(authProvider).uid;
-      if (actorUid != null && actorUid.isNotEmpty && actorUid != user.uid) {
+      final actorUid = ref.read(currentUserProvider).user.uid;
+      if (actorUid.isNotEmpty && actorUid != user.uid) {
         ref.invalidate(followInfoProvider(actorUid));
       }
     } catch (e) {

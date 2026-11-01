@@ -83,8 +83,9 @@ void main() {
     await tester.enterText(find.byType(TextFormField).at(0), 'Yes');
     await _post(tester);
 
-    final l10n =
-        AppLocalizations.of(tester.element(find.byType(TextButton).last))!;
+    final l10n = AppLocalizations.of(
+      tester.element(find.byType(TextButton).last),
+    )!;
     expect(find.text(l10n.needTwoOptions), findsOneWidget);
   });
 
@@ -99,8 +100,9 @@ void main() {
 
     await _post(tester);
 
-    final l10n =
-        AppLocalizations.of(tester.element(find.byType(TextButton).last))!;
+    final l10n = AppLocalizations.of(
+      tester.element(find.byType(TextButton).last),
+    )!;
     expect(find.text(l10n.blankPollOption), findsOneWidget);
   });
 
@@ -108,8 +110,10 @@ void main() {
     await _pumpCompose(tester);
     await _addPoll(tester);
 
-    while (
-        find.widgetWithText(TextButton, 'Add option').evaluate().isNotEmpty) {
+    while (find
+        .widgetWithText(TextButton, 'Add option')
+        .evaluate()
+        .isNotEmpty) {
       await tester.tap(find.widgetWithText(TextButton, 'Add option'));
       await tester.pump();
     }
@@ -122,18 +126,18 @@ void main() {
     await _pumpCompose(tester);
     await _addPoll(tester);
 
-    final pollOptions =
-        tester.widget<PollCreator>(find.byType(PollCreator)).pollOptions;
+    final pollOptions = tester
+        .widget<PollCreator>(find.byType(PollCreator))
+        .pollOptions;
     pollOptions
       ..clear()
-      ..addAll([
-        for (var i = 0; i < c.maxPollOptions + 1; i++) 'Option $i',
-      ]);
+      ..addAll([for (var i = 0; i < c.maxPollOptions + 1; i++) 'Option $i']);
 
     await _post(tester);
 
-    final l10n =
-        AppLocalizations.of(tester.element(find.byType(TextButton).last))!;
+    final l10n = AppLocalizations.of(
+      tester.element(find.byType(TextButton).last),
+    )!;
     expect(find.text(l10n.tooManyPollOptions), findsOneWidget);
   });
 

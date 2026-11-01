@@ -6,19 +6,56 @@ part of '../../providers/post_preview_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+
+@ProviderFor(PostPreview)
+final postPreviewProvider = PostPreviewProvider._();
+
+final class PostPreviewProvider extends $NotifierProvider<PostPreview, bool> {
+  PostPreviewProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'postPreviewProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$postPreviewHash();
+
+  @$internal
+  @override
+  PostPreview create() => PostPreview();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(bool value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<bool>(value),
+    );
+  }
+}
+
 String _$postPreviewHash() => r'97af7488599d078d3d5473cf990a77f88702eef4';
 
-/// See also [PostPreview].
-@ProviderFor(PostPreview)
-final postPreviewProvider = NotifierProvider<PostPreview, bool>.internal(
-  PostPreview.new,
-  name: r'postPreviewProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$postPreviewHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef _$PostPreview = Notifier<bool>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+abstract class _$PostPreview extends $Notifier<bool> {
+  bool build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<bool, bool>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<bool, bool>,
+              bool,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
+  }
+}

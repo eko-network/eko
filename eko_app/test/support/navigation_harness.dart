@@ -18,6 +18,7 @@ import 'package:eko_app/types/follow_info.dart';
 import 'package:eko_app/types/post.dart';
 import 'package:eko_app/types/user.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:eko_app/utilities/router.dart';
@@ -37,39 +38,32 @@ Future<void> ensureNavigationTestPrefs() async {
 
 /// Minimal [PostModel] for [postPoolProvider] so [postProvider] never hits RPC.
 PostModel get testNavigationPost => PostModel(
-      uid: 'author-uid',
-      id: testPostId,
-      createdAt: '2020-01-01T00:00:00.000Z',
-    );
+  uid: 'author-uid',
+  id: testPostId,
+  createdAt: '2020-01-01T00:00:00.000Z',
+);
 
 UserModel get testNavigationUser => UserModel(
-      name: 'Tester',
-      username: testUsername,
-      profilePicture: '',
-      bio: '',
-      followers: [],
-      following: [],
-      uid: testUid,
-      isVerified: false,
-      shareOnlineStatus: false,
-    );
+  name: 'Tester',
+  username: testUsername,
+  profilePicture: '',
+  bio: '',
+  uid: testUid,
+  isVerified: false,
+  shareOnlineStatus: false,
+);
 
 class FakeSignedOutAuth extends Auth {
   @override
-  AuthModel build() => AuthModel.signedOut();
+  Future<AuthModel> build() async {
+    return AuthModel.signedOut();
+  }
 }
 
 class FakeSignedInAuth extends Auth {
   @override
-  AuthModel build() {
-    return AuthModel(
-      uid: testUid,
-      email: 'test@example.com',
-      isLoading: false,
-      emailVerified: true,
-      creationTime: DateTime.utc(2020),
-      pendingPasswordRecovery: false,
-    );
+  Future<AuthModel> build() async {
+    return AuthModel(uid: testUid);
   }
 }
 
@@ -112,11 +106,7 @@ class FakePendingDeepLink extends PendingDeepLink {
 class FakeSignedInCurrentUser extends CurrentUser {
   @override
   CurrentUserModel build() {
-    return CurrentUserModel(
-      user: testNavigationUser,
-      blockedUsers: {},
-      blockedBy: {},
-    );
+    return CurrentUserModel(user: testNavigationUser);
   }
 }
 
@@ -153,10 +143,17 @@ class _EndedPopularFeed extends PopularFeed {
   Future<void> refresh() async {}
 }
 
+class _FakeNeedsProfileSetup extends NeedsProfileSetupNotifier {
+  _FakeNeedsProfileSetup(this._value);
+  final bool _value;
+
+  @override
+  bool build() => _value;
+}
+
 class _EmptyEndedProfilePosts extends ProfilePostListNotifier {
-  _EmptyEndedProfilePosts(super.ref) {
-    state = ([], true);
-  }
+  @override
+  ProfilePostListState build() => ([], true);
 
   @override
   Future<void> getter() async {}
@@ -166,9 +163,10 @@ class _EmptyEndedProfilePosts extends ProfilePostListNotifier {
 }
 
 class _EmptyEndedOtherProfilePosts extends OtherProfilePostListNotifier {
-  _EmptyEndedOtherProfilePosts(super.ref, super.uid) {
-    state = ([], true);
-  }
+  _EmptyEndedOtherProfilePosts(super.uid);
+
+  @override
+  ProfilePostListState build() => ([], true);
 
   @override
   Future<void> getter() async {}
@@ -193,16 +191,16 @@ List<Override> signedInNavigationOverrides({bool needsProfileSetup = false}) {
     pendingDeepLinkProvider.overrideWith(FakePendingDeepLink.new),
     authProvider.overrideWith(FakeSignedInAuth.new),
     currentUserProvider.overrideWith(FakeSignedInCurrentUser.new),
-    needsProfileSetupProvider.overrideWith((ref) => needsProfileSetup),
+    needsProfileSetupProvider.overrideWith(
+      () => _FakeNeedsProfileSetup(needsProfileSetup),
+    ),
     newFeedProvider.overrideWith(_EndedNewFeed.new),
     followingFeedProvider.overrideWith(_EndedFollowingFeed.new),
     popularFeedProvider.overrideWith(_EndedPopularFeed.new),
-    profilePostListProvider.overrideWith(
-      (ref) => _EmptyEndedProfilePosts(ref),
-    ),
-    otherProfilePostListProvider(testUid).overrideWith(
-      (ref) => _EmptyEndedOtherProfilePosts(ref, testUid),
-    ),
+    profilePostListProvider.overrideWith(_EmptyEndedProfilePosts.new),
+    otherProfilePostListProvider(
+      testUid,
+    ).overrideWith(() => _EmptyEndedOtherProfilePosts(testUid)),
     commentListProvider(testPostId).overrideWith(_EmptyEndedCommentList.new),
     postProvider(testPostId).overrideWith(_FakePost.new),
     userProvider(testUid).overrideWith(_FakeUser.new),

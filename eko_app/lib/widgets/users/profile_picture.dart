@@ -12,13 +12,13 @@ class ProfilePicture extends ConsumerWidget {
   final bool onlineIndicatorEnabled;
   final void Function()? onPressed;
   final EdgeInsets? padding;
-  final double size;
+  final double? size;
   const ProfilePicture({
     required this.uid,
     this.onlineIndicatorEnabled = true,
     this.onPressed,
     this.padding,
-    required this.size,
+    this.size,
     super.key,
   });
 
@@ -41,7 +41,7 @@ class ProfilePicture extends ConsumerWidget {
                       imageUrl: user.profilePicture,
                     );
                   },
-                  error: (_, __) {
+                  error: (_, _) {
                     return Text(AppLocalizations.of(context)!.shortLoadError);
                   },
                   loading: () => LoadingProfileImage(),

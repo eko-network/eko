@@ -79,12 +79,15 @@ class _LikesList extends ConsumerWidget {
     WidgetRef ref,
   ) async {
     final lastUid = list.isEmpty ? null : list.last.key;
-    final rows = await supabase.rpc(rpcName, params: {
-      'p_limit': c.usersOnSearch,
-      'p_id': targetId,
-      'p_last_uid': lastUid,
-      'p_dislikes': dislikes,
-    });
+    final rows = await supabase.rpc(
+      rpcName,
+      params: {
+        'p_limit': c.usersOnSearch,
+        'p_id': targetId,
+        'p_last_uid': lastUid,
+        'p_dislikes': dislikes,
+      },
+    );
 
     final rowList = rows as List<dynamic>? ?? [];
     final userList = rowList

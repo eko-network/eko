@@ -1,7 +1,14 @@
+import 'dart:async';
+import 'package:ecp/ecp.dart';
+import 'package:eko_app/types/device.dart';
+import 'package:eko_app/database/database.dart';
+import 'package:eko_app/database/storage.dart';
 import 'package:eko_app/localization/generated/app_localizations.dart';
+import 'package:eko_app/messenger/providers/devices_provider.dart';
+import 'package:eko_app/providers/ecp_provider.dart';
+import 'package:eko_app/utilities/device_uid_service.dart';
 import 'package:eko_app/widgets/errors/snack_bar.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart' show debugPrint, kDebugMode;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -13,17 +20,9 @@ import 'package:eko_app/interfaces/notification_helper.dart';
 import 'package:eko_app/interfaces/user.dart' as user;
 import 'package:eko_app/utilities/gauth/supabase_google_oauth.dart';
 import 'package:eko_app/utilities/platform.dart' as platform;
-
 part '../generated/providers/auth_provider.g.dart';
 
 Future<void>? _registerNotificationsInFlight;
-
-void _debugPrintSupabaseBearer(Session? session) {
-  if (!kDebugMode) return;
-  final token = session?.accessToken;
-  if (token == null || token.isEmpty) return;
-  debugPrint('Supabase Bearer JWT: Bearer $token');
-}
 
 class SignUpOutcome {
   const SignUpOutcome({this.errorCode, this.needsEmailVerification = false});
@@ -73,61 +72,65 @@ void handleAuthError(Object e, BuildContext context) {
 
 @Riverpod(keepAlive: true)
 class Auth extends _$Auth {
+  StreamSubscription? _authSub;
   @override
-  AuthModel build() {
-    _init();
-    return AuthModel.loading();
+  Future<AuthModel> build() async {
+    ref.onDispose(() {
+      _authSub?.cancel();
+    });
+    final session = supabase.auth.currentSession;
+    final AuthModel nextState;
+    if (session != null) {
+      nextState = await _stateFromSession(session);
+    } else {
+      nextState = AuthModel(uid: null);
+    }
+    _listenToAuthChanges();
+    return nextState;
   }
 
-  void _init() {
-    final currentSession = supabase.auth.currentSession;
-    if (currentSession != null) {
-      _debugPrintSupabaseBearer(currentSession);
-      final user = currentSession.user;
-      state = AuthModel(
-        uid: user.id,
-        isLoading: false,
-        email: user.email,
-        emailVerified: user.emailConfirmedAt != null,
-        creationTime: DateTime.tryParse(user.createdAt),
-      );
-    }
+  Future<AuthModel> _stateFromSession(Session session) async {
+    debugPrint('[Auth] _stateFromSession called');
+    final u = session.user;
+    registerNotificationsIfNeeded(u.id);
+    final model = AuthModel(
+      uid: u.id,
+      email: u.email,
+      device: DeviceModel.fromSession(session),
+    );
+    debugPrint(
+      '[Auth] _stateFromSession called\n\tuid: ${model.uid}\n\t\tdid: ${model.device?.did ?? 'null'}\n\t\tdat: ${model.device?.dat ?? 'null'}',
+    );
+    return model;
+  }
 
-    supabase.auth.onAuthStateChange.listen(
-      (data) {
+  void _listenToAuthChanges() {
+    _authSub = supabase.auth.onAuthStateChange.listen(
+      (data) async {
+        if (data.event == AuthChangeEvent.initialSession) return;
         final session = data.session;
         if (session == null) {
-          state = AuthModel.signedOut();
-        } else {
-          _debugPrintSupabaseBearer(session);
-          if (data.event == AuthChangeEvent.passwordRecovery) {
-            final user = session.user;
-            state = state.copyWith(
-              uid: user.id,
-              isLoading: false,
-              email: user.email,
-              emailVerified: user.emailConfirmedAt != null,
-              creationTime: DateTime.tryParse(user.createdAt),
-              pendingPasswordRecovery: true,
-            );
-          } else {
-            final user = session.user;
-            state = state.copyWith(
-              uid: user.id,
-              isLoading: false,
-              email: user.email,
-              emailVerified: user.emailConfirmedAt != null,
-              creationTime: DateTime.tryParse(user.createdAt),
-              pendingPasswordRecovery: false,
-            );
-            if (data.event == AuthChangeEvent.signedIn) {
-              // This throws on linux but appears to have to affect on android
-              if (!platform.isLinux) {
-                // ios typically opens an in-app web view, so it doesnt get dismissed otherwise
-                closeInAppWebView();
-              }
-            }
-          }
+          debugPrint('[Auth] SignOut called');
+          _cleanAfterSignOut();
+          return;
+        }
+
+        if (state.isLoading) return;
+
+        final isSameToken =
+            state.value?.uid == session.user.id &&
+            state.value?.email == session.user.email &&
+            (platform.isWeb ||
+                DeviceModel.fromSession(session) == state.value?.device);
+
+        if (!isSameToken) {
+          state = const AsyncValue.loading();
+          state = await AsyncValue.guard(() => _stateFromSession(session));
+        }
+        if (!(data.event == AuthChangeEvent.passwordRecovery) &&
+            data.event == AuthChangeEvent.signedIn &&
+            !platform.isLinux) {
+          closeInAppWebView();
         }
       },
       onError: (error) {
@@ -137,13 +140,9 @@ class Auth extends _$Auth {
             debugPrint('Error signing out after auth error: $e');
           });
         }
-        state = AuthModel.signedOut();
+        state = AsyncValue.data(AuthModel.signedOut());
       },
     );
-  }
-
-  void clearPasswordRecovery() {
-    state = state.copyWith(pendingPasswordRecovery: false);
   }
 
   Future<void> signIn({required String email, required String password}) async {
@@ -203,9 +202,39 @@ class Auth extends _$Auth {
     }
   }
 
+  Future<void> signOut() async {
+    final uid = state.value?.uid;
+    final did = state.value?.device?.did;
+    if (uid != null) {
+      await user.removeDeviceNotificationToken(uid);
+      // local messenger keys are wiped on sign out, so the device record has
+      // to go too. Otherwise it stays approved forever and the next sign in
+      // waits on an approval nobody can give.
+      if (did != null) {
+        try {
+          // revoking the device in the chain needs its keys, so the client
+          // has to be up even if the messenger was never opened
+          final client = await ref
+              .read(asyncEcpClientProvider.future)
+              .then<EcpClient?>((c) => c, onError: (_) => null);
+          await removeMessengerDevice(client, did);
+        } catch (e) {
+          debugPrint('[Auth] remove_device failed: $e');
+        }
+      }
+      DeviceUidService.remove();
+    }
+    supabase.auth.signOut();
+  }
+
+  Future<void> _cleanAfterSignOut() async {
+    await AppStorage(db).clear();
+    state = AsyncValue.data(AuthModel.signedOut());
+  }
+
   Future<void> deleteAccount() async {
     try {
-      final uid = state.uid;
+      final uid = state.value?.uid;
       if (uid == null) return;
       await supabase.rpc('delete_user');
       await supabase.auth.signOut();
@@ -228,26 +257,18 @@ class Auth extends _$Auth {
 
   Future<void> refreshEmailVerification() async {
     try {
-      final response = await supabase.auth.refreshSession();
-      final user = response.user;
-      if (user != null) {
-        state = state.copyWith(emailVerified: user.emailConfirmedAt != null);
-      }
+      await supabase.auth.refreshSession();
     } catch (e) {
       debugPrint('Error refreshing email verification: $e');
     }
   }
 
   Future<void> updatePassword(String newPassword) async {
-    await supabase.auth.updateUser(
-      UserAttributes(password: newPassword),
-    );
+    await supabase.auth.updateUser(UserAttributes(password: newPassword));
   }
 
   Future<void> updateEmailBeforeVerify(String newEmail) async {
-    await supabase.auth.updateUser(
-      UserAttributes(email: newEmail.trim()),
-    );
+    await supabase.auth.updateUser(UserAttributes(email: newEmail.trim()));
   }
 
   String? _oauthAvatarUrl() {
@@ -318,9 +339,8 @@ class Auth extends _$Auth {
     }
   }
 
-  Future<void> registerNotificationsIfNeeded() async {
-    final uid = state.uid;
-    if (uid == null || uid.isEmpty) return;
+  Future<void> registerNotificationsIfNeeded(String uid) async {
+    if (uid.isEmpty) return;
     if (_registerNotificationsInFlight != null) {
       await _registerNotificationsInFlight;
       return;
@@ -343,7 +363,7 @@ class Auth extends _$Auth {
   }
 
   Future<void> refreshDeviceNotificationTokenIfNeeded() async {
-    final uid = state.uid;
+    final uid = state.value?.uid;
     if (uid == null || uid.isEmpty) return;
     if (!PrefsService.notificationsEnabled) return;
     await user.refreshDeviceNotificationTokenIfNeeded(uid);

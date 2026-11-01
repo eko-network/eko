@@ -33,69 +33,72 @@ class _CommentHost extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final asyncComment = ref.watch(commentProvider(_commentId));
     return asyncComment.when(
-      data: (comment) =>
-          Scaffold(body: Center(child: CommentLikeButtons(comment: comment))),
+      data: (comment) => Scaffold(
+        body: Center(child: CommentLikeButtons(comment: comment)),
+      ),
       loading: () => const SizedBox.shrink(),
-      error: (_, __) => const SizedBox.shrink(),
+      error: (_, _) => const SizedBox.shrink(),
     );
   }
 }
 
 void main() {
   testWidgets(
-      'comment like count refreshes after returning from view likes page',
-      (tester) async {
-    var serverLikes = 0;
-    _FakeComment.likesGetter = () => serverLikes;
+    'comment like count refreshes after returning from view likes page',
+    (tester) async {
+      var serverLikes = 0;
+      _FakeComment.likesGetter = () => serverLikes;
 
-    final container = ProviderContainer(
-      overrides: [commentProvider(_commentId).overrideWith(_FakeComment.new)],
-    );
-    addTearDown(container.dispose);
+      final container = ProviderContainer(
+        overrides: [commentProvider(_commentId).overrideWith(_FakeComment.new)],
+      );
+      addTearDown(container.dispose);
 
-    final router = GoRouter(
-      routes: [
-        GoRoute(path: '/', builder: (_, __) => const _CommentHost()),
-        GoRoute(
-          path: '/feed/comment/:id/likes',
-          builder: (context, state) {
-            serverLikes = 1; // Simulate another user liking while we are here.
-            return Scaffold(
-              body: Center(
-                child: TextButton(
-                  key: const Key('back'),
-                  onPressed: () => context.pop(),
-                  child: const Text('back'),
+      final router = GoRouter(
+        routes: [
+          GoRoute(path: '/', builder: (_, _) => const _CommentHost()),
+          GoRoute(
+            path: '/feed/comment/:id/likes',
+            builder: (context, state) {
+              serverLikes =
+                  1; // Simulate another user liking while we are here.
+              return Scaffold(
+                body: Center(
+                  child: TextButton(
+                    key: const Key('back'),
+                    onPressed: () => context.pop(),
+                    child: const Text('back'),
+                  ),
                 ),
-              ),
-            );
-          },
+              );
+            },
+          ),
+          GoRoute(
+            path: '/feed/comment/:id/dislikes',
+            builder: (_, _) => const SizedBox.shrink(),
+          ),
+        ],
+      );
+      addTearDown(router.dispose);
+
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: MaterialApp.router(routerConfig: router),
         ),
-        GoRoute(
-          path: '/feed/comment/:id/dislikes',
-          builder: (_, __) => const SizedBox.shrink(),
-        ),
-      ],
-    );
-    addTearDown(router.dispose);
+      );
+      await tester.pumpAndSettle();
 
-    await tester.pumpWidget(
-      UncontrolledProviderScope(
-        container: container,
-        child: MaterialApp.router(routerConfig: router),
-      ),
-    );
-    await tester.pumpAndSettle();
+      expect(tester.widget<Count>(find.byType(Count).first).count, 0);
 
-    expect(tester.widget<Count>(find.byType(Count).first).count, 0);
+      await tester.tap(find.byType(Count).first);
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('back')), findsOneWidget);
 
-    await tester.tap(find.byType(Count).first);
-    await tester.pumpAndSettle();
-    expect(find.byKey(const Key('back')), findsOneWidget);
+      await tester.tap(find.byKey(const Key('back')));
+      await tester.pumpAndSettle();
 
-    await tester.tap(find.byKey(const Key('back')));
-    await tester.pumpAndSettle();
-
-    expect(tester.widget<Count>(find.byType(Count).first).count, 1);
-  });
+      expect(tester.widget<Count>(find.byType(Count).first).count, 1);
+    },
+  );
 }

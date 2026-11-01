@@ -76,11 +76,7 @@ class _FollowersState extends ConsumerState<Followers> {
 
     final rows = await supabase.rpc(
       'paginated_user_followers',
-      params: {
-        'p_limit': chunkSize,
-        'p_uid': uid,
-        'p_last_uid': lastUid,
-      },
+      params: {'p_limit': chunkSize, 'p_uid': uid, 'p_last_uid': lastUid},
     );
 
     final List<Future<dynamic>> futures = [];
@@ -107,19 +103,17 @@ class _FollowersState extends ConsumerState<Followers> {
   @override
   Widget build(BuildContext context) {
     return AppScaffold(
-      appBar: EkoAppBar(
-        title: Text(AppLocalizations.of(context)!.followers),
-      ),
+      appBar: EkoAppBar(title: Text(AppLocalizations.of(context)!.followers)),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _error != null
-              ? Center(child: Text(_error!))
-              : InfiniteScrolly<String, Never?>(
-                  getter: getter,
-                  widget: (uid) => UserCard(uid: uid),
-                  onRefresh: onRefresh,
-                  initialLoadingWidget: UserLoader(),
-                ),
+          ? Center(child: Text(_error!))
+          : InfiniteScrolly<String, Never?>(
+              getter: getter,
+              widget: (uid) => UserCard(uid: uid),
+              onRefresh: onRefresh,
+              initialLoadingWidget: UserLoader(),
+            ),
     );
   }
 }

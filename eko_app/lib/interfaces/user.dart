@@ -34,6 +34,7 @@ Future<void> addDeviceNotificationToken(String uid) async {
         PrefsService.deviceNotificationToken = null;
         return;
       }
+      print("token: $token");
       PrefsService.deviceNotificationToken = token;
       await _updateNotifications(token: token, isActive: true);
       PrefsService.notificationsEnabled = true;
@@ -83,13 +84,16 @@ Future<void> _updateNotifications({
   required bool isActive,
 }) async {
   final deviceUid = DeviceUidService.getOrCreate();
-  await supabase.rpc('update_notifications', params: {
-    'p_device_id': deviceUid,
-    'p_token': token,
-    'p_active': isActive,
-    'p_device_type': deviceTypeFromPlatform(),
-    'p_notification_type': notificationTypeFromPlatform(),
-  });
+  await supabase.rpc(
+    'update_notifications',
+    params: {
+      'p_device_id': deviceUid,
+      'p_token': token,
+      'p_active': isActive,
+      'p_device_type': deviceTypeFromPlatform(),
+      'p_notification_type': notificationTypeFromPlatform(),
+    },
+  );
 }
 
 Future<String> forgotPassword({

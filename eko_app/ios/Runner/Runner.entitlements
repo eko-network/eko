@@ -8,5 +8,13 @@
 	<array>
 		<string>applinks:app.eko-app.com</string>
 	</array>
+	<key>com.apple.security.application-groups</key>
+	<array>
+		<string>group.com.example.untitledApp</string>
+	</array>
+	<key>keychain-access-groups</key>
+	<array>
+		<string>$(AppIdentifierPrefix)group.com.example.untitledApp</string>
+	</array>
 </dict>
 </plist>

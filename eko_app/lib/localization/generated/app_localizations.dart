@@ -65,7 +65,7 @@ import 'app_localizations_id.dart';
 /// property.
 abstract class AppLocalizations {
   AppLocalizations(String locale)
-      : localeName = intl.Intl.canonicalizedLocale(locale.toString());
+    : localeName = intl.Intl.canonicalizedLocale(locale.toString());
 
   final String localeName;
 
@@ -88,18 +88,18 @@ abstract class AppLocalizations {
   /// of delegates is preferred or required.
   static const List<LocalizationsDelegate<dynamic>> localizationsDelegates =
       <LocalizationsDelegate<dynamic>>[
-    delegate,
-    GlobalMaterialLocalizations.delegate,
-    GlobalCupertinoLocalizations.delegate,
-    GlobalWidgetsLocalizations.delegate,
-  ];
+        delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ];
 
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
     Locale('en'),
     Locale('es'),
     Locale('hi'),
-    Locale('id')
+    Locale('id'),
   ];
 
   /// No description provided for @addComment.
@@ -558,6 +558,18 @@ abstract class AppLocalizations {
   /// **'I\'ve verified my email'**
   String get iveVerifiedMyEmail;
 
+  /// No description provided for @keyExchangeFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Key exchange failed'**
+  String get keyExchangeFailed;
+
+  /// No description provided for @keysExchanged.
+  ///
+  /// In en, this message translates to:
+  /// **'Keys exchanged'**
+  String get keysExchanged;
+
   /// No description provided for @likes.
   ///
   /// In en, this message translates to:
@@ -642,6 +654,30 @@ abstract class AppLocalizations {
   /// **'New Lines'**
   String get newLines;
 
+  /// No description provided for @chats.
+  ///
+  /// In en, this message translates to:
+  /// **'Chats'**
+  String get chats;
+
+  /// No description provided for @newMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'New message'**
+  String get newMessage;
+
+  /// No description provided for @noMessagesYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No messages yet'**
+  String get noMessagesYet;
+
+  /// No description provided for @typeAMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Type a message'**
+  String get typeAMessage;
+
   /// No description provided for @newPasswordMustBeDifferent.
   ///
   /// In en, this message translates to:
@@ -659,6 +695,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Nothing to see here!'**
   String get nothingToSeeHere;
+
+  /// No description provided for @noteToSelf.
+  ///
+  /// In en, this message translates to:
+  /// **'Note to Self'**
+  String get noteToSelf;
 
   /// No description provided for @ok.
   ///
@@ -966,6 +1008,12 @@ abstract class AppLocalizations {
   /// **'Please go back and choose a different username.'**
   String get usernameTakenBody;
 
+  /// No description provided for @userMayNotHaveDeviceRegistered.
+  ///
+  /// In en, this message translates to:
+  /// **'User may not have a device registered.'**
+  String get userMayNotHaveDeviceRegistered;
+
   /// No description provided for @userNotFound.
   ///
   /// In en, this message translates to:
@@ -1062,6 +1110,108 @@ abstract class AppLocalizations {
   /// **'eko messenger coming soon'**
   String get messengerSubtitle;
 
+  /// No description provided for @messengerSetupBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Register this device to send and receive end-to-end encrypted messages.'**
+  String get messengerSetupBody;
+
+  /// No description provided for @enableMessages.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable messages'**
+  String get enableMessages;
+
+  /// No description provided for @registeringDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'Registering device…'**
+  String get registeringDevice;
+
+  /// No description provided for @deviceRegistrationFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not set up messaging on this device.'**
+  String get deviceRegistrationFailed;
+
+  /// No description provided for @messengerServerUnavailableTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Messages server unavailable'**
+  String get messengerServerUnavailableTitle;
+
+  /// No description provided for @messengerServerUnavailableBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not reach the messages server. Check that it is running and try again.'**
+  String get messengerServerUnavailableBody;
+
+  /// No description provided for @messengerWaitForApprovalTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Device not approved'**
+  String get messengerWaitForApprovalTitle;
+
+  /// No description provided for @messengerWaitForApprovalBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This device hasn\'t been approved yet. A notification has been sent to your active devices.'**
+  String get messengerWaitForApprovalBody;
+
+  /// No description provided for @messengerDevicePublicKey.
+  ///
+  /// In en, this message translates to:
+  /// **'Public key'**
+  String get messengerDevicePublicKey;
+
+  /// No description provided for @messengerDeviceCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Device code'**
+  String get messengerDeviceCode;
+
+  /// No description provided for @messengerResendApprovalNotification.
+  ///
+  /// In en, this message translates to:
+  /// **'Resend notification'**
+  String get messengerResendApprovalNotification;
+
+  /// No description provided for @messengerApproveDeviceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Approve new device'**
+  String get messengerApproveDeviceTitle;
+
+  /// No description provided for @messengerApproveDeviceBody.
+  ///
+  /// In en, this message translates to:
+  /// **'A new device is requesting access. Verify the public key matches, then enter the device code shown on that device.'**
+  String get messengerApproveDeviceBody;
+
+  /// No description provided for @messengerEnterDeviceCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter device code'**
+  String get messengerEnterDeviceCode;
+
+  /// No description provided for @messengerApproveDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'Approve'**
+  String get messengerApproveDevice;
+
+  /// No description provided for @messengerIgnoreDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'Ignore'**
+  String get messengerIgnoreDevice;
+
+  /// No description provided for @messengerInvalidDeviceCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid device code'**
+  String get messengerInvalidDeviceCode;
+
   /// No description provided for @selectEmojiTitle.
   ///
   /// In en, this message translates to:
@@ -1140,11 +1290,131 @@ abstract class AppLocalizations {
   /// **'Image saved to gallery'**
   String get imageSavedToGallery;
 
+  /// No description provided for @today.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get today;
+
+  /// No description provided for @yesterday.
+  ///
+  /// In en, this message translates to:
+  /// **'Yesterday'**
+  String get yesterday;
+
   /// No description provided for @repostLoadFailed.
   ///
   /// In en, this message translates to:
   /// **'Could not load this post'**
   String get repostLoadFailed;
+
+  /// No description provided for @messageSendFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Your message couldn\'t be sent.'**
+  String get messageSendFailed;
+
+  /// No description provided for @messengerDeviceChatsSyncFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Device approved, but it couldn\'t be added to some of your chats.'**
+  String get messengerDeviceChatsSyncFailed;
+
+  /// No description provided for @messengerDevicesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Messenger devices'**
+  String get messengerDevicesTitle;
+
+  /// No description provided for @messengerThisDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'This device'**
+  String get messengerThisDevice;
+
+  /// No description provided for @messengerDevicePending.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending approval'**
+  String get messengerDevicePending;
+
+  /// No description provided for @messengerDeviceName.
+  ///
+  /// In en, this message translates to:
+  /// **'Device {code}'**
+  String messengerDeviceName(String code);
+
+  /// No description provided for @messengerDeviceAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'Added {date}'**
+  String messengerDeviceAdded(String date);
+
+  /// No description provided for @messengerRemoveDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get messengerRemoveDevice;
+
+  /// No description provided for @messengerRemoveDeviceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove device?'**
+  String get messengerRemoveDeviceTitle;
+
+  /// No description provided for @messengerRemoveDeviceBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This device will lose access to your chats and will need to be approved again to use messenger.'**
+  String get messengerRemoveDeviceBody;
+
+  /// No description provided for @messengerRemoveDeviceFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t remove this device.'**
+  String get messengerRemoveDeviceFailed;
+
+  /// No description provided for @messengerDevicesLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load your devices.'**
+  String get messengerDevicesLoadFailed;
+
+  /// No description provided for @messengerDevicesChangedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}\'s devices changed'**
+  String messengerDevicesChangedTitle(String name);
+
+  /// No description provided for @messengerDevicesChangedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Their devices were reset, for example because they lost them or signed out everywhere. If you didn\'t expect this, check with them first: someone else could be trying to read your messages.'**
+  String get messengerDevicesChangedBody;
+
+  /// No description provided for @messengerDevicesChangedContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get messengerDevicesChangedContinue;
+
+  /// No description provided for @messengerUnknownDeviceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown device in a chat'**
+  String get messengerUnknownDeviceTitle;
+
+  /// No description provided for @messengerUnknownDeviceAddedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{adder} added a device to a chat that isn\'t one of {owner}\'s devices. It will be removed. If this happens again, check with them: someone in the chat could be trying to read your messages.'**
+  String messengerUnknownDeviceAddedBody(String adder, String owner);
+
+  /// No description provided for @messengerUnknownDeviceBody.
+  ///
+  /// In en, this message translates to:
+  /// **'A device that isn\'t one of {owner}\'s current devices is in a chat. It will be removed.'**
+  String messengerUnknownDeviceBody(String owner);
 }
 
 class _AppLocalizationsDelegate
@@ -1178,8 +1448,9 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
   }
 
   throw FlutterError(
-      'AppLocalizations.delegate failed to load unsupported locale "$locale". This is likely '
-      'an issue with the localizations generation tool. Please file an issue '
-      'on GitHub with a reproducible sample app and the gen-l10n configuration '
-      'that was used.');
+    'AppLocalizations.delegate failed to load unsupported locale "$locale". This is likely '
+    'an issue with the localizations generation tool. Please file an issue '
+    'on GitHub with a reproducible sample app and the gen-l10n configuration '
+    'that was used.',
+  );
 }

@@ -32,16 +32,19 @@ class _PostHost extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final asyncPost = ref.watch(postProvider(_postId));
     return asyncPost.when(
-      data: (post) => Scaffold(body: Center(child: LikeButtons(post: post))),
+      data: (post) => Scaffold(
+        body: Center(child: LikeButtons(post: post)),
+      ),
       loading: () => const SizedBox.shrink(),
-      error: (_, __) => const SizedBox.shrink(),
+      error: (_, _) => const SizedBox.shrink(),
     );
   }
 }
 
 void main() {
-  testWidgets('like count refreshes after returning from view likes page',
-      (tester) async {
+  testWidgets('like count refreshes after returning from view likes page', (
+    tester,
+  ) async {
     var serverLikes = 0;
     _FakePost.likesGetter = () => serverLikes;
 
@@ -52,7 +55,7 @@ void main() {
 
     final router = GoRouter(
       routes: [
-        GoRoute(path: '/', builder: (_, __) => const _PostHost()),
+        GoRoute(path: '/', builder: (_, _) => const _PostHost()),
         GoRoute(
           path: '/feed/post/:id/likes',
           builder: (context, state) {
@@ -70,7 +73,7 @@ void main() {
         ),
         GoRoute(
           path: '/feed/post/:id/dislikes',
-          builder: (_, __) => const SizedBox.shrink(),
+          builder: (_, _) => const SizedBox.shrink(),
         ),
       ],
     );

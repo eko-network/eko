@@ -5,10 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:eko_app/widgets/scaffolds/app_safe_area.dart';
 import 'package:eko_app/interfaces/notification_helper.dart';
-import 'package:eko_app/providers/auth_provider.dart';
-import 'package:eko_app/providers/current_user_provider.dart';
-import 'package:eko_app/providers/pending_deep_link_provider.dart';
 import 'package:eko_app/views/blocked_users_page.dart';
+import 'package:eko_app/messenger/views/devices_page.dart';
 import 'package:eko_app/views/change_email_page.dart';
 import 'package:eko_app/views/change_password_page.dart';
 import 'package:eko_app/views/download_page.dart';
@@ -20,7 +18,8 @@ import 'package:eko_app/views/sign_up.dart';
 import 'package:eko_app/views/user_settings.dart';
 import 'package:eko_app/views/compose_page.dart';
 import 'package:eko_app/views/feed_page.dart';
-import 'package:eko_app/views/messages_page.dart';
+import 'package:eko_app/messenger/views/adaptive_chat_layout.dart';
+import 'package:eko_app/utilities/constants.dart' as c;
 import 'package:eko_app/views/search_page.dart';
 import 'package:eko_app/views/edit_profile.dart';
 import 'package:eko_app/widgets/scaffolds/navigation_bar.dart';
@@ -34,6 +33,7 @@ import 'package:eko_app/views/following.dart';
 import 'package:eko_app/views/recent_activity.dart';
 import 'package:eko_app/views/view_likes_page.dart';
 import 'package:eko_app/widgets/posts/gifs.dart';
+import 'package:eko_app/widgets/scaffolds/messenger_bootstrap.dart';
 import 'package:eko_app/widgets/scaffolds/require_auth.dart';
 import 'package:eko_app/widgets/scaffolds/require_no_auth.dart';
 import 'package:eko_app/views/profile_redirect_page.dart';
@@ -57,53 +57,10 @@ class GoRouterRefreshNotifier extends ChangeNotifier {
 }
 
 final goRouterProvider = Provider<GoRouter>((ref) {
-  final refreshNotifier = GoRouterRefreshNotifier();
-  ref.listen(authProvider, (_, __) => refreshNotifier.refresh());
-  // needsProfileSetup is set async in currentUserProvider.reload(); without this,
-  // GoRouter never re-runs redirect and /feed stays on RequireAuth's spinner forever.
-  ref.listen(needsProfileSetupProvider, (_, __) => refreshNotifier.refresh());
   return GoRouter(
     initialLocation: '/feed',
     navigatorKey: NotificationHelper.navigatorKey,
-    refreshListenable: refreshNotifier,
     debugLogDiagnostics: kDebugMode,
-    redirectLimit: 15,
-    redirect: (context, state) {
-      final auth = ref.read(authProvider);
-      final loc = state.matchedLocation;
-      if (auth.isLoading) return null;
-
-      if (auth.pendingPasswordRecovery && loc != '/auth') {
-        return '/auth?type=recovery';
-      }
-
-      final needsSetup = ref.read(needsProfileSetupProvider);
-      if (auth.uid != null && needsSetup && loc != '/google_setup') {
-        return '/google_setup';
-      }
-
-      const unauthenticatedRoutes = [
-        '/',
-        '/signup',
-        '/login',
-        '/auth',
-        '/download',
-        '/google_setup',
-      ];
-
-      if (auth.uid == null) {
-        if (unauthenticatedRoutes.contains(loc)) return null;
-        ref.read(pendingDeepLinkProvider.notifier).set(state.uri.toString());
-        return '/';
-      }
-
-      if (unauthenticatedRoutes.sublist(0, 3).contains(loc)) {
-        final pending = ref.read(pendingDeepLinkProvider.notifier).consume();
-        return pending ?? '/feed';
-      }
-
-      return null;
-    },
     routes: [
       GoRoute(
         path: '/google_setup',
@@ -122,7 +79,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: '/',
         name: 'root',
         builder: (context, state) {
-          return const WelcomePage();
+          return const RequireNoAuth(child: WelcomePage());
         },
         routes: [
           GoRoute(
@@ -158,10 +115,12 @@ final goRouterProvider = Provider<GoRouter>((ref) {
               if (didPop) return;
               navigationShell.goBranch(0);
             },
-            child: NotificationHandler(
-              child: RequireAuth(
-                child: ScaffoldWithNestedNavigation(
-                  navigationShell: navigationShell,
+            child: RequireAuth(
+              child: MessengerBootstrap(
+                child: NotificationHandler(
+                  child: ScaffoldWithNestedNavigation(
+                    navigationShell: navigationShell,
+                  ),
                 ),
               ),
             ),
@@ -201,8 +160,9 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                         path: 'likes',
                         name: 'likes',
                         builder: (context, state) {
-                          final id =
-                              int.tryParse(state.pathParameters['id'] ?? '');
+                          final id = int.tryParse(
+                            state.pathParameters['id'] ?? '',
+                          );
                           if (id == null) {
                             return const FeedPage();
                           }
@@ -213,8 +173,9 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                         path: 'dislikes',
                         name: 'dislikes',
                         builder: (context, state) {
-                          final id =
-                              int.tryParse(state.pathParameters['id'] ?? '');
+                          final id = int.tryParse(
+                            state.pathParameters['id'] ?? '',
+                          );
                           if (id == null) {
                             return const FeedPage();
                           }
@@ -243,7 +204,9 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                         return const FeedPage();
                       }
                       return ViewCommentLikesPage(
-                          commentId: id, dislikes: true);
+                        commentId: id,
+                        dislikes: true,
+                      );
                     },
                   ),
                 ],
@@ -256,8 +219,35 @@ final goRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: '/messages',
                 name: 'messages',
-                pageBuilder: (context, state) =>
-                    const NoTransitionPage(child: MessagesPage()),
+                pageBuilder: (context, state) => NoTransitionPage(
+                  child: MessagesGaurd(child: AdaptiveChat()),
+                ),
+                routes: [
+                  GoRoute(
+                    path: ':id',
+                    name: 'message_thread',
+                    pageBuilder: (context, state) {
+                      final id = int.tryParse(state.pathParameters['id'] ?? '');
+                      final isWide =
+                          MediaQuery.of(context).size.width >=
+                          c.messengerWideScreen;
+
+                      Page<void> buildPage(Widget child) {
+                        if (isWide) {
+                          return NoTransitionPage(child: child);
+                        }
+                        return MaterialPage(child: child);
+                      }
+
+                      if (id == null) {
+                        return buildPage(MessagesGaurd(child: AdaptiveChat()));
+                      }
+                      return buildPage(
+                        MessagesGaurd(child: AdaptiveChat(selectedGroupId: id)),
+                      );
+                    },
+                  ),
+                ],
               ),
             ],
           ),
@@ -305,21 +295,21 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                         child: GifSearchSection(),
                         transitionsBuilder:
                             (context, animation, secondaryAnimation, child) {
-                          const begin = Offset(0.0, 1.0);
-                          const end = Offset.zero;
-                          const curve = Curves.easeOut;
+                              const begin = Offset(0.0, 1.0);
+                              const end = Offset.zero;
+                              const curve = Curves.easeOut;
 
-                          final tween = Tween(
-                            begin: begin,
-                            end: end,
-                          ).chain(CurveTween(curve: curve));
-                          final offsetAnimation = animation.drive(tween);
+                              final tween = Tween(
+                                begin: begin,
+                                end: end,
+                              ).chain(CurveTween(curve: curve));
+                              final offsetAnimation = animation.drive(tween);
 
-                          return SlideTransition(
-                            position: offsetAnimation,
-                            child: child,
-                          );
-                        },
+                              return SlideTransition(
+                                position: offsetAnimation,
+                                child: child,
+                              );
+                            },
                       );
                     },
                   ),
@@ -385,6 +375,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                         path: 'change_password',
                         name: 'change_password',
                         builder: (context, state) => const ChangePasswordPage(),
+                      ),
+                      GoRoute(
+                        path: 'messenger_devices',
+                        name: 'messenger_devices',
+                        builder: (context, state) => const DevicesPage(),
                       ),
                     ],
                   ),

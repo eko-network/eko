@@ -24,8 +24,7 @@ const List<IconData> _activeIconList = [
 
 class ScaffoldWithNestedNavigation extends StatelessWidget {
   const ScaffoldWithNestedNavigation({Key? key, required this.navigationShell})
-      : super(
-            key: key ?? const ValueKey<String>('ScaffoldWithNestedNavigation'));
+    : super(key: key ?? const ValueKey<String>('ScaffoldWithNestedNavigation'));
   final StatefulNavigationShell navigationShell;
 
   void goBranch(int index) {
@@ -37,26 +36,22 @@ class ScaffoldWithNestedNavigation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        const navRailWidth = 80.0;
-        final hasRoomForRail =
-            constraints.maxWidth >= c.indealAppWidth + navRailWidth;
+    const navRailWidth = 80.0;
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final hasRoomForRail = screenWidth >= c.indealAppWidth + navRailWidth;
 
-        if (hasRoomForRail) {
-          return ScaffoldWithNavigationRail(
-            body: navigationShell,
-            selectedIndex: navigationShell.currentIndex,
-            onDestinationSelected: goBranch,
-          );
-        }
+    if (hasRoomForRail) {
+      return ScaffoldWithNavigationRail(
+        body: navigationShell,
+        selectedIndex: navigationShell.currentIndex,
+        onDestinationSelected: goBranch,
+      );
+    }
 
-        return ScaffoldWithNavigationBar(
-          body: navigationShell,
-          selectedIndex: navigationShell.currentIndex,
-          onDestinationSelected: goBranch,
-        );
-      },
+    return ScaffoldWithNavigationBar(
+      body: navigationShell,
+      selectedIndex: navigationShell.currentIndex,
+      onDestinationSelected: goBranch,
     );
   }
 }

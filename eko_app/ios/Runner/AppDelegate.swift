@@ -31,7 +31,13 @@ import UserNotifications
         case "registerForPushNotifications":
             self?.registerForPushNotifications(application: application, result: result)
         case "retrieveDeviceToken":
-            self?.getDeviceToken(result: result)        
+            self?.getDeviceToken(result: result)
+        case "getAppGroupPath":
+            if let url = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.com.example.untitledApp") {
+                result(url.path)
+            } else {
+                result(nil)
+            }
         default:
             result(FlutterMethodNotImplemented)
         }
