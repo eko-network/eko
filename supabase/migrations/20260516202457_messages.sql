@@ -214,6 +214,16 @@ BEGIN
 END;
 $$;
 
+-- only the auth server may run the hook, it is security definer so it needs no
+-- table grants of its own
+GRANT EXECUTE ON FUNCTION public.custom_access_token_hook (jsonb) TO supabase_auth_admin;
+
+REVOKE ALL ON FUNCTION public.custom_access_token_hook (jsonb)
+FROM
+  PUBLIC,
+  anon,
+  authenticated;
+
 -- re-registering a device id from a different session drops its approval and key packages.
 -- p_chain_entry is the device's self-signed AddDevice entry, used when it is
 -- trusted on first use and so starts a new device chain for the user
@@ -474,23 +484,12 @@ alter table "public"."devices" validate constraint "devices_uid_fkey";
 set
   check_function_bodies = off;
 
-grant delete on table "public"."devices" to "anon";
+-- Supabase's default privileges grant anon everything on new tables
+revoke all on table "public"."devices" from "anon";
 
-grant insert on table "public"."devices" to "anon";
+revoke all on table "public"."device_chain" from "anon";
 
-grant references on table "public"."devices" to "anon";
-
-grant
-select
-  on table "public"."devices" to "anon";
-
-grant trigger on table "public"."devices" to "anon";
-
-grant
-truncate on table "public"."devices" to "anon";
-
-grant
-update on table "public"."devices" to "anon";
+revoke all on table "public"."key_packages" from "anon";
 
 grant delete on table "public"."devices" to "authenticated";
 
