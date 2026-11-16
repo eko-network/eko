@@ -11,6 +11,7 @@
 // Uses the seeded accounts from supabase/seed.sql.
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:ecp/ecp.dart';
@@ -93,9 +94,75 @@ Future<void> main() async {
   });
 
   await step("a pending device's key packages are not handed out", () async {
+    final res = await bob1.takeKey(alice2.uid, alice2.did);
+    check(res.statusCode != 200, 'got a key package: ${res.statusCode}');
+  });
+
+  await step('clients cannot take key packages directly', () async {
     await rejects(
-      () => bob1.rpc('take_key_package', {'p_device_id': alice2.did}),
+      () => bob1.rpc('take_key_package', {'p_device_id': carol1.did}),
     );
+  });
+
+  await step('a fresh device needs no new key packages', () async {
+    check(!await carol1.refillKeyPackages(), 'carol-1 refilled');
+  });
+
+  await step('once used up, the last resort key package is reused', () async {
+    await _service(
+      'DELETE',
+      'key_packages',
+      query: {'device_id': 'eq.${carol1.did}', 'last_resort': 'is.false'},
+    );
+    // carol-1 joins two chats with it, keeping its private key after the first
+    final groups = [
+      for (var i = 0; i < 2; i++)
+        (await bob1.client.groups.createGroup([
+          bob1.personFor(carol1.uid),
+        ], groupId: _randomBytes(16))).$1.groupId,
+    ];
+    for (final group in groups) {
+      await until('carol-1 joins a chat', () async {
+        await carol1.sync();
+        return (await carol1.storage.groupStore.getGroupByGroupId(group)) !=
+            null;
+      });
+    }
+    final first = await bob1.takeKey(carol1.uid, carol1.did);
+    final second = await bob1.takeKey(carol1.uid, carol1.did);
+    check(first.statusCode == 200, 'no key package: ${first.body}');
+    check(first.body == second.body, 'the last resort one was not reused');
+    check(await carol1.refillKeyPackages(), 'carol-1 did not refill');
+    final third = await bob1.takeKey(carol1.uid, carol1.did);
+    check(third.body != first.body, 'a refilled key package was not used');
+  });
+
+  await step('stale key packages are not handed out', () async {
+    final stale = DateTime.now().subtract(const Duration(days: 85));
+    await _service(
+      'PATCH',
+      'key_packages',
+      query: {'device_id': 'eq.${carol1.did}'},
+      body: {'created_at': stale.toUtc().toIso8601String()},
+    );
+    final res = await bob1.takeKey(carol1.uid, carol1.did);
+    check(res.statusCode != 200, 'got a stale key package');
+    check(await carol1.refillKeyPackages(), 'carol-1 did not refill');
+    final left =
+        await _service(
+              'GET',
+              'key_packages',
+              query: {
+                'select': 'id',
+                'device_id': 'eq.${carol1.did}',
+                'created_at':
+                    'lt.${stale.add(const Duration(days: 1)).toUtc().toIso8601String()}',
+              },
+            )
+            as List;
+    check(left.isEmpty, '${left.length} stale key package(s) left');
+    final fresh = await bob1.takeKey(carol1.uid, carol1.did);
+    check(fresh.statusCode == 200, 'no key package after refill');
   });
 
   await step('a pending device receives no messages', () async {
@@ -624,6 +691,11 @@ Future<void> _removedBy(
   await device.sync();
   return (await device.core.memberIndicesForKey(groupId, signatureKey)).isEmpty;
 });
+
+Uint8List _randomBytes(int length) {
+  final random = Random.secure();
+  return Uint8List.fromList(List.generate(length, (_) => random.nextInt(256)));
+}
 
 String _bytea(List<int> bytes) =>
     '\\x${bytes.map((b) => b.toRadixString(16).padLeft(2, '0')).join()}';

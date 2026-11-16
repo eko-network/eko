@@ -130,11 +130,59 @@ BEGIN
 END;
 $$;
 
+-- a device's last resort package is handed out again once its others run out,
+-- the others are used once. Clients create packages valid for 90 days.
 create table "public"."key_packages" (
   "id" uuid not null default gen_random_uuid(),
   "device_id" uuid not null,
-  "key_package" bytea not null
+  "key_package" bytea not null,
+  "last_resort" boolean not null default false,
+  "created_at" timestamp with time zone not null default now()
 );
+
+-- packages older than this are no longer handed out, leaving a margin before
+-- the 90 day lifetime clients give them runs out
+CREATE OR REPLACE FUNCTION public.key_package_max_age () RETURNS INTERVAL LANGUAGE sql IMMUTABLE AS $$
+  SELECT interval '80 days';
+$$;
+
+-- packages younger than this count as fresh, a device tops up once it has few
+-- fresh ones left, so it never runs out as long as it is opened every 50 days
+CREATE OR REPLACE FUNCTION public.key_package_refresh_age () RETURNS INTERVAL LANGUAGE sql IMMUTABLE AS $$
+  SELECT interval '30 days';
+$$;
+
+-- stores a device's new key packages, replacing its last resort one when
+-- given, and drops its packages too old to be handed out
+CREATE OR REPLACE FUNCTION public.insert_key_packages (
+  p_did UUID,
+  p_key_packages TEXT[],
+  p_last_resort TEXT
+) RETURNS VOID LANGUAGE plpgsql SECURITY DEFINER
+SET
+  search_path = '' AS $$
+BEGIN
+  DELETE FROM public.key_packages
+  WHERE device_id = p_did
+    AND (created_at < now() - public.key_package_max_age()
+      OR (p_last_resort IS NOT NULL AND last_resort));
+
+  INSERT INTO public.key_packages (device_id, key_package)
+  SELECT p_did, decode(pkg, 'base64')
+  FROM unnest(COALESCE(p_key_packages, '{}')) AS pkg;
+
+  IF p_last_resort IS NOT NULL THEN
+    INSERT INTO public.key_packages (device_id, key_package, last_resort)
+    VALUES (p_did, decode(p_last_resort, 'base64'), true);
+  END IF;
+END;
+$$;
+
+REVOKE ALL ON FUNCTION public.insert_key_packages (UUID, TEXT[], TEXT)
+FROM
+  PUBLIC,
+  anon,
+  authenticated;
 
 CREATE OR REPLACE FUNCTION public.custom_access_token_hook (event jsonb) RETURNS jsonb LANGUAGE plpgsql SECURITY DEFINER
 SET
@@ -173,6 +221,7 @@ CREATE OR REPLACE FUNCTION public.register_device (
   p_did UUID,
   p_signer_public_key TEXT DEFAULT NULL,
   p_key_packages TEXT[] DEFAULT NULL,
+  p_last_resort_key_package TEXT DEFAULT NULL,
   p_chain_entry JSONB DEFAULT NULL,
   p_chain_hash TEXT DEFAULT NULL
 ) RETURNS UUID LANGUAGE plpgsql SECURITY DEFINER
@@ -182,7 +231,6 @@ DECLARE
   v_uid        UUID := auth.uid();
   v_session_id UUID := (auth.jwt() ->> 'session_id')::UUID;
   v_tofu BOOL;
-  pkg          TEXT;
 BEGIN
   IF v_uid IS NULL THEN
     RAISE EXCEPTION 'Not authenticated';
@@ -244,23 +292,21 @@ BEGIN
     RAISE EXCEPTION 'Device id % is registered to a different user', p_did;
   END IF;
 
-  IF p_key_packages IS NOT NULL AND array_length(p_key_packages, 1) > 0 THEN
-    FOREACH pkg IN ARRAY p_key_packages LOOP
-      INSERT INTO public.key_packages (device_id, key_package)
-      VALUES (p_did, decode(pkg, 'base64'));
-    END LOOP;
-  END IF;
+  PERFORM public.insert_key_packages(p_did, p_key_packages, p_last_resort_key_package);
 
   RETURN p_did;
 END;
 $$;
 
-CREATE OR REPLACE FUNCTION public.add_key_packages (p_did UUID, p_key_packages TEXT[]) RETURNS VOID LANGUAGE plpgsql SECURITY DEFINER
+CREATE OR REPLACE FUNCTION public.add_key_packages (
+  p_did UUID,
+  p_key_packages TEXT[],
+  p_last_resort_key_package TEXT DEFAULT NULL
+) RETURNS VOID LANGUAGE plpgsql SECURITY DEFINER
 SET
   search_path = '' AS $$
 DECLARE
   v_uid UUID := auth.uid();
-  pkg   TEXT;          
 BEGIN
   IF v_uid IS NULL THEN
     RAISE EXCEPTION 'Not authenticated';
@@ -272,10 +318,36 @@ BEGIN
     RAISE EXCEPTION 'Device % does not belong to the authenticated user', p_did;
   END IF;
 
-  FOREACH pkg IN ARRAY p_key_packages LOOP
-    INSERT INTO public.key_packages (device_id, key_package)
-    VALUES (p_did, decode(pkg, 'base64'));
-  END LOOP;
+  PERFORM public.insert_key_packages(p_did, p_key_packages, p_last_resort_key_package);
+END;
+$$;
+
+-- how many of the device's key packages are fresh, see key_package_refresh_age
+CREATE OR REPLACE FUNCTION public.key_package_status (p_did UUID) RETURNS JSONB LANGUAGE plpgsql SECURITY DEFINER
+SET
+  search_path = '' AS $$
+DECLARE
+  v_uid UUID := auth.uid();
+BEGIN
+  IF v_uid IS NULL THEN
+    RAISE EXCEPTION 'Not authenticated';
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM public.devices WHERE id = p_did AND uid = v_uid
+  ) THEN
+    RAISE EXCEPTION 'Device % does not belong to the authenticated user', p_did;
+  END IF;
+
+  RETURN (
+    SELECT jsonb_build_object(
+      'fresh', count(*) FILTER (WHERE NOT last_resort),
+      'freshLastResort', bool_or(last_resort) IS TRUE
+    )
+    FROM public.key_packages
+    WHERE device_id = p_did
+      AND created_at > now() - public.key_package_refresh_age()
+  );
 END;
 $$;
 
@@ -322,13 +394,15 @@ BEGIN
 END;
 $$;
 
--- pending devices must not be added to groups
+-- pending devices must not be added to groups. Only the messenger server hands
+-- out key packages, through the device chain it serves.
+-- The oldest one still young enough is used up, the last resort one is kept.
 CREATE OR REPLACE FUNCTION public.take_key_package (p_device_id UUID) RETURNS BYTEA LANGUAGE plpgsql SECURITY DEFINER
 SET
   search_path = '' AS $$
 DECLARE
-    v_ids UUID[];
-    v_packages BYTEA[];
+    v_id UUID;
+    v_package BYTEA;
 BEGIN
     IF NOT EXISTS (
         SELECT 1 FROM public.devices
@@ -337,27 +411,42 @@ BEGIN
         RAISE EXCEPTION 'Device % is not approved', p_device_id;
     END IF;
 
-    SELECT array_agg(id), array_agg(key_package)
-    INTO v_ids, v_packages
-    FROM (
-        SELECT id, key_package
-        FROM public.key_packages
-        WHERE device_id = p_device_id
-        LIMIT 2
-        FOR UPDATE
-    ) locked_rows;
+    -- concurrent callers skip each other's packages rather than both getting one
+    SELECT id, key_package INTO v_id, v_package
+    FROM public.key_packages
+    WHERE device_id = p_device_id
+      AND NOT last_resort
+      AND created_at > now() - public.key_package_max_age()
+    ORDER BY created_at
+    LIMIT 1
+    FOR UPDATE SKIP LOCKED;
 
-    IF v_ids IS NULL THEN
+    IF FOUND THEN
+        DELETE FROM public.key_packages WHERE id = v_id;
+        RETURN v_package;
+    END IF;
+
+    SELECT key_package INTO v_package
+    FROM public.key_packages
+    WHERE device_id = p_device_id
+      AND last_resort
+      AND created_at > now() - public.key_package_max_age()
+    ORDER BY created_at DESC
+    LIMIT 1;
+
+    IF NOT FOUND THEN
         RAISE EXCEPTION 'No key packages available for device %', p_device_id;
     END IF;
 
-    IF array_length(v_ids, 1) > 1 THEN
-        DELETE FROM public.key_packages WHERE id = v_ids[1];
-    END IF;
-
-    RETURN v_packages[1];
+    RETURN v_package;
 END;
 $$;
+
+REVOKE ALL ON FUNCTION public.take_key_package (UUID)
+FROM
+  PUBLIC,
+  anon,
+  authenticated;
 
 CREATE OR REPLACE FUNCTION public.ensure_pending_approval (did UUID) RETURNS BOOL LANGUAGE sql
 SET
@@ -443,7 +532,7 @@ alter table "public"."key_packages" enable row level security;
 
 CREATE UNIQUE INDEX key_packages_pkey ON public.key_packages USING btree (id);
 
-CREATE INDEX key_packages_device_id_idx ON public.key_packages USING btree (device_id);
+CREATE INDEX key_packages_device_id_idx ON public.key_packages USING btree (device_id, created_at);
 
 alter table "public"."key_packages"
 add constraint "key_packages_pkey" PRIMARY KEY using index "key_packages_pkey";

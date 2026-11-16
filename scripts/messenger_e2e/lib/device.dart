@@ -165,9 +165,12 @@ class SimDevice {
     await rpc('register_device', {
       'p_did': did,
       'p_signer_public_key': base64Encode(cred.signerPublicKey),
-      'p_key_packages': keyPackages
+      'p_key_packages': keyPackages.keyPackages
           .map((k) => base64Encode(k.keyPackageBytes))
           .toList(),
+      'p_last_resort_key_package': base64Encode(
+        keyPackages.lastResort.keyPackageBytes,
+      ),
       'p_chain_entry': genesis.toJson(),
       'p_chain_hash': base64Encode(genesis.hash),
     });
@@ -184,6 +187,43 @@ class SimDevice {
       );
     }
   }
+
+  /// Tops up this device's key packages when few fresh ones are left, what
+  /// the app does whenever it opens the core. Returns whether it uploaded.
+  Future<bool> refillKeyPackages() async {
+    final status =
+        await rpc('key_package_status', {'p_did': did}) as Map<String, dynamic>;
+    if ((status['fresh'] as int) >= 10 && status['freshLastResort'] == true) {
+      return false;
+    }
+    final batch = await core.createKeyPackages();
+    await rpc('add_key_packages', {
+      'p_did': did,
+      'p_key_packages': batch.keyPackages
+          .map((k) => base64Encode(k.keyPackageBytes))
+          .toList(),
+      'p_last_resort_key_package': base64Encode(
+        batch.lastResort.keyPackageBytes,
+      ),
+    });
+    return true;
+  }
+
+  /// Takes a key package of [otherUid]'s device [otherDid] from the messenger
+  /// server, without checking it against their device chain.
+  Future<http.Response> takeKey(String otherUid, String otherDid) => _http.post(
+    env.messengerUrl.replace(
+      pathSegments: [
+        ...env.messengerUrl.pathSegments.where((s) => s.isNotEmpty),
+        'users',
+        otherUid,
+        'devices',
+        otherDid,
+        'keys',
+      ],
+    ),
+    headers: {'Authorization': 'Bearer $_accessToken'},
+  );
 
   /// Pull the inbox and return the messages it produced.
   Future<List<StoredMessage>> sync() => client.getInbox();

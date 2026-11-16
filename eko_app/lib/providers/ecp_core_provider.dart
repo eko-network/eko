@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -23,6 +24,10 @@ part '../generated/providers/ecp_core_provider.g.dart';
 @Riverpod(keepAlive: true)
 class EcpCoreHolder extends _$EcpCoreHolder {
   EcpCore? _core;
+  bool _refillingKeyPackages = false;
+
+  /// Below this many fresh key packages on the server the device uploads more.
+  static const _minFreshKeyPackages = 10;
 
   @override
   Future<EcpCore?> build() async {
@@ -59,7 +64,43 @@ class EcpCoreHolder extends _$EcpCoreHolder {
       return null;
     }
 
-    return _initAndOpenCore(session);
+    final core = await _initAndOpenCore(session);
+    unawaited(_refillKeyPackages(core, did));
+    return core;
+  }
+
+  /// Uploads new key packages once this device has few fresh ones left on the
+  /// server, see key_package_status in the Supabase migration.
+  Future<void> _refillKeyPackages(EcpCore core, String did) async {
+    if (_refillingKeyPackages) return;
+    _refillingKeyPackages = true;
+    try {
+      final status =
+          await supabase.rpc('key_package_status', params: {'p_did': did})
+              as Map<String, dynamic>;
+      if ((status['fresh'] as int) >= _minFreshKeyPackages &&
+          status['freshLastResort'] == true) {
+        return;
+      }
+      debugPrint('[EcpCore] Refilling key packages ($status)');
+      final batch = await core.createKeyPackages();
+      await supabase.rpc(
+        'add_key_packages',
+        params: {
+          'p_did': did,
+          'p_key_packages': batch.keyPackages
+              .map((it) => base64Encode(it.keyPackageBytes))
+              .toList(),
+          'p_last_resort_key_package': base64Encode(
+            batch.lastResort.keyPackageBytes,
+          ),
+        },
+      );
+    } catch (e, st) {
+      debugPrint('[EcpCore] key package refill error: $e\n$st');
+    } finally {
+      _refillingKeyPackages = false;
+    }
   }
 
   Future<EcpCore> _initAndOpenCore(Session session) async {
@@ -178,9 +219,12 @@ class EcpCoreHolder extends _$EcpCoreHolder {
         params: {
           'p_did': did,
           'p_signer_public_key': base64Encode(credential.signerPublicKey),
-          'p_key_packages': keyPackages
+          'p_key_packages': keyPackages.keyPackages
               .map((it) => base64Encode(it.keyPackageBytes))
               .toList(),
+          'p_last_resort_key_package': base64Encode(
+            keyPackages.lastResort.keyPackageBytes,
+          ),
           'p_chain_entry': genesis.toJson(),
           'p_chain_hash': base64Encode(genesis.hash),
         },
@@ -190,7 +234,8 @@ class EcpCoreHolder extends _$EcpCoreHolder {
           ? DeviceModel.fromSession(refreshed.session!)
           : DeviceModel.idle();
       if (device.dat == null && device.did != null) {
-        await sendApprovalRequest();
+        // authProvider hasn't seen the refreshed session yet
+        await sendApprovalRequest(did: device.did);
       }
 
       state = AsyncValue.data(_core!);
@@ -200,13 +245,13 @@ class EcpCoreHolder extends _$EcpCoreHolder {
     }
   }
 
-  Future<void> sendApprovalRequest() async {
+  Future<void> sendApprovalRequest({String? did}) async {
     final core = _core ?? state.value;
     if (core == null) {
       throw StateError('ECP core not initialized');
     }
 
-    final did = ref.read(authProvider).value?.device?.did;
+    did ??= ref.read(authProvider).value?.device?.did;
     if (did == null || did.isEmpty) {
       throw StateError('Device id not available');
     }
@@ -221,13 +266,19 @@ class EcpCoreHolder extends _$EcpCoreHolder {
     );
 
     try {
+      final activitySender = ActivitySender(
+        client: client,
+        did: DeviceUidService.getOrCreate(),
+        core: core,
+      );
       final handler = MessageHandler(
         core: core,
         client: client,
-        activitySender: ActivitySender(
-          client: client,
-          did: DeviceUidService.getOrCreate(),
+        activitySender: activitySender,
+        groups: GroupManager(
           core: core,
+          activitySender: activitySender,
+          devices: DeviceManager(core: core, activitySender: activitySender),
         ),
       );
       await handler.sendApprovalRequest(

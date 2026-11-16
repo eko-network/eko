@@ -3,6 +3,7 @@ import 'package:eko_app/providers/ecp_core_provider.dart';
 import 'package:eko_app/utilities/constants.dart' as c;
 import 'package:eko_app/widgets/auth/auth_button.dart';
 import 'package:eko_app/widgets/common/icons.dart';
+import 'package:eko_app/widgets/errors/snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -13,6 +14,16 @@ class MessengerSetupPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final isRegistering = ref.watch(ecpCoreHolderProvider).isLoading;
+
+    ref.listen(ecpCoreHolderProvider, (prev, next) {
+      if (next.hasError && !next.isLoading && prev?.error != next.error) {
+        showSnackBar(
+          text: l10n.deviceRegistrationFailed,
+          context: context,
+          variant: SnackBarVariant.destructive,
+        );
+      }
+    });
 
     return Scaffold(
       body: SafeArea(
