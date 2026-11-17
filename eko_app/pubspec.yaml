@@ -58,7 +58,9 @@ dependencies:
   flutter_secure_storage: ^10.3.1
   path: ^1.9.1
   ecp:
-     path: ../../ecp-dart-sdk
+    git:
+      url: https://github.com/eko-network/ecp-dart-sdk.git
+      ref: 94dd8a77b1441d04b599bb266305a3b1f6853963
   sqlite3: ^2.9.4
   drift: ^2.31.0
   sqlcipher_flutter_libs: ^0.6.8
