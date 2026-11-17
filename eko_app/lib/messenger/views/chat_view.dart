@@ -259,6 +259,8 @@ class _ChatViewState extends ConsumerState<ChatView>
 
   Widget _buildInputRow(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final canSend =
+        _messageController.text.trim().isNotEmpty || _selectedGifs.isNotEmpty;
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -388,8 +390,8 @@ class _ChatViewState extends ConsumerState<ChatView>
             ),
           ),
         ),
-        if (_messageController.text != '') const SizedBox(width: 8),
-        if (_messageController.text != '')
+        if (canSend) const SizedBox(width: 8),
+        if (canSend)
           CircleAvatar(
             backgroundColor: Color(0xFF115AEF),
             child: IconButton(
