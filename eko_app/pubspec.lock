@@ -388,9 +388,11 @@ packages:
   ecp:
     dependency: "direct main"
     description:
-      path: "../../ecp-dart-sdk"
-      relative: true
-    source: path
+      path: "."
+      ref: "94dd8a77b1441d04b599bb266305a3b1f6853963"
+      resolved-ref: "94dd8a77b1441d04b599bb266305a3b1f6853963"
+      url: "https://github.com/eko-network/ecp-dart-sdk.git"
+    source: git
     version: "0.0.1"
   emoji_picker_flutter:
     dependency: "direct main"

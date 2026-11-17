@@ -11,8 +11,54 @@ pkgs.flutter.buildFlutterApplication {
   src = lib.cleanSource ../eko_app;
   autoPubspecLock = ../eko_app/pubspec.lock;
   gitHashes = {
+    ecp = "sha256-uorxo4mhlESmJmrfFZWavxVv2nGYoWnTn74DTf8bds4=";
     webcrypto = "sha256-XkZe7LcVyUtUJoTqeyd87xLENJIIExgyI9lym/aQBtw=";
   };
+  customSourceBuilders.sqlcipher_flutter_libs = {
+    version,
+    src,
+    ...
+  }: let
+    sqlcipherAmalgamation = pkgs.fetchurl {
+      url = "https://fsn1.your-objectstorage.com/simon-public/assets/sqlcipher/v4_10_0.c";
+      hash = "sha256-3njvCHy8Juj+WE3gXxeQ8+NIl9uHMegVTcZ00/LfKMs=";
+    };
+  in
+    pkgs.stdenv.mkDerivation {
+      pname = "sqlcipher_flutter_libs";
+      inherit version src;
+      inherit (src) passthru;
+      dontConfigure = true;
+      dontBuild = true;
+      postPatch = ''
+        substituteInPlace linux/CMakeLists.txt \
+          --replace-fail 'statically" ON)' 'statically" OFF)' \
+          --replace-fail '${sqlcipherAmalgamation.url}' 'file://${sqlcipherAmalgamation}'
+      '';
+      installPhase = "cp -r . $out";
+    };
+  customSourceBuilders.openmls = {
+    version,
+    src,
+    ...
+  }: let
+    openmlsFrb = pkgs.fetchurl {
+      url = "https://github.com/djx-y-z/openmls_dart/releases/download/openmls_frb-1.4.0/openmls_frb-1.4.0-linux-x86_64.tar.gz";
+      hash = "sha256-Jl69ix6pCAoB+gsRrQl68GUnc76PmqJRir+4HDMRTek=";
+    };
+  in
+    pkgs.stdenv.mkDerivation {
+      pname = "openmls";
+      inherit version src;
+      inherit (src) passthru;
+      dontConfigure = true;
+      dontBuild = true;
+      installPhase = ''
+        cp -r . $out
+        mkdir -p $out/rust/target/release
+        tar -xzf ${openmlsFrb} -C $out/rust/target/release libopenmls_frb.so
+      '';
+    };
   vendorHash = lib.fakeHash;
   dontUseCmakeConfigure = true;
 
