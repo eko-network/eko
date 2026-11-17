@@ -65,7 +65,7 @@
           // linuxShells
           // {
             default =
-              if pkgs.stdenv.isDarwin
+              if pkgs.stdenv.hostPlatform.isDarwin
               then darwinShells.darwin
               else linuxShells.linux;
           };

@@ -12,3 +12,6 @@ fi
 webcrypto_root="${webcrypto_root_uri#file://}"
 cmake -S "$webcrypto_root/src" -B .dart_tool/webcrypto
 cmake --build .dart_tool/webcrypto --target webcrypto
+
+# sqlcipher_flutter_libs defaults to static OpenSSL, but nixpkgs only ships shared libs.
+sed -i '/^project(/a set(OPENSSL_USE_STATIC_LIBS OFF CACHE BOOL "" FORCE)' linux/CMakeLists.txt

@@ -5,6 +5,34 @@
   gitRev ? "dirty",
   ...
 }:
+let
+  # The openmls build hook downloads a prebuilt library from GitHub, which
+  # can't happen in the sandbox. It prefers rust/target/release if present,
+  # so build the bundled crate and drop it there.
+  openmlsFrb = {
+    version,
+    src,
+    ...
+  }: let
+    lib' = pkgs.rustPlatform.buildRustPackage {
+      pname = "openmls_frb";
+      inherit version;
+      src = "${src}/rust";
+      # Update when the openmls pub version changes.
+      cargoHash = "sha256-yqlEKQK5ORU93FKZuvFW78m6VDTqfTCJlV28KGHcuew=";
+      # Bundle sqlcipher and OpenSSL like upstream's prebuilt, so the
+      # tarball doesn't depend on the host having libsqlcipher.
+      dontCargoUseSystemLibs = true;
+      nativeBuildInputs = [pkgs.perl];
+      doCheck = false;
+    };
+  in
+    pkgs.runCommand "pub-openmls-${version}" {inherit (src) passthru;} ''
+      cp -r ${src} $out
+      chmod -R +w $out
+      install -Dm755 ${lib'}/lib/libopenmls_frb.so $out/rust/target/release/libopenmls_frb.so
+    '';
+in
 pkgs.flutter.buildFlutterApplication {
   inherit pname;
   version = gitRev;
@@ -14,52 +42,7 @@ pkgs.flutter.buildFlutterApplication {
     ecp = "sha256-uorxo4mhlESmJmrfFZWavxVv2nGYoWnTn74DTf8bds4=";
     webcrypto = "sha256-XkZe7LcVyUtUJoTqeyd87xLENJIIExgyI9lym/aQBtw=";
   };
-  customSourceBuilders.sqlcipher_flutter_libs = {
-    version,
-    src,
-    ...
-  }: let
-    sqlcipherAmalgamation = pkgs.fetchurl {
-      url = "https://fsn1.your-objectstorage.com/simon-public/assets/sqlcipher/v4_10_0.c";
-      hash = "sha256-3njvCHy8Juj+WE3gXxeQ8+NIl9uHMegVTcZ00/LfKMs=";
-    };
-  in
-    pkgs.stdenv.mkDerivation {
-      pname = "sqlcipher_flutter_libs";
-      inherit version src;
-      inherit (src) passthru;
-      dontConfigure = true;
-      dontBuild = true;
-      postPatch = ''
-        substituteInPlace linux/CMakeLists.txt \
-          --replace-fail 'statically" ON)' 'statically" OFF)' \
-          --replace-fail '${sqlcipherAmalgamation.url}' 'file://${sqlcipherAmalgamation}'
-      '';
-      installPhase = "cp -r . $out";
-    };
-  customSourceBuilders.openmls = {
-    version,
-    src,
-    ...
-  }: let
-    openmlsFrb = pkgs.fetchurl {
-      url = "https://github.com/djx-y-z/openmls_dart/releases/download/openmls_frb-1.4.0/openmls_frb-1.4.0-linux-x86_64.tar.gz";
-      hash = "sha256-Jl69ix6pCAoB+gsRrQl68GUnc76PmqJRir+4HDMRTek=";
-    };
-  in
-    pkgs.stdenv.mkDerivation {
-      pname = "openmls";
-      inherit version src;
-      inherit (src) passthru;
-      dontConfigure = true;
-      dontBuild = true;
-      installPhase = ''
-        cp -r . $out
-        mkdir -p $out/rust/target/release
-        tar -xzf ${openmlsFrb} -C $out/rust/target/release libopenmls_frb.so
-      '';
-    };
-  vendorHash = lib.fakeHash;
+  customSourceBuilders.openmls = openmlsFrb;
   dontUseCmakeConfigure = true;
 
   buildInputs = with pkgs; [
