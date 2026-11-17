@@ -14,6 +14,7 @@ class MessengerSetupPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final isRegistering = ref.watch(ecpCoreHolderProvider).isLoading;
+    final removed = ref.watch(deviceRemovedNoticeProvider);
 
     ref.listen(ecpCoreHolderProvider, (prev, next) {
       if (next.hasError && !next.isLoading && prev?.error != next.error) {
@@ -50,7 +51,9 @@ class MessengerSetupPage extends ConsumerWidget {
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    l10n.messengerSetupBody,
+                    removed
+                        ? l10n.messengerDeviceRemoved
+                        : l10n.messengerSetupBody,
                     style: Theme.of(context).textTheme.bodyLarge,
                     textAlign: TextAlign.center,
                   ),

@@ -241,6 +241,41 @@ class SimDevice {
     });
   }
 
+  /// Signs in again with an emailed one time code, what the app's device
+  /// reset asks for.
+  Future<void> verifyEmailCode(String code) async {
+    final res = await _http.post(
+      env.supabaseUrl.replace(path: '/auth/v1/verify'),
+      headers: {'apikey': env.anonKey, 'Content-Type': 'application/json'},
+      body: jsonEncode({'email': email, 'token': code, 'type': 'email'}),
+    );
+    _takeSession(res);
+  }
+
+  /// Replaces all of this user's devices with this one, what the app does
+  /// when every other device is lost.
+  Future<void> resetDevices() async {
+    final batch = await core.createKeyPackages();
+    final genesis = await DeviceChainEntry.genesis(
+      actor: person.id,
+      did: did,
+      credential: credential,
+    );
+    await rpc('reset_devices', {
+      'p_did': did,
+      'p_signer_public_key': base64Encode(credential.signerPublicKey),
+      'p_key_packages': batch.keyPackages
+          .map((k) => base64Encode(k.keyPackageBytes))
+          .toList(),
+      'p_last_resort_key_package': base64Encode(
+        batch.lastResort.keyPackageBytes,
+      ),
+      'p_chain_entry': genesis.toJson(),
+      'p_chain_hash': base64Encode(genesis.hash),
+    });
+    await refreshSession();
+  }
+
   /// Removes a device of this user, this one included, revoking it in the
   /// chain when it was approved.
   Future<void> removeDevice(String otherDid) async {

@@ -67,22 +67,50 @@ class _CapabilitiesStore implements CapabilitiesStore {
 
 class _GroupStore implements GroupStore {
   final groups = <MlsGroupRecord>[];
+  var _nextId = 1;
 
   @override
   Future<void> saveGroup({
     required Uint8List groupIdBytes,
     String? displayName,
+    bool isActive = true,
   }) async {
     if (await getGroupByGroupId(groupIdBytes) != null) return;
     groups.add(
       MlsGroupRecord(
-        id: groups.length + 1,
+        id: _nextId++,
         groupIdBytes: groupIdBytes,
         displayName: displayName,
         createdAt: DateTime.now(),
+        isActive: isActive,
       ),
     );
   }
+
+  @override
+  Future<void> setGroupActive(Uint8List groupIdBytes, bool isActive) async {
+    final i = groups.indexWhere(
+      (g) => bytesEqual(g.groupIdBytes, groupIdBytes),
+    );
+    if (i < 0) return;
+    final g = groups[i];
+    groups[i] = MlsGroupRecord(
+      id: g.id,
+      groupIdBytes: g.groupIdBytes,
+      displayName: g.displayName,
+      createdAt: g.createdAt,
+      lastActivityAt: g.lastActivityAt,
+      isActive: isActive,
+    );
+  }
+
+  @override
+  Future<void> deleteGroup(Uint8List groupIdBytes) async =>
+      groups.removeWhere((g) => bytesEqual(g.groupIdBytes, groupIdBytes));
+
+  @override
+  Future<List<MlsGroupRecord>> getHiddenGroups() async =>
+      groups.where((g) => !g.isActive).toList();
 
   @override
   Future<MlsGroupRecord?> getGroup(int id) async =>
@@ -105,8 +133,39 @@ class _MessageStore implements MessageStore {
       messages.add(message);
 
   @override
-  Future<bool> markMessageDelivered(Uri serverActivityId) async =>
-      messages.any((m) => m.serverActivityId == serverActivityId);
+  Future<bool> markMessageDelivered(Uri serverActivityId) async {
+    var found = false;
+    for (final (i, m) in messages.indexed.toList()) {
+      if (m.serverActivityId != serverActivityId) continue;
+      messages[i] = _copy(m, delivered: true);
+      found = true;
+    }
+    return found;
+  }
+
+  @override
+  Future<void> moveMessages({
+    required Uint8List from,
+    required Uint8List to,
+  }) async {
+    for (final (i, m) in messages.indexed.toList()) {
+      if (!bytesEqual(m.groupId, from)) continue;
+      messages[i] = _copy(m, groupId: to);
+    }
+  }
+
+  StoredMessage _copy(StoredMessage m, {Uint8List? groupId, bool? delivered}) =>
+      StoredMessage(
+        serverActivityId: m.serverActivityId,
+        receivedAt: m.receivedAt,
+        senderId: m.senderId,
+        id: m.id,
+        content: m.content,
+        inReplyTo: m.inReplyTo,
+        attachment: m.attachment,
+        groupId: groupId ?? m.groupId,
+        delivered: delivered ?? m.delivered,
+      );
 }
 
 class _ProcessedObjectStore implements ProcessedObjectStore {
@@ -119,7 +178,8 @@ class _ProcessedObjectStore implements ProcessedObjectStore {
   Future<bool> check(Uri id) async => _ids.contains(id);
 
   @override
-  Future<bool> markDelivered(Uri id) async => _ids.contains(id);
+  // like the app, the first delivered for an object counts
+  Future<bool> markDelivered(Uri id) async => _ids.add(id);
 }
 
 class _ApprovalRequestStore implements ApprovalRequestStore {

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:eko_app/messenger/utilities/device_public_key.dart';
 import 'package:eko_app/database/database.dart';
 import 'package:eko_app/database/storage.dart';
+import 'package:eko_app/messenger/views/reset_devices_dialog.dart';
 import 'package:eko_app/messenger/widgets/pub_key.dart';
 import 'package:eko_app/providers/ecp_core_provider.dart';
 import 'package:eko_app/localization/generated/app_localizations.dart';
@@ -34,9 +35,25 @@ class _WaitForApprovalState extends ConsumerState<WaitForApproval> {
   void initState() {
     super.initState();
     _loadPublicKey();
+    _startRefreshing();
+  }
+
+  void _startRefreshing() {
     _refreshTimer = Timer.periodic(const Duration(seconds: 5), (_) {
       supabase.auth.refreshSession();
     });
+  }
+
+  Future<void> _resetDevices() async {
+    // a refresh of this session finishing after the reset signed in again
+    // would bring this session back
+    _refreshTimer?.cancel();
+    await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const ResetDevicesDialog(),
+    );
+    if (mounted) _startRefreshing();
   }
 
   @override
@@ -187,6 +204,11 @@ class _WaitForApprovalState extends ConsumerState<WaitForApproval> {
                           ? null
                           : _resendNotification,
                       isLoading: _sendingNotification,
+                    ),
+                    const SizedBox(height: 8),
+                    TextButton(
+                      onPressed: _resetDevices,
+                      child: Text(l10n.messengerLostDevices),
                     ),
                   ],
                 ],

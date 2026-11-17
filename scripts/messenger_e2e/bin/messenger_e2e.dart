@@ -588,7 +588,196 @@ Future<void> main() async {
     check(indices.isEmpty, 'bob-1 should be removed from the dm');
   });
 
-  for (final d in [alice1, alice2, bob2, carol1]) {
+  // bob loses bob-2, his only device, and signs in on bob-3
+  final bob3 = SimDevice(env, 'bob-3', 'bob@test.local');
+  final bob = alice1.personFor(bob2.uid);
+  late Uint8List bobDm;
+  late Uint8List groupChat;
+  late Uint8List newDm;
+
+  await step('chats with bob before he loses his device', () async {
+    // put back the chain the server replaced, carol-1's genesis signs the
+    // same way again so it matches what everyone pinned
+    await _service(
+      'DELETE',
+      'device_chain',
+      query: {'uid': 'eq.${carol1.uid}'},
+    );
+    final genesis = await DeviceChainEntry.genesis(
+      actor: carol.id,
+      did: carol1.did,
+      credential: carol1.credential,
+    );
+    await _service(
+      'POST',
+      'device_chain',
+      body: {
+        'uid': carol1.uid,
+        'seq': 0,
+        'entry': genesis.toJson(),
+        'hash': _bytea(genesis.hash),
+      },
+    );
+    await _service('DELETE', 'devices', query: {'id': 'eq.${fake.did}'});
+
+    final (dmGroup, _) = await alice1.client.groups.createGroup([bob]);
+    bobDm = dmGroup.groupId;
+    await alice1.sendText(bobDm, 'before the reset');
+    await receives(bob2, (m) => m.content == 'before the reset');
+
+    // carol last saw bob-1's chain
+    await carol1.client.devices.trust(bob);
+    final (group, _) = await carol1.client.groups.createGroup([
+      bob,
+      carol1.personFor(alice1.uid),
+    ]);
+    groupChat = group.groupId;
+    await carol1.sendText(groupChat, 'hi both');
+    await receives(bob2, (m) => m.content == 'hi both');
+    await receives(alice1, (m) => m.content == 'hi both');
+  });
+
+  await step('the new device is pending with nothing to approve it', () async {
+    await bob3.setUp();
+    check(!bob3.approved, 'bob-3 should be pending');
+  });
+
+  await step('resetting devices needs a confirmed email code', () async {
+    await rejects(() => bob3.resetDevices());
+    final rows = await bob3.selectDevices();
+    check(rows.length == 2, 'bob-2 and bob-3 should be left, got $rows');
+  });
+
+  await step(
+    'with an email code, the new device replaces the lost ones',
+    () async {
+      await bob3.verifyEmailCode(await _emailCode(bob3.email));
+      await bob3.resetDevices();
+      check(bob3.approved, 'bob-3 should be trusted on first use');
+      final rows = await bob3.selectDevices();
+      check(
+        rows.map((r) => r['id']).join() == bob3.did,
+        'only bob-3 should be left, got $rows',
+      );
+      final chain = await bob3.client.devices.fetch(bob3.person);
+      check(
+        chain.entries.length == 1 && chain.devices.single.did == bob3.did,
+        'bob-3 should start a new chain',
+      );
+    },
+  );
+
+  await step('a device the reset removed is turned away', () async {
+    // bob-2's token still says it is approved until it expires
+    try {
+      await bob2.sync();
+      throw _CheckFailed('bob-2 should not get its inbox');
+    } on EcpNetworkException catch (e) {
+      check(e.statusCode == 410, 'expected 410 Gone, got ${e.statusCode}');
+    }
+    try {
+      await bob2.sendText(bobDm, 'from the lost phone');
+      throw _CheckFailed('bob-2 should not send');
+    } on http.ClientException catch (e) {
+      check(e.message.contains('410'), 'expected 410 Gone, got $e');
+    }
+  });
+
+  await step(
+    "a reset contact's new chat stays hidden until accepted",
+    () async {
+      final (group, _) = await bob3.client.groups.createGroup([
+        bob3.personFor(alice1.uid),
+      ]);
+      newDm = group.groupId;
+      await bob3.sendText(newDm, 'new phone, who dis');
+
+      final warnings = <GroupDeviceWarning>[];
+      final sub = alice1.client.groups.deviceWarnings.listen(warnings.add);
+      try {
+        await receives(alice1, (m) => m.content == 'new phone, who dis');
+        check(
+          warnings.any((w) => w.unverified && w.owner == bob.id),
+          'alice-1 should be warned about the reset',
+        );
+        final active = await alice1.storage.groupStore.getActiveGroups();
+        check(
+          !active.any((g) => bytesEqual(g.groupIdBytes, newDm)),
+          'the new chat should be hidden',
+        );
+      } finally {
+        await sub.cancel();
+      }
+    },
+  );
+
+  await step("messages the new device can't read aren't delivered", () async {
+    await alice1.sendText(bobDm, 'still there?');
+    await bob3.sync();
+    await alice1.sync();
+    final sent = alice1.storage.messages.singleWhere(
+      (m) => m.content == 'still there?',
+    );
+    check(!sent.delivered, 'bob-3 cannot read it, it should not be delivered');
+  });
+
+  await step('once accepted, the new chat takes over the old one', () async {
+    await alice1.client.groups.acceptDeviceReset(bob);
+    final store = alice1.storage.groupStore;
+    check(
+      (await store.getActiveGroups()).any(
+        (g) => bytesEqual(g.groupIdBytes, newDm),
+      ),
+      'the new chat should be shown',
+    );
+    check(
+      await store.getGroupByGroupId(bobDm) == null,
+      'the old chat should be gone',
+    );
+    final history = alice1.storage.messages.where(
+      (m) => m.content == 'before the reset',
+    );
+    check(
+      history.isNotEmpty && history.every((m) => bytesEqual(m.groupId, newDm)),
+      'the old messages should move to the new chat',
+    );
+    await alice1.sendText(newDm, 'welcome back');
+    await receives(bob3, (m) => m.content == 'welcome back');
+    await until('welcome back to be delivered', () async {
+      await alice1.sync();
+      return alice1.storage.messages.any(
+        (m) => m.content == 'welcome back' && m.delivered,
+      );
+    });
+  });
+
+  await step('accepting brings the contact back into group chats', () async {
+    await until('bob-3 joins the group chat', () async {
+      await bob3.sync();
+      return (await bob3.storage.groupStore.getActiveGroups()).any(
+        (g) => bytesEqual(g.groupIdBytes, groupChat),
+      );
+    });
+    final old = await alice1.core.memberIndicesForKey(
+      groupChat,
+      bob2.credential.signerPublicKey,
+    );
+    check(old.isEmpty, 'bob-2 should be removed from the group chat');
+    await bob3.sendText(groupChat, 'back in the group');
+    await receives(alice1, (m) => m.content == 'back in the group');
+    await receives(carol1, (m) => m.content == 'back in the group');
+  });
+
+  await step('other members accepting add the contact only once', () async {
+    await carol1.client.groups.acceptDeviceReset(bob);
+    final leaves = await carol1.core.memberIndicesForKey(
+      groupChat,
+      bob3.credential.signerPublicKey,
+    );
+    check(leaves.length == 1, 'bob-3 should be in the group once');
+  });
+
+  for (final d in [alice1, alice2, bob2, bob3, carol1]) {
     await d.close().catchError((_) {});
   }
   stdout.writeln(_failed == 0 ? '\nall steps passed' : '\n$_failed failed');
@@ -649,6 +838,23 @@ Future<dynamic> _service(
   final res = await http.Response.fromStream(await request.send());
   if (res.statusCode >= 300) throw RpcException(res.statusCode, res.body);
   return res.body.isEmpty ? null : jsonDecode(res.body);
+}
+
+/// A one time sign in code for [email], what the user would get emailed.
+Future<String> _emailCode(String email) async {
+  final serviceKey = _env('SUPABASE_SERVICE_ROLE_KEY');
+  final res = await http.post(
+    _runEnv.supabaseUrl.replace(path: '/auth/v1/admin/generate_link'),
+    headers: {
+      'apikey': serviceKey,
+      'Authorization': 'Bearer $serviceKey',
+      'Content-Type': 'application/json',
+    },
+    body: jsonEncode({'type': 'magiclink', 'email': email}),
+  );
+  if (res.statusCode >= 300) throw RpcException(res.statusCode, res.body);
+  final body = jsonDecode(res.body) as Map<String, dynamic>;
+  return (body['email_otp'] ?? body['properties']['email_otp']) as String;
 }
 
 /// Sends a commit [device] already merged, bypassing the checks

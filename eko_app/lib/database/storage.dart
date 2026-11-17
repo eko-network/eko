@@ -206,9 +206,18 @@ class _DriftGroupStore implements GroupStore {
   }
 
   @override
+  Future<List<MlsGroupRecord>> getHiddenGroups() async {
+    final rows = await (_db.select(
+      _db.mlsGroups,
+    )..where((t) => t.isActive.equals(false))).get();
+    return rows.map((r) => r.toRecord()).toList();
+  }
+
+  @override
   Future<void> saveGroup({
     required Uint8List groupIdBytes,
     String? displayName,
+    bool isActive = true,
   }) async {
     await _db
         .into(_db.mlsGroups)
@@ -216,8 +225,23 @@ class _DriftGroupStore implements GroupStore {
           MlsGroupsCompanion(
             groupIdBytes: Value(groupIdBytes),
             displayName: Value.absentIfNull(displayName),
+            isActive: Value(isActive),
           ),
         );
+  }
+
+  @override
+  Future<void> setGroupActive(Uint8List groupIdBytes, bool isActive) async {
+    await (_db.update(_db.mlsGroups)
+          ..where((t) => t.groupIdBytes.equals(groupIdBytes)))
+        .write(MlsGroupsCompanion(isActive: Value(isActive)));
+  }
+
+  @override
+  Future<void> deleteGroup(Uint8List groupIdBytes) async {
+    await (_db.delete(
+      _db.mlsGroups,
+    )..where((t) => t.groupIdBytes.equals(groupIdBytes))).go();
   }
 }
 
@@ -290,6 +314,15 @@ class _DriftMessageStore implements MessageStore {
       '[AppStorage] markMessageDelivered: $serverActivityId -> $count rows',
     );
     return count > 0;
+  }
+
+  @override
+  Future<void> moveMessages({
+    required Uint8List from,
+    required Uint8List to,
+  }) async {
+    await (_db.update(_db.storedMessages)..where((t) => t.groupId.equals(from)))
+        .write(StoredMessagesCompanion(groupId: Value(to)));
   }
 }
 

@@ -1,6 +1,11 @@
+import 'dart:async';
+
 import 'package:collection/collection.dart';
+import 'package:ecp/ecp.dart';
 import 'package:eko_app/localization/generated/app_localizations.dart';
+import 'package:eko_app/messenger/ecp_helpers.dart';
 import 'package:eko_app/messenger/providers/group_provider.dart';
+import 'package:eko_app/providers/ecp_provider.dart';
 import 'package:eko_app/messenger/types/group.dart';
 import 'package:eko_app/utilities/constants.dart' as c;
 import 'package:eko_app/messenger/views/chat_view.dart';
@@ -22,9 +27,18 @@ class AdaptiveChat extends ConsumerStatefulWidget {
 }
 
 class _AdaptiveChatState extends ConsumerState<AdaptiveChat> {
+  StreamSubscription<({Uri person, MlsGroupRecord? dm})>? _resets;
+
+  // the open chat as last shown, it is gone from the groups once handed over
+  GroupWithUsers? _shown;
+
   @override
   void initState() {
     super.initState();
+    ref.listenManual(asyncEcpClientProvider, (_, next) {
+      _resets?.cancel();
+      _resets = next.value?.groups.resetsAccepted.listen(_onResetAccepted);
+    }, fireImmediately: true);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final isWideScreen =
           MediaQuery.of(context).size.width >= c.messengerWideScreen;
@@ -36,6 +50,26 @@ class _AdaptiveChatState extends ConsumerState<AdaptiveChat> {
         }
       }
     });
+  }
+
+  @override
+  void dispose() {
+    _resets?.cancel();
+    super.dispose();
+  }
+
+  /// Accepting a contact's device reset hands an old DM with them over to the
+  /// one they started since, which is opened in its place.
+  void _onResetAccepted(({Uri person, MlsGroupRecord? dm}) e) {
+    final shown = _shown;
+    final dm = e.dm;
+    if (!mounted || shown == null || dm == null) return;
+    if (shown.group.id != widget.selectedGroupId) return;
+    final me = uidFromActorId(ref.read(ecpClientProvider).me.id);
+    final others = shown.users.where((u) => u != me).toSet();
+    if (others.length == 1 && others.single == uidFromActorId(e.person)) {
+      context.replace('/messages/${dm.id}');
+    }
   }
 
   @override
@@ -78,6 +112,7 @@ class _AdaptiveChatState extends ConsumerState<AdaptiveChat> {
     final selectedGroup = groups.firstWhereOrNull(
       (item) => item.group.id == widget.selectedGroupId,
     );
+    if (selectedGroup != null) _shown = selectedGroup;
 
     return ResizablePanel(
       key: ValueKey(constraints.maxWidth),
@@ -117,6 +152,7 @@ class _AdaptiveChatState extends ConsumerState<AdaptiveChat> {
     final selectedGroup = groups.firstWhereOrNull(
       (item) => item.group.id == widget.selectedGroupId,
     );
+    if (selectedGroup != null) _shown = selectedGroup;
 
     if (widget.selectedGroupId == null || selectedGroup == null) {
       return GroupList(

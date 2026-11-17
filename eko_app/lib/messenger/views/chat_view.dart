@@ -1,12 +1,17 @@
+import 'dart:async';
+
 import 'package:cupertino_interactive_keyboard/cupertino_interactive_keyboard.dart'; // FIXME remove when this issue is closed https://github.com/flutter/flutter/issues/57609
 import 'package:ecp/ecp.dart' as ecp;
 import 'package:eko_app/localization/generated/app_localizations.dart';
+import 'package:eko_app/messenger/ecp_helpers.dart';
 import 'package:eko_app/messenger/providers/message_provider.dart';
 import 'package:eko_app/messenger/types/group.dart';
+import 'package:eko_app/messenger/views/device_warning.dart';
 import 'package:eko_app/messenger/widgets/group_card.dart';
 import 'package:eko_app/messenger/widgets/media_picker.dart';
 import 'package:eko_app/messenger/widgets/message.dart';
 import 'package:eko_app/providers/ecp_provider.dart';
+import 'package:eko_app/providers/user_provider.dart';
 import 'package:eko_app/utilities/emoji_text_style.dart';
 import 'package:eko_app/utilities/platform.dart' as platform;
 import 'package:eko_app/widgets/errors/snack_bar.dart';
@@ -42,10 +47,27 @@ class _ChatViewState extends ConsumerState<ChatView>
   bool _showMediaPicker = false;
   Map<Uri, ecp.Image> _selectedGifs = {};
 
+  // members whose devices were reset and not accepted yet, messages here
+  // don't reach their new devices
+  final _changed = <Uri>{};
+  StreamSubscription<ecp.GroupDeviceWarning>? _warnings;
+  StreamSubscription<({Uri person, ecp.MlsGroupRecord? dm})>? _accepted;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    ref.listenManual(asyncEcpClientProvider, (_, next) {
+      _warnings?.cancel();
+      _accepted?.cancel();
+      final groups = next.value?.groups;
+      _warnings = groups?.deviceWarnings.listen((warning) {
+        if (warning.unverified && _isMember(warning.owner) && mounted) {
+          setState(() => _changed.add(warning.owner));
+        }
+      });
+      _accepted = groups?.resetsAccepted.listen(_onResetAccepted);
+    }, fireImmediately: true);
     _focusNode.addListener(() {
       if (_focusNode.hasFocus) {
         setState(() {
@@ -62,22 +84,105 @@ class _ChatViewState extends ConsumerState<ChatView>
   @override
   void didUpdateWidget(ChatView oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.group.group.id != widget.group.group.id) _verifyMembers();
+    if (oldWidget.group.group.id != widget.group.group.id) {
+      _changed.clear();
+      _verifyMembers();
+    }
   }
 
   /// Checks the chat's devices against their users' device chains, problems
-  /// show up through DeviceWarningHandler.
+  /// show up through DeviceWarningHandler, unaccepted device resets also in
+  /// a banner here.
   void _verifyMembers() {
-    final groupId = widget.group.group.groupIdBytes;
+    final group = widget.group.group;
     ref
         .read(ecpClientProvider)
         .groups
-        .verifyGroup(groupId)
+        .verifyGroup(group.groupIdBytes)
+        .then<void>((unverified) {
+          if (!mounted || widget.group.group.id != group.id) return;
+          setState(
+            () => _changed
+              ..clear()
+              ..addAll(unverified),
+          );
+        })
         .catchError((Object e) => debugPrint('[ChatView] verifyGroup: $e'));
+  }
+
+  bool _isMember(Uri owner) =>
+      widget.group.users.contains(uidFromActorId(owner));
+
+  // an old DM that is handed over is left by AdaptiveChat
+  void _onResetAccepted(({Uri person, ecp.MlsGroupRecord? dm}) e) {
+    if (mounted && _changed.contains(e.person)) {
+      setState(() => _changed.remove(e.person));
+    }
+  }
+
+  Future<void> _review(Uri owner, String name) async {
+    if (!await confirmDevicesChanged(context, name)) return;
+    try {
+      await ref
+          .read(ecpClientProvider)
+          .groups
+          .acceptDeviceReset(ecp.Person.fromId(owner));
+    } catch (e) {
+      debugPrint('[ChatView] acceptDeviceReset: $e');
+      if (!mounted) return;
+      showSnackBar(
+        text: AppLocalizations.of(context)!.defaultErrorTitle,
+        context: context,
+        variant: SnackBarVariant.destructive,
+      );
+    }
+  }
+
+  Widget _buildChangedBanner(BuildContext context, Uri owner) {
+    final l10n = AppLocalizations.of(context)!;
+    final colorScheme = Theme.of(context).colorScheme;
+    final uid = uidFromActorId(owner);
+    final name = ref.watch(userProvider(uid)).value?.name ?? uid;
+    return Material(
+      color: colorScheme.errorContainer,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
+        child: Row(
+          children: [
+            Icon(Icons.warning_amber_rounded, color: colorScheme.error),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l10n.messengerDevicesChangedTitle(name),
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: colorScheme.onErrorContainer,
+                    ),
+                  ),
+                  Text(
+                    l10n.messengerDevicesChangedBanner,
+                    style: TextStyle(color: colorScheme.onErrorContainer),
+                  ),
+                ],
+              ),
+            ),
+            TextButton(
+              onPressed: () => _review(owner, name),
+              child: Text(l10n.messengerDevicesChangedReview),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
   void dispose() {
+    _warnings?.cancel();
+    _accepted?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     _focusNode.dispose();
     _messageController.dispose();
@@ -344,6 +449,7 @@ class _ChatViewState extends ConsumerState<ChatView>
       ),
       body: Column(
         children: [
+          for (final owner in _changed) _buildChangedBanner(context, owner),
           Expanded(
             child: messagesAsync.when(
               data: (messages) {

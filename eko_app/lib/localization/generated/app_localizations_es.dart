@@ -544,6 +544,10 @@ class AppLocalizationsEs extends AppLocalizations {
       'Registra este dispositivo para enviar y recibir mensajes cifrados de extremo a extremo.';
 
   @override
+  String get messengerDeviceRemoved =>
+      'Este dispositivo se eliminó de tu cuenta, así que se borraron sus chats. Activa los mensajes para configurarlo de nuevo y luego apruébalo desde otro dispositivo.';
+
+  @override
   String get enableMessages => 'Activar mensajes';
 
   @override
@@ -697,10 +701,53 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get messengerDevicesChangedBody =>
-      'Sus dispositivos se restablecieron, por ejemplo porque los perdió o cerró sesión en todos. Si no lo esperabas, confírmalo primero con esa persona: alguien más podría intentar leer tus mensajes.';
+      'Sus dispositivos se restablecieron, por ejemplo porque los perdió o cerró sesión en todos. Si no lo esperabas, confírmalo primero con esa persona: alguien más podría intentar leer tus mensajes. Sus chats nuevos quedan ocultos hasta que continúes.';
 
   @override
   String get messengerDevicesChangedContinue => 'Continuar';
+
+  @override
+  String get messengerDevicesChangedBanner =>
+      'Tus mensajes aquí no llegarán a sus nuevos dispositivos hasta que revises el cambio.';
+
+  @override
+  String get messengerDevicesChangedReview => 'Revisar';
+
+  @override
+  String get messengerLostDevices =>
+      '¿No puedes acceder a tus otros dispositivos?';
+
+  @override
+  String get messengerResetDevicesTitle => '¿Restablecer tus dispositivos?';
+
+  @override
+  String get messengerResetDevicesBody =>
+      'Si ningún otro dispositivo puede aprobar este, puedes convertirlo en tu único dispositivo. Tus otros dispositivos pierden el acceso a tus chats y su historial de mensajes no se trae. Se avisará a tus contactos de que tus dispositivos cambiaron, y volverás a cada chat cuando alguien en él lo acepte.';
+
+  @override
+  String get messengerResetDevicesSendCode => 'Enviarme un código';
+
+  @override
+  String messengerResetDevicesCodeBody(String email) {
+    return 'Introduce el código que enviamos a $email.';
+  }
+
+  @override
+  String get messengerResetDevicesCodeHint => 'Código';
+
+  @override
+  String get messengerResetDevices => 'Restablecer dispositivos';
+
+  @override
+  String get messengerResendCode => 'Reenviar código';
+
+  @override
+  String get messengerResetCodeSendFailed =>
+      'No se pudo enviar el código. Inténtalo de nuevo en un minuto.';
+
+  @override
+  String get messengerResetDevicesFailed =>
+      'No se pudieron restablecer tus dispositivos. Revisa el código o envía uno nuevo.';
 
   @override
   String get messengerUnknownDeviceTitle =>

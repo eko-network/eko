@@ -114,18 +114,20 @@ final _supabaseKey = [
   104,
   50,
 ];
-const _useLocal = kDebugMode && (String.fromEnvironment('USE_LOCAL') == '1');
-const supabaseUrl = _useLocal
+
+/// debug builds run against the local stack from scripts/dev.sh
+const useLocal = kDebugMode && (String.fromEnvironment('USE_LOCAL') == '1');
+const supabaseUrl = useLocal
     ? String.fromEnvironment('SUPABASE_URL')
     : 'https://nkwizistugahxfwdwtwg.supabase.co';
-final supabaseKey = _useLocal
+final supabaseKey = useLocal
     ? String.fromEnvironment('SUPABASE_PUBLISHABLE_KEY')
     : String.fromCharCodes(_supabaseKey);
 final klipyKey = String.fromCharCodes(_klipyKey);
 
 /// eko-messenger server; override with --dart-define=MESSENGER_URL=...
 final messengerUrl = Uri.parse(
-  _useLocal
+  useLocal
       ? const String.fromEnvironment(
           'MESSENGER_URL',
           defaultValue: 'http://localhost:3000',

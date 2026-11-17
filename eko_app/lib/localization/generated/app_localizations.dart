@@ -1116,6 +1116,12 @@ abstract class AppLocalizations {
   /// **'Register this device to send and receive end-to-end encrypted messages.'**
   String get messengerSetupBody;
 
+  /// No description provided for @messengerDeviceRemoved.
+  ///
+  /// In en, this message translates to:
+  /// **'This device was removed from your account, so its chats were cleared from it. Enable messages to set it up again, then approve it from another device.'**
+  String get messengerDeviceRemoved;
+
   /// No description provided for @enableMessages.
   ///
   /// In en, this message translates to:
@@ -1389,7 +1395,7 @@ abstract class AppLocalizations {
   /// No description provided for @messengerDevicesChangedBody.
   ///
   /// In en, this message translates to:
-  /// **'Their devices were reset, for example because they lost them or signed out everywhere. If you didn\'t expect this, check with them first: someone else could be trying to read your messages.'**
+  /// **'Their devices were reset, for example because they lost them or signed out everywhere. If you didn\'t expect this, check with them first: someone else could be trying to read your messages. Their new chats stay hidden until you continue.'**
   String get messengerDevicesChangedBody;
 
   /// No description provided for @messengerDevicesChangedContinue.
@@ -1397,6 +1403,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Continue'**
   String get messengerDevicesChangedContinue;
+
+  /// No description provided for @messengerDevicesChangedBanner.
+  ///
+  /// In en, this message translates to:
+  /// **'Your messages here won\'t reach their new devices until you review the change.'**
+  String get messengerDevicesChangedBanner;
+
+  /// No description provided for @messengerDevicesChangedReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Review'**
+  String get messengerDevicesChangedReview;
+
+  /// No description provided for @messengerLostDevices.
+  ///
+  /// In en, this message translates to:
+  /// **'Can\'t access your other devices?'**
+  String get messengerLostDevices;
+
+  /// No description provided for @messengerResetDevicesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset your devices?'**
+  String get messengerResetDevicesTitle;
+
+  /// No description provided for @messengerResetDevicesBody.
+  ///
+  /// In en, this message translates to:
+  /// **'If no other device can approve this one, you can make it your only device instead. Your other devices lose access to your chats, and their message history doesn\'t come with you. Your contacts are told your devices changed, and you\'re back in each chat once someone in it accepts that.'**
+  String get messengerResetDevicesBody;
+
+  /// No description provided for @messengerResetDevicesSendCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Email me a code'**
+  String get messengerResetDevicesSendCode;
+
+  /// No description provided for @messengerResetDevicesCodeBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the code we sent to {email}.'**
+  String messengerResetDevicesCodeBody(String email);
+
+  /// No description provided for @messengerResetDevicesCodeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Code'**
+  String get messengerResetDevicesCodeHint;
+
+  /// No description provided for @messengerResetDevices.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset devices'**
+  String get messengerResetDevices;
+
+  /// No description provided for @messengerResendCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Resend code'**
+  String get messengerResendCode;
+
+  /// No description provided for @messengerResetCodeSendFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t send the code. Try again in a minute.'**
+  String get messengerResetCodeSendFailed;
+
+  /// No description provided for @messengerResetDevicesFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t reset your devices. Check the code, or send a new one.'**
+  String get messengerResetDevicesFailed;
 
   /// No description provided for @messengerUnknownDeviceTitle.
   ///

@@ -117,7 +117,13 @@ class _ConversationListState extends ConsumerState<GroupList> {
         if (!mounted || !await confirmDevicesChanged(context, user.name)) {
           return;
         }
-        await client.devices.trust(peer);
+        try {
+          // brings them back into shared chats, the DM included, which the
+          // createGroup below then reuses
+          await client.groups.acceptDeviceReset(peer);
+        } on EcpException catch (e) {
+          debugPrint('[GroupList] acceptDeviceReset: $e');
+        }
         await client.groups.createGroup([peer]);
       }
       if (!mounted) return;

@@ -33,7 +33,7 @@ final class EcpCoreHolderProvider
   EcpCoreHolder create() => EcpCoreHolder();
 }
 
-String _$ecpCoreHolderHash() => r'188d19b1366cce309f51fcbc66ea9f80fa5958c4';
+String _$ecpCoreHolderHash() => r'0189c0f0964c5bac2b1813ea374e34086c41a49e';
 
 abstract class _$EcpCoreHolder extends $AsyncNotifier<EcpCore?> {
   FutureOr<EcpCore?> build();
@@ -46,6 +46,69 @@ abstract class _$EcpCoreHolder extends $AsyncNotifier<EcpCore?> {
             as $ClassProviderElement<
               AnyNotifier<AsyncValue<EcpCore?>, EcpCore?>,
               AsyncValue<EcpCore?>,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
+  }
+}
+
+/// Whether messenger setup should say this device was removed from the
+/// user's account, see [EcpCoreHolder.checkDeviceRemoved].
+
+@ProviderFor(DeviceRemovedNotice)
+final deviceRemovedNoticeProvider = DeviceRemovedNoticeProvider._();
+
+/// Whether messenger setup should say this device was removed from the
+/// user's account, see [EcpCoreHolder.checkDeviceRemoved].
+final class DeviceRemovedNoticeProvider
+    extends $NotifierProvider<DeviceRemovedNotice, bool> {
+  /// Whether messenger setup should say this device was removed from the
+  /// user's account, see [EcpCoreHolder.checkDeviceRemoved].
+  DeviceRemovedNoticeProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'deviceRemovedNoticeProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$deviceRemovedNoticeHash();
+
+  @$internal
+  @override
+  DeviceRemovedNotice create() => DeviceRemovedNotice();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(bool value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<bool>(value),
+    );
+  }
+}
+
+String _$deviceRemovedNoticeHash() =>
+    r'a4fd151442f064c6b6a223967679b722a2ddeaf9';
+
+/// Whether messenger setup should say this device was removed from the
+/// user's account, see [EcpCoreHolder.checkDeviceRemoved].
+
+abstract class _$DeviceRemovedNotice extends $Notifier<bool> {
+  bool build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<bool, bool>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<bool, bool>,
+              bool,
               Object?,
               Object?
             >;

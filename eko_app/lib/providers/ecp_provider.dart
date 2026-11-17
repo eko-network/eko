@@ -34,8 +34,10 @@ Future<EcpClient> asyncEcpClient(Ref ref) async {
     throw StateError('EcpClient accessed before auth or on web');
   }
 
+  final holder = ref.read(ecpCoreHolderProvider.notifier);
   final httpClient = AuthenticatedClient(
     () => supabase.auth.currentSession?.accessToken,
+    onDeviceRemoved: () => unawaited(holder.checkDeviceRemoved()),
   );
 
   ref.onDispose(() {

@@ -539,6 +539,10 @@ class AppLocalizationsHi extends AppLocalizations {
       'एंड-टू-एंड एन्क्रिप्टेड संदेश भेजने और प्राप्त करने के लिए इस डिवाइस को पंजीकृत करें।';
 
   @override
+  String get messengerDeviceRemoved =>
+      'यह डिवाइस आपके खाते से हटा दिया गया था, इसलिए इसकी चैट इससे मिटा दी गईं। इसे फिर से सेट करने के लिए संदेश चालू करें, फिर इसे किसी दूसरे डिवाइस से स्वीकृत करें।';
+
+  @override
   String get enableMessages => 'संदेश सक्षम करें';
 
   @override
@@ -689,10 +693,52 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get messengerDevicesChangedBody =>
-      'उनके डिवाइस रीसेट हो गए हैं, उदाहरण के लिए क्योंकि वे खो गए या उन्होंने हर जगह से साइन आउट किया। अगर आपको इसकी उम्मीद नहीं थी, तो पहले उनसे पुष्टि करें: कोई और आपके संदेश पढ़ने की कोशिश कर सकता है।';
+      'उनके डिवाइस रीसेट हो गए हैं, उदाहरण के लिए क्योंकि वे खो गए या उन्होंने हर जगह से साइन आउट किया। अगर आपको इसकी उम्मीद नहीं थी, तो पहले उनसे पुष्टि करें: कोई और आपके संदेश पढ़ने की कोशिश कर सकता है। उनकी नई चैट तब तक छिपी रहेंगी जब तक आप जारी नहीं रखते।';
 
   @override
   String get messengerDevicesChangedContinue => 'जारी रखें';
+
+  @override
+  String get messengerDevicesChangedBanner =>
+      'जब तक आप बदलाव की समीक्षा नहीं करते, यहाँ आपके संदेश उनके नए डिवाइस तक नहीं पहुँचेंगे।';
+
+  @override
+  String get messengerDevicesChangedReview => 'समीक्षा करें';
+
+  @override
+  String get messengerLostDevices => 'अपने दूसरे डिवाइस तक पहुंच नहीं है?';
+
+  @override
+  String get messengerResetDevicesTitle => 'अपने डिवाइस रीसेट करें?';
+
+  @override
+  String get messengerResetDevicesBody =>
+      'अगर कोई दूसरा डिवाइस इसे स्वीकृत नहीं कर सकता, तो आप इसे अपना एकमात्र डिवाइस बना सकते हैं। आपके दूसरे डिवाइस आपकी चैट तक पहुंच खो देंगे, और उनका संदेश इतिहास साथ नहीं आएगा। आपके संपर्कों को बताया जाएगा कि आपके डिवाइस बदल गए हैं, और जब किसी चैट में कोई इसे स्वीकार करेगा, तो आप उस चैट में वापस आ जाएंगे।';
+
+  @override
+  String get messengerResetDevicesSendCode => 'मुझे कोड ईमेल करें';
+
+  @override
+  String messengerResetDevicesCodeBody(String email) {
+    return '$email पर भेजा गया कोड दर्ज करें।';
+  }
+
+  @override
+  String get messengerResetDevicesCodeHint => 'कोड';
+
+  @override
+  String get messengerResetDevices => 'डिवाइस रीसेट करें';
+
+  @override
+  String get messengerResendCode => 'कोड फिर से भेजें';
+
+  @override
+  String get messengerResetCodeSendFailed =>
+      'कोड नहीं भेजा जा सका। एक मिनट बाद फिर कोशिश करें।';
+
+  @override
+  String get messengerResetDevicesFailed =>
+      'आपके डिवाइस रीसेट नहीं हो सके। कोड जांचें, या नया कोड भेजें।';
 
   @override
   String get messengerUnknownDeviceTitle => 'चैट में अज्ञात डिवाइस';

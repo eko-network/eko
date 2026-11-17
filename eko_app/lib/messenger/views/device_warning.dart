@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:ecp/ecp.dart';
 import 'package:eko_app/localization/generated/app_localizations.dart';
 import 'package:eko_app/messenger/ecp_helpers.dart';
+import 'package:eko_app/providers/ecp_core_provider.dart';
 import 'package:eko_app/providers/ecp_provider.dart';
 import 'package:eko_app/providers/user_provider.dart';
 import 'package:flutter/material.dart';
@@ -60,7 +61,13 @@ class _DeviceWarningHandlerState extends ConsumerState<DeviceWarningHandler> {
     super.initState();
     ref.listenManual(asyncEcpClientProvider, (_, next) {
       _subscription?.cancel();
-      _subscription = next.value?.groups.deviceWarnings.listen(_queue);
+      final groups = next.value?.groups;
+      _subscription = groups?.deviceWarnings.listen(_queue);
+      // warns again about chats still hidden from before, e.g. ones joined
+      // while the app was in the background
+      groups?.verifyHiddenGroups().catchError(
+        (Object e) => debugPrint('[DeviceWarning] verifyHiddenGroups: $e'),
+      );
     }, fireImmediately: true);
   }
 
@@ -76,7 +83,12 @@ class _DeviceWarningHandlerState extends ConsumerState<DeviceWarningHandler> {
         _accepted.contains(warning.owner)) {
       return;
     }
-    final key = (warning.owner, warning.addedBy, warning.unverified);
+    // a reset is one question however many chats it shows up in
+    final key = (
+      warning.owner,
+      warning.unverified ? null : warning.addedBy,
+      warning.unverified,
+    );
     if (!_pending.add(key)) return;
     _shown = _shown.then((_) async {
       try {
@@ -97,11 +109,19 @@ class _DeviceWarningHandlerState extends ConsumerState<DeviceWarningHandler> {
     if (!mounted) return;
 
     if (warning.unverified) {
-      if (!await confirmDevicesChanged(context, owner)) return;
       final client = ref.read(ecpClientProvider);
-      await client.devices.trust(Person.fromId(warning.owner));
+      // the user's own devices were reset from another one, which removed
+      // this one, rather than a contact's
+      if (warning.owner == client.me.id) {
+        await ref.read(ecpCoreHolderProvider.notifier).checkDeviceRemoved();
+        return;
+      }
+      final person = Person.fromId(warning.owner);
+      // accepted meanwhile, from a warning about another chat
+      if (await _isTrusted(client, person) || !mounted) return;
+      if (!await confirmDevicesChanged(context, owner)) return;
       _accepted.add(warning.owner);
-      await client.groups.verifyGroup(warning.groupId);
+      await client.groups.acceptDeviceReset(person);
       return;
     }
 
@@ -123,6 +143,17 @@ class _DeviceWarningHandlerState extends ConsumerState<DeviceWarningHandler> {
         ],
       ),
     );
+  }
+
+  Future<bool> _isTrusted(EcpClient client, Person person) async {
+    try {
+      await client.devices.fetch(person);
+      return true;
+    } on EcpDeviceChainChangedException {
+      return false;
+    } on EcpDeviceChainException {
+      return false;
+    }
   }
 
   Future<String> _name(Uri actor) async {

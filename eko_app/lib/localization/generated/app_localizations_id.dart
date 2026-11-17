@@ -540,6 +540,10 @@ class AppLocalizationsId extends AppLocalizations {
       'Daftarkan perangkat ini untuk mengirim dan menerima pesan terenkripsi ujung ke ujung.';
 
   @override
+  String get messengerDeviceRemoved =>
+      'Perangkat ini telah dihapus dari akun Anda, jadi obrolannya dihapus dari perangkat ini. Aktifkan pesan untuk menyiapkannya lagi, lalu setujui dari perangkat lain.';
+
+  @override
   String get enableMessages => 'Aktifkan pesan';
 
   @override
@@ -691,10 +695,52 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get messengerDevicesChangedBody =>
-      'Perangkat mereka direset, misalnya karena hilang atau mereka keluar dari semua perangkat. Jika kamu tidak menduganya, pastikan dulu dengan mereka: orang lain mungkin mencoba membaca pesanmu.';
+      'Perangkat mereka direset, misalnya karena hilang atau mereka keluar dari semua perangkat. Jika kamu tidak menduganya, pastikan dulu dengan mereka: orang lain mungkin mencoba membaca pesanmu. Chat baru dari mereka tetap tersembunyi sampai kamu melanjutkan.';
 
   @override
   String get messengerDevicesChangedContinue => 'Lanjutkan';
+
+  @override
+  String get messengerDevicesChangedBanner =>
+      'Pesan Anda di sini tidak akan sampai ke perangkat baru mereka sampai Anda meninjau perubahannya.';
+
+  @override
+  String get messengerDevicesChangedReview => 'Tinjau';
+
+  @override
+  String get messengerLostDevices => 'Tidak bisa mengakses perangkat lainmu?';
+
+  @override
+  String get messengerResetDevicesTitle => 'Reset perangkatmu?';
+
+  @override
+  String get messengerResetDevicesBody =>
+      'Jika tidak ada perangkat lain yang bisa menyetujui perangkat ini, kamu bisa menjadikannya satu-satunya perangkatmu. Perangkat lainmu kehilangan akses ke chatmu, dan riwayat pesannya tidak ikut. Kontakmu akan diberi tahu bahwa perangkatmu berubah, dan kamu kembali ke setiap chat setelah seseorang di dalamnya menerimanya.';
+
+  @override
+  String get messengerResetDevicesSendCode => 'Kirimi saya kode';
+
+  @override
+  String messengerResetDevicesCodeBody(String email) {
+    return 'Masukkan kode yang kami kirim ke $email.';
+  }
+
+  @override
+  String get messengerResetDevicesCodeHint => 'Kode';
+
+  @override
+  String get messengerResetDevices => 'Reset perangkat';
+
+  @override
+  String get messengerResendCode => 'Kirim ulang kode';
+
+  @override
+  String get messengerResetCodeSendFailed =>
+      'Kode tidak bisa dikirim. Coba lagi sebentar lagi.';
+
+  @override
+  String get messengerResetDevicesFailed =>
+      'Perangkatmu tidak bisa direset. Periksa kodenya, atau kirim kode baru.';
 
   @override
   String get messengerUnknownDeviceTitle => 'Perangkat tak dikenal di chat';

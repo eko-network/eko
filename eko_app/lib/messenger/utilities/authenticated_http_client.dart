@@ -6,7 +6,12 @@ class AuthenticatedClient extends http.BaseClient {
   final String? Function() _getToken;
   final http.Client _inner;
 
-  AuthenticatedClient(this._getToken) : _inner = http.Client();
+  /// Called when the messenger server says this device was removed from the
+  /// user's account, which its token doesn't show until it expires.
+  final void Function()? onDeviceRemoved;
+
+  AuthenticatedClient(this._getToken, {this.onDeviceRemoved})
+    : _inner = http.Client();
 
   @override
   Future<http.StreamedResponse> send(http.BaseRequest request) async {
@@ -14,7 +19,9 @@ class AuthenticatedClient extends http.BaseClient {
     if (token != null && token.isNotEmpty) {
       request.headers['Authorization'] = 'Bearer $token';
     }
-    return _inner.send(request).timeout(messagesServerTimeout);
+    final response = await _inner.send(request).timeout(messagesServerTimeout);
+    if (response.statusCode == 410) onDeviceRemoved?.call();
+    return response;
   }
 
   @override
