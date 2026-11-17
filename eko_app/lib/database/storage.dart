@@ -31,8 +31,8 @@ class AppStorage extends Storage {
       await _db.delete(_db.mlsGroups).go();
       await _db.delete(_db.mlsEngineConfigs).go();
       await _db.delete(_db.processedObjects).go();
-      await _db.delete(_db.storedMessages).go();
       await _db.delete(_db.messageAttachments).go();
+      await _db.delete(_db.storedMessages).go();
       await _db.delete(_db.deviceChainPins).go();
     });
     if (config != null) {
@@ -219,13 +219,19 @@ class _DriftGroupStore implements GroupStore {
     String? displayName,
     bool isActive = true,
   }) async {
+    final row = MlsGroupsCompanion(
+      groupIdBytes: Value(groupIdBytes),
+      displayName: Value.absentIfNull(displayName),
+      isActive: Value(isActive),
+    );
+    // the id is autoincremented, so the conflict has to be on the group id
     await _db
         .into(_db.mlsGroups)
-        .insertOnConflictUpdate(
-          MlsGroupsCompanion(
-            groupIdBytes: Value(groupIdBytes),
-            displayName: Value.absentIfNull(displayName),
-            isActive: Value(isActive),
+        .insert(
+          row,
+          onConflict: DoUpdate(
+            (_) => row,
+            target: [_db.mlsGroups.groupIdBytes],
           ),
         );
   }

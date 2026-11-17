@@ -1487,6 +1487,10 @@ class $MlsGroupsTable extends MlsGroups
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {groupIdBytes},
+  ];
+  @override
   MlsGroupRow map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return MlsGroupRow(
@@ -2706,7 +2710,7 @@ class $MessageAttachmentsTable extends MessageAttachments
         type: DriftSqlType.string,
         requiredDuringInsert: true,
         defaultConstraints: GeneratedColumn.constraintIsAlways(
-          'REFERENCES stored_messages (server_activity_id)',
+          'REFERENCES stored_messages (server_activity_id) ON DELETE CASCADE',
         ),
       ).withConverter<Uri>($MessageAttachmentsTable.$convertermessageId);
   @override
@@ -2773,7 +2777,7 @@ class $MessageAttachmentsTable extends MessageAttachments
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => const {};
+  Set<GeneratedColumn> get $primaryKey => {messageId, position};
   @override
   MessageAttachmentRow map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -3049,6 +3053,10 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $StoredMessagesTable storedMessages = $StoredMessagesTable(this);
   late final $MessageAttachmentsTable messageAttachments =
       $MessageAttachmentsTable(this);
+  late final Index storedMessagesGroupReceived = Index(
+    'stored_messages_group_received',
+    'CREATE INDEX stored_messages_group_received ON stored_messages (group_id, received_at)',
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -3064,7 +3072,18 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     processedObjects,
     storedMessages,
     messageAttachments,
+    storedMessagesGroupReceived,
   ];
+  @override
+  StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'stored_messages',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('message_attachments', kind: UpdateKind.delete)],
+    ),
+  ]);
 }
 
 typedef $$ApprovalRequestTableCreateCompanionBuilder =

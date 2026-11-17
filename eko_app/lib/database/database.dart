@@ -107,6 +107,11 @@ class MlsGroups extends Table {
   DateTimeColumn get lastActivityAt =>
       dateTime().withDefault(currentDateAndTime)();
   BoolColumn get isActive => boolean().withDefault(const Constant(true))();
+
+  @override
+  List<Set<Column>> get uniqueKeys => [
+    {groupIdBytes},
+  ];
 }
 
 @DataClassName('ApprovalRequestRow')
@@ -147,6 +152,11 @@ class ProcessedObjects extends Table {
 }
 
 @DataClassName('StoredMessageRow')
+// chat views and previews read a group's messages by time
+@TableIndex(
+  name: 'stored_messages_group_received',
+  columns: {#groupId, #receivedAt},
+)
 class StoredMessages extends Table {
   TextColumn get serverActivityId => text().map(const UriTypeConverter())();
   DateTimeColumn get receivedAt => dateTime()();
@@ -166,11 +176,18 @@ class StoredMessages extends Table {
 class MessageAttachments extends Table {
   TextColumn get messageId => text()
       .map(const UriTypeConverter())
-      .references(StoredMessages, #serverActivityId)();
+      .references(
+        StoredMessages,
+        #serverActivityId,
+        onDelete: KeyAction.cascade,
+      )();
   TextColumn get attachmentId => text().map(const InternalIdConverter())();
   IntColumn get position => integer().withDefault(const Constant(0))();
   // the full ActivityPub object, needed to render it (url, size, media type)
   TextColumn get object => text().map(const JsonValueConverter()).nullable()();
+
+  @override
+  Set<Column> get primaryKey => {messageId, position};
 }
 
 // --- Database ---

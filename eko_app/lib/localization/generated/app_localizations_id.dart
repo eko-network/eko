@@ -299,10 +299,16 @@ class AppLocalizationsId extends AppLocalizations {
   String get chats => 'Chats';
 
   @override
+  String get newGroup => 'New group';
+
+  @override
   String get newMessage => 'Pesan baru';
 
   @override
   String get noMessagesYet => 'Belum ada pesan';
+
+  @override
+  String get sentAnAttachment => 'Sent an attachment';
 
   @override
   String get typeAMessage => 'Ketik pesan';

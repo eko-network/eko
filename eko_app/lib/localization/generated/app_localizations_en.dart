@@ -299,10 +299,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chats => 'Chats';
 
   @override
+  String get newGroup => 'New group';
+
+  @override
   String get newMessage => 'New message';
 
   @override
   String get noMessagesYet => 'No messages yet';
+
+  @override
+  String get sentAnAttachment => 'Sent an attachment';
 
   @override
   String get typeAMessage => 'Type a message';

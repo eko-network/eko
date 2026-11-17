@@ -1,4 +1,5 @@
 import 'package:eko_app/localization/generated/app_localizations.dart';
+import 'package:eko_app/messenger/providers/message_provider.dart';
 import 'package:eko_app/messenger/types/group.dart';
 import 'package:eko_app/messenger/widgets/relative_time.dart';
 import 'package:eko_app/providers/current_user_provider.dart';
@@ -82,6 +83,28 @@ class GroupIcon extends ConsumerWidget {
   }
 }
 
+class GroupSubtitle extends ConsumerWidget {
+  final GroupWithUsers group;
+  const GroupSubtitle({super.key, required this.group});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+    final last = ref.watch(lastMessageProvider(group.group.groupIdBytes)).value;
+    final content = last?.content?.trim() ?? '';
+    final text = last == null
+        ? l10n.noMessagesYet
+        : content.isNotEmpty
+        // one line in the list, so line breaks become spaces
+        ? content.replaceAll(RegExp(r'\s+'), ' ')
+        : last.hasAttachment
+        ? l10n.sentAnAttachment
+        : '';
+
+    return Text(text, maxLines: 1, overflow: TextOverflow.ellipsis);
+  }
+}
+
 class GroupCard extends ConsumerWidget {
   final GroupWithUsers group;
   final bool isSelected;
@@ -103,9 +126,7 @@ class GroupCard extends ConsumerWidget {
       selected: isSelected,
       leading: showOnlyAvatar ? null : pfp,
       title: showOnlyAvatar ? pfp : GroupTitle(group: group),
-      subtitle: showOnlyAvatar
-          ? null
-          : Text('group', maxLines: 1, overflow: TextOverflow.ellipsis),
+      subtitle: showOnlyAvatar ? null : GroupSubtitle(group: group),
       trailing: showOnlyAvatar
           ? null
           : RelativeTimeWidget(time: group.group.lastActivityAt!),

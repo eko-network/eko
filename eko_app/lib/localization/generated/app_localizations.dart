@@ -660,6 +660,12 @@ abstract class AppLocalizations {
   /// **'Chats'**
   String get chats;
 
+  /// No description provided for @newGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'New group'**
+  String get newGroup;
+
   /// No description provided for @newMessage.
   ///
   /// In en, this message translates to:
@@ -671,6 +677,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No messages yet'**
   String get noMessagesYet;
+
+  /// No description provided for @sentAnAttachment.
+  ///
+  /// In en, this message translates to:
+  /// **'Sent an attachment'**
+  String get sentAnAttachment;
 
   /// No description provided for @typeAMessage.
   ///

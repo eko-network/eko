@@ -19,6 +19,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:klipy_dart/klipy_dart.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 enum MessagePosition { middle, bottom, top, single }
 
@@ -350,8 +351,10 @@ class _ChatViewState extends ConsumerState<ChatView>
                       keyboardType: TextInputType.multiline,
                       decoration: InputDecoration(
                         prefixIcon: IconButton(
-                          icon: const Icon(
-                            Icons.emoji_emotions_outlined,
+                          icon: Icon(
+                            platform.isMobile
+                                ? LucideIcons.imagePlay
+                                : LucideIcons.smilePlus,
                             size: 24,
                           ),
                           onPressed: () {
@@ -555,10 +558,10 @@ class _ChatViewState extends ConsumerState<ChatView>
                 if (platform.isMobile && _showMediaPicker)
                   SizedBox(
                     height: 400,
-                    // child: MediaPicker(
-                    //   textController: _messageController,
-                    //   onGifSelected: _onGifSelected,
-                    // ),
+                    child: MediaPicker(
+                      textController: _messageController,
+                      onGifSelected: _onGifSelected,
+                    ),
                   ),
               ],
             ),

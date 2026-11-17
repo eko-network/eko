@@ -303,10 +303,16 @@ class AppLocalizationsEs extends AppLocalizations {
   String get chats => 'Chats';
 
   @override
+  String get newGroup => 'New group';
+
+  @override
   String get newMessage => 'Nuevo mensaje';
 
   @override
   String get noMessagesYet => 'Aún no hay mensajes';
+
+  @override
+  String get sentAnAttachment => 'Sent an attachment';
 
   @override
   String get typeAMessage => 'Escribe un mensaje';

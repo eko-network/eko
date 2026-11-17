@@ -85,3 +85,94 @@ final class MessageFamily extends $Family
   @override
   String toString() => r'messageProvider';
 }
+
+/// The newest message in a group, for the chat list, or null when the group
+/// has none yet.
+
+@ProviderFor(lastMessage)
+final lastMessageProvider = LastMessageFamily._();
+
+/// The newest message in a group, for the chat list, or null when the group
+/// has none yet.
+
+final class LastMessageProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<LastMessagePreview?>,
+          LastMessagePreview?,
+          Stream<LastMessagePreview?>
+        >
+    with
+        $FutureModifier<LastMessagePreview?>,
+        $StreamProvider<LastMessagePreview?> {
+  /// The newest message in a group, for the chat list, or null when the group
+  /// has none yet.
+  LastMessageProvider._({
+    required LastMessageFamily super.from,
+    required Uint8List super.argument,
+  }) : super(
+         retry: null,
+         name: r'lastMessageProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$lastMessageHash();
+
+  @override
+  String toString() {
+    return r'lastMessageProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $StreamProviderElement<LastMessagePreview?> $createElement(
+    $ProviderPointer pointer,
+  ) => $StreamProviderElement(pointer);
+
+  @override
+  Stream<LastMessagePreview?> create(Ref ref) {
+    final argument = this.argument as Uint8List;
+    return lastMessage(ref, argument);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is LastMessageProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$lastMessageHash() => r'a1f1224dea0ea60790f7582f7ea70780ee67db5d';
+
+/// The newest message in a group, for the chat list, or null when the group
+/// has none yet.
+
+final class LastMessageFamily extends $Family
+    with $FunctionalFamilyOverride<Stream<LastMessagePreview?>, Uint8List> {
+  LastMessageFamily._()
+    : super(
+        retry: null,
+        name: r'lastMessageProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  /// The newest message in a group, for the chat list, or null when the group
+  /// has none yet.
+
+  LastMessageProvider call(Uint8List groupId) =>
+      LastMessageProvider._(argument: groupId, from: this);
+
+  @override
+  String toString() => r'lastMessageProvider';
+}

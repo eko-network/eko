@@ -76,3 +76,32 @@ Future<void> _sendPendingDeliveryAcks(
     );
   }
 }
+
+typedef LastMessagePreview = ({String? content, bool hasAttachment});
+
+/// The newest message in a group, for the chat list, or null when the group
+/// has none yet.
+@riverpod
+Stream<LastMessagePreview?> lastMessage(Ref ref, Uint8List groupId) {
+  final messages = db.storedMessages;
+  final attachments = db.messageAttachments;
+  // the join can repeat the message once per attachment, any one of those
+  // rows answers whether it has one
+  final query =
+      db.select(messages).join([
+          leftOuterJoin(
+            attachments,
+            attachments.messageId.equalsExp(messages.serverActivityId),
+          ),
+        ])
+        ..where(messages.groupId.equals(groupId))
+        ..orderBy([OrderingTerm.desc(messages.receivedAt)])
+        ..limit(1);
+  return query.watchSingleOrNull().map((row) {
+    if (row == null) return null;
+    return (
+      content: row.readTable(messages).content,
+      hasAttachment: row.readTableOrNull(attachments) != null,
+    );
+  });
+}

@@ -41,6 +41,10 @@ class GroupList extends ConsumerStatefulWidget {
 class _ConversationListState extends ConsumerState<GroupList> {
   final searchController = TextEditingController();
   bool newChatScreen = false;
+  bool newGroupMode = false;
+  bool creatingGroup = false;
+  // keyed by uid, in the order they were picked
+  final Map<String, UserModel> groupMembers = {};
   List<MapEntry<String, double>> searchData = [];
   bool searchIsEnd = false;
   Timer? debounce;
@@ -105,38 +109,64 @@ class _ConversationListState extends ConsumerState<GroupList> {
     });
   }
 
-  Future<void> onUserSelected(UserModel user) async {
-    final l10n = AppLocalizations.of(context)!;
+  void closeNewChat() {
+    setState(() {
+      newChatScreen = false;
+      newGroupMode = false;
+      groupMembers.clear();
+      searchController.clear();
+      searchData.clear();
+      searchIsEnd = false;
+      lastSearchVal = '';
+    });
+  }
 
+  void onUserSelected(UserModel user) {
+    if (!newGroupMode) {
+      createGroup([user]);
+      return;
+    }
+    setState(() {
+      if (groupMembers.remove(user.uid) == null) groupMembers[user.uid] = user;
+    });
+  }
+
+  Future<void> createGroup(List<UserModel> users) async {
+    final l10n = AppLocalizations.of(context)!;
+    final peers = [for (final user in users) EkoPerson.fromUid(user.uid)];
+    final client = ref.read(ecpClientProvider);
+    final accepted = <Uri>{};
+
+    setState(() => creatingGroup = true);
     try {
-      final peer = EkoPerson.fromUid(user.uid);
-      final client = ref.read(ecpClientProvider);
-      try {
-        await client.groups.createGroup([peer]);
-      } on EcpDeviceChainChangedException {
-        if (!mounted || !await confirmDevicesChanged(context, user.name)) {
-          return;
-        }
+      while (true) {
         try {
-          // brings them back into shared chats, the DM included, which the
-          // createGroup below then reuses
-          await client.groups.acceptDeviceReset(peer);
-        } on EcpException catch (e) {
-          debugPrint('[GroupList] acceptDeviceReset: $e');
+          await client.groups.createGroup(peers);
+          break;
+        } on EcpDeviceChainChangedException catch (e) {
+          // a second change from the same person after accepting it is a
+          // real failure, not something to ask about again
+          if (!accepted.add(e.actor)) rethrow;
+          final user = users.firstWhere(
+            (u) => actorIdFromUid(u.uid) == e.actor,
+          );
+          if (!mounted || !await confirmDevicesChanged(context, user.name)) {
+            return;
+          }
+          try {
+            // brings them back into shared chats, the DM included, which the
+            // createGroup retry then reuses
+            await client.groups.acceptDeviceReset(Person.fromId(e.actor));
+          } on EcpException catch (e) {
+            debugPrint('[GroupList] acceptDeviceReset: $e');
+          }
         }
-        await client.groups.createGroup([peer]);
       }
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(l10n.keysExchanged)));
-      setState(() {
-        newChatScreen = false;
-        searchController.clear();
-        searchData.clear();
-        searchIsEnd = false;
-        lastSearchVal = '';
-      });
+      closeNewChat();
     } catch (e, st) {
       debugPrint(e.toString());
       debugPrint(st.toString());
@@ -154,6 +184,8 @@ class _ConversationListState extends ConsumerState<GroupList> {
           ],
         ),
       );
+    } finally {
+      if (mounted) setState(() => creatingGroup = false);
     }
   }
 
@@ -249,15 +281,12 @@ class _ConversationListState extends ConsumerState<GroupList> {
                                 width: c.kConversationAvatarRadius * 2,
                                 height: c.kConversationAvatarRadius * 2,
                                 child: IconButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      newChatScreen = false;
-                                      searchController.clear();
-                                      searchData.clear();
-                                      searchIsEnd = false;
-                                      lastSearchVal = '';
-                                    });
-                                  },
+                                  onPressed: newGroupMode
+                                      ? () => setState(() {
+                                          newGroupMode = false;
+                                          groupMembers.clear();
+                                        })
+                                      : closeNewChat,
                                   icon: const Icon(Icons.chevron_left),
                                   iconSize: 24,
                                   splashRadius: c.kConversationAvatarRadius,
@@ -265,13 +294,27 @@ class _ConversationListState extends ConsumerState<GroupList> {
                               ),
                             ),
                             Text(
-                              l10n.newMessage,
+                              newGroupMode ? l10n.newGroup : l10n.newMessage,
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 22,
                                 color: Theme.of(context).colorScheme.onSurface,
                               ),
                             ),
+                            if (newGroupMode)
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: TextButton(
+                                  // one person is a DM, see onUserSelected
+                                  onPressed:
+                                      groupMembers.length < 2 || creatingGroup
+                                      ? null
+                                      : () => createGroup(
+                                          groupMembers.values.toList(),
+                                        ),
+                                  child: Text(l10n.create),
+                                ),
+                              ),
                           ],
                         ),
                       Expanded(
@@ -287,38 +330,59 @@ class _ConversationListState extends ConsumerState<GroupList> {
                             getter: onSearchLoadMore,
                             initialLoadingWidget: const UserLoader(),
                             widget: (uid) => UserCard(
-                              actionWidget: (_) => SizedBox.shrink(),
+                              actionWidget: (_) => newGroupMode
+                                  ? Icon(
+                                      groupMembers.containsKey(uid)
+                                          ? LucideIcons.circleCheck
+                                          : LucideIcons.circle,
+                                    )
+                                  : SizedBox.shrink(),
                               uid: uid,
-                              onCardPressed: onUserSelected,
+                              onCardPressed: creatingGroup
+                                  ? (_) {}
+                                  : onUserSelected,
                             ),
                             header: Column(
                               children: [
                                 SizedBox(height: 15),
-                                DecoratedBox(
-                                  decoration: BoxDecoration(
+                                if (!newGroupMode)
+                                  // Material rather than a DecoratedBox so the
+                                  // tiles' ink shows over the background
+                                  Material(
                                     color: Theme.of(
                                       context,
                                     ).colorScheme.outlineVariant,
                                     borderRadius: BorderRadius.circular(15),
+                                    clipBehavior: Clip.antiAlias,
+                                    child: Column(
+                                      children: [
+                                        _NewChatOptionTile(
+                                          icon: LucideIcons.users,
+                                          label: l10n.newGroup,
+                                          onTap: () => setState(
+                                            () => newGroupMode = true,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-
-                                  child: Column(
-                                    children: [
-                                      _NewChatOptionTile(
-                                        icon: LucideIcons.users,
-                                        label: 'New Group',
-                                      ),
-                                      _NewChatOptionTile(
-                                        icon: LucideIcons.atSign,
-                                        label: 'Find by Username',
-                                      ),
-                                      _NewChatOptionTile(
-                                        icon: LucideIcons.qrCode,
-                                        label: 'Find by QR code',
-                                      ),
-                                    ],
+                                if (groupMembers.isNotEmpty)
+                                  Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Wrap(
+                                      spacing: 8,
+                                      runSpacing: 8,
+                                      children: [
+                                        for (final user in groupMembers.values)
+                                          InputChip(
+                                            label: Text('@${user.username}'),
+                                            onDeleted: creatingGroup
+                                                ? null
+                                                : () => onUserSelected(user),
+                                          ),
+                                      ],
+                                    ),
                                   ),
-                                ),
                                 SizedBox(height: 15),
                                 UserSearchBar(controller: searchController),
                               ],
@@ -341,38 +405,46 @@ class _ConversationListState extends ConsumerState<GroupList> {
 class _NewChatOptionTile extends StatelessWidget {
   final IconData icon;
   final String label;
+  final VoidCallback? onTap;
 
-  const _NewChatOptionTile({required this.icon, required this.label});
+  const _NewChatOptionTile({
+    required this.icon,
+    required this.label,
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
-      decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(
-            color: Theme.of(context).colorScheme.surfaceContainer,
-          ),
-        ),
-      ),
-      child: Row(
-        children: [
-          Icon(icon),
-          const SizedBox(width: 15),
-          Expanded(
-            child: Text(
-              label,
-              style: TextStyle(
-                fontSize: 20,
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+        decoration: BoxDecoration(
+          border: Border(
+            bottom: BorderSide(
+              color: Theme.of(context).colorScheme.surfaceContainer,
             ),
           ),
-          Icon(
-            LucideIcons.chevronRight,
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
-          ),
-        ],
+        ),
+        child: Row(
+          children: [
+            Icon(icon),
+            const SizedBox(width: 15),
+            Expanded(
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontSize: 20,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+              ),
+            ),
+            Icon(
+              LucideIcons.chevronRight,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+          ],
+        ),
       ),
     );
   }

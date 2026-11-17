@@ -298,10 +298,16 @@ class AppLocalizationsHi extends AppLocalizations {
   String get chats => 'Chats';
 
   @override
+  String get newGroup => 'New group';
+
+  @override
   String get newMessage => 'नया संदेश';
 
   @override
   String get noMessagesYet => 'अभी तक कोई संदेश नहीं';
+
+  @override
+  String get sentAnAttachment => 'Sent an attachment';
 
   @override
   String get typeAMessage => 'एक संदेश लिखें';
