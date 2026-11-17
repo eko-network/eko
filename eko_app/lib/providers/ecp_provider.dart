@@ -4,6 +4,7 @@ import 'package:ecp/ecp.dart';
 import 'package:eko_app/messenger/utilities/authenticated_http_client.dart';
 import 'package:eko_app/providers/auth_provider.dart';
 import 'package:eko_app/providers/ecp_core_provider.dart';
+import 'package:eko_app/services/messenger_notification_service.dart';
 import 'package:eko_app/utilities/device_uid_service.dart';
 import 'package:eko_app/utilities/supabase_ref.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -60,6 +61,7 @@ void inboxPolling(Ref ref) {
   MessageStreamController? controller;
 
   void stop() {
+    MessengerNotificationService.unregisterMainIsolate();
     subscription?.cancel();
     subscription = null;
     controller = null;
@@ -67,11 +69,20 @@ void inboxPolling(Ref ref) {
 
   void start(EcpClient client) {
     stop();
+    final me = client.core.identity.id;
     controller = MessageStreamController(
       client: client,
       config: MessageStreamConfig(useWebSocket: true),
     );
-    subscription = controller!.messages().listen((_) {});
+    subscription = controller!.messages().listen(
+      (messages) =>
+          MessengerNotificationService.showForMessages(messages, me: me),
+    );
+    // the websocket may have been dropped while in the background
+    MessengerNotificationService.registerMainIsolate(() async {
+      final messages = await client.getInbox();
+      await MessengerNotificationService.showForMessages(messages, me: me);
+    });
   }
 
   ref.listen(asyncEcpClientProvider, (previous, next) {

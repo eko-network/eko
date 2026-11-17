@@ -57,6 +57,29 @@ class UnifiedPushNotificationAdapter extends NotificationPlatformAdapter {
     _onMessage?.call();
   }
 
+  static bool _launchNotificationHandled = false;
+
+  /// A tap that cold starts the app doesn't reach the response callback, the
+  /// plugin only reports it through the launch details.
+  static Future<void> _openLaunchNotification() async {
+    if (_launchNotificationHandled || !platform.isAndroid) return;
+    _launchNotificationHandled = true;
+    try {
+      await _ensureFlutterLocalNotificationsInitialized();
+      final details = await _flutterLocalNotifications
+          .getNotificationAppLaunchDetails();
+      final response = details?.notificationResponse;
+      if (details?.didNotificationLaunchApp != true || response == null) {
+        return;
+      }
+      // setHandlers runs while the router builds, navigate after that frame
+      await WidgetsBinding.instance.endOfFrame;
+      await _onLocalNotificationResponse(response);
+    } catch (e) {
+      debugPrint('[UnifiedPush] launch notification failed: $e');
+    }
+  }
+
   static bool _localNotificationsInitialized = false;
   static int _notificationId = 0;
 
@@ -198,11 +221,17 @@ class UnifiedPushNotificationAdapter extends NotificationPlatformAdapter {
             '[UnifiedPush] onMessage payloadKeys=${decoded.keys.join(",")}',
           );
 
+          final data = decoded['data'];
+          // sent by the messenger server, the content is in the encrypted inbox
+          if (data is Map && data['type'] == 'message') {
+            await MessengerNotificationService.handlePush();
+            return;
+          }
+
           final title = decoded['title'] as String? ?? 'New notification';
           final body =
               decoded['body'] as String? ?? decoded['message'] as String? ?? '';
 
-          await _ensureFlutterLocalNotificationsInitialized();
           _notificationId = (_notificationId + 1) & 0x7fffffff;
           String? payload;
           try {
@@ -210,36 +239,12 @@ class UnifiedPushNotificationAdapter extends NotificationPlatformAdapter {
           } catch (_) {
             payload = null;
           }
-          final NotificationDetails details;
-          if (platform.isAndroid) {
-            details = const NotificationDetails(
-              android: AndroidNotificationDetails(
-                _androidChannelId,
-                _androidChannelName,
-                importance: Importance.high,
-                priority: Priority.high,
-              ),
-            );
-          } else if (platform.isLinux) {
-            details = NotificationDetails(
-              linux: LinuxNotificationDetails(
-                defaultActionName: _linuxDefaultActionName,
-              ),
-            );
-          } else {
-            details = const NotificationDetails();
-          }
-          try {
-            await _flutterLocalNotifications.show(
-              id: _notificationId,
-              title: title,
-              body: body,
-              payload: payload,
-              notificationDetails: details,
-            );
-          } catch (e, st) {
-            debugPrint('[UnifiedPush] local notification show failed: $e $st');
-          }
+          await showLocalNotification(
+            id: _notificationId,
+            title: title,
+            body: body,
+            payload: payload,
+          );
 
           _onMessage?.call();
         },
@@ -253,6 +258,47 @@ class UnifiedPushNotificationAdapter extends NotificationPlatformAdapter {
       _initialized = false;
       debugPrint('[UnifiedPush] initialize failed');
       rethrow;
+    }
+  }
+
+  static Future<void> showLocalNotification({
+    required int id,
+    required String title,
+    required String body,
+    String? payload,
+    String channelId = _androidChannelId,
+    String channelName = _androidChannelName,
+  }) async {
+    await _ensureFlutterLocalNotificationsInitialized();
+    final NotificationDetails details;
+    if (platform.isAndroid) {
+      details = NotificationDetails(
+        android: AndroidNotificationDetails(
+          channelId,
+          channelName,
+          importance: Importance.high,
+          priority: Priority.high,
+        ),
+      );
+    } else if (platform.isLinux) {
+      details = NotificationDetails(
+        linux: LinuxNotificationDetails(
+          defaultActionName: _linuxDefaultActionName,
+        ),
+      );
+    } else {
+      details = const NotificationDetails();
+    }
+    try {
+      await _flutterLocalNotifications.show(
+        id: id,
+        title: title,
+        body: body,
+        payload: payload,
+        notificationDetails: details,
+      );
+    } catch (e, st) {
+      debugPrint('[UnifiedPush] local notification show failed: $e $st');
     }
   }
 
@@ -454,5 +500,6 @@ class UnifiedPushNotificationAdapter extends NotificationPlatformAdapter {
       PrefsService.notificationsEnabled =
           endpoint != null && endpoint.isNotEmpty;
     };
+    unawaited(_openLaunchNotification());
   }
 }

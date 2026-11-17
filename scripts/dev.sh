@@ -8,6 +8,7 @@
 #   scripts/dev.sh app [N]       build the Linux app, open N signed-out windows (default 2)
 #   scripts/dev.sh app alice alice bob
 #                                one signed-in window per account, each its own device
+#   scripts/dev.sh android [DEV] flutter run on a USB Android device against local services
 #   scripts/dev.sh e2e           headless multi-device test (needs `up`)
 #   scripts/dev.sh logs          follow the server and Postgres logs
 #
@@ -127,6 +128,13 @@ cmd_app() {
     windows=("$@")
   fi
   supabase_env
+  # CMake caches the compiler, so after a flake.lock update the app would still
+  # link the old glibc, which the new mesa below can't load against
+  local cache="$ROOT/eko_app/build/linux/x64/debug/CMakeCache.txt"
+  if [[ -f "$cache" ]] && ! grep -qxF "CMAKE_CXX_COMPILER:STRING=$(command -v clang++)" "$cache"; then
+    log "toolchain changed, removing the stale Linux build"
+    rm -rf "$ROOT/eko_app/build/linux"
+  fi
   log "building the Linux app against local services"
   (cd "$ROOT/eko_app" && flutter build linux --debug \
     --dart-define=USE_LOCAL=1 \
@@ -175,6 +183,24 @@ cmd_app() {
   done
 }
 
+cmd_android() {
+  # adb and the Android SDK only exist in the android dev shell
+  command -v adb >/dev/null || exec nix develop "$ROOT#android" -c "$0" android "$@"
+  supabase_env
+  port_open 3000 || die "messenger server is not running (scripts/dev.sh up)"
+  local adb=(adb ${1:+-s "$1"})
+  # the app reaches the services at 127.0.0.1, which on the phone is the
+  # phone, so forward those ports back to this machine
+  "${adb[@]}" reverse tcp:54321 tcp:54321 >/dev/null
+  "${adb[@]}" reverse tcp:3000 tcp:3000 >/dev/null
+  cd "$ROOT/eko_app"
+  exec flutter run ${1:+-d "$1"} \
+    --dart-define=USE_LOCAL=1 \
+    --dart-define=SUPABASE_URL="$API_URL" \
+    --dart-define=SUPABASE_PUBLISHABLE_KEY="$PUBLISHABLE_KEY" \
+    --dart-define=MESSENGER_URL="$MESSENGER_URL"
+}
+
 cmd_e2e() {
   supabase_env
   port_open 3000 || die "messenger server is not running (scripts/dev.sh up)"
@@ -192,7 +218,8 @@ case "${1:-}" in
   down) cmd_down ;;
   reset) cmd_reset ;;
   app) shift; cmd_app "$@" ;;
+  android) shift; cmd_android "$@" ;;
   e2e) cmd_e2e ;;
   logs) tail -n 50 -F "$LOGS"/messenger*.log ;;
-  *) sed -n '2,14p' "$0" | sed 's/^# \{0,1\}//'; exit 1 ;;
+  *) sed -n '2,15p' "$0" | sed 's/^# \{0,1\}//'; exit 1 ;;
 esac

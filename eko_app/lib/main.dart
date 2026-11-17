@@ -1,7 +1,6 @@
 import 'dart:ui';
 
 import 'package:eko_app/interfaces/notification_helper.dart';
-import 'package:eko_app/utilities/api_constants.dart' as ac;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -12,7 +11,7 @@ import 'package:eko_app/utilities/dev_auto_login.dart';
 import 'package:eko_app/utilities/logo_service.dart';
 import 'package:eko_app/utilities/provider_debugger.dart';
 import 'package:eko_app/utilities/shared_pref_service.dart';
-import 'package:eko_app/utilities/supabase_session_storage.dart';
+import 'package:eko_app/utilities/supabase_ref.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:eko_app/localization/generated/app_localizations.dart';
 import 'package:eko_app/widgets/scaffolds/check_version.dart';
@@ -30,22 +29,6 @@ Future<void> _checkFirstInstall() async {
   }
 }
 
-Future<void> _initSupabase() async {
-  final projectRef = Uri.parse(ac.supabaseUrl).host.split('.').first;
-  await Supabase.initialize(
-    url: ac.supabaseUrl,
-    anonKey: ac.supabaseKey,
-    authOptions: platform.isLinux
-        ? FlutterAuthClientOptions(
-            authFlowType: AuthFlowType.implicit,
-            localStorage: ReliableSupabaseSessionStorage(
-              persistSessionKey: 'sb-$projectRef-auth-token',
-            ),
-          )
-        : FlutterAuthClientOptions(authFlowType: AuthFlowType.implicit),
-  );
-}
-
 Future<void> main(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
   if (!kIsWeb &&
@@ -56,7 +39,7 @@ Future<void> main(List<String> args) async {
     return;
   }
   usePathUrlStrategy();
-  await Future.wait([PrefsService.init(), _initSupabase()]);
+  await Future.wait([PrefsService.init(), initSupabase()]);
   // setupLocator();
   //protected/dependent services
   await Future.wait([_checkFirstInstall(), LogoService.init()]);

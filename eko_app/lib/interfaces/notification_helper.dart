@@ -9,6 +9,7 @@ import 'package:go_router/go_router.dart';
 import 'package:eko_app/providers/following_feed_provider.dart';
 import 'package:eko_app/providers/new_feed_provider.dart';
 import 'package:eko_app/providers/popular_feed_provider.dart';
+import 'package:eko_app/services/messenger_notification_service.dart';
 import 'package:eko_app/utilities/api_constants.dart' as ac;
 import 'package:eko_app/utilities/shared_pref_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -71,6 +72,27 @@ class NotificationHelper {
         UnifiedPushNotificationAdapter.clearLinuxBackgroundLaunch();
       }
     }
+  }
+
+  /// Shows a notification from Dart, for platforms without a native push UI
+  /// (Android and Linux).
+  static Future<void> showLocalNotification({
+    required int id,
+    required String title,
+    required String body,
+    String? payload,
+    required String channelId,
+    required String channelName,
+  }) async {
+    if (!platform.isAndroid && !platform.isLinux) return;
+    await UnifiedPushNotificationAdapter.showLocalNotification(
+      id: id,
+      title: title,
+      body: body,
+      payload: payload,
+      channelId: channelId,
+      channelName: channelName,
+    );
   }
 
   /// For when a user clicks on a notification they received
@@ -162,6 +184,9 @@ class NotificationHelper {
         break;
       case 'follow':
         context.push('/users/_?uid=$path');
+        break;
+      case 'message':
+        context.go('/messages/$path');
         break;
     }
   }
