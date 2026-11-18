@@ -19,7 +19,7 @@ let
       inherit version;
       src = "${src}/rust";
       # Update when the openmls pub version changes.
-      cargoHash = "sha256-yqlEKQK5ORU93FKZuvFW78m6VDTqfTCJlV28KGHcuew=";
+      cargoHash = "sha256-1DZ2mL9Qwk8GnFBXB2UrCutalsdEUzWMkBOUcpyxoB0=";
       # Bundle sqlcipher and OpenSSL like upstream's prebuilt, so the
       # tarball doesn't depend on the host having libsqlcipher.
       dontCargoUseSystemLibs = true;
@@ -31,6 +31,10 @@ let
       cp -r ${src} $out
       chmod -R +w $out
       install -Dm755 ${lib'}/lib/libopenmls_frb.so $out/rust/target/release/libopenmls_frb.so
+      # the hook only uses a local build stamped with the crate version and
+      # the lock file it was built from, as `make build` does
+      sed -n 's/^version = "\(.*\)"/\1/p' $out/rust/Cargo.toml | head -n1 > $out/rust/target/release/.crate-version
+      cp $out/rust/Cargo.lock $out/rust/target/release/.cargo-lock
     '';
 in
 pkgs.flutter.buildFlutterApplication {
@@ -39,7 +43,7 @@ pkgs.flutter.buildFlutterApplication {
   src = lib.cleanSource ../eko_app;
   autoPubspecLock = ../eko_app/pubspec.lock;
   gitHashes = {
-    ecp = "sha256-2GKWwUOyDwHGxO9qtM+0SBxRY4GIEUGw1CrLNghnxAQ=";
+    ecp = "sha256-oopAgYJoHFh/gpgDeZEulKD2DIoheBzBW1A+sQG6IxI=";
     webcrypto = "sha256-XkZe7LcVyUtUJoTqeyd87xLENJIIExgyI9lym/aQBtw=";
   };
   customSourceBuilders.openmls = openmlsFrb;
