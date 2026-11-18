@@ -53,7 +53,7 @@ dependencies:
   unifiedpush: ^6.2.0
   unifiedpush_platform_interface: ^4.0.0
   unifiedpush_storage_shared_preferences: ^1.0.0
-  flutter_local_notifications: ^21.0.0
+  flutter_local_notifications: ^22.3.3
   webcrypto: ^0.6.1
   flutter_secure_storage: ^10.3.1
   path: ^1.9.1
@@ -61,9 +61,8 @@ dependencies:
     git:
       url: https://github.com/eko-network/ecp-dart-sdk.git
       ref: de1581f95a7a18dd0b2f3832a8dd398d242d1555
-  sqlite3: ^2.9.4
-  drift: ^2.31.0
-  sqlcipher_flutter_libs: ^0.6.8
+  sqlite3: ^3.5.2
+  drift: ^2.34.4
   lucide_icons_flutter: ^3.1.14+2
   cupertino_interactive_keyboard: ^1.0.0
 
@@ -72,6 +71,13 @@ dependency_overrides:
   flutter_markdown_plus: ^1.0.7
   markdown: ^7.3.1
   flutter_math_fork: ^0.7.4
+
+# the iOS notification extension reads ecp.db with the SQLCipher pod, so the app
+# has to write the same format
+hooks:
+  user_defines:
+    sqlite3:
+      source: sqlcipher
 
 dev_dependencies:
   flutter_test:
@@ -82,7 +88,7 @@ dev_dependencies:
   json_serializable: ^6.9.5
   remove_unused_localizations_keys: ^0.0.40
   riverpod_generator: ^4.0.1
-  drift_dev: ^2.31.0
+  drift_dev: ^2.34.0
 
 flutter:
   generate: true

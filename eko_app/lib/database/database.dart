@@ -9,8 +9,6 @@ import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
-import 'package:sqlcipher_flutter_libs/sqlcipher_flutter_libs.dart';
-import 'package:sqlite3/open.dart';
 import 'package:sqlite3/sqlite3.dart';
 import 'package:uuid/uuid.dart';
 
@@ -270,9 +268,6 @@ LazyDatabase _openConnection() {
 
     debugPrint('[LazyDatabase] opening db: ${file.path}');
     final password = await _getDbPassword();
-    // sqlcipher_flutter_libs ships libsqlcipher.so on Android, but sqlite3
-    // looks for libsqlite3.so by default
-    open.overrideFor(OperatingSystem.android, openCipherOnAndroid);
     final rawDb = sqlite3.open(file.path, uri: false);
 
     final result = rawDb.select('PRAGMA cipher_version;');

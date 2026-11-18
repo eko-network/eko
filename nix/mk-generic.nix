@@ -27,8 +27,16 @@ in
         fi
       done
 
-
       chmod -R +w "$staging_dir"
+
+      # nixpkgs' sqlite3 source builder loads SQLCipher from the system and
+      # puts it on the wrapper's LD_LIBRARY_PATH, so bundle that copy
+      sqlcipher="$(grep -o '/nix/store/[^:'"'"']*-libsqlcipher.so/lib' ${app}/bin/${pname} | head -n1)"
+      if [ ! -f "$sqlcipher/libsqlcipher.so" ]; then
+        echo "libsqlcipher.so not found in the ${pname} wrapper" >&2
+        exit 1
+      fi
+      cp "$sqlcipher/libsqlcipher.so" "$release_root/lib/"
 
       # --- UN-NIXIFY ---
       patchelf --set-interpreter /lib64/ld-linux-x86-64.so.2 "$release_root/${pname}"

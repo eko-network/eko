@@ -4467,14 +4467,13 @@ final class $$StoredMessagesTableReferences
     $MessageAttachmentsTable,
     List<MessageAttachmentRow>
   >
-  _messageAttachmentsRefsTable(_$AppDatabase db) =>
-      MultiTypedResultKey.fromTable(
-        db.messageAttachments,
-        aliasName: $_aliasNameGenerator(
-          db.storedMessages.serverActivityId,
-          db.messageAttachments.messageId,
-        ),
-      );
+  _messageAttachmentsRefsTable(
+    _$AppDatabase db,
+  ) => MultiTypedResultKey.fromTable(
+    db.messageAttachments,
+    aliasName:
+        'stored_messages__server_activity_id__message_attachments__message_id',
+  );
 
   $$MessageAttachmentsTableProcessedTableManager get messageAttachmentsRefs {
     final manager =
@@ -4854,10 +4853,7 @@ final class $$MessageAttachmentsTableReferences
 
   static $StoredMessagesTable _messageIdTable(_$AppDatabase db) =>
       db.storedMessages.createAlias(
-        $_aliasNameGenerator(
-          db.messageAttachments.messageId,
-          db.storedMessages.serverActivityId,
-        ),
+        'message_attachments__message_id__stored_messages__server_activity_id',
       );
 
   $$StoredMessagesTableProcessedTableManager get messageId {
