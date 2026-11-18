@@ -46,8 +46,8 @@ class _ResetDevicesDialogState extends ConsumerState<ResetDevicesDialog> {
     });
     try {
       await action();
-    } catch (e) {
-      debugPrint('[ResetDevices] $e');
+    } catch (e, st) {
+      debugPrint('[ResetDevices] $e\n$st');
       if (mounted) setState(() => _error = error);
     } finally {
       if (mounted) setState(() => _busy = false);

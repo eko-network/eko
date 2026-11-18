@@ -319,6 +319,8 @@ class EcpCoreHolder extends _$EcpCoreHolder {
     if (core == null || email == null || credential == null) {
       throw StateError('Device is not registered');
     }
+    // a rebuild can leave the core closed, open() reuses its engine otherwise
+    await core.open();
 
     // the new session has no device yet, which rebuilds this provider and
     // closes the core, so everything that needs it comes first
