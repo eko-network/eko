@@ -8,7 +8,7 @@
 #   scripts/dev.sh app [N]       build the Linux app, open N signed-out windows (default 2)
 #   scripts/dev.sh app alice alice bob
 #                                one signed-in window per account, each its own device
-#   scripts/dev.sh android [DEV] flutter run on a USB Android device against local services
+#   scripts/dev.sh android [DEV] flutter run on a USB Android device or emulator against local services
 #   scripts/dev.sh e2e           headless multi-device test (needs `up`)
 #   scripts/dev.sh logs          follow the server and Postgres logs
 #
@@ -193,6 +193,8 @@ cmd_android() {
   # phone, so forward those ports back to this machine
   "${adb[@]}" reverse tcp:54321 tcp:54321 >/dev/null
   "${adb[@]}" reverse tcp:3000 tcp:3000 >/dev/null
+  # debug builds read sign in codes from the local mail server
+  "${adb[@]}" reverse tcp:54324 tcp:54324 >/dev/null
   cd "$ROOT/eko_app"
   exec flutter run ${1:+-d "$1"} \
     --dart-define=USE_LOCAL=1 \
