@@ -121,11 +121,13 @@ Future<void> main() async {
           bob1.personFor(carol1.uid),
         ], groupId: _randomBytes(16))).$1.groupId,
     ];
+    // both are DMs with bob, so carol-1 keeps one and merges the other
+    final store = carol1.storage.groupStore;
     for (final group in groups) {
       await until('carol-1 joins a chat', () async {
         await carol1.sync();
-        return (await carol1.storage.groupStore.getGroupByGroupId(group)) !=
-            null;
+        return await store.getGroupByGroupId(group) != null ||
+            await store.getMergedInto(group) != null;
       });
     }
     final first = await bob1.takeKey(carol1.uid, carol1.did);
@@ -711,14 +713,10 @@ Future<void> main() async {
     },
   );
 
-  await step("messages the new device can't read aren't delivered", () async {
-    await alice1.sendText(bobDm, 'still there?');
-    await bob3.sync();
-    await alice1.sync();
-    final sent = alice1.storage.messages.singleWhere(
-      (m) => m.content == 'still there?',
-    );
-    check(!sent.delivered, 'bob-3 cannot read it, it should not be delivered');
+  await step('nothing is sent to the new device until accepted', () async {
+    // opening the chat checks it, sending rechecks one not checked lately
+    await alice1.client.groups.verifyGroup(bobDm);
+    await sendRefused(alice1, bobDm, bob.id);
   });
 
   await step('once accepted, the new chat takes over the old one', () async {
@@ -777,7 +775,84 @@ Future<void> main() async {
     check(leaves.length == 1, 'bob-3 should be in the group once');
   });
 
-  for (final d in [alice1, alice2, bob2, bob3, carol1]) {
+  // bob loses his device again, a contact can notice before he writes
+  Future<SimDevice> resetBob(String name) async {
+    final device = SimDevice(env, name, 'bob@test.local');
+    await device.setUp();
+    await device.verifyEmailCode(await _emailCode(device.email));
+    await device.resetDevices();
+    return device;
+  }
+
+  Future<List<Uint8List>> dmsWith(SimDevice device, Uri other) async {
+    final found = <Uint8List>[];
+    for (final g in await device.storage.groupStore.getActiveGroups()) {
+      final ids = (await device.client.groups.getMembers(
+        g,
+      )).members.map((p) => p.id).toSet();
+      if (ids.length == 2 && ids.contains(other)) found.add(g.groupIdBytes);
+    }
+    return found;
+  }
+
+  final devices = [alice1, alice2, bob2, bob3, carol1];
+  final alice = alice1.personFor(alice1.uid);
+
+  await step('alice notices the reset first and brings bob back', () async {
+    final bob4 = await resetBob('bob-4');
+    devices.add(bob4);
+    final unverified = await alice1.client.groups.verifyGroup(newDm);
+    check(unverified.contains(bob.id), 'alice-1 should see the reset');
+    await sendRefused(alice1, newDm, bob.id);
+    final took = await alice1.client.groups.acceptDeviceReset(bob);
+    check(took == null, 'bob-4 has started no chat to take over');
+
+    await until('bob-4 joins the old dm', () async {
+      await bob4.sync();
+      return (await bob4.storage.groupStore.getActiveGroups()).any(
+        (g) => bytesEqual(g.groupIdBytes, newDm),
+      );
+    });
+    await alice1.sendText(newDm, 'found you');
+    await receives(bob4, (m) => m.content == 'found you');
+
+    final (started, _) = await bob4.client.groups.createGroup([alice]);
+    check(
+      bytesEqual(started.groupId, newDm),
+      'bob-4 starting a dm should reuse the one alice brought him into',
+    );
+    final dms = await dmsWith(bob4, alice.id);
+    check(dms.length == 1, 'bob-4 should have one dm, has ${dms.length}');
+  });
+
+  await step("bob's new dm racing alice's accept leaves one dm", () async {
+    final bob5 = await resetBob('bob-5');
+    devices.add(bob5);
+    final (raced, _) = await bob5.client.groups.createGroup([alice]);
+    await bob5.sendText(raced.groupId, 'new phone again');
+
+    // alice accepts from the old chat before her inbox has bob-5's welcome
+    final unverified = await alice1.client.groups.verifyGroup(newDm);
+    check(unverified.contains(bob.id), 'alice-1 should see the reset');
+    await alice1.client.groups.acceptDeviceReset(bob);
+    await receives(alice1, (m) => m.content == 'new phone again');
+
+    await until('bob-5 joins the old dm', () async {
+      await bob5.sync();
+      return (await bob5.storage.groupStore.getActiveGroups()).any(
+        (g) => bytesEqual(g.groupIdBytes, newDm),
+      );
+    });
+    final aliceDms = await dmsWith(alice1, bob.id);
+    final bobDms = await dmsWith(bob5, alice.id);
+    check(
+      aliceDms.length == 1 && bobDms.length == 1,
+      'alice-1 has ${aliceDms.length} dms with bob, '
+      'bob-5 has ${bobDms.length} with alice',
+    );
+  });
+
+  for (final d in devices) {
     await d.close().catchError((_) {});
   }
   stdout.writeln(_failed == 0 ? '\nall steps passed' : '\n$_failed failed');
@@ -1021,6 +1096,22 @@ Future<void> until(String what, Future<bool> Function() condition) async {
     await Future<void>.delayed(const Duration(milliseconds: 300));
   }
   throw _CheckFailed('timed out waiting for $what');
+}
+
+/// Checks that [device] refuses to send to [groupId] while [owner]'s device
+/// reset is not accepted, and stores nothing.
+Future<void> sendRefused(SimDevice device, Uint8List groupId, Uri owner) async {
+  final before = device.storage.messages.length;
+  try {
+    await device.sendText(groupId, 'should not be sent');
+    throw _CheckFailed('sending should wait for the reset to be accepted');
+  } on EcpDevicesChangedException catch (e) {
+    check(e.owners.contains(owner), 'the refusal should name $owner');
+  }
+  check(
+    device.storage.messages.length == before,
+    'a refused message should not be stored',
+  );
 }
 
 /// Syncs [device] until a stored message matches.

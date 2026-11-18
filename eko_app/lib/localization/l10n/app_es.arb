@@ -223,7 +223,7 @@
   "messengerDevicesChangedTitle" : "Los dispositivos de {name} cambiaron",
   "messengerDevicesChangedBody" : "Sus dispositivos se restablecieron, por ejemplo porque los perdió o cerró sesión en todos. Si no lo esperabas, confírmalo primero con esa persona: alguien más podría intentar leer tus mensajes. Sus chats nuevos quedan ocultos hasta que continúes.",
   "messengerDevicesChangedContinue" : "Continuar",
-  "messengerDevicesChangedBanner" : "Tus mensajes aquí no llegarán a sus nuevos dispositivos hasta que revises el cambio.",
+  "messengerDevicesChangedBanner" : "No puedes enviar mensajes aquí hasta que revises el cambio.",
   "messengerDevicesChangedReview" : "Revisar",
   "messengerLostDevices" : "¿No puedes acceder a tus otros dispositivos?",
   "messengerResetDevicesTitle" : "¿Restablecer tus dispositivos?",

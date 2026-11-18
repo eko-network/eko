@@ -1419,7 +1419,7 @@ abstract class AppLocalizations {
   /// No description provided for @messengerDevicesChangedBanner.
   ///
   /// In en, this message translates to:
-  /// **'Your messages here won\'t reach their new devices until you review the change.'**
+  /// **'You can\'t send messages here until you review the change.'**
   String get messengerDevicesChangedBanner;
 
   /// No description provided for @messengerDevicesChangedReview.

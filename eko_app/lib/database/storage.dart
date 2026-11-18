@@ -29,6 +29,7 @@ class AppStorage extends Storage {
       await _db.delete(_db.mlsKeyPackages).go();
       await _db.delete(_db.capabilities).go();
       await _db.delete(_db.mlsGroups).go();
+      await _db.delete(_db.mergedGroups).go();
       await _db.delete(_db.mlsEngineConfigs).go();
       await _db.delete(_db.processedObjects).go();
       await _db.delete(_db.messageAttachments).go();
@@ -248,6 +249,35 @@ class _DriftGroupStore implements GroupStore {
     await (_db.delete(
       _db.mlsGroups,
     )..where((t) => t.groupIdBytes.equals(groupIdBytes))).go();
+  }
+
+  @override
+  Future<void> mergeGroup({
+    required Uint8List from,
+    required Uint8List into,
+  }) async {
+    await _db.transaction(() async {
+      await (_db.update(_db.mergedGroups)
+            ..where((t) => t.mergedInto.equals(from)))
+          .write(MergedGroupsCompanion(mergedInto: Value(into)));
+      await _db
+          .into(_db.mergedGroups)
+          .insertOnConflictUpdate(
+            MergedGroupsCompanion(
+              groupIdBytes: Value(from),
+              mergedInto: Value(into),
+            ),
+          );
+      await deleteGroup(from);
+    });
+  }
+
+  @override
+  Future<Uint8List?> getMergedInto(Uint8List groupIdBytes) async {
+    final row = await (_db.select(
+      _db.mergedGroups,
+    )..where((t) => t.groupIdBytes.equals(groupIdBytes))).getSingleOrNull();
+    return row?.mergedInto;
   }
 }
 

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:ecp/ecp.dart';
@@ -25,6 +26,7 @@ class MemoryStorage extends Storage {
   Future<void> clear() async {
     messages.clear();
     groups.clear();
+    (groupStore as _GroupStore).mergedInto.clear();
     approvalRequests.clear();
     (deviceChainStore as _DeviceChainStore).heads.clear();
   }
@@ -67,6 +69,7 @@ class _CapabilitiesStore implements CapabilitiesStore {
 
 class _GroupStore implements GroupStore {
   final groups = <MlsGroupRecord>[];
+  final mergedInto = <String, Uint8List>{};
   var _nextId = 1;
 
   @override
@@ -123,6 +126,22 @@ class _GroupStore implements GroupStore {
   @override
   Future<List<MlsGroupRecord>> getActiveGroups() async =>
       groups.where((g) => g.isActive).toList();
+
+  @override
+  Future<void> mergeGroup({
+    required Uint8List from,
+    required Uint8List into,
+  }) async {
+    for (final key in mergedInto.keys.toList()) {
+      if (bytesEqual(mergedInto[key]!, from)) mergedInto[key] = into;
+    }
+    mergedInto[base64Encode(from)] = into;
+    await deleteGroup(from);
+  }
+
+  @override
+  Future<Uint8List?> getMergedInto(Uint8List groupIdBytes) async =>
+      mergedInto[base64Encode(groupIdBytes)];
 }
 
 class _MessageStore implements MessageStore {

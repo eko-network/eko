@@ -194,6 +194,8 @@ class _ChatViewState extends ConsumerState<ChatView>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       ref.invalidate(messageProvider(widget.group.group.groupIdBytes));
+      // a contact may have reset their devices meanwhile
+      _verifyMembers();
     }
   }
 
@@ -217,23 +219,35 @@ class _ChatViewState extends ConsumerState<ChatView>
 
   Future<void> _sendMessage() async {
     final text = _messageController.text.trim();
-    final gifs = _selectedGifs.values;
-    if (text.isEmpty && gifs.isEmpty) return;
+    final selected = _selectedGifs;
+    final gifs = selected.values;
+    // held back until the reset is reviewed in the banner
+    if (_changed.isNotEmpty || (text.isEmpty && gifs.isEmpty)) return;
     _messageController.clear();
     setState(() {
       _selectedGifs = {};
     });
 
-    if (text.isEmpty && gifs.length == 1) {
-      await _dispatchMessage(gifs.first);
-    } else {
-      await _dispatchMessage(
-        ecp.Note(
-          content: text,
-          id: ecp.InternalId.gen(),
-          attachments: gifs.isEmpty ? null : gifs.toList(),
-        ),
-      );
+    try {
+      if (text.isEmpty && gifs.length == 1) {
+        await _dispatchMessage(gifs.first);
+      } else {
+        await _dispatchMessage(
+          ecp.Note(
+            content: text,
+            id: ecp.InternalId.gen(),
+            attachments: gifs.isEmpty ? null : gifs.toList(),
+          ),
+        );
+      }
+    } on ecp.EcpDevicesChangedException catch (e) {
+      // the reset was only noticed now, the message waits in the input
+      if (!mounted) return;
+      setState(() {
+        _changed.addAll(e.owners.where(_isMember));
+        if (_messageController.text.isEmpty) _messageController.text = text;
+        if (_selectedGifs.isEmpty) _selectedGifs = selected;
+      });
     }
   }
 
@@ -246,6 +260,8 @@ class _ChatViewState extends ConsumerState<ChatView>
             ecp.Activity.newCreate(object: object),
             widget.group.group.groupIdBytes,
           );
+    } on ecp.EcpDevicesChangedException {
+      rethrow;
     } catch (e) {
       debugPrint('[ChatView] send failed: $e');
       if (!mounted) return;
@@ -260,7 +276,8 @@ class _ChatViewState extends ConsumerState<ChatView>
   Widget _buildInputRow(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final canSend =
-        _messageController.text.trim().isNotEmpty || _selectedGifs.isNotEmpty;
+        _changed.isEmpty &&
+        (_messageController.text.trim().isNotEmpty || _selectedGifs.isNotEmpty);
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,

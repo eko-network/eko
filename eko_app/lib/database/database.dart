@@ -124,6 +124,15 @@ class ApprovalRequest extends Table {
 
 /// Head of each user's device chain last verified, see [DeviceChainStore].
 @DataClassName('DeviceChainPinRow')
+/// DMs merged into another DM with the same user, see GroupManager.mergeDms.
+class MergedGroups extends Table {
+  BlobColumn get groupIdBytes => blob()();
+  BlobColumn get mergedInto => blob()();
+
+  @override
+  Set<Column> get primaryKey => {groupIdBytes};
+}
+
 class DeviceChainPins extends Table {
   TextColumn get actor => text().map(const UriTypeConverter())();
   BlobColumn get head => blob()();
@@ -194,6 +203,7 @@ class MessageAttachments extends Table {
     ApprovalRequest,
     Capabilities,
     DeviceChainPins,
+    MergedGroups,
     MlsCredentials,
     MlsKeyPackages,
     MlsGroups,

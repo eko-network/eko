@@ -708,7 +708,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get messengerDevicesChangedBanner =>
-      'Pesan Anda di sini tidak akan sampai ke perangkat baru mereka sampai Anda meninjau perubahannya.';
+      'Anda tidak dapat mengirim pesan di sini sampai Anda meninjau perubahannya.';
 
   @override
   String get messengerDevicesChangedReview => 'Tinjau';

@@ -714,7 +714,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get messengerDevicesChangedBanner =>
-      'Tus mensajes aquí no llegarán a sus nuevos dispositivos hasta que revises el cambio.';
+      'No puedes enviar mensajes aquí hasta que revises el cambio.';
 
   @override
   String get messengerDevicesChangedReview => 'Revisar';

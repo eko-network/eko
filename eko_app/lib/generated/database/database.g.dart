@@ -526,7 +526,7 @@ class CapabilitiesCompanion extends UpdateCompanion<CapabilityRow> {
 }
 
 class $DeviceChainPinsTable extends DeviceChainPins
-    with TableInfo<$DeviceChainPinsTable, DeviceChainPinRow> {
+    with TableInfo<$DeviceChainPinsTable, DeviceChainPin> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -558,7 +558,7 @@ class $DeviceChainPinsTable extends DeviceChainPins
   static const String $name = 'device_chain_pins';
   @override
   VerificationContext validateIntegrity(
-    Insertable<DeviceChainPinRow> instance, {
+    Insertable<DeviceChainPin> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -577,9 +577,9 @@ class $DeviceChainPinsTable extends DeviceChainPins
   @override
   Set<GeneratedColumn> get $primaryKey => {actor};
   @override
-  DeviceChainPinRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+  DeviceChainPin map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return DeviceChainPinRow(
+    return DeviceChainPin(
       actor: $DeviceChainPinsTable.$converteractor.fromSql(
         attachedDatabase.typeMapping.read(
           DriftSqlType.string,
@@ -601,11 +601,10 @@ class $DeviceChainPinsTable extends DeviceChainPins
   static TypeConverter<Uri, String> $converteractor = const UriTypeConverter();
 }
 
-class DeviceChainPinRow extends DataClass
-    implements Insertable<DeviceChainPinRow> {
+class DeviceChainPin extends DataClass implements Insertable<DeviceChainPin> {
   final Uri actor;
   final Uint8List head;
-  const DeviceChainPinRow({required this.actor, required this.head});
+  const DeviceChainPin({required this.actor, required this.head});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -622,12 +621,12 @@ class DeviceChainPinRow extends DataClass
     return DeviceChainPinsCompanion(actor: Value(actor), head: Value(head));
   }
 
-  factory DeviceChainPinRow.fromJson(
+  factory DeviceChainPin.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return DeviceChainPinRow(
+    return DeviceChainPin(
       actor: serializer.fromJson<Uri>(json['actor']),
       head: serializer.fromJson<Uint8List>(json['head']),
     );
@@ -641,10 +640,10 @@ class DeviceChainPinRow extends DataClass
     };
   }
 
-  DeviceChainPinRow copyWith({Uri? actor, Uint8List? head}) =>
-      DeviceChainPinRow(actor: actor ?? this.actor, head: head ?? this.head);
-  DeviceChainPinRow copyWithCompanion(DeviceChainPinsCompanion data) {
-    return DeviceChainPinRow(
+  DeviceChainPin copyWith({Uri? actor, Uint8List? head}) =>
+      DeviceChainPin(actor: actor ?? this.actor, head: head ?? this.head);
+  DeviceChainPin copyWithCompanion(DeviceChainPinsCompanion data) {
+    return DeviceChainPin(
       actor: data.actor.present ? data.actor.value : this.actor,
       head: data.head.present ? data.head.value : this.head,
     );
@@ -652,7 +651,7 @@ class DeviceChainPinRow extends DataClass
 
   @override
   String toString() {
-    return (StringBuffer('DeviceChainPinRow(')
+    return (StringBuffer('DeviceChainPin(')
           ..write('actor: $actor, ')
           ..write('head: $head')
           ..write(')'))
@@ -664,12 +663,12 @@ class DeviceChainPinRow extends DataClass
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is DeviceChainPinRow &&
+      (other is DeviceChainPin &&
           other.actor == this.actor &&
           $driftBlobEquality.equals(other.head, this.head));
 }
 
-class DeviceChainPinsCompanion extends UpdateCompanion<DeviceChainPinRow> {
+class DeviceChainPinsCompanion extends UpdateCompanion<DeviceChainPin> {
   final Value<Uri> actor;
   final Value<Uint8List> head;
   final Value<int> rowid;
@@ -684,7 +683,7 @@ class DeviceChainPinsCompanion extends UpdateCompanion<DeviceChainPinRow> {
     this.rowid = const Value.absent(),
   }) : actor = Value(actor),
        head = Value(head);
-  static Insertable<DeviceChainPinRow> custom({
+  static Insertable<DeviceChainPin> custom({
     Expression<String>? actor,
     Expression<Uint8List>? head,
     Expression<int>? rowid,
@@ -730,6 +729,241 @@ class DeviceChainPinsCompanion extends UpdateCompanion<DeviceChainPinRow> {
     return (StringBuffer('DeviceChainPinsCompanion(')
           ..write('actor: $actor, ')
           ..write('head: $head, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $MergedGroupsTable extends MergedGroups
+    with TableInfo<$MergedGroupsTable, DeviceChainPinRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $MergedGroupsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _groupIdBytesMeta = const VerificationMeta(
+    'groupIdBytes',
+  );
+  @override
+  late final GeneratedColumn<Uint8List> groupIdBytes =
+      GeneratedColumn<Uint8List>(
+        'group_id_bytes',
+        aliasedName,
+        false,
+        type: DriftSqlType.blob,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _mergedIntoMeta = const VerificationMeta(
+    'mergedInto',
+  );
+  @override
+  late final GeneratedColumn<Uint8List> mergedInto = GeneratedColumn<Uint8List>(
+    'merged_into',
+    aliasedName,
+    false,
+    type: DriftSqlType.blob,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [groupIdBytes, mergedInto];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'merged_groups';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<DeviceChainPinRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('group_id_bytes')) {
+      context.handle(
+        _groupIdBytesMeta,
+        groupIdBytes.isAcceptableOrUnknown(
+          data['group_id_bytes']!,
+          _groupIdBytesMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_groupIdBytesMeta);
+    }
+    if (data.containsKey('merged_into')) {
+      context.handle(
+        _mergedIntoMeta,
+        mergedInto.isAcceptableOrUnknown(data['merged_into']!, _mergedIntoMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_mergedIntoMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {groupIdBytes};
+  @override
+  DeviceChainPinRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return DeviceChainPinRow(
+      groupIdBytes: attachedDatabase.typeMapping.read(
+        DriftSqlType.blob,
+        data['${effectivePrefix}group_id_bytes'],
+      )!,
+      mergedInto: attachedDatabase.typeMapping.read(
+        DriftSqlType.blob,
+        data['${effectivePrefix}merged_into'],
+      )!,
+    );
+  }
+
+  @override
+  $MergedGroupsTable createAlias(String alias) {
+    return $MergedGroupsTable(attachedDatabase, alias);
+  }
+}
+
+class DeviceChainPinRow extends DataClass
+    implements Insertable<DeviceChainPinRow> {
+  final Uint8List groupIdBytes;
+  final Uint8List mergedInto;
+  const DeviceChainPinRow({
+    required this.groupIdBytes,
+    required this.mergedInto,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['group_id_bytes'] = Variable<Uint8List>(groupIdBytes);
+    map['merged_into'] = Variable<Uint8List>(mergedInto);
+    return map;
+  }
+
+  MergedGroupsCompanion toCompanion(bool nullToAbsent) {
+    return MergedGroupsCompanion(
+      groupIdBytes: Value(groupIdBytes),
+      mergedInto: Value(mergedInto),
+    );
+  }
+
+  factory DeviceChainPinRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return DeviceChainPinRow(
+      groupIdBytes: serializer.fromJson<Uint8List>(json['groupIdBytes']),
+      mergedInto: serializer.fromJson<Uint8List>(json['mergedInto']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'groupIdBytes': serializer.toJson<Uint8List>(groupIdBytes),
+      'mergedInto': serializer.toJson<Uint8List>(mergedInto),
+    };
+  }
+
+  DeviceChainPinRow copyWith({
+    Uint8List? groupIdBytes,
+    Uint8List? mergedInto,
+  }) => DeviceChainPinRow(
+    groupIdBytes: groupIdBytes ?? this.groupIdBytes,
+    mergedInto: mergedInto ?? this.mergedInto,
+  );
+  DeviceChainPinRow copyWithCompanion(MergedGroupsCompanion data) {
+    return DeviceChainPinRow(
+      groupIdBytes: data.groupIdBytes.present
+          ? data.groupIdBytes.value
+          : this.groupIdBytes,
+      mergedInto: data.mergedInto.present
+          ? data.mergedInto.value
+          : this.mergedInto,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DeviceChainPinRow(')
+          ..write('groupIdBytes: $groupIdBytes, ')
+          ..write('mergedInto: $mergedInto')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    $driftBlobEquality.hash(groupIdBytes),
+    $driftBlobEquality.hash(mergedInto),
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is DeviceChainPinRow &&
+          $driftBlobEquality.equals(other.groupIdBytes, this.groupIdBytes) &&
+          $driftBlobEquality.equals(other.mergedInto, this.mergedInto));
+}
+
+class MergedGroupsCompanion extends UpdateCompanion<DeviceChainPinRow> {
+  final Value<Uint8List> groupIdBytes;
+  final Value<Uint8List> mergedInto;
+  final Value<int> rowid;
+  const MergedGroupsCompanion({
+    this.groupIdBytes = const Value.absent(),
+    this.mergedInto = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  MergedGroupsCompanion.insert({
+    required Uint8List groupIdBytes,
+    required Uint8List mergedInto,
+    this.rowid = const Value.absent(),
+  }) : groupIdBytes = Value(groupIdBytes),
+       mergedInto = Value(mergedInto);
+  static Insertable<DeviceChainPinRow> custom({
+    Expression<Uint8List>? groupIdBytes,
+    Expression<Uint8List>? mergedInto,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (groupIdBytes != null) 'group_id_bytes': groupIdBytes,
+      if (mergedInto != null) 'merged_into': mergedInto,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  MergedGroupsCompanion copyWith({
+    Value<Uint8List>? groupIdBytes,
+    Value<Uint8List>? mergedInto,
+    Value<int>? rowid,
+  }) {
+    return MergedGroupsCompanion(
+      groupIdBytes: groupIdBytes ?? this.groupIdBytes,
+      mergedInto: mergedInto ?? this.mergedInto,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (groupIdBytes.present) {
+      map['group_id_bytes'] = Variable<Uint8List>(groupIdBytes.value);
+    }
+    if (mergedInto.present) {
+      map['merged_into'] = Variable<Uint8List>(mergedInto.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MergedGroupsCompanion(')
+          ..write('groupIdBytes: $groupIdBytes, ')
+          ..write('mergedInto: $mergedInto, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -3041,6 +3275,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $DeviceChainPinsTable deviceChainPins = $DeviceChainPinsTable(
     this,
   );
+  late final $MergedGroupsTable mergedGroups = $MergedGroupsTable(this);
   late final $MlsCredentialsTable mlsCredentials = $MlsCredentialsTable(this);
   late final $MlsKeyPackagesTable mlsKeyPackages = $MlsKeyPackagesTable(this);
   late final $MlsGroupsTable mlsGroups = $MlsGroupsTable(this);
@@ -3065,6 +3300,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     approvalRequest,
     capabilities,
     deviceChainPins,
+    mergedGroups,
     mlsCredentials,
     mlsKeyPackages,
     mlsGroups,
@@ -3497,21 +3733,21 @@ class $$DeviceChainPinsTableTableManager
         RootTableManager<
           _$AppDatabase,
           $DeviceChainPinsTable,
-          DeviceChainPinRow,
+          DeviceChainPin,
           $$DeviceChainPinsTableFilterComposer,
           $$DeviceChainPinsTableOrderingComposer,
           $$DeviceChainPinsTableAnnotationComposer,
           $$DeviceChainPinsTableCreateCompanionBuilder,
           $$DeviceChainPinsTableUpdateCompanionBuilder,
           (
-            DeviceChainPinRow,
+            DeviceChainPin,
             BaseReferences<
               _$AppDatabase,
               $DeviceChainPinsTable,
-              DeviceChainPinRow
+              DeviceChainPin
             >,
           ),
-          DeviceChainPinRow,
+          DeviceChainPin,
           PrefetchHooks Function()
         > {
   $$DeviceChainPinsTableTableManager(
@@ -3559,15 +3795,166 @@ typedef $$DeviceChainPinsTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
       $DeviceChainPinsTable,
-      DeviceChainPinRow,
+      DeviceChainPin,
       $$DeviceChainPinsTableFilterComposer,
       $$DeviceChainPinsTableOrderingComposer,
       $$DeviceChainPinsTableAnnotationComposer,
       $$DeviceChainPinsTableCreateCompanionBuilder,
       $$DeviceChainPinsTableUpdateCompanionBuilder,
       (
+        DeviceChainPin,
+        BaseReferences<_$AppDatabase, $DeviceChainPinsTable, DeviceChainPin>,
+      ),
+      DeviceChainPin,
+      PrefetchHooks Function()
+    >;
+typedef $$MergedGroupsTableCreateCompanionBuilder =
+    MergedGroupsCompanion Function({
+      required Uint8List groupIdBytes,
+      required Uint8List mergedInto,
+      Value<int> rowid,
+    });
+typedef $$MergedGroupsTableUpdateCompanionBuilder =
+    MergedGroupsCompanion Function({
+      Value<Uint8List> groupIdBytes,
+      Value<Uint8List> mergedInto,
+      Value<int> rowid,
+    });
+
+class $$MergedGroupsTableFilterComposer
+    extends Composer<_$AppDatabase, $MergedGroupsTable> {
+  $$MergedGroupsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<Uint8List> get groupIdBytes => $composableBuilder(
+    column: $table.groupIdBytes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<Uint8List> get mergedInto => $composableBuilder(
+    column: $table.mergedInto,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$MergedGroupsTableOrderingComposer
+    extends Composer<_$AppDatabase, $MergedGroupsTable> {
+  $$MergedGroupsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<Uint8List> get groupIdBytes => $composableBuilder(
+    column: $table.groupIdBytes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<Uint8List> get mergedInto => $composableBuilder(
+    column: $table.mergedInto,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$MergedGroupsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $MergedGroupsTable> {
+  $$MergedGroupsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<Uint8List> get groupIdBytes => $composableBuilder(
+    column: $table.groupIdBytes,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<Uint8List> get mergedInto => $composableBuilder(
+    column: $table.mergedInto,
+    builder: (column) => column,
+  );
+}
+
+class $$MergedGroupsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $MergedGroupsTable,
+          DeviceChainPinRow,
+          $$MergedGroupsTableFilterComposer,
+          $$MergedGroupsTableOrderingComposer,
+          $$MergedGroupsTableAnnotationComposer,
+          $$MergedGroupsTableCreateCompanionBuilder,
+          $$MergedGroupsTableUpdateCompanionBuilder,
+          (
+            DeviceChainPinRow,
+            BaseReferences<
+              _$AppDatabase,
+              $MergedGroupsTable,
+              DeviceChainPinRow
+            >,
+          ),
+          DeviceChainPinRow,
+          PrefetchHooks Function()
+        > {
+  $$MergedGroupsTableTableManager(_$AppDatabase db, $MergedGroupsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$MergedGroupsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$MergedGroupsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$MergedGroupsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<Uint8List> groupIdBytes = const Value.absent(),
+                Value<Uint8List> mergedInto = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => MergedGroupsCompanion(
+                groupIdBytes: groupIdBytes,
+                mergedInto: mergedInto,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required Uint8List groupIdBytes,
+                required Uint8List mergedInto,
+                Value<int> rowid = const Value.absent(),
+              }) => MergedGroupsCompanion.insert(
+                groupIdBytes: groupIdBytes,
+                mergedInto: mergedInto,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$MergedGroupsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $MergedGroupsTable,
+      DeviceChainPinRow,
+      $$MergedGroupsTableFilterComposer,
+      $$MergedGroupsTableOrderingComposer,
+      $$MergedGroupsTableAnnotationComposer,
+      $$MergedGroupsTableCreateCompanionBuilder,
+      $$MergedGroupsTableUpdateCompanionBuilder,
+      (
         DeviceChainPinRow,
-        BaseReferences<_$AppDatabase, $DeviceChainPinsTable, DeviceChainPinRow>,
+        BaseReferences<_$AppDatabase, $MergedGroupsTable, DeviceChainPinRow>,
       ),
       DeviceChainPinRow,
       PrefetchHooks Function()
@@ -5156,6 +5543,8 @@ class $AppDatabaseManager {
       $$CapabilitiesTableTableManager(_db, _db.capabilities);
   $$DeviceChainPinsTableTableManager get deviceChainPins =>
       $$DeviceChainPinsTableTableManager(_db, _db.deviceChainPins);
+  $$MergedGroupsTableTableManager get mergedGroups =>
+      $$MergedGroupsTableTableManager(_db, _db.mergedGroups);
   $$MlsCredentialsTableTableManager get mlsCredentials =>
       $$MlsCredentialsTableTableManager(_db, _db.mlsCredentials);
   $$MlsKeyPackagesTableTableManager get mlsKeyPackages =>

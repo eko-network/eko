@@ -242,7 +242,7 @@
   },
   "messengerDevicesChangedBody" : "Their devices were reset, for example because they lost them or signed out everywhere. If you didn't expect this, check with them first: someone else could be trying to read your messages. Their new chats stay hidden until you continue.",
   "messengerDevicesChangedContinue" : "Continue",
-  "messengerDevicesChangedBanner" : "Your messages here won't reach their new devices until you review the change.",
+  "messengerDevicesChangedBanner" : "You can't send messages here until you review the change.",
   "messengerDevicesChangedReview" : "Review",
   "messengerLostDevices" : "Can't access your other devices?",
   "messengerResetDevicesTitle" : "Reset your devices?",

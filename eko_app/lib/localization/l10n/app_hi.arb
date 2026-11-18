@@ -223,7 +223,7 @@
   "messengerDevicesChangedTitle" : "{name} के डिवाइस बदल गए",
   "messengerDevicesChangedBody" : "उनके डिवाइस रीसेट हो गए हैं, उदाहरण के लिए क्योंकि वे खो गए या उन्होंने हर जगह से साइन आउट किया। अगर आपको इसकी उम्मीद नहीं थी, तो पहले उनसे पुष्टि करें: कोई और आपके संदेश पढ़ने की कोशिश कर सकता है। उनकी नई चैट तब तक छिपी रहेंगी जब तक आप जारी नहीं रखते।",
   "messengerDevicesChangedContinue" : "जारी रखें",
-  "messengerDevicesChangedBanner" : "जब तक आप बदलाव की समीक्षा नहीं करते, यहाँ आपके संदेश उनके नए डिवाइस तक नहीं पहुँचेंगे।",
+  "messengerDevicesChangedBanner" : "जब तक आप बदलाव की समीक्षा नहीं करते, आप यहाँ संदेश नहीं भेज सकते।",
   "messengerDevicesChangedReview" : "समीक्षा करें",
   "messengerLostDevices" : "अपने दूसरे डिवाइस तक पहुंच नहीं है?",
   "messengerResetDevicesTitle" : "अपने डिवाइस रीसेट करें?",

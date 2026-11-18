@@ -1,9 +1,9 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
 import 'package:ecp/ecp.dart';
 import 'package:eko_app/localization/generated/app_localizations.dart';
-import 'package:eko_app/messenger/ecp_helpers.dart';
 import 'package:eko_app/messenger/providers/group_provider.dart';
 import 'package:eko_app/providers/ecp_provider.dart';
 import 'package:eko_app/messenger/types/group.dart';
@@ -27,17 +27,17 @@ class AdaptiveChat extends ConsumerStatefulWidget {
 }
 
 class _AdaptiveChatState extends ConsumerState<AdaptiveChat> {
-  StreamSubscription<({Uri person, MlsGroupRecord? dm})>? _resets;
+  StreamSubscription<({Uint8List from, MlsGroupRecord into})>? _merged;
 
-  // the open chat as last shown, it is gone from the groups once handed over
+  // the open chat as last shown, it is gone from the groups once merged
   GroupWithUsers? _shown;
 
   @override
   void initState() {
     super.initState();
     ref.listenManual(asyncEcpClientProvider, (_, next) {
-      _resets?.cancel();
-      _resets = next.value?.groups.resetsAccepted.listen(_onResetAccepted);
+      _merged?.cancel();
+      _merged = next.value?.groups.dmsMerged.listen(_onDmMerged);
     }, fireImmediately: true);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final isWideScreen =
@@ -54,21 +54,18 @@ class _AdaptiveChatState extends ConsumerState<AdaptiveChat> {
 
   @override
   void dispose() {
-    _resets?.cancel();
+    _merged?.cancel();
     super.dispose();
   }
 
-  /// Accepting a contact's device reset hands an old DM with them over to the
-  /// one they started since, which is opened in its place.
-  void _onResetAccepted(({Uri person, MlsGroupRecord? dm}) e) {
+  /// A DM merged into another one with the same user, e.g. after accepting
+  /// their device reset, is replaced by the one that took over.
+  void _onDmMerged(({Uint8List from, MlsGroupRecord into}) e) {
     final shown = _shown;
-    final dm = e.dm;
-    if (!mounted || shown == null || dm == null) return;
+    if (!mounted || shown == null) return;
     if (shown.group.id != widget.selectedGroupId) return;
-    final me = uidFromActorId(ref.read(ecpClientProvider).me.id);
-    final others = shown.users.where((u) => u != me).toSet();
-    if (others.length == 1 && others.single == uidFromActorId(e.person)) {
-      context.replace('/messages/${dm.id}');
+    if (const ListEquality<int>().equals(shown.group.groupIdBytes, e.from)) {
+      context.replace('/messages/${e.into.id}');
     }
   }
 

@@ -60,7 +60,7 @@ dependencies:
   ecp:
     git:
       url: https://github.com/eko-network/ecp-dart-sdk.git
-      ref: b880670b3ac378ea1c47fb224ad8839a00bf35a0
+      ref: d1bb1418d9d783029566b6266dc7a00c47690080
   sqlite3: ^3.5.2
   drift: ^2.34.4
   lucide_icons_flutter: ^3.1.14+2

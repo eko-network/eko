@@ -223,7 +223,7 @@
   "messengerDevicesChangedTitle" : "Perangkat {name} berubah",
   "messengerDevicesChangedBody" : "Perangkat mereka direset, misalnya karena hilang atau mereka keluar dari semua perangkat. Jika kamu tidak menduganya, pastikan dulu dengan mereka: orang lain mungkin mencoba membaca pesanmu. Chat baru dari mereka tetap tersembunyi sampai kamu melanjutkan.",
   "messengerDevicesChangedContinue" : "Lanjutkan",
-  "messengerDevicesChangedBanner" : "Pesan Anda di sini tidak akan sampai ke perangkat baru mereka sampai Anda meninjau perubahannya.",
+  "messengerDevicesChangedBanner" : "Anda tidak dapat mengirim pesan di sini sampai Anda meninjau perubahannya.",
   "messengerDevicesChangedReview" : "Tinjau",
   "messengerLostDevices" : "Tidak bisa mengakses perangkat lainmu?",
   "messengerResetDevicesTitle" : "Reset perangkatmu?",

@@ -706,7 +706,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get messengerDevicesChangedBanner =>
-      'Your messages here won\'t reach their new devices until you review the change.';
+      'You can\'t send messages here until you review the change.';
 
   @override
   String get messengerDevicesChangedReview => 'Review';

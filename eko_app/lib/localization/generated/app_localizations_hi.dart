@@ -706,7 +706,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get messengerDevicesChangedBanner =>
-      'जब तक आप बदलाव की समीक्षा नहीं करते, यहाँ आपके संदेश उनके नए डिवाइस तक नहीं पहुँचेंगे।';
+      'जब तक आप बदलाव की समीक्षा नहीं करते, आप यहाँ संदेश नहीं भेज सकते।';
 
   @override
   String get messengerDevicesChangedReview => 'समीक्षा करें';
