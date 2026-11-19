@@ -334,6 +334,16 @@ class _DriftMessageStore implements MessageStore {
   }
 
   @override
+  Future<bool> hasMessage(Uri serverActivityId) async {
+    final row =
+        await (_db.select(_db.storedMessages)..where(
+              (t) => t.serverActivityId.equals(serverActivityId.toString()),
+            ))
+            .getSingleOrNull();
+    return row != null;
+  }
+
+  @override
   Future<bool> markMessageDelivered(Uri serverActivityId) async {
     // TODO there exists interleavings where the queue is empty when the message comes in and then the delivery message is added to the queue and the delivered query happens before the message is inserted. i dont want to introduce locks bc thats scary. and delivered markings are not very important.
     _pendingDeliveries.add(serverActivityId);

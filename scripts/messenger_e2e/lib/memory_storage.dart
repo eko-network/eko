@@ -152,6 +152,10 @@ class _MessageStore implements MessageStore {
       messages.add(message);
 
   @override
+  Future<bool> hasMessage(Uri serverActivityId) async =>
+      messages.any((m) => m.serverActivityId == serverActivityId);
+
+  @override
   Future<bool> markMessageDelivered(Uri serverActivityId) async {
     var found = false;
     for (final (i, m) in messages.indexed.toList()) {
