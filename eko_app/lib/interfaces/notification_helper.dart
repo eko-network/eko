@@ -9,6 +9,7 @@ import 'package:go_router/go_router.dart';
 import 'package:eko_app/providers/following_feed_provider.dart';
 import 'package:eko_app/providers/new_feed_provider.dart';
 import 'package:eko_app/providers/popular_feed_provider.dart';
+import 'package:eko_app/interfaces/user.dart' as user;
 import 'package:eko_app/services/messenger_notification_service.dart';
 import 'package:eko_app/utilities/api_constants.dart' as ac;
 import 'package:eko_app/utilities/shared_pref_service.dart';

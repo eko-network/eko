@@ -13,6 +13,10 @@ Future<String?> freshAccessToken() async {
   return (await supabase.auth.refreshSession()).session?.accessToken;
 }
 
+// Supabase.instance asserts until it is initialized, so it can't tell
+var _initialized = false;
+bool get supabaseInitialized => _initialized;
+
 /// [background] is for headless push engines, which have no activity to
 /// receive auth deep links.
 Future<void> initSupabase({bool background = false}) async {
@@ -33,4 +37,12 @@ Future<void> initSupabase({bool background = false}) async {
             detectSessionInUri: !background,
           ),
   );
+  _initialized = true;
+}
+
+/// For the push engine, which only has Supabase while it uses it.
+Future<void> disposeSupabase() async {
+  if (!_initialized) return;
+  _initialized = false;
+  await Supabase.instance.dispose();
 }

@@ -6,6 +6,7 @@ import 'package:eko_app/utilities/constants.dart' as c;
 import 'package:eko_app/interfaces/notification_helper.dart';
 import 'package:eko_app/utilities/device_uid_service.dart';
 import 'package:eko_app/utilities/notification_type_helper.dart';
+import 'package:eko_app/services/messenger_notification_service.dart';
 
 Future<bool> isUsernameAvailable(String username) async {
   try {
@@ -37,11 +38,27 @@ Future<void> addDeviceNotificationToken(String uid) async {
       print("token: $token");
       PrefsService.deviceNotificationToken = token;
       await _updateNotifications(token: token, isActive: true);
+      PrefsService.uploadedNotificationToken = token;
       PrefsService.notificationsEnabled = true;
     } catch (e) {
       debugPrint('addDeviceNotificationToken error: $e');
     }
   }
+}
+
+/// Replaces the endpoint the backend has when the distributor changes it after
+/// sign in, e.g. when FCM rotates its token. The server pushes to the old one
+/// until then, and this can happen in the push engine with the app closed.
+Future<void> uploadChangedDeviceNotificationToken(String token) async {
+  final uploaded = PrefsService.uploadedNotificationToken;
+  if (uploaded == null || uploaded == token) return;
+  await MessengerNotificationService.withSupabase(() async {
+    if (supabase.auth.currentSession == null) return;
+    await freshAccessToken();
+    await _updateNotifications(token: token, isActive: true);
+    PrefsService.uploadedNotificationToken = token;
+    debugPrint('[Notifications] uploaded changed push endpoint');
+  });
 }
 
 Future<void> removeDeviceNotificationToken(String uid) async {
@@ -50,6 +67,7 @@ Future<void> removeDeviceNotificationToken(String uid) async {
       final token = await NotificationHelper.getDeviceToken();
       if (token == null) return;
       await _updateNotifications(token: token, isActive: false);
+      PrefsService.uploadedNotificationToken = null;
       PrefsService.notificationsEnabled = false;
       PrefsService.deviceNotificationToken = null;
       PrefsService.deviceNotificationTokenLastCheckedAt = null;

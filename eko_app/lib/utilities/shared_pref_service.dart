@@ -14,6 +14,7 @@ class PrefsService {
   static const String _keyDeviceToken = 'DEVICE_PUSH_TOKEN';
   static const String _keyDeviceTokenLastCheckedAt =
       'DEVICE_PUSH_TOKEN_LAST_CHECKED_AT';
+  static const String _keyUploadedDeviceToken = 'DEVICE_PUSH_TOKEN_UPLOADED';
 
   static Future<void> init() async {
     _prefs = await SharedPreferencesWithCache.create(
@@ -83,6 +84,18 @@ class PrefsService {
       instance.remove(_keyDeviceToken);
     } else {
       instance.setString(_keyDeviceToken, value);
+    }
+  }
+
+  /// The push endpoint the backend has for this device, null while it has
+  /// none, e.g. with notifications turned off.
+  static String? get uploadedNotificationToken =>
+      instance.getString(_keyUploadedDeviceToken);
+  static set uploadedNotificationToken(String? value) {
+    if (value == null) {
+      instance.remove(_keyUploadedDeviceToken);
+    } else {
+      instance.setString(_keyUploadedDeviceToken, value);
     }
   }
 

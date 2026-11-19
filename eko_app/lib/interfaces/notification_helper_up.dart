@@ -178,6 +178,9 @@ class UnifiedPushNotificationAdapter extends NotificationPlatformAdapter {
         onNewEndpoint: (endpoint, instance) {
           if (instance != instanceId) return;
           final token = _serializedWebPushSubscription(endpoint);
+          if (token != null) {
+            unawaited(user.uploadChangedDeviceNotificationToken(token));
+          }
           if (token != null && token == _lastSerializedEndpoint) {
             _completeToken(token);
             return;

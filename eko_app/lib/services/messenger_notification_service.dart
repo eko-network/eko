@@ -14,7 +14,6 @@ import 'package:eko_app/utilities/shared_pref_service.dart';
 import 'package:eko_app/utilities/supabase_ref.dart';
 import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 /// Messenger notifications for platforms that receive pushes through
 /// UnifiedPush. Pushes only say that a message arrived, the inbox is fetched
@@ -92,6 +91,24 @@ class MessengerNotificationService {
     }
   }
 
+  /// Runs [body] with Supabase, which the push engine only has while it
+  /// syncs, so it is set up here then, one at a time with the syncs.
+  static Future<void> withSupabase(Future<void> Function() body) {
+    final run = _headlessSync
+        .then((_) async {
+          final own = !supabaseInitialized;
+          if (own) await initSupabase(background: true);
+          try {
+            await body();
+          } finally {
+            if (own) await disposeSupabase();
+          }
+        })
+        .catchError((Object e) => debugPrint('[MessengerNotifications] $e'));
+    _headlessSync = run;
+    return run;
+  }
+
   static Future<void> _syncHeadless() async {
     EcpCore? core;
     http.Client? httpClient;
@@ -128,9 +145,7 @@ class MessengerNotificationService {
       httpClient?.close();
       await core?.close();
       // stops token auto refresh so it can't race the app's own refresh
-      if (Supabase.instance.isInitialized) {
-        await Supabase.instance.dispose();
-      }
+      await disposeSupabase();
     }
   }
 
