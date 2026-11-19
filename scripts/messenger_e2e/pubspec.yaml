@@ -11,7 +11,7 @@ dependencies:
   http: ^1.4.0
   uuid: ^4.4.2
 
-# match eko_app/pubspec.lock so the test runs the same native openmls build
+# match eko_app/pubspec.lock so the test runs the same native openmls build,
+# openmls itself comes from ecp, the eko fork
 dependency_overrides:
-  openmls: 4.0.0
   flutter_rust_bridge: 2.13.0

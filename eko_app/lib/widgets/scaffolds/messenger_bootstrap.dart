@@ -1,3 +1,4 @@
+import 'package:eko_app/messenger/notification_service_share.dart';
 import 'package:eko_app/messenger/providers/approval_stream_provider.dart';
 import 'package:eko_app/messenger/views/approval.dart';
 import 'package:eko_app/messenger/views/device_warning.dart';
@@ -25,6 +26,7 @@ class MessengerBootstrap extends ConsumerWidget {
 
     if (ecpInitialized) {
       ref.watch(inboxPollingProvider);
+      ref.watch(notificationServiceShareProvider);
     }
 
     return ecpInitialized

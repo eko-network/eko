@@ -32,6 +32,17 @@ import UserNotifications
             self?.registerForPushNotifications(application: application, result: result)
         case "retrieveDeviceToken":
             self?.getDeviceToken(result: result)
+        case "beginBackgroundTask":
+            var task = UIBackgroundTaskIdentifier.invalid
+            task = application.beginBackgroundTask(withName: "suspend messenger") {
+                application.endBackgroundTask(task)
+            }
+            result(task.rawValue)
+        case "endBackgroundTask":
+            if let raw = call.arguments as? Int {
+                application.endBackgroundTask(UIBackgroundTaskIdentifier(rawValue: raw))
+            }
+            result(nil)
         case "getAppGroupPath":
             if let url = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.com.example.untitledApp") {
                 result(url.path)

@@ -4,6 +4,7 @@ import 'package:eko_app/types/device.dart';
 import 'package:eko_app/database/database.dart';
 import 'package:eko_app/database/storage.dart';
 import 'package:eko_app/localization/generated/app_localizations.dart';
+import 'package:eko_app/messenger/notification_service_share.dart';
 import 'package:eko_app/messenger/providers/devices_provider.dart';
 import 'package:eko_app/providers/ecp_provider.dart';
 import 'package:eko_app/utilities/device_uid_service.dart';
@@ -229,6 +230,7 @@ class Auth extends _$Auth {
 
   Future<void> _cleanAfterSignOut() async {
     await AppStorage(db).clear();
+    await NotificationServiceShare.clear();
     state = AsyncValue.data(AuthModel.signedOut());
   }
 

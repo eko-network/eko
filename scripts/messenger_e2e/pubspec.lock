@@ -145,12 +145,13 @@ packages:
     source: hosted
     version: "1.19.0"
   openmls:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
-      name: openmls
-      sha256: fe5729d8381360dcc3c0e523cedc8f09d62ce7e2eed2febdca19af8b5d754e50
-      url: "https://pub.dev"
-    source: hosted
+      path: "."
+      ref: "6262578c36de99f4faee31b45f8888f7bc539327"
+      resolved-ref: "6262578c36de99f4faee31b45f8888f7bc539327"
+      url: "https://github.com/eko-network/openmls_dart.git"
+    source: git
     version: "4.0.0"
   path:
     dependency: transitive

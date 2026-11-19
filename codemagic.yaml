@@ -56,7 +56,7 @@ workflows:
     publishing:
       google_play:
         credentials: $GOOGLE_PLAY_SERVICE_ACCOUNT_CREDENTIALS
-        track: production
+        track: internal
 
   ios-release:
     name: iOS Release
@@ -87,6 +87,14 @@ workflows:
     scripts:
       - name: Get Dependencies
         script: flutter pub get
+      - name: Build the notification service's MLS library
+        script: |
+          if ! command -v rustup >/dev/null; then
+            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal
+          fi
+          source "$HOME/.cargo/env"
+          rustup target add aarch64-apple-ios aarch64-apple-ios-sim x86_64-apple-ios
+          ios/build_openmls_push.sh
       - name: Install CocoaPods
         script: |
           find . -name "Podfile" -execdir pod install \;
@@ -143,6 +151,14 @@ workflows:
     scripts:
       - name: Get Dependencies
         script: flutter pub get
+      - name: Build the notification service's MLS library
+        script: |
+          if ! command -v rustup >/dev/null; then
+            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal
+          fi
+          source "$HOME/.cargo/env"
+          rustup target add aarch64-apple-ios aarch64-apple-ios-sim x86_64-apple-ios
+          ios/build_openmls_push.sh
       - name: Install CocoaPods
         script: |
           find . -name "Podfile" -execdir pod install \;

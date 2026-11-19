@@ -389,8 +389,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: "150ed5a9ff1f23c75d3c0320ade8accb2ed4b636"
-      resolved-ref: "150ed5a9ff1f23c75d3c0320ade8accb2ed4b636"
+      ref: "132fd6b0155f8a5fe5b3b6c2325854a170e03aae"
+      resolved-ref: "132fd6b0155f8a5fe5b3b6c2325854a170e03aae"
       url: "https://github.com/eko-network/ecp-dart-sdk.git"
     source: git
     version: "0.0.1"
@@ -1145,10 +1145,11 @@ packages:
   openmls:
     dependency: transitive
     description:
-      name: openmls
-      sha256: fe5729d8381360dcc3c0e523cedc8f09d62ce7e2eed2febdca19af8b5d754e50
-      url: "https://pub.dev"
-    source: hosted
+      path: "."
+      ref: "6262578c36de99f4faee31b45f8888f7bc539327"
+      resolved-ref: "6262578c36de99f4faee31b45f8888f7bc539327"
+      url: "https://github.com/eko-network/openmls_dart.git"
+    source: git
     version: "4.0.0"
   overlay_support:
     dependency: "direct main"

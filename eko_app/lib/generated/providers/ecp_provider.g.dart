@@ -45,7 +45,7 @@ final class AsyncEcpClientProvider
   }
 }
 
-String _$asyncEcpClientHash() => r'3d38878d324207ac902ec3bee99a02dcfeb7e766';
+String _$asyncEcpClientHash() => r'24f6b505b3d114006ef230db37a2651a5d502221';
 
 @ProviderFor(ecpClient)
 final ecpClientProvider = EcpClientProvider._();
@@ -126,4 +126,4 @@ final class InboxPollingProvider extends $FunctionalProvider<void, void, void>
   }
 }
 
-String _$inboxPollingHash() => r'd668cfe3ae9805e2e43ee91785fecc8d3f2c7d8e';
+String _$inboxPollingHash() => r'd45c5a96d7dc3aa37bc47d557211f6d3afd79c1e';

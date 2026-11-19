@@ -8,6 +8,7 @@
 #ifndef MessengerNotificationService_Bridging_Header_h
 #define MessengerNotificationService_Bridging_Header_h
 
-#import <sqlite3.h>
+// from OpenmlsPush.xcframework, see build_openmls_push.sh
+#import "openmls_push.h"
 
 #endif /* MessengerNotificationService_Bridging_Header_h */

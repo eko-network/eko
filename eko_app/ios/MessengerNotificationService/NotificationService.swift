@@ -7,272 +7,458 @@
 //  Created by Christian Knab on 6/13/26.
 //
 
-import UserNotifications
+import CryptoKit
+import Foundation
 import OSLog
+import Security
+import UserNotifications
 
+/// Pushes only say that a message arrived. This fetches the inbox and applies
+/// its messages to the MLS state it shares with the app (openmls_push.h),
+/// which keeps each one's plaintext for the app to store, acks them, and
+/// shows one notification per message.
+///
+/// Messages are applied in inbox order, and a group's commits only by the app:
+/// once one turns up, the rest of that group is left for the app. Anything
+/// that was not applied stays in the inbox, unacked, and a push whose message
+/// was not applied shows what the server sent.
 class NotificationService: UNNotificationServiceExtension {
-    
-    var contentHandler: ((UNNotificationContent) -> Void)?
-    var bestAttemptContent: UNMutableNotificationContent?
 
-    private let logger = Logger(subsystem: "com.example.untitledApp.NotificationService", category: "PushExtension")
-    
-    func debugBody(_ msg: String) {
-        bestAttemptContent?.body = msg
-        if let content = bestAttemptContent {
-            self.contentHandler?(content)
-        }
-    }
-    
+    // each run holds the MLS database while it applies, so one at a time
+    private static let queue = DispatchQueue(label: "com.example.untitledApp.NotificationService")
+
+    private let lock = NSLock()
+    private var contentHandler: ((UNNotificationContent) -> Void)?
+    private var fallback: UNNotificationContent?
+
     override func didReceive(_ request: UNNotificationRequest,
                              withContentHandler contentHandler: @escaping (UNNotificationContent) -> Void) {
         self.contentHandler = contentHandler
-        bestAttemptContent = request.content.mutableCopy() as? UNMutableNotificationContent
-        
-        // the openmls_push_decrypt.xcframework this used was never committed, so
-        // decryption is disabled until it is (see README.md) and every push
-        // shows a generic notification. git history has the decrypt path.
-        logger.debug("[didReceive] push decryption disabled")
-        bestAttemptContent?.body = "New message"
-        if let content = bestAttemptContent {
-            contentHandler(content)
+        fallback = request.content
+        let data = request.content.userInfo["data"] as? [String: Any]
+        let run = Run(
+            pushedObjectId: data?["object_id"] as? String,
+            // the system gives 30 seconds, this leaves room to show what was found
+            deadline: Date().addingTimeInterval(20))
+        Self.queue.async {
+            self.deliver(run.content() ?? request.content)
         }
     }
-    
+
     override func serviceExtensionTimeWillExpire() {
-        if let contentHandler = contentHandler, let bestAttemptContent = bestAttemptContent {
-            contentHandler(bestAttemptContent)
+        if let fallback = fallback {
+            deliver(fallback)
         }
     }
-    
-    /// open ecp.db via SQLCipher and insert the decrypted message + mark as processed.
-    private func storeDecryptedMessageInAppDb(groupId: Data, serverMessageId: String, plaintext: Data) {
-        let tag = "[storeDecryptedMessageInAppDb]"
-        guard let appGroup = FileManager.default
-                .containerURL(forSecurityApplicationGroupIdentifier: "group.com.example.untitledApp")
-        else {
-            logger.debug("\(tag) App Group container not available")
-            return
+
+    private func deliver(_ content: UNNotificationContent) {
+        lock.lock()
+        let handler = contentHandler
+        contentHandler = nil
+        lock.unlock()
+        handler?(content)
+    }
+}
+
+private let appGroup = "group.com.example.untitledApp"
+private let logger = Logger(subsystem: "com.example.untitledApp.NotificationService", category: "PushExtension")
+
+/// Set once the target has the com.apple.developer.usernotifications.filtering
+/// entitlement, which lets a push whose message was already shown show nothing.
+private let filtersNotifications =
+    Bundle.main.object(forInfoDictionaryKey: "EkoFiltersNotifications") as? Bool ?? false
+
+/// The id of the notification for a message, which the server also sends its
+/// push as apns-collapse-id, so the push replaces what this showed for it
+/// instead of showing it twice. See apns_collapse_id in eko-messenger.
+private func notificationId(objectId: String) -> String {
+    base64Url(Data(SHA256.hash(data: Data(objectId.utf8))))
+}
+
+private func base64Url(_ data: Data) -> String {
+    data.base64EncodedString()
+        .replacingOccurrences(of: "+", with: "-")
+        .replacingOccurrences(of: "/", with: "_")
+        .replacingOccurrences(of: "=", with: "")
+}
+
+/// A message this run applied, or an earlier one did.
+private struct Applied {
+    let objectId: String
+    /// Who the server says sent it, whom the ack goes to.
+    let actor: String
+    let groupId: Data
+    /// Who MLS says sent it.
+    let sender: String
+    let plaintext: Data
+    let earlier: Bool
+}
+
+private struct Run {
+    let pushedObjectId: String?
+    let deadline: Date
+
+    func content() -> UNNotificationContent? {
+        guard let config = SharedConfig.load() else {
+            logger.error("no config shared by the app")
+            return nil
+        }
+        let session = URLSession(configuration: {
+            let configuration = URLSessionConfiguration.ephemeral
+            configuration.timeoutIntervalForRequest = 5
+            configuration.timeoutIntervalForResource = 8
+            return configuration
+        }())
+        guard let inbox = fetchInbox(config, session) else { return nil }
+
+        let applied = apply(inbox)
+        for message in applied where Date() < deadline {
+            ack(message, config, session)
         }
 
-        let dbPath = appGroup.appendingPathComponent("ecp.db").path
-        guard FileManager.default.fileExists(atPath: dbPath) else {
-            logger.debug("\(tag) ecp.db does not exist yet at \(dbPath, privacy: .public)")
-            return
-        }
-
-        guard let dbKey = loadDbEncryptionKey() else {
-            let msg = "db_encryption_key not found"
-            logger.debug("\(tag) \(msg)")
-            debugBody("DEBUG: \(msg)")
-            return
-        }
-
-        var db: OpaquePointer?
-        guard sqlite3_open_v2(dbPath, &db, SQLITE_OPEN_READWRITE, nil) == SQLITE_OK,
-              let db = db
-        else {
-            logger.debug("\(tag) failed to open ecp.db")
-            return
-        }
-
-        // set SQLCipher key — this always returns OK; real check is deferred
-        let keyStmt = "PRAGMA key = '\(dbKey)';"
-        sqlite3_exec(db, keyStmt, nil, nil, nil)
-
-        // verify key by querying the schema
-        if sqlite3_exec(db, "SELECT count(*) FROM sqlite_master;", nil, nil, nil) != SQLITE_OK {
-            let msg = String(cString: sqlite3_errmsg(db))
-            logger.debug("\(tag) wrong key or corrupt db — skipping write (app will handle): \(msg, privacy: .public)")
-            sqlite3_close(db)
-            return
-        }
-
-        // parse ActivityPub JSON payload
-        let json = try? JSONSerialization.jsonObject(with: plaintext) as? [String: Any]
-        if let json = json {
-            logger.debug("\(tag) full payload: \(json, privacy: .public)")
-        }
-        let serverActivityId = json?["id"] as? String ?? UUID().uuidString
-        logger.debug("processing serverActivityId=\(serverActivityId, privacy: .public)")
-        let senderId = json?["actor"] as? String ?? ""
-        let obj = json?["object"] as? [String: Any]
-        let content = obj?["content"] as? String
-        let inReplyTo = obj?["inReplyTo"] as? String
-        let messageId = obj?["id"] as? String ?? UUID().uuidString
-        logger.debug("\(tag) processing msg messageId=\(messageId, privacy: .public)")
-
-        // Drift stores DateTime as seconds since epoch
-        let receivedAt = Int64(Date().timeIntervalSince1970)
-        logger.debug("\(tag) raw timeIntervalSince1970=\(Date().timeIntervalSince1970) receivedAt=\(receivedAt)")
-
-        // check if the message has already been processed
-        let checkSQL = "SELECT COUNT(*) FROM processed_objects WHERE id = ?;"
-        var checkStmt: OpaquePointer?
-        if sqlite3_prepare_v2(db, checkSQL, -1, &checkStmt, nil) == SQLITE_OK {
-            sqlite3_bind_text(checkStmt, 1, (serverActivityId as NSString).utf8String, -1, nil)
-            if sqlite3_step(checkStmt) == SQLITE_ROW, sqlite3_column_int(checkStmt, 0) > 0 {
-                sqlite3_finalize(checkStmt)
-                sqlite3_close(db)
-                logger.debug("\(tag) already processed, skipping")
-                return
+        let names = Names.load()
+        var pushedApplied = false
+        var pushed: UNNotificationContent?
+        var shown: [String] = []
+        for message in applied {
+            if message.objectId == pushedObjectId {
+                pushedApplied = true
+                if message.sender != config.actor {
+                    pushed = notification(for: message, names)
+                }
+                continue
             }
-            sqlite3_finalize(checkStmt)
+            guard !message.earlier, message.sender != config.actor,
+                  let content = notification(for: message, names)
+            else { continue }
+            // e.g. its push was dropped while the device was offline, APNs
+            // only keeps the last one
+            let id = notificationId(objectId: message.objectId)
+            show(UNNotificationRequest(identifier: id, content: content, trigger: nil))
+            shown.append(id)
         }
+        Shown.add(shown)
 
-        // insert into stored_messages
-        let insertSQL = """
-            INSERT OR IGNORE INTO stored_messages
-                (server_activity_id, received_at, sender_id, id, content, group_id, in_reply_to, delivered)
-            VALUES (?, ?, ?, ?, ?, ?, ?, 0);
-        """
-        var insertStmt: OpaquePointer?
-        guard sqlite3_prepare_v2(db, insertSQL, -1, &insertStmt, nil) == SQLITE_OK,
-              let insertStmt = insertStmt
-        else {
-            let msg = String(cString: sqlite3_errmsg(db))
-            logger.debug("\(tag) prepare insert failed: \(msg, privacy: .public)")
-            debugBody("DEBUG: prepare insert failed: \(msg)")
-            sqlite3_close(db)
-            return
+        if let pushed = pushed {
+            return pushed
         }
-
-        sqlite3_bind_text(insertStmt, 1, (serverActivityId as NSString).utf8String, -1, nil)
-        sqlite3_bind_int64(insertStmt, 2, receivedAt)
-        sqlite3_bind_text(insertStmt, 3, (senderId as NSString).utf8String, -1, nil)
-        sqlite3_bind_text(insertStmt, 4, (messageId as NSString).utf8String, -1, nil)
-        if let content = content {
-            sqlite3_bind_text(insertStmt, 5, (content as NSString).utf8String, -1, nil)
-        } else {
-            sqlite3_bind_null(insertStmt, 5)
+        if pushedApplied {
+            // nothing the app shows either, e.g. a message from this user
+            return filtersNotifications ? UNNotificationContent() : nil
         }
-        groupId.withUnsafeBytes { buf in
-            sqlite3_bind_blob(insertStmt, 6, buf.baseAddress, Int32(buf.count), nil)
-        }
-        if let inReplyTo = inReplyTo {
-            sqlite3_bind_text(insertStmt, 7, (inReplyTo as NSString).utf8String, -1, nil)
-        } else {
-            sqlite3_bind_null(insertStmt, 7)
-        }
-
-        if sqlite3_step(insertStmt) != SQLITE_DONE {
-            let msg = String(cString: sqlite3_errmsg(db))
-            logger.debug("\(tag) insert failed: \(msg, privacy: .public)")
-            debugBody("DEBUG: insert failed: \(msg)")
-            sqlite3_finalize(insertStmt)
-            sqlite3_close(db)
-            return
-        }
-        sqlite3_finalize(insertStmt)
-        logger.debug("\(tag) inserted stored_message")
-
-        if let obj = obj {
-            insertAttachments(db: db, messageId: serverActivityId, attachments: Self.attachments(of: obj))
-        }
-
-        // mark as processed
-        let markSQL = "INSERT OR IGNORE INTO processed_objects (id) VALUES (?);"
-        var markStmt: OpaquePointer?
-        guard sqlite3_prepare_v2(db, markSQL, -1, &markStmt, nil) == SQLITE_OK,
-              let markStmt = markStmt
-        else {
-            let msg = String(cString: sqlite3_errmsg(db))
-            logger.debug("\(tag) prepare mark_processed failed: \(msg, privacy: .public)")
-            sqlite3_close(db)
-            return
-        }
-
-        sqlite3_bind_text(markStmt, 1, (serverMessageId as NSString).utf8String, -1, nil)
-        if sqlite3_step(markStmt) == SQLITE_DONE {
-            logger.debug("\(tag) marked processed_objects")
-        }
-        sqlite3_finalize(markStmt)
-        sqlite3_close(db)
+        // an earlier run found the message in the inbox and showed it
+        guard let objectId = pushedObjectId else { return nil }
+        let id = notificationId(objectId: objectId)
+        guard Shown.contains(id) else { return nil }
+        return Shown.delivered(id) ?? (filtersNotifications ? UNNotificationContent() : nil)
     }
 
-    /// the text of a decrypted object, or a label when it only carries attachments
-    private static func notificationBody(of obj: [String: Any]) -> String? {
-        if let content = obj["content"] as? String, !content.isEmpty {
+    private func fetchInbox(_ config: SharedConfig, _ session: URLSession) -> [[String: Any]]? {
+        var request = URLRequest(url: config.inbox)
+        request.setValue("Bearer \(config.token)", forHTTPHeaderField: "Authorization")
+        guard let result = session.load(request),
+              (result.1 as? HTTPURLResponse)?.statusCode == 200,
+              let json = try? JSONSerialization.jsonObject(with: result.0) as? [String: Any]
+        else {
+            logger.error("fetching the inbox failed")
+            return nil
+        }
+        return json["orderedItems"] as? [[String: Any]] ?? []
+    }
+
+    private func apply(_ inbox: [[String: Any]]) -> [Applied] {
+        guard let key = SharedConfig.mlsKey(),
+              let dbPath = FileManager.default
+                .containerURL(forSecurityApplicationGroupIdentifier: appGroup)?
+                .appendingPathComponent("mls.db").path
+        else {
+            logger.error("no MLS key or database")
+            return []
+        }
+        var err: UnsafeMutablePointer<CChar>?
+        // waits up to five seconds while the app holds the database
+        let opened = key.withUnsafeBytes { bytes in
+            openmls_push_open(dbPath, bytes.bindMemory(to: UInt8.self).baseAddress, key.count, &err)
+        }
+        guard let push = opened else {
+            logger.error("opening the MLS database failed: \(takeString(err), privacy: .public)")
+            return []
+        }
+        // closed before anything is shown: iOS ends a suspended process that
+        // holds a lock on a file in the app group
+        defer { openmls_push_close(push) }
+
+        var applied: [Applied] = []
+        var waiting = Set<Data>()
+        for item in inbox {
+            guard Date() < deadline else { break }
+            guard item["type"] as? String == "Create",
+                  let actor = item["actor"] as? String,
+                  let object = item["object"] as? [String: Any],
+                  object["type"] as? String == "PrivateMessage",
+                  let objectId = object["id"] as? String,
+                  let content = object["content"] as? String,
+                  let message = Data(base64Encoded: content),
+                  let groupId = groupId(of: message),
+                  !waiting.contains(groupId)
+            else { continue }
+            switch receive(push, message, objectId: objectId, actor: actor) {
+            case .applied(let message):
+                applied.append(message)
+            case .notApplication:
+                // the app applies it, and then what follows it
+                waiting.insert(groupId)
+            case .failed(let error):
+                // e.g. a group this device has not joined yet
+                logger.error("\(objectId, privacy: .public) not applied: \(error, privacy: .public)")
+                waiting.insert(groupId)
+            }
+        }
+        return applied
+    }
+
+    private func groupId(of message: Data) -> Data? {
+        var group: UnsafeMutablePointer<UInt8>?
+        var groupLen = 0
+        let rc = message.withUnsafeBytes { bytes in
+            openmls_push_group_id(bytes.bindMemory(to: UInt8.self).baseAddress, message.count,
+                                  &group, &groupLen, nil)
+        }
+        return rc == 0 ? takeBytes(group, groupLen) : nil
+    }
+
+    private enum Received {
+        case applied(Applied)
+        case notApplication
+        case failed(String)
+    }
+
+    private func receive(_ push: OpaquePointer, _ message: Data, objectId: String, actor: String) -> Received {
+        var plaintext: UnsafeMutablePointer<UInt8>?
+        var plaintextLen = 0
+        var sender: UnsafeMutablePointer<UInt8>?
+        var senderLen = 0
+        var group: UnsafeMutablePointer<UInt8>?
+        var groupLen = 0
+        var err: UnsafeMutablePointer<CChar>?
+        let rc = message.withUnsafeBytes { bytes in
+            openmls_push_receive(push, bytes.bindMemory(to: UInt8.self).baseAddress, message.count,
+                                 objectId, &plaintext, &plaintextLen, &sender, &senderLen,
+                                 &group, &groupLen, &err)
+        }
+        let groupId = takeBytes(group, groupLen)
+        switch rc {
+        case OPENMLS_PUSH_STASHED, OPENMLS_PUSH_ALREADY_STASHED:
+            return .applied(Applied(
+                objectId: objectId,
+                actor: actor,
+                groupId: groupId,
+                sender: String(decoding: takeBytes(sender, senderLen), as: UTF8.self),
+                plaintext: takeBytes(plaintext, plaintextLen),
+                earlier: rc == OPENMLS_PUSH_ALREADY_STASHED))
+        case OPENMLS_PUSH_NOT_APPLICATION:
+            return .notApplication
+        default:
+            return .failed(takeString(err))
+        }
+    }
+
+    /// Mirrors the app's ack. The message was applied, so a failed ack only
+    /// leaves its inbox entry, which is acked again from there.
+    private func ack(_ message: Applied, _ config: SharedConfig, _ session: URLSession) {
+        let delivered: [String: Any] = [
+            "@context": ["https://www.w3.org/ns/activitystreams",
+                         ["ecp": "https://www.w3.org/ns/activitystreams"]],
+            "type": "Delivered",
+            "actor": config.actor,
+            "to": [message.actor],
+            "object": message.objectId,
+        ]
+        var request = URLRequest(url: config.outbox)
+        request.httpMethod = "POST"
+        request.setValue("Bearer \(config.token)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = try? JSONSerialization.data(withJSONObject: delivered)
+        let status = (session.load(request)?.1 as? HTTPURLResponse)?.statusCode ?? 0
+        if status != 201 {
+            logger.error("ack of \(message.objectId, privacy: .public) failed: \(status)")
+        }
+    }
+
+    /// What MessengerNotificationService shows on Android: the sender and the
+    /// text. Nothing for what the app does not show as a message, and no
+    /// content for a group it hides.
+    private func notification(for message: Applied, _ names: Names) -> UNNotificationContent? {
+        guard let activity = try? JSONSerialization.jsonObject(with: message.plaintext) as? [String: Any],
+              activity["type"] as? String == "Create",
+              let object = activity["object"] as? [String: Any],
+              let type = object["type"] as? String, type == "Note" || type == "Image"
+        else { return nil }
+
+        let content = UNMutableNotificationContent()
+        content.sound = .default
+        let group = base64Url(message.groupId)
+        content.threadIdentifier = group
+        guard let path = names.groups[group] else {
+            content.title = "New message"
             return content
         }
-        return attachments(of: obj).isEmpty ? nil : "GIF"
-    }
-
-    /// attachments of a decrypted object: an Image is sent on its own, a Note carries a list
-    private static func attachments(of obj: [String: Any]) -> [[String: Any]] {
-        if obj["type"] as? String == "Image" {
-            return [obj]
+        let uid = URL(string: message.sender)?.lastPathComponent ?? ""
+        content.title = names.users[uid].map { "@\($0)" } ?? "New message"
+        let text = (object["content"] as? String)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let attachments = object["attachments"] as? [Any] ?? []
+        if !text.isEmpty {
+            content.body = text
+        } else if type == "Image" || !attachments.isEmpty {
+            content.body = "Sent an attachment"
+        } else {
+            content.body = "New message"
         }
-        return obj["attachments"] as? [[String: Any]] ?? []
+        // what the app's tap handler opens
+        content.userInfo = ["data": ["type": "message", "path": path]]
+        return content
     }
 
-    /// mirrors _DriftMessageStore.saveMessage so the app can render the attachments
-    private func insertAttachments(db: OpaquePointer, messageId: String, attachments: [[String: Any]]) {
-        let tag = "[insertAttachments]"
-        let sql = "INSERT INTO message_attachments (message_id, attachment_id, position, object) VALUES (?, ?, ?, ?);"
-        for (index, attachment) in attachments.enumerated() {
-            guard let attachmentId = attachment["id"] as? String,
-                  let data = try? JSONSerialization.data(withJSONObject: attachment),
-                  let objectJson = String(data: data, encoding: .utf8)
-            else { continue }
-
-            var stmt: OpaquePointer?
-            guard sqlite3_prepare_v2(db, sql, -1, &stmt, nil) == SQLITE_OK,
-                  let stmt = stmt
-            else {
-                let msg = String(cString: sqlite3_errmsg(db))
-                logger.debug("\(tag) prepare failed: \(msg, privacy: .public)")
-                return
+    private func show(_ request: UNNotificationRequest) {
+        let done = DispatchSemaphore(value: 0)
+        UNUserNotificationCenter.current().add(request) { error in
+            if let error = error {
+                logger.error("showing failed: \(error.localizedDescription, privacy: .public)")
             }
-            sqlite3_bind_text(stmt, 1, (messageId as NSString).utf8String, -1, nil)
-            sqlite3_bind_text(stmt, 2, (attachmentId as NSString).utf8String, -1, nil)
-            sqlite3_bind_int64(stmt, 3, Int64(index))
-            sqlite3_bind_text(stmt, 4, (objectJson as NSString).utf8String, -1, nil)
-            if sqlite3_step(stmt) != SQLITE_DONE {
-                let msg = String(cString: sqlite3_errmsg(db))
-                logger.debug("\(tag) insert failed: \(msg, privacy: .public)")
-            }
-            sqlite3_finalize(stmt)
+            done.signal()
         }
+        _ = done.wait(timeout: .now() + 2)
     }
+}
 
-    /// read the ecp.db encryption key from the shared .ecp_db_key file in the App Group container.
-    /// eko flutter writes this file in _writeSharedDbKeyFile().
-    private func loadDbEncryptionKey() -> String? {
-        guard let appGroup = FileManager.default
-                .containerURL(forSecurityApplicationGroupIdentifier: "group.com.example.untitledApp")
+/// What the app shares in the keychain, see notification_service_share.dart.
+private struct SharedConfig {
+    let actor: String
+    let inbox: URL
+    let outbox: URL
+    let token: String
+
+    static func load() -> SharedConfig? {
+        guard let data = keychainItem("messenger_notification_service"),
+              let json = try? JSONSerialization.jsonObject(with: data) as? [String: String],
+              let actor = json["actor"],
+              let inbox = json["inbox"].flatMap({ URL(string: $0) }),
+              let outbox = json["outbox"].flatMap({ URL(string: $0) }),
+              let token = json["token"]
         else { return nil }
-        let fileUrl = appGroup.appendingPathComponent(".ecp_db_key")
-        guard let data = try? Data(contentsOf: fileUrl),
-              let key = String(data: data, encoding: .utf8), !key.isEmpty
+        return SharedConfig(actor: actor, inbox: inbox, outbox: outbox, token: token)
+    }
+
+    static func mlsKey() -> Data? {
+        guard let data = keychainItem("mls_encryption_key"),
+              let b64 = String(data: data, encoding: .utf8),
+              let key = Data(base64Encoded: b64), key.count == 32
         else { return nil }
         return key
     }
 
-    func loadEncryptionKey() -> Data {
+    private static func keychainItem(_ account: String) -> Data? {
         let query: [String: Any] = [
-             kSecClass as String: kSecClassGenericPassword,
-             kSecAttrAccount as String: "mls_encryption_key",
-             kSecReturnData as String: true,
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrAccount as String: account,
+            kSecReturnData as String: true,
         ]
         var item: CFTypeRef?
         let status = SecItemCopyMatching(query as CFDictionary, &item)
-        if status == errSecSuccess, let data = item as? Data {
-            if let b64 = String(data: data, encoding: .utf8),
-               let key = Data(base64Encoded: b64),
-               key.count == 32
-            {
-                return key
-            }
-            debugBody("DEBUG: found \(data.count)B not valid key")
-            return Data()
-        } else {
-            debugBody("DEBUG: status=\(status)")
-            return Data()
+        guard status == errSecSuccess else {
+            logger.error("keychain \(account, privacy: .public): \(status)")
+            return nil
         }
-        debugBody("DEBUG: all queries returned errSecItemNotFound")
-        return Data()
+        return item as? Data
     }
 }
 
+/// The active groups by base64url group id, with the path the app opens for
+/// each, and usernames by uid. Written by the app.
+private struct Names {
+    var groups: [String: String] = [:]
+    var users: [String: String] = [:]
 
+    static func load() -> Names {
+        guard let url = FileManager.default
+                .containerURL(forSecurityApplicationGroupIdentifier: appGroup)?
+                .appendingPathComponent("notification_names.json"),
+              let data = try? Data(contentsOf: url),
+              let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
+        else { return Names() }
+        return Names(groups: json["groups"] as? [String: String] ?? [:],
+                     users: json["users"] as? [String: String] ?? [:])
+    }
+}
+
+/// The ids of the last notifications shown for messages other than their
+/// push's, which their own push then replaces.
+private enum Shown {
+    private static let limit = 200
+    private static var url: URL? {
+        FileManager.default
+            .containerURL(forSecurityApplicationGroupIdentifier: appGroup)?
+            .appendingPathComponent("notification_shown.json")
+    }
+
+    private static func load() -> [String] {
+        guard let url = url, let data = try? Data(contentsOf: url) else { return [] }
+        return (try? JSONSerialization.jsonObject(with: data) as? [String]) ?? []
+    }
+
+    static func contains(_ id: String) -> Bool {
+        load().contains(id)
+    }
+
+    static func add(_ ids: [String]) {
+        guard !ids.isEmpty, let url = url,
+              let data = try? JSONSerialization.data(withJSONObject: Array((load() + ids).suffix(limit)))
+        else { return }
+        try? data.write(to: url, options: .atomic)
+    }
+
+    /// What is shown under `id`, while it is in Notification Center.
+    static func delivered(_ id: String) -> UNNotificationContent? {
+        let done = DispatchSemaphore(value: 0)
+        let content = Box<UNNotificationContent>()
+        UNUserNotificationCenter.current().getDeliveredNotifications { notifications in
+            content.value = notifications.first { $0.request.identifier == id }?.request.content
+            done.signal()
+        }
+        _ = done.wait(timeout: .now() + 2)
+        return content.value
+    }
+}
+
+/// What a completion handler hands back to a caller that waits for it.
+private final class Box<Value>: @unchecked Sendable {
+    var value: Value?
+}
+
+private func takeBytes(_ pointer: UnsafeMutablePointer<UInt8>?, _ count: Int) -> Data {
+    guard let pointer = pointer else { return Data() }
+    defer { openmls_push_free_bytes(pointer, count) }
+    return Data(bytes: pointer, count: count)
+}
+
+private func takeString(_ pointer: UnsafeMutablePointer<CChar>?) -> String {
+    guard let pointer = pointer else { return "unknown error" }
+    defer { openmls_push_free_string(pointer) }
+    return String(cString: pointer)
+}
+
+private extension URLSession {
+    /// Blocks, runs are on their own queue.
+    func load(_ request: URLRequest) -> (Data, URLResponse)? {
+        let done = DispatchSemaphore(value: 0)
+        let result = Box<(Data, URLResponse)>()
+        dataTask(with: request) { data, response, _ in
+            if let data = data, let response = response {
+                result.value = (data, response)
+            }
+            done.signal()
+        }.resume()
+        done.wait()
+        return result.value
+    }
+}

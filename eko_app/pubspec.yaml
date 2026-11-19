@@ -1,7 +1,7 @@
 name: eko_app
 description: A new Flutter project.
 publish_to: 'none'
-version: 2.2.1+72
+version: 2.2.2+73
 environment:
   sdk: '>=3.8.0 <4.0.0'
 dependencies:
@@ -60,7 +60,7 @@ dependencies:
   ecp:
     git:
       url: https://github.com/eko-network/ecp-dart-sdk.git
-      ref: 150ed5a9ff1f23c75d3c0320ade8accb2ed4b636
+      ref: 132fd6b0155f8a5fe5b3b6c2325854a170e03aae
   sqlite3: ^3.5.2
   drift: ^2.34.4
   lucide_icons_flutter: ^3.1.14+2
@@ -72,8 +72,6 @@ dependency_overrides:
   markdown: ^7.3.1
   flutter_math_fork: ^0.7.4
 
-# the iOS notification extension reads ecp.db with the SQLCipher pod, so the app
-# has to write the same format
 hooks:
   user_defines:
     sqlite3:

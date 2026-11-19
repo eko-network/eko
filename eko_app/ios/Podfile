@@ -40,9 +40,9 @@ target 'Runner' do
   end
 end
 
+# links OpenmlsPush.xcframework instead, see build_openmls_push.sh
 target 'MessengerNotificationService' do
   use_frameworks!
-  pod 'SQLCipher', '~> 4.10.0'
 end
 
 # uncomment for not using ccache

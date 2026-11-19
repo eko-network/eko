@@ -1,31 +1,36 @@
-# iOS: openmls Push Decryption Extension
+# iOS: Messenger Notification Service
 
-## Building the openmls Rust Library for iOS
+Messenger pushes only say that a message arrived. The `MessengerNotificationService`
+extension fetches the inbox, applies its messages to `mls.db` in the App Group,
+acks them, and shows one notification per message. The app stores what it
+applied when it next runs (the openmls stash, see `processMessageStashed`).
 
-The `openmls_push_decrypt.xcframework` contains the Rust static library (`libopenmls_frb.a`) used by the `MessengerNotificationService` extension. To rebuild it from source:
+It shares with the app:
 
-### Prerequisites
+- `mls_encryption_key` in the keychain, the key of `mls.db`
+- `messenger_notification_service` in the keychain: the inbox, outbox and a
+  notification token the messenger mints for the device, which only reads the
+  inbox and sends `Delivered` acks
+- `notification_names.json` in the App Group: the active groups and usernames
+  it titles notifications with
+
+## Building OpenmlsPush.xcframework
+
+The extension links `OpenmlsPush.xcframework`, the C API in `push_ffi/` of
+the openmls package (`openmls_push.h`). It is built from the copy of the
+package `flutter pub get` resolved, so the extension and the app use the same
+engine:
 
 ```bash
-# Install Rust
-# Add iOS targets
 rustup target add aarch64-apple-ios aarch64-apple-ios-sim x86_64-apple-ios
+flutter pub get
+ios/build_openmls_push.sh
 ```
 
-### Build
+Codemagic does the same before `pod install`. Rebuild it whenever the openmls
+dependency changes.
 
-```bash
-# Navigate to the openmls_dart package
-cd /path/to/openmls_dart
-
-# Build static libraries for device + sim
-make build-ios-static
-
-# Create the XCFramework (overwrites ios/openmls_push_decrypt.xcframework)
-make xcframework
-```
-
-If you are in a direnv, you will need to make sure you can find the iphoneos sdk. Nix overrides SDKROOT which does not contain the SDK. It should be the following:
+If you are in a direnv, you will need to make sure you can find the iphoneos sdk. Nix overrides SDKROOT which does not contain the SDK, the script unsets it. It should be the following:
 ```
 xcrun --show-sdk-path --sdk iphoneos
 /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.5.sdk
@@ -38,11 +43,10 @@ sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer
 
 But you will need to probably `direnv disallow`.
 
-This produces:
-- `rust/target/aarch64-apple-ios/release/libopenmls_frb.a` — device (arm64)
-- `rust/target/aarch64-apple-ios-sim/release/libopenmls_frb.a` — simulator (arm64)
-- `rust/target/x86_64-apple-ios/release/libopenmls_frb.a` — simulator (x86_64)
+## Hiding notifications
 
-The `xcframework` target merges these into `ios/openmls_push_decrypt.xcframework`.
-Copy the resulting `.xcframework` and `openmls_push_decrypt.h` header into the app's `ios/` directory.
-
+Without the `com.apple.developer.usernotifications.filtering` entitlement every
+push shows a notification, so a push whose message was already shown shows it
+again. Once Apple grants it, add it to
+`MessengerNotificationService.entitlements` and set `EkoFiltersNotifications`
+in its `Info.plist`, and those pushes show nothing.

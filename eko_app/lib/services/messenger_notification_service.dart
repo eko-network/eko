@@ -175,7 +175,7 @@ class MessengerNotificationService {
     )..where((t) => t.groupIdBytes.equals(message.groupId))).getSingleOrNull();
     if (group == null || !group.isActive) return;
 
-    final username = await _username(uidFromActorId(message.senderId));
+    final sender = await username(uidFromActorId(message.senderId));
     final content = message.content?.trim() ?? '';
     final body = content.isNotEmpty
         ? content
@@ -185,7 +185,7 @@ class MessengerNotificationService {
 
     await NotificationHelper.showLocalNotification(
       id: _notificationIdBase + group.id,
-      title: username != null ? '@$username' : 'New message',
+      title: sender != null ? '@$sender' : 'New message',
       body: body,
       channelId: _channelId,
       channelName: _channelName,
@@ -195,7 +195,7 @@ class MessengerNotificationService {
     );
   }
 
-  static Future<String?> _username(String uid) async {
+  static Future<String?> username(String uid) async {
     if (_usernames.containsKey(uid)) return _usernames[uid];
     try {
       final response = await supabase.rpc(

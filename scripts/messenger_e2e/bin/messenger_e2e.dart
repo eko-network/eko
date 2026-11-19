@@ -273,6 +273,64 @@ Future<void> main() async {
     );
   });
 
+  await step('the notification service syncs with its own token', () async {
+    final token = await bob1.client.mintNotificationToken();
+    final service = _NotificationService(bob1, token);
+    // a receipt for bob waits in his inbox
+    await bob1.sendText(dm, 'before going away');
+    await receives(alice1, (m) => m.content == 'before going away');
+    await alice1.sendText(dm, 'while bob is away');
+
+    await until('the service to apply the message', () async {
+      await service.sync();
+      final stashed = await bob1.core.stashedMessages();
+      return stashed.any(
+        (m) => utf8.decode(m.plaintext).contains('while bob is away'),
+      );
+    });
+    check(
+      bob1.storage.messages.every((m) => m.content != 'while bob is away'),
+      'the service should leave storing to the app',
+    );
+
+    for (final (what, status) in [
+      ('a create', await service.post(_noteFor(alice1, bob1))),
+      (
+        'the devices',
+        await service.get(
+          bob1.person.id.replace(
+            pathSegments: [...bob1.person.id.pathSegments, 'devices'],
+          ),
+        ),
+      ),
+      ('a new token', await service.post(null, path: 'notificationToken')),
+    ]) {
+      check(status == 403, 'the token should not reach $what, got $status');
+    }
+
+    await bob1.sync();
+    check(
+      bob1.storage.messages.any((m) => m.content == 'while bob is away'),
+      'the app should store what the service applied',
+    );
+    check(
+      (await bob1.core.stashedMessages()).isEmpty,
+      'the app should clear the stash',
+    );
+    check(
+      bob1.storage.messages
+          .where((m) => m.content == 'before going away')
+          .every((m) => m.delivered),
+      "the service should leave bob's receipts for the app",
+    );
+    await until("alice to see the service's ack", () async {
+      await alice1.sync();
+      return alice1.storage.messages.any(
+        (m) => m.content == 'while bob is away' && m.delivered,
+      );
+    });
+  });
+
   await step("new chats include the creator's other devices", () async {
     final (group, _) = await alice1.client.groups.createGroup([
       alice1.personFor(carol1.uid),
@@ -284,6 +342,10 @@ Future<void> main() async {
   });
 
   await step('an approved device can remove another', () async {
+    final service = _NotificationService(
+      alice2,
+      await alice2.client.mintNotificationToken(),
+    );
     await alice1.removeDevice(alice2.did);
     await alice1.client.groups.removeDeviceFromGroups(
       publicKey: alice2.credential.signerPublicKey,
@@ -315,6 +377,8 @@ Future<void> main() async {
     } on EcpNetworkException {
       // the server refusing the removed device entirely is fine too
     }
+    final status = await service.get(alice2.person.inbox);
+    check(status == 410, "a removed device's token should not work: $status");
   });
 
   // the service role key stands in for a malicious server: it can write any
@@ -1113,6 +1177,82 @@ Future<void> sendRefused(SimDevice device, Uint8List groupId, Uri owner) async {
     'a refused message should not be stored',
   );
 }
+
+/// What MessengerNotificationService does on iOS with the device's
+/// notification token: apply the application messages in the inbox, which
+/// stashes them for the app, and ack them.
+class _NotificationService {
+  final SimDevice device;
+  final String token;
+  final _http = http.Client();
+
+  _NotificationService(this.device, this.token);
+
+  Map<String, String> get _headers => {
+    'Authorization': 'Bearer $token',
+    'Content-Type': 'application/json',
+  };
+
+  Future<void> sync() async {
+    final res = await _http.get(device.person.inbox, headers: _headers);
+    check(res.statusCode == 200, 'inbox with the token: ${res.statusCode}');
+    final items = ((jsonDecode(res.body) as Map)['orderedItems'] as List? ?? [])
+        .cast<Map<String, dynamic>>();
+    check(
+      items.every((item) => item['type'] == 'Create'),
+      'the token should only be handed creates',
+    );
+    for (final item in items) {
+      final object = item['object'] as Map<String, dynamic>;
+      if (object['type'] != 'PrivateMessage') continue;
+      final message = base64Decode(object['content'] as String);
+      if (mlsMessageContentType(messageBytes: message) != 'application') {
+        continue;
+      }
+      await device.core.decryptPrivateMessage(
+        ciphertext: message,
+        stashId: object['id'] as String,
+      );
+      final status = await post({
+        '@context': ecpJsonLdContext,
+        'type': 'Delivered',
+        'actor': device.person.id.toString(),
+        'to': [item['actor']],
+        'object': object['id'],
+      });
+      check(status == 201, 'ack with the token: $status');
+    }
+  }
+
+  Future<int> get(Uri url) async =>
+      (await _http.get(url, headers: _headers)).statusCode;
+
+  Future<int> post(Object? body, {String? path}) async {
+    final me = device.person;
+    final url = path == null
+        ? me.outbox
+        : me.id.replace(pathSegments: [...me.id.pathSegments, path]);
+    final res = await _http.post(
+      url,
+      headers: _headers,
+      body: body == null ? null : jsonEncode(body),
+    );
+    return res.statusCode;
+  }
+}
+
+Map<String, dynamic> _noteFor(SimDevice to, SimDevice from) => {
+  '@context': ecpJsonLdContext,
+  'type': 'Create',
+  'actor': from.person.id.toString(),
+  'to': [to.person.id.toString()],
+  'object': {
+    'type': 'PrivateMessage',
+    'actor': from.person.id.toString(),
+    'to': [to.person.id.toString()],
+    'content': base64Encode([0, 1, 0, 2]),
+  },
+};
 
 /// Syncs [device] until a stored message matches.
 Future<StoredMessage> receives(
