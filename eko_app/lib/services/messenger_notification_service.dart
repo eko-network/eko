@@ -114,14 +114,12 @@ class MessengerNotificationService {
         identity: EkoPerson.fromUid(session.user.id),
         engineConfig: engineConfig,
       );
-      httpClient = AuthenticatedClient(
-        () => supabase.auth.currentSession?.accessToken,
-      );
+      httpClient = AuthenticatedClient(freshAccessToken);
       final client = await EcpClient.build(
         core: core,
         did: did,
         client: httpClient,
-        tokenGetter: () => supabase.auth.currentSession?.accessToken ?? '',
+        tokenGetter: () async => await freshAccessToken() ?? '',
       );
       await showForMessages(await client.getInbox(), me: core.identity.id);
     } catch (e, st) {

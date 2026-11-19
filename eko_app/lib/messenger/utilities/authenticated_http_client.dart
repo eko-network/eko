@@ -1,9 +1,11 @@
+import 'dart:async';
+
 import 'package:http/http.dart' as http;
 
 const messagesServerTimeout = Duration(seconds: 10);
 
 class AuthenticatedClient extends http.BaseClient {
-  final String? Function() _getToken;
+  final FutureOr<String?> Function() _getToken;
   final http.Client _inner;
 
   /// Called when the messenger server says this device was removed from the
@@ -15,7 +17,7 @@ class AuthenticatedClient extends http.BaseClient {
 
   @override
   Future<http.StreamedResponse> send(http.BaseRequest request) async {
-    final token = _getToken();
+    final token = await _getToken();
     if (token != null && token.isNotEmpty) {
       request.headers['Authorization'] = 'Bearer $token';
     }

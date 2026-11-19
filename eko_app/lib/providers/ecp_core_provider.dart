@@ -272,9 +272,7 @@ class EcpCoreHolder extends _$EcpCoreHolder {
       throw StateError('MLS credential not available');
     }
 
-    final client = AuthenticatedClient(
-      () => supabase.auth.currentSession?.accessToken,
-    );
+    final client = AuthenticatedClient(freshAccessToken);
 
     try {
       final activitySender = ActivitySender(

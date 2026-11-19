@@ -5,6 +5,14 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 SupabaseClient get supabase => Supabase.instance.client;
 
+/// The session only refreshes itself while the app is in the foreground, so a
+/// backgrounded app woken by a push would otherwise send an expired token.
+Future<String?> freshAccessToken() async {
+  final session = supabase.auth.currentSession;
+  if (session == null || !session.isExpired) return session?.accessToken;
+  return (await supabase.auth.refreshSession()).session?.accessToken;
+}
+
 /// [background] is for headless push engines, which have no activity to
 /// receive auth deep links.
 Future<void> initSupabase({bool background = false}) async {

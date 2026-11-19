@@ -36,7 +36,7 @@ Future<EcpClient> asyncEcpClient(Ref ref) async {
 
   final holder = ref.read(ecpCoreHolderProvider.notifier);
   final httpClient = AuthenticatedClient(
-    () => supabase.auth.currentSession?.accessToken,
+    freshAccessToken,
     onDeviceRemoved: () => unawaited(holder.checkDeviceRemoved()),
   );
 
@@ -48,7 +48,7 @@ Future<EcpClient> asyncEcpClient(Ref ref) async {
     core: core,
     did: DeviceUidService.getOrCreate(),
     client: httpClient,
-    tokenGetter: () => supabase.auth.currentSession?.accessToken ?? '',
+    tokenGetter: () async => await freshAccessToken() ?? '',
   );
 }
 
