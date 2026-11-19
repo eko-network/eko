@@ -19,7 +19,7 @@ let
       inherit version;
       src = "${src}/rust";
       # Update when the openmls pub version changes.
-      cargoHash = "sha256-1DZ2mL9Qwk8GnFBXB2UrCutalsdEUzWMkBOUcpyxoB0=";
+      cargoHash = "sha256-ZfWMkjcqeT3AHpU0Z+CDa+j00Uxnxcumf4VXQ4b9ug0=";
       # Bundle sqlcipher and OpenSSL like upstream's prebuilt, so the
       # tarball doesn't depend on the host having libsqlcipher.
       dontCargoUseSystemLibs = true;
@@ -43,8 +43,9 @@ pkgs.flutter.buildFlutterApplication {
   src = lib.cleanSource ../eko_app;
   autoPubspecLock = ../eko_app/pubspec.lock;
   gitHashes = {
-    ecp = "sha256-NXVYVNnu89ITDs7ajzr1SaiEnVCKWWsfCNj/CTnglXM=";
+    ecp = "sha256-AWPjur/i+1e68TE7B0zMfDnT9nmQRmIREDC4realT10=";
     webcrypto = "sha256-XkZe7LcVyUtUJoTqeyd87xLENJIIExgyI9lym/aQBtw=";
+    openmls = "sha256-7oz9fVZ6nK8zeUwjKofnVrrwvKf91K+JOjCTdkgT70I=";
   };
   customSourceBuilders.openmls = openmlsFrb;
   dontUseCmakeConfigure = true;
