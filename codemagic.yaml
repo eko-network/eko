@@ -22,7 +22,7 @@ workflows:
         - upload-keystore
       vars:
         PACKAGE_NAME: "com.echo.android"
-      flutter: stable
+      flutter: 3.47.4
     scripts:
       - name: Get Dependencies
         script: flutter pub get
@@ -82,7 +82,7 @@ workflows:
       ios_signing:
         distribution_type: app_store
         bundle_identifier: com.example.untitledApp
-      flutter: stable
+      flutter: 3.47.4
       xcode: latest
     scripts:
       - name: Get Dependencies
@@ -138,7 +138,7 @@ workflows:
       ios_signing:
         distribution_type: app_store
         bundle_identifier: com.example.untitledApp
-      flutter: stable
+      flutter: 3.47.4
       xcode: latest
     scripts:
       - name: Get Dependencies
@@ -195,7 +195,7 @@ workflows:
       groups:
         - secrets
         - firebase
-      flutter: stable
+      flutter: 3.47.4
     scripts:
       - name: Get Dependencies
         script: flutter pub get
