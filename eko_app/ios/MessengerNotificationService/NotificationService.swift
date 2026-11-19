@@ -29,114 +29,14 @@ class NotificationService: UNNotificationServiceExtension {
         self.contentHandler = contentHandler
         bestAttemptContent = request.content.mutableCopy() as? UNMutableNotificationContent
         
-        let userInfo = request.content.userInfo
-        
-        guard let ciphertextB64 = userInfo["mls_message"] as? String else {
-            let msg = "mls_message missing"
-            logger.debug("[didReceive] \(msg)")
-            debugBody("DEBUG: \(msg). got: \(userInfo["mls_message"] ?? "nil")")
-            return
+        // the openmls_push_decrypt.xcframework this used was never committed, so
+        // decryption is disabled until it is (see README.md) and every push
+        // shows a generic notification. git history has the decrypt path.
+        logger.debug("[didReceive] push decryption disabled")
+        bestAttemptContent?.body = "New message"
+        if let content = bestAttemptContent {
+            contentHandler(content)
         }
-        guard let ciphertext = Data(base64Encoded: ciphertextB64) else {
-            let msg = "mls_message b64 decode failed"
-            logger.debug("[didReceive] \(msg)")
-            debugBody("DEBUG: \(msg): \(String(ciphertextB64.prefix(40)))...")
-            return
-        }
-        guard let serverMessageId = userInfo["object_id"] as? String else {let msg = "object_id missing"
-            logger.debug("[didReceive] \(msg)")
-            debugBody("DEBUG: \(msg). got: \(userInfo["object_id"] ?? "nil")")
-            return}
-
-        guard let dbPath = FileManager.default
-                .containerURL(forSecurityApplicationGroupIdentifier: "group.com.example.untitledApp")?
-                .appendingPathComponent("mls.db").path
-        else {
-            let msg = "no dbPath (App Group container missing?)"
-            logger.debug("[didReceive] \(msg)")
-            debugBody("DEBUG: \(msg)")
-            return
-        }
-        
-        // get the key
-        let key = loadEncryptionKey()
-        guard key.count == 32 else {
-            logger.debug("[didReceive] encryption key not 32 bytes, got \(key.count)")
-            return
-        }
-        
-        var err: UnsafeMutablePointer<CChar>?
-        let engine = key.withUnsafeBytes { keyBytes in
-            openmls_push_decrypt_create(dbPath, keyBytes.baseAddress!, 32, &err)
-        }
-        
-        if let err = err {
-            let msg = String(cString: err)
-            openmls_push_decrypt_free_string(err)
-            logger.debug("[didReceive] engine error: \(msg, privacy: .public)")
-            debugBody("DEBUG: engine error: \(msg)")
-            return
-        }
-        
-        var pt: UnsafeMutablePointer<UInt8>?
-        var ptLen: Int = 0
-
-        var gid: UnsafeMutablePointer<UInt8>?
-        var gidLen: Int = 0
-        
-        let rc = 
-            ciphertext.withUnsafeBytes { msg in
-                openmls_push_decrypt_message(
-                    engine,
-                    msg.baseAddress!, msg.count,
-                    &pt, &ptLen, nil, 
-                    &gid, &gidLen,
-                    &err
-                )
-        }
-        
-        if rc == 0, let pt = pt {
-            let plaintext = Data(bytes: pt, count: ptLen)
-            let groupId = Data(bytes: gid!, count: gidLen)
-            let body = String(data: plaintext, encoding: .utf8) ?? "New message"
-            openmls_push_decrypt_free_bytes(pt, ptLen)
-            openmls_push_decrypt_free_bytes(gid!, gidLen)
-            logger.debug("[didReceive] decrypted \(ptLen)B plaintext")
-
-            // store decrypted message in ecp.db so the app has when opend
-            storeDecryptedMessageInAppDb(groupId: groupId, serverMessageId: serverMessageId, plaintext: plaintext)
-
-            // try to extract message content from ActivityPub JSON
-            if let json = try? JSONSerialization.jsonObject(with: plaintext) as? [String: Any],
-               let obj = json["object"] as? [String: Any],
-               let content = Self.notificationBody(of: obj) {
-                bestAttemptContent?.body = content
-                // use sender's name from actor field if available
-                if let actor = json["actor"] as? String,
-                   let actorUrl = URL(string: actor) {
-                    bestAttemptContent?.title = actorUrl.lastPathComponent
-                }
-            } else {
-                bestAttemptContent?.body = body
-            }
-            if let content = bestAttemptContent {
-                contentHandler(content)
-            }
-        } else if rc == 1 {
-            logger.debug("[didReceive] non-application msg (rc=1)")
-            debugBody("DEBUG: non-application msg (rc=1)")
-        } else if let err = err {
-            let msg = String(cString: err)
-            openmls_push_decrypt_free_string(err)
-            logger.debug("[didReceive] decrypt error: \(msg, privacy: .public)")
-            debugBody("DEBUG: decrypt error: \(msg)")
-        } else {
-            logger.debug("[didReceive] unknown failure rc=\(rc)")
-            debugBody("DEBUG: unknown failure rc=\(rc)")
-        }
-        
-        openmls_push_decrypt_free(engine)
-        logger.debug("[didReceive] engine freed")
     }
     
     override func serviceExtensionTimeWillExpire() {
