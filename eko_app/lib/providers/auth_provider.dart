@@ -229,7 +229,8 @@ class Auth extends _$Auth {
   }
 
   Future<void> _cleanAfterSignOut() async {
-    await AppStorage(db).clear();
+    // web has no messenger database
+    if (!platform.isWeb) await AppStorage(db).clear();
     await NotificationServiceShare.clear();
     state = AsyncValue.data(AuthModel.signedOut());
   }
