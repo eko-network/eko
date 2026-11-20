@@ -1,10 +1,12 @@
 import 'dart:math' show min;
 import 'package:ecp/ecp.dart' as ecp;
 import 'package:eko_app/localization/generated/app_localizations.dart';
+import 'package:eko_app/messenger/ecp_helpers.dart';
 import 'package:eko_app/messenger/providers/time_provider.dart';
 import 'package:eko_app/messenger/views/chat_view.dart';
 import 'package:eko_app/messenger/widgets/message_quote.dart';
 import 'package:eko_app/messenger/widgets/relative_time.dart';
+import 'package:eko_app/providers/user_provider.dart';
 import 'package:eko_app/utilities/emoji_text_style.dart';
 import 'package:eko_app/widgets/users/profile_picture.dart';
 import 'package:flutter/material.dart';
@@ -205,6 +207,10 @@ class MessageWidget extends StatelessWidget {
   /// The members whose newest read message this is, shown under it.
   final List<String> readBy;
 
+  /// In group chats, received messages show who sent them: an avatar beside
+  /// the bottom of each stack and the username above its top.
+  final bool showSender;
+
   /// Called with the bubble's position on screen.
   final void Function(Rect bubble)? onActions;
   final VoidCallback? onReply;
@@ -224,6 +230,7 @@ class MessageWidget extends StatelessWidget {
     this.sending = false,
     this.read = false,
     this.readBy = const [],
+    this.showSender = false,
     this.onActions,
     this.onReply,
     this.onQuoteTap,
@@ -236,6 +243,10 @@ class MessageWidget extends StatelessWidget {
     final isBottom =
         position == MessagePosition.single ||
         position == MessagePosition.bottom;
+    final isTop =
+        position == MessagePosition.single || position == MessagePosition.top;
+    final withSender = showSender && isReceived;
+    final senderUid = uidFromActorId(message.senderId);
 
     void openActions(BuildContext bubbleContext) {
       final box = bubbleContext.findRenderObject() as RenderBox?;
@@ -264,6 +275,9 @@ class MessageWidget extends StatelessWidget {
       ),
     );
 
+    // what's under or above the bubble lines up with it, not the avatar
+    final indent = withSender ? _avatarSize + _avatarGap : 0.0;
+
     final body = Align(
       alignment: isReceived ? Alignment.centerLeft : Alignment.centerRight,
       child: Column(
@@ -272,12 +286,38 @@ class MessageWidget extends StatelessWidget {
             ? CrossAxisAlignment.start
             : CrossAxisAlignment.end,
         children: [
-          bubble,
+          if (withSender && isTop)
+            Padding(
+              padding: EdgeInsets.only(left: indent, bottom: 2),
+              child: _SenderName(uid: senderUid),
+            ),
+          if (withSender)
+            // the avatar's bottom on the stack's bottom
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                SizedBox(
+                  width: _avatarSize,
+                  child: isBottom
+                      ? ProfilePicture(
+                          uid: senderUid,
+                          size: _avatarSize,
+                          onlineIndicatorEnabled: false,
+                        )
+                      : null,
+                ),
+                const SizedBox(width: _avatarGap),
+                bubble,
+              ],
+            )
+          else
+            bubble,
           if (reactions.isNotEmpty)
             Transform.translate(
               offset: const Offset(0, -6),
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
+                padding: EdgeInsets.only(left: 8 + indent, right: 8),
                 child: _ReactionsPill(
                   reactions: reactions,
                   me: me,
@@ -288,6 +328,7 @@ class MessageWidget extends StatelessWidget {
           if (!_hasText(message) && isBottom)
             Padding(
               padding: EdgeInsets.only(
+                left: indent,
                 top: reactions.isEmpty ? 5 : 0,
                 bottom: 10,
               ),
@@ -332,6 +373,31 @@ class MessageWidget extends StatelessWidget {
               reverse: !isReceived,
               child: content,
             ),
+    );
+  }
+}
+
+const double _avatarSize = 28;
+const double _avatarGap = 8;
+
+/// The username of who sent a message, above its stack in group chats.
+class _SenderName extends ConsumerWidget {
+  final String uid;
+
+  const _SenderName({required this.uid});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.watch(userProvider(uid));
+    final username = user.value?.name ?? user.value?.username ?? '';
+    return Text(
+      username,
+      style: TextStyle(
+        fontSize: 12,
+        fontWeight: FontWeight.w500,
+        color: Theme.of(context).colorScheme.onSurfaceVariant,
+      ),
+      overflow: TextOverflow.ellipsis,
     );
   }
 }

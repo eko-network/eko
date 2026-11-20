@@ -90,6 +90,37 @@ extension ReadState on AppDatabase {
       );
     return query.map((row) => row.read(count)!);
   }
+
+  /// Whether [me] has not read a message of others in any active group, see
+  /// [unreadCount].
+  Selectable<bool> hasUnread(Uri me) {
+    final m = storedMessages;
+    final position = subqueryExpression<DateTime>(
+      selectOnly(readCursors)
+        ..addColumns([readCursors.position])
+        ..where(
+          readCursors.groupId.equalsExp(m.groupId) &
+              readCursors.reader.equalsValue(me),
+        ),
+    );
+    final query =
+        selectOnly(m).join([
+            innerJoin(
+              mlsGroups,
+              mlsGroups.groupIdBytes.equalsExp(m.groupId),
+              useColumns: false,
+            ),
+          ])
+          ..addColumns([m.serverActivityId])
+          ..where(
+            mlsGroups.isActive &
+                m.senderId.equalsValue(me).not() &
+                m.deleted.not() &
+                (position.isNull() | m.receivedAt.isBiggerThan(position)),
+          )
+          ..limit(1);
+    return query.map((_) => true);
+  }
 }
 
 class _DriftApprovalRequestStore implements ApprovalRequestStore {

@@ -31,6 +31,8 @@ Future<(bool, bool, Set<String>, String)> groupMeta(
   return (isDm, isNoteToSelf, otherUsers, otherUsers.firstOrNull ?? myUid);
 }
 
+const _maxTitleUsernames = 10;
+
 class GroupTitle extends ConsumerWidget {
   final MlsGroupRecord group;
   const GroupTitle({super.key, required this.group});
@@ -42,18 +44,24 @@ class GroupTitle extends ConsumerWidget {
         .watch(groupMetaProvider(group.id))
         .when(
           data: (meta) {
-            final (isDm, isNoteToSelf, otherUsers, displayUid) = meta;
+            final (isDm, isNoteToSelf, otherUsers, _) = meta;
             if (isNoteToSelf) return l10n.noteToSelf;
             if (!isDm && group.displayName != null) return group.displayName!;
-            return ref
-                .watch(userProvider(displayUid))
-                .when(
-                  data: (data) => data.username.isNotEmpty
-                      ? '@${data.username}${isDm ? '' : ' + ${otherUsers.length - 1}'}'
-                      : l10n.error,
-                  error: (_, _) => l10n.error,
-                  loading: () => l10n.loadingEllipsis,
-                );
+            // each username is its own request, so only fetch the first few
+            final shown = otherUsers.take(_maxTitleUsernames).toList();
+            final users = [
+              for (final uid in shown) ref.watch(userProvider(uid)),
+            ];
+            if (users.any((u) => u.isLoading)) return l10n.loadingEllipsis;
+            final names = [
+              for (final u in users)
+                if (u.value?.username.isNotEmpty ?? false)
+                  '@${u.value!.username}',
+            ];
+            if (names.isEmpty) return l10n.error;
+            return otherUsers.length > shown.length
+                ? '${names.join(', ')}, …'
+                : names.join(', ');
           },
           error: (_, _) => l10n.error,
           loading: () => l10n.loadingEllipsis,

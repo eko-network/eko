@@ -8,6 +8,7 @@
 #   scripts/dev.sh app [N]       build the Linux app, open N signed-out windows (default 2)
 #   scripts/dev.sh app alice alice bob
 #                                one signed-in window per account, each its own device
+#   scripts/dev.sh run [ACCT]    flutter run on Linux with hot reload, one device, signed in as ACCT if given
 #   scripts/dev.sh android [DEV] flutter run on a USB Android device or emulator against local services
 #   scripts/dev.sh e2e           headless multi-device test (needs `up`)
 #   scripts/dev.sh logs          follow the server and Postgres logs
@@ -19,6 +20,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 MESSENGER_DIR="${MESSENGER_DIR:-$ROOT/../eko-messenger}"
 MESSENGER_URL="http://127.0.0.1:3000" # the server's dev shell sets PORT/DOMAIN to this
 STATE="$ROOT/.dev"
+LINUX_BUNDLE="$ROOT/eko_app/build/linux/x64/debug/bundle"
 LOGS="$STATE/logs"
 mkdir -p "$LOGS"
 
@@ -67,6 +69,13 @@ supabase_env() {
   set -a
   eval "$out"
   set +a
+  # points the app at the local services
+  LOCAL_DEFINES=(
+    --dart-define=USE_LOCAL=1
+    --dart-define=SUPABASE_URL="$API_URL"
+    --dart-define=SUPABASE_PUBLISHABLE_KEY="$PUBLISHABLE_KEY"
+    --dart-define=MESSENGER_URL="$MESSENGER_URL"
+  )
 }
 
 stop_server() {
@@ -117,6 +126,55 @@ data_dir_in_use() {
   return 1
 }
 
+# CMake caches the compiler, so after a flake.lock update the app would still
+# link the old glibc, which the new mesa below can't load against
+check_linux_toolchain() {
+  local cache="$ROOT/eko_app/build/linux/x64/debug/CMakeCache.txt"
+  if [[ -f "$cache" ]] && ! grep -qxF "CMAKE_CXX_COMPILER:STRING=$(command -v clang++)" "$cache"; then
+    log "toolchain changed, removing the stale Linux build"
+    rm -rf "$ROOT/eko_app/build/linux"
+  fi
+}
+
+# The app links the flake's glibc, the host's mesa may need a newer one, so
+# EGL is pointed at a mesa from the same nixpkgs (the dev shell exports it).
+linux_gl_env() {
+  local mesa="${EKO_GL_MESA:-}" glvnd="${EKO_GL_LIBGLVND:-}"
+  if [[ -z "$mesa" ]]; then
+    mesa="$(nix build --inputs-from "$ROOT" nixpkgs#mesa --no-link --print-out-paths)"
+    glvnd="$(nix build --inputs-from "$ROOT" nixpkgs#libglvnd --no-link --print-out-paths)"
+  fi
+  # plugins dlopen their libraries (e.g. libwebcrypto.so) by bare name, which
+  # does not search the executable's $ORIGIN/lib
+  export LD_LIBRARY_PATH="$LINUX_BUNDLE/lib:$glvnd/lib:$mesa/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+  export __EGL_VENDOR_LIBRARY_FILENAMES="$mesa/share/glvnd/egl_vendor.d/50_mesa.json"
+  export LIBGL_DRIVERS_PATH="$mesa/lib/dri"
+  export GBM_BACKENDS_PATH="$mesa/lib/gbm"
+}
+
+# Sets email, name and data (the caller's locals) for "alice", "bob@x" or
+# "-" (signed out). "alice" -> alice@test.local. Takes the lowest alice-N data
+# dir no running window holds, so separate launches get separate devices and
+# closed windows' devices are reused on the next launch.
+pick_device() {
+  local prefix n
+  if [[ "$1" == "-" ]]; then
+    prefix="device"
+    email=""
+  else
+    email="$1"
+    [[ "$email" == *@* ]] || email="$1@test.local"
+    prefix="${email%%@*}"
+  fi
+  for ((n = 1; ; n++)); do
+    name="$prefix-$n"
+    data="$STATE/devices/$name"
+    data_dir_in_use "$data" || break
+  done
+  # each window gets its own data dir: prefs (device id), session, ecp.db, mls.db
+  mkdir -p "$data"
+}
+
 cmd_app() {
   # a number opens that many signed-out windows, names open signed-in ones
   local windows=()
@@ -128,59 +186,32 @@ cmd_app() {
     windows=("$@")
   fi
   supabase_env
-  # CMake caches the compiler, so after a flake.lock update the app would still
-  # link the old glibc, which the new mesa below can't load against
-  local cache="$ROOT/eko_app/build/linux/x64/debug/CMakeCache.txt"
-  if [[ -f "$cache" ]] && ! grep -qxF "CMAKE_CXX_COMPILER:STRING=$(command -v clang++)" "$cache"; then
-    log "toolchain changed, removing the stale Linux build"
-    rm -rf "$ROOT/eko_app/build/linux"
-  fi
+  check_linux_toolchain
   log "building the Linux app against local services"
-  (cd "$ROOT/eko_app" && flutter build linux --debug \
-    --dart-define=USE_LOCAL=1 \
-    --dart-define=SUPABASE_URL="$API_URL" \
-    --dart-define=SUPABASE_PUBLISHABLE_KEY="$PUBLISHABLE_KEY" \
-    --dart-define=MESSENGER_URL="$MESSENGER_URL")
-  local bin="$ROOT/eko_app/build/linux/x64/debug/bundle/eko"
+  (cd "$ROOT/eko_app" && flutter build linux --debug "${LOCAL_DEFINES[@]}")
+  linux_gl_env
 
-  # The app links the flake's glibc, the host's mesa may need a newer one, so
-  # EGL is pointed at a mesa from the same nixpkgs (the dev shell exports it).
-  local mesa="${EKO_GL_MESA:-}" glvnd="${EKO_GL_LIBGLVND:-}"
-  if [[ -z "$mesa" ]]; then
-    mesa="$(nix build --inputs-from "$ROOT" nixpkgs#mesa --no-link --print-out-paths)"
-    glvnd="$(nix build --inputs-from "$ROOT" nixpkgs#libglvnd --no-link --print-out-paths)"
-  fi
-  # plugins dlopen their libraries (e.g. libwebcrypto.so) by bare name, which
-  # does not search the executable's $ORIGIN/lib
-  export LD_LIBRARY_PATH="$(dirname "$bin")/lib:$glvnd/lib:$mesa/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
-  export __EGL_VENDOR_LIBRARY_FILENAMES="$mesa/share/glvnd/egl_vendor.d/50_mesa.json"
-  export LIBGL_DRIVERS_PATH="$mesa/lib/dri"
-  export GBM_BACKENDS_PATH="$mesa/lib/gbm"
-
-  # "alice" -> alice@test.local. Each window takes the lowest alice-N data dir
-  # no running window holds, so separate `app alice` calls get separate
-  # devices and closed windows' devices are reused on the next launch.
-  local who prefix email data name n
+  local who email data name
   for who in "${windows[@]}"; do
-    if [[ "$who" == "-" ]]; then
-      prefix="device"
-      email=""
-    else
-      email="$who"
-      [[ "$email" == *@* ]] || email="$who@test.local"
-      prefix="${email%%@*}"
-    fi
-    for ((n = 1; ; n++)); do
-      name="$prefix-$n"
-      data="$STATE/devices/$name"
-      data_dir_in_use "$data" || break
-    done
-    # each window gets its own data dir: prefs (device id), session, ecp.db, mls.db
-    mkdir -p "$data"
+    pick_device "$who"
     XDG_DATA_HOME="$data" EKO_DEV_EMAIL="$email" EKO_DEV_PASSWORD="${email:+password}" \
-      setsid "$bin" >"$LOGS/app-$name.log" 2>&1 &
+      setsid "$LINUX_BUNDLE/eko" >"$LOGS/app-$name.log" 2>&1 &
     log "$name started${email:+ as $email} (log: $LOGS/app-$name.log)"
   done
+}
+
+cmd_run() {
+  [[ $# -le 1 ]] || die "usage: scripts/dev.sh run [ACCOUNT]"
+  supabase_env
+  port_open 3000 || die "messenger server is not running (scripts/dev.sh up)"
+  check_linux_toolchain
+  linux_gl_env
+  local email data name
+  pick_device "${1:--}"
+  log "$name${email:+ as $email}: r hot reloads, R hot restarts"
+  cd "$ROOT/eko_app"
+  XDG_DATA_HOME="$data" EKO_DEV_EMAIL="$email" EKO_DEV_PASSWORD="${email:+password}" \
+    exec flutter run -d linux "${LOCAL_DEFINES[@]}"
 }
 
 cmd_android() {
@@ -196,11 +227,7 @@ cmd_android() {
   # debug builds read sign in codes from the local mail server
   "${adb[@]}" reverse tcp:54324 tcp:54324 >/dev/null
   cd "$ROOT/eko_app"
-  exec flutter run ${1:+-d "$1"} \
-    --dart-define=USE_LOCAL=1 \
-    --dart-define=SUPABASE_URL="$API_URL" \
-    --dart-define=SUPABASE_PUBLISHABLE_KEY="$PUBLISHABLE_KEY" \
-    --dart-define=MESSENGER_URL="$MESSENGER_URL"
+  exec flutter run ${1:+-d "$1"} "${LOCAL_DEFINES[@]}"
 }
 
 cmd_e2e() {
@@ -220,8 +247,9 @@ case "${1:-}" in
   down) cmd_down ;;
   reset) cmd_reset ;;
   app) shift; cmd_app "$@" ;;
+  run) shift; cmd_run "$@" ;;
   android) shift; cmd_android "$@" ;;
   e2e) cmd_e2e ;;
   logs) tail -n 50 -F "$LOGS"/messenger*.log ;;
-  *) sed -n '2,15p' "$0" | sed 's/^# \{0,1\}//'; exit 1 ;;
+  *) sed -n '2,16p' "$0" | sed 's/^# \{0,1\}//'; exit 1 ;;
 esac

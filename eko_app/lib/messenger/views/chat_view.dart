@@ -902,6 +902,7 @@ class _ChatViewState extends ConsumerState<ChatView>
                         sending: sending,
                         read: !isReceived && readByAll(message),
                         readBy: readBy[message.id] ?? const [],
+                        showSender: others.length > 1,
                         onActions: sending
                             ? null
                             : (rect) => _onActions(

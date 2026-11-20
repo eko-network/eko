@@ -32,4 +32,8 @@ abstract class DeviceModel with _$DeviceModel {
   }
 
   bool get isRegistered => did != null && did!.isNotEmpty;
+
+  /// Whether this device may use the messenger, which then starts with the
+  /// app, see MessengerBootstrap.
+  bool get isApproved => isRegistered && dat != null;
 }

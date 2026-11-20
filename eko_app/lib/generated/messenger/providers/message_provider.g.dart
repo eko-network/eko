@@ -436,6 +436,53 @@ final class UnreadCountFamily extends $Family
   String toString() => r'unreadCountProvider';
 }
 
+/// Whether any chat has messages of others we have not read.
+///
+/// The nav bar shows it on every page, so it only follows the client
+/// MessengerBootstrap starts for an approved device instead of starting one.
+
+@ProviderFor(hasUnread)
+final hasUnreadProvider = HasUnreadProvider._();
+
+/// Whether any chat has messages of others we have not read.
+///
+/// The nav bar shows it on every page, so it only follows the client
+/// MessengerBootstrap starts for an approved device instead of starting one.
+
+final class HasUnreadProvider
+    extends $FunctionalProvider<AsyncValue<bool>, bool, Stream<bool>>
+    with $FutureModifier<bool>, $StreamProvider<bool> {
+  /// Whether any chat has messages of others we have not read.
+  ///
+  /// The nav bar shows it on every page, so it only follows the client
+  /// MessengerBootstrap starts for an approved device instead of starting one.
+  HasUnreadProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'hasUnreadProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$hasUnreadHash();
+
+  @$internal
+  @override
+  $StreamProviderElement<bool> $createElement($ProviderPointer pointer) =>
+      $StreamProviderElement(pointer);
+
+  @override
+  Stream<bool> create(Ref ref) {
+    return hasUnread(ref);
+  }
+}
+
+String _$hasUnreadHash() => r'a2aa54e39e0509d5d1987d5443de34548dd741e5';
+
 /// The earlier contents of an edited message, oldest first.
 
 @ProviderFor(messageRevisions)

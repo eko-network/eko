@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:eko_app/messenger/providers/message_provider.dart';
 import 'package:eko_app/widgets/common/download_button.dart';
 import 'package:eko_app/widgets/scaffolds/app_safe_area.dart';
 import 'package:eko_app/providers/nav_bar_provider.dart';
@@ -21,6 +22,34 @@ const List<IconData> _activeIconList = [
   Icons.search,
   Icons.person,
 ];
+
+const _messagesIndex = 1;
+
+/// The icon of tab [index], with a dot on the messages tab while a chat has
+/// unread messages.
+class _NavIcon extends ConsumerWidget {
+  final int index;
+  final bool active;
+  const _NavIcon({required this.index, required this.active});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final icon = Icon(
+      active ? _activeIconList[index] : _passiveIconList[index],
+      size: active
+          ? c.navBarIconSize + c.navBarIconSizeAdder
+          : c.navBarIconSize,
+    );
+    if (index != _messagesIndex) return icon;
+    final hasUnread = ref.watch(hasUnreadProvider).value ?? false;
+    return Badge(
+      isLabelVisible: hasUnread,
+      smallSize: 8,
+      alignment: AlignmentGeometry.xy(1, -0.7), //AlignmentDirectional.topEnd,
+      child: icon,
+    );
+  }
+}
 
 class ScaffoldWithNestedNavigation extends StatelessWidget {
   const ScaffoldWithNestedNavigation({Key? key, required this.navigationShell})
@@ -98,19 +127,8 @@ class ScaffoldWithNavigationBar extends ConsumerWidget {
                   items: [
                     for (int i = 0; i < _passiveIconList.length; i++)
                       BottomNavigationBarItem(
-                        icon: Stack(
-                          children: [
-                            Icon(_passiveIconList[i], size: c.navBarIconSize),
-                          ],
-                        ),
-                        activeIcon: Stack(
-                          children: [
-                            Icon(
-                              _activeIconList[i],
-                              size: c.navBarIconSize + c.navBarIconSizeAdder,
-                            ),
-                          ],
-                        ),
+                        icon: _NavIcon(index: i, active: false),
+                        activeIcon: _NavIcon(index: i, active: true),
                         label: '',
                       ),
                   ],
@@ -161,19 +179,8 @@ class ScaffoldWithNavigationRail extends ConsumerWidget {
                   for (int i = 0; i < _passiveIconList.length; i++)
                     NavigationRailDestination(
                       label: const Text(''),
-                      icon: Stack(
-                        children: [
-                          Icon(_passiveIconList[i], size: c.navBarIconSize),
-                        ],
-                      ),
-                      selectedIcon: Stack(
-                        children: [
-                          Icon(
-                            _activeIconList[i],
-                            size: c.navBarIconSize + c.navBarIconSizeAdder,
-                          ),
-                        ],
-                      ),
+                      icon: _NavIcon(index: i, active: false),
+                      selectedIcon: _NavIcon(index: i, active: true),
                     ),
                 ],
               )

@@ -5,7 +5,9 @@ import 'package:ecp/ecp.dart';
 import 'package:eko_app/database/database.dart';
 import 'package:eko_app/database/mappers.dart';
 import 'package:eko_app/database/storage.dart';
+import 'package:eko_app/providers/auth_provider.dart';
 import 'package:eko_app/providers/ecp_provider.dart';
+import 'package:eko_app/utilities/platform.dart' as platform;
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 part '../../generated/messenger/providers/message_provider.g.dart';
@@ -127,6 +129,22 @@ Stream<int> unreadCount(Ref ref, int id) async* {
   final me = ref.watch(ecpClientProvider).me.id;
   final groupId = await ref.watch(groupIdBytesProvider(id).future);
   yield* db.unreadCount(groupId, me).watchSingle();
+}
+
+/// Whether any chat has messages of others we have not read.
+///
+/// The nav bar shows it on every page, so it only follows the client
+/// MessengerBootstrap starts for an approved device instead of starting one.
+@riverpod
+Stream<bool> hasUnread(Ref ref) {
+  final device = ref.watch(authProvider).value?.device;
+  if (platform.isWeb || !(device?.isApproved ?? false)) {
+    return Stream.value(false);
+  }
+  // ecpClientProvider fails while the client loads, a stream provider just
+  // stays loading on requireValue until it is up
+  final me = ref.watch(asyncEcpClientProvider).requireValue.me.id;
+  return db.hasUnread(me).watch().map((rows) => rows.isNotEmpty);
 }
 
 typedef MessageRevision = ({String? content, DateTime since});

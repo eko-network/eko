@@ -20,9 +20,7 @@ class MessengerBootstrap extends ConsumerWidget {
     if (platform.isWeb) return child;
 
     final device = ref.watch(authProvider).value?.device;
-    final did = device?.did;
-    final dat = device?.dat;
-    final ecpInitialized = did != null && did.isNotEmpty && dat != null;
+    final ecpInitialized = device?.isApproved ?? false;
 
     if (ecpInitialized) {
       ref.watch(inboxPollingProvider);
