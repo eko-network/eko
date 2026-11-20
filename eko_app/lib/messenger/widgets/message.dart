@@ -386,6 +386,13 @@ class MessageBubble extends StatelessWidget {
         quoted == null &&
         _isShortEmojiString(content!);
 
+    // images on their own aren't drawn on a bubble
+    final isMediaOnly =
+        !hasContent &&
+        !message.deleted &&
+        message.attachment.isNotEmpty &&
+        quoted == null;
+
     final backgroundColor = isReceived ? _receivedColor : _sentColor;
 
     return Container(
@@ -397,7 +404,7 @@ class MessageBubble extends StatelessWidget {
       clipBehavior: Clip.hardEdge,
       decoration: BoxDecoration(
         borderRadius: _posToBorder(position, isReceived),
-        color: isEmojiOnly
+        color: isEmojiOnly || isMediaOnly
             ? Colors.transparent
             : message.deleted
             ? backgroundColor.withValues(alpha: 0.4)
