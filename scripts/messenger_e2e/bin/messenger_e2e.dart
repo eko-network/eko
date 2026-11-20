@@ -324,6 +324,36 @@ Future<void> main() async {
     },
   );
 
+  await step('read cursors reach the sender and our other devices', () async {
+    await alice1.sendText(dm, 'read me');
+    final message = await receives(bob1, (m) => m.content == 'read me');
+    await bob1.client.messages.markRead(message);
+    await until("alice-1 to see bob's cursor", () async {
+      await alice1.sync();
+      final cursor = await alice1.storage.messageStore.getReadCursor(
+        dm,
+        bob1.person.id,
+      );
+      return cursor?.messageId == message.id;
+    });
+
+    await bob1.sendText(dm, 'unread on alice-2');
+    final unread = await receives(
+      alice2,
+      (m) => m.content == 'unread on alice-2',
+    );
+    await receives(alice1, (m) => m.content == 'unread on alice-2');
+    await alice1.client.messages.markRead(unread);
+    await until("alice-2 to see alice-1's cursor", () async {
+      await alice2.sync();
+      final cursor = await alice2.storage.messageStore.getReadCursor(
+        dm,
+        alice1.person.id,
+      );
+      return cursor?.messageId == unread.id;
+    });
+  });
+
   await step('the notification service syncs with its own token', () async {
     final token = await bob1.client.mintNotificationToken();
     final service = _NotificationService(bob1, token);

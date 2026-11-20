@@ -305,6 +305,15 @@ class UnifiedPushNotificationAdapter extends NotificationPlatformAdapter {
     }
   }
 
+  static Future<void> cancelLocalNotification(int id) async {
+    await _ensureFlutterLocalNotificationsInitialized();
+    try {
+      await _flutterLocalNotifications.cancel(id: id);
+    } catch (e, st) {
+      debugPrint('[UnifiedPush] local notification cancel failed: $e $st');
+    }
+  }
+
   static Map<String, dynamic> _decodePayload(dynamic content) {
     if (content == null) return {};
     String payload;

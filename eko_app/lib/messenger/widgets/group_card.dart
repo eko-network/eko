@@ -107,6 +107,34 @@ class GroupSubtitle extends ConsumerWidget {
   }
 }
 
+/// When the group last had activity, and how many messages are unread.
+class GroupTrailing extends ConsumerWidget {
+  final GroupWithUsers group;
+  const GroupTrailing({super.key, required this.group});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final unread =
+        ref.watch(unreadCountProvider(group.group.groupIdBytes)).value ?? 0;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        RelativeTimeWidget(time: group.group.lastActivityAt!),
+        if (unread > 0)
+          Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Badge.count(
+              count: unread,
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              textColor: Theme.of(context).colorScheme.onPrimary,
+            ),
+          ),
+      ],
+    );
+  }
+}
+
 class GroupCard extends ConsumerWidget {
   final GroupWithUsers group;
   final bool isSelected;
@@ -123,15 +151,25 @@ class GroupCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final pfp = GroupIcon(group: group);
+    final unread = showOnlyAvatar
+        ? ref.watch(unreadCountProvider(group.group.groupIdBytes)).value ?? 0
+        : 0;
 
     return ListTile(
       selected: isSelected,
       leading: showOnlyAvatar ? null : pfp,
-      title: showOnlyAvatar ? pfp : GroupTitle(group: group),
+      title: showOnlyAvatar
+          // the count is next to the time otherwise
+          ? Badge.count(
+              count: unread,
+              isLabelVisible: unread > 0,
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              textColor: Theme.of(context).colorScheme.onPrimary,
+              child: pfp,
+            )
+          : GroupTitle(group: group),
       subtitle: showOnlyAvatar ? null : GroupSubtitle(group: group),
-      trailing: showOnlyAvatar
-          ? null
-          : RelativeTimeWidget(time: group.group.lastActivityAt!),
+      trailing: showOnlyAvatar ? null : GroupTrailing(group: group),
       onTap: () => onTap(),
     );
   }

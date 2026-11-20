@@ -150,6 +150,8 @@ class _GroupStore implements GroupStore {
 class _MessageStore implements MessageStore {
   final messages = <StoredMessage>[];
   final reactions = <StoredReaction>[];
+  // by base64 group id, then reader
+  final cursors = <String, Map<Uri, ReadCursor>>{};
 
   @override
   Future<void> saveMessage(StoredMessage message) async =>
@@ -225,10 +227,48 @@ class _MessageStore implements MessageStore {
   }
 
   @override
+  Future<ReadCursor?> getReadCursor(Uint8List groupId, Uri reader) async =>
+      cursors[base64Encode(groupId)]?[reader];
+
+  @override
+  Future<ReadCursor?> advanceReadCursor(
+    Uint8List groupId,
+    Uri reader,
+    InternalId messageId,
+  ) async {
+    final message = await getMessage(groupId, messageId);
+    final current = await getReadCursor(groupId, reader);
+    if (message == null || (current != null && current.covers(message))) {
+      return null;
+    }
+    return cursors.putIfAbsent(
+      base64Encode(groupId),
+      () => {},
+    )[reader] = ReadCursor(
+      groupId: groupId,
+      reader: reader,
+      messageId: messageId,
+      position: message.receivedAt,
+    );
+  }
+
+  @override
   Future<void> moveMessages({
     required Uint8List from,
     required Uint8List to,
   }) async {
+    final moved = cursors.remove(base64Encode(from)) ?? {};
+    final kept = cursors.putIfAbsent(base64Encode(to), () => {});
+    for (final cursor in moved.values) {
+      final other = kept[cursor.reader];
+      if (other != null && !cursor.position.isAfter(other.position)) continue;
+      kept[cursor.reader] = ReadCursor(
+        groupId: to,
+        reader: cursor.reader,
+        messageId: cursor.messageId,
+        position: cursor.position,
+      );
+    }
     for (final (i, m) in messages.indexed.toList()) {
       if (!bytesEqual(m.groupId, from)) continue;
       messages[i] = _copy(m, groupId: to);

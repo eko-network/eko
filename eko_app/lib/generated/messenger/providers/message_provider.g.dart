@@ -176,6 +176,170 @@ final class ReactionsFamily extends $Family
   String toString() => r'reactionsProvider';
 }
 
+/// How far each member read a group, by reader.
+
+@ProviderFor(readCursors)
+final readCursorsProvider = ReadCursorsFamily._();
+
+/// How far each member read a group, by reader.
+
+final class ReadCursorsProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<Map<Uri, ReadCursor>>,
+          Map<Uri, ReadCursor>,
+          Stream<Map<Uri, ReadCursor>>
+        >
+    with
+        $FutureModifier<Map<Uri, ReadCursor>>,
+        $StreamProvider<Map<Uri, ReadCursor>> {
+  /// How far each member read a group, by reader.
+  ReadCursorsProvider._({
+    required ReadCursorsFamily super.from,
+    required Uint8List super.argument,
+  }) : super(
+         retry: null,
+         name: r'readCursorsProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$readCursorsHash();
+
+  @override
+  String toString() {
+    return r'readCursorsProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $StreamProviderElement<Map<Uri, ReadCursor>> $createElement(
+    $ProviderPointer pointer,
+  ) => $StreamProviderElement(pointer);
+
+  @override
+  Stream<Map<Uri, ReadCursor>> create(Ref ref) {
+    final argument = this.argument as Uint8List;
+    return readCursors(ref, argument);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is ReadCursorsProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$readCursorsHash() => r'058de0e212b300e1f9d4473118b2d490490d0108';
+
+/// How far each member read a group, by reader.
+
+final class ReadCursorsFamily extends $Family
+    with $FunctionalFamilyOverride<Stream<Map<Uri, ReadCursor>>, Uint8List> {
+  ReadCursorsFamily._()
+    : super(
+        retry: null,
+        name: r'readCursorsProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  /// How far each member read a group, by reader.
+
+  ReadCursorsProvider call(Uint8List groupId) =>
+      ReadCursorsProvider._(argument: groupId, from: this);
+
+  @override
+  String toString() => r'readCursorsProvider';
+}
+
+/// How many messages of others in a group we have not read.
+
+@ProviderFor(unreadCount)
+final unreadCountProvider = UnreadCountFamily._();
+
+/// How many messages of others in a group we have not read.
+
+final class UnreadCountProvider
+    extends $FunctionalProvider<AsyncValue<int>, int, Stream<int>>
+    with $FutureModifier<int>, $StreamProvider<int> {
+  /// How many messages of others in a group we have not read.
+  UnreadCountProvider._({
+    required UnreadCountFamily super.from,
+    required Uint8List super.argument,
+  }) : super(
+         retry: null,
+         name: r'unreadCountProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$unreadCountHash();
+
+  @override
+  String toString() {
+    return r'unreadCountProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $StreamProviderElement<int> $createElement($ProviderPointer pointer) =>
+      $StreamProviderElement(pointer);
+
+  @override
+  Stream<int> create(Ref ref) {
+    final argument = this.argument as Uint8List;
+    return unreadCount(ref, argument);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is UnreadCountProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$unreadCountHash() => r'8bf3643a82fb64eb8166ae7be26ea88f19cfadea';
+
+/// How many messages of others in a group we have not read.
+
+final class UnreadCountFamily extends $Family
+    with $FunctionalFamilyOverride<Stream<int>, Uint8List> {
+  UnreadCountFamily._()
+    : super(
+        retry: null,
+        name: r'unreadCountProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  /// How many messages of others in a group we have not read.
+
+  UnreadCountProvider call(Uint8List groupId) =>
+      UnreadCountProvider._(argument: groupId, from: this);
+
+  @override
+  String toString() => r'unreadCountProvider';
+}
+
 /// The earlier contents of an edited message, oldest first.
 
 @ProviderFor(messageRevisions)

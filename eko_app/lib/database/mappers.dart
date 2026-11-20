@@ -56,6 +56,17 @@ extension MessageReactionRowMapper on MessageReactionRow {
   }
 }
 
+extension ReadCursorRowMapper on ReadCursorRow {
+  ReadCursor toCursor() {
+    return ReadCursor(
+      groupId: groupId,
+      reader: reader,
+      messageId: messageId,
+      position: position,
+    );
+  }
+}
+
 extension MlsEngineConfigRowMapper on MlsEngineConfigRow {
   MlsEngineConfig toConfig() {
     return MlsEngineConfig(dbPath: dbPath, encryptionKey: encryptionKey);

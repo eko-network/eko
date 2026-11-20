@@ -17,6 +17,7 @@ import 'package:eko_app/messenger/widgets/message_actions.dart';
 import 'package:eko_app/messenger/widgets/message_quote.dart';
 import 'package:eko_app/providers/ecp_provider.dart';
 import 'package:eko_app/providers/user_provider.dart';
+import 'package:eko_app/services/messenger_notification_service.dart';
 import 'package:eko_app/utilities/emoji_text_style.dart';
 import 'package:eko_app/utilities/platform.dart' as platform;
 import 'package:eko_app/widgets/errors/snack_bar.dart';
@@ -66,6 +67,11 @@ class _ChatViewState extends ConsumerState<ChatView>
   // members whose devices were reset and not accepted yet, messages here
   // don't reach their new devices
   final _changed = <Uri>{};
+
+  // the newest message, read once it is on screen
+  ecp.StoredMessage? _newest;
+  Timer? _readTimer;
+
   StreamSubscription<ecp.GroupDeviceWarning>? _warnings;
   StreamSubscription<({Uri person, ecp.MlsGroupRecord? dm})>? _accepted;
 
@@ -94,6 +100,7 @@ class _ChatViewState extends ConsumerState<ChatView>
     _messageController.addListener(() {
       setState(() {});
     });
+    _scrollController.addListener(_scheduleMarkRead);
     _verifyMembers();
   }
 
@@ -105,7 +112,39 @@ class _ChatViewState extends ConsumerState<ChatView>
       _replyingTo = null;
       if (_editing != null) _messageController.clear();
       _editing = null;
+      _newest = null;
       _verifyMembers();
+    }
+  }
+
+  void _scheduleMarkRead() {
+    _readTimer ??= Timer(const Duration(milliseconds: 500), () {
+      _readTimer = null;
+      _markRead();
+    });
+  }
+
+  /// Marks the chat read up to the newest message while it is on screen: the
+  /// app is in the foreground and the list scrolled to the bottom.
+  Future<void> _markRead() async {
+    final newest = _newest;
+    if (newest == null || !mounted) return;
+    if (WidgetsBinding.instance.lifecycleState != AppLifecycleState.resumed) {
+      return;
+    }
+    // reversed, the newest messages are at the start
+    if (_scrollController.hasClients && _scrollController.offset > 48) return;
+    final client = ref.read(ecpClientProvider);
+    try {
+      await client.messages.markRead(newest);
+      await MessengerNotificationService.clearIfRead(
+        newest.groupId,
+        me: client.me.id,
+      );
+    } on ecp.EcpDevicesChangedException {
+      // waits for the reset to be reviewed in the banner, like sending
+    } catch (e) {
+      debugPrint('[ChatView] markRead failed: $e');
     }
   }
 
@@ -203,6 +242,7 @@ class _ChatViewState extends ConsumerState<ChatView>
     _warnings?.cancel();
     _accepted?.cancel();
     _highlightTimer?.cancel();
+    _readTimer?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     _scrollController.dispose();
     _focusNode.dispose();
@@ -216,6 +256,7 @@ class _ChatViewState extends ConsumerState<ChatView>
       ref.invalidate(messageProvider(widget.group.group.groupIdBytes));
       // a contact may have reset their devices meanwhile
       _verifyMembers();
+      _scheduleMarkRead();
     }
   }
 
@@ -682,15 +723,40 @@ class _ChatViewState extends ConsumerState<ChatView>
     }
   }
 
+  /// The members, other than us, whose newest read message each message is.
+  /// None for DMs, there the read status says it.
+  Map<ecp.InternalId, List<String>> _readBy(
+    List<ecp.StoredMessage> messages,
+    Map<Uri, ecp.ReadCursor> cursors,
+    List<String> others,
+  ) {
+    final readBy = <ecp.InternalId, List<String>>{};
+    if (others.length < 2) return readBy;
+    for (final uid in others) {
+      final cursor = cursors[actorIdFromUid(uid)];
+      if (cursor == null) continue;
+      final newest = messages.where(cursor.covers).lastOrNull;
+      // their own message already says they read up to it
+      if (newest == null || uidFromActorId(newest.senderId) == uid) continue;
+      readBy.putIfAbsent(newest.id, () => []).add(uid);
+    }
+    return readBy;
+  }
+
   @override
   Widget build(BuildContext context) {
     final actorId = ref.watch(ecpClientProvider).me.id;
-    final messagesAsync = ref.watch(
-      messageProvider(widget.group.group.groupIdBytes),
-    );
-    final reactions =
-        ref.watch(reactionsProvider(widget.group.group.groupIdBytes)).value ??
-        const {};
+    final groupId = widget.group.group.groupIdBytes;
+    final messagesAsync = ref.watch(messageProvider(groupId));
+    final reactions = ref.watch(reactionsProvider(groupId)).value ?? const {};
+    final cursors = ref.watch(readCursorsProvider(groupId)).value ?? const {};
+    final myUid = uidFromActorId(actorId);
+    final others = widget.group.users.where((uid) => uid != myUid).toList();
+    bool readByAll(ecp.StoredMessage message) =>
+        others.isNotEmpty &&
+        others.every(
+          (uid) => cursors[actorIdFromUid(uid)]?.covers(message) ?? false,
+        );
     final inputRow = _buildInputRow(context);
 
     return Scaffold(
@@ -731,7 +797,12 @@ class _ChatViewState extends ConsumerState<ChatView>
                   );
                 }
 
+                if (messages.last.id != _newest?.id) {
+                  _newest = messages.last;
+                  _scheduleMarkRead();
+                }
                 final byId = {for (final m in messages) m.id: m};
+                final readBy = _readBy(messages, cursors, others);
                 return CupertinoInteractiveKeyboard(
                   child: ListView.builder(
                     controller: _scrollController,
@@ -794,6 +865,8 @@ class _ChatViewState extends ConsumerState<ChatView>
                         quoted: quoted,
                         reactions: messageReactions,
                         highlighted: _highlighted == message.id,
+                        read: !isReceived && readByAll(message),
+                        readBy: readBy[message.id] ?? const [],
                         onActions: (rect) => _onActions(
                           message,
                           rect,

@@ -6,6 +6,7 @@ import 'package:eko_app/messenger/views/chat_view.dart';
 import 'package:eko_app/messenger/widgets/message_quote.dart';
 import 'package:eko_app/messenger/widgets/relative_time.dart';
 import 'package:eko_app/utilities/emoji_text_style.dart';
+import 'package:eko_app/widgets/users/profile_picture.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -63,7 +64,7 @@ class DateChip extends ConsumerWidget {
   }
 }
 
-enum MessageStatus { sending, sent, delivered, failed }
+enum MessageStatus { sending, sent, delivered, read, failed }
 
 class StatusIcon extends StatelessWidget {
   final MessageStatus status;
@@ -82,6 +83,9 @@ class StatusIcon extends StatelessWidget {
       case MessageStatus.delivered:
         icon = LucideIcons.mailCheck;
         break;
+      case MessageStatus.read:
+        icon = LucideIcons.checkCheck;
+        break;
       case MessageStatus.failed:
         icon = LucideIcons.badgeAlert;
         break;
@@ -99,11 +103,15 @@ class StatusIcon extends StatelessWidget {
 class StatusWidget extends StatelessWidget {
   final ecp.StoredMessage message;
   final bool isReceived;
+
+  /// Every other member of the chat read it.
+  final bool read;
   final VoidCallback? onEditedTap;
   const StatusWidget({
     super.key,
     required this.message,
     required this.isReceived,
+    this.read = false,
     this.onEditedTap,
   });
 
@@ -133,7 +141,9 @@ class StatusWidget extends StatelessWidget {
             Padding(
               padding: EdgeInsetsGeometry.only(left: 4),
               child: StatusIcon(
-                status: message.delivered
+                status: read
+                    ? MessageStatus.read
+                    : message.delivered
                     ? MessageStatus.delivered
                     : MessageStatus.sent,
               ),
@@ -180,6 +190,12 @@ class MessageWidget extends StatelessWidget {
   final List<ecp.StoredReaction> reactions;
   final bool highlighted;
 
+  /// Every other member of the chat read it.
+  final bool read;
+
+  /// The members whose newest read message this is, shown under it.
+  final List<String> readBy;
+
   /// Called with the bubble's position on screen.
   final void Function(Rect bubble)? onActions;
   final VoidCallback? onReply;
@@ -196,6 +212,8 @@ class MessageWidget extends StatelessWidget {
     this.quoted,
     this.reactions = const [],
     this.highlighted = false,
+    this.read = false,
+    this.readBy = const [],
     this.onActions,
     this.onReply,
     this.onQuoteTap,
@@ -228,13 +246,14 @@ class MessageWidget extends StatelessWidget {
           position: position,
           me: me,
           quoted: quoted,
+          read: read,
           onQuoteTap: onQuoteTap,
           onEditedTap: onEditedTap,
         ),
       ),
     );
 
-    final content = Align(
+    final body = Align(
       alignment: isReceived ? Alignment.centerLeft : Alignment.centerRight,
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -264,12 +283,28 @@ class MessageWidget extends StatelessWidget {
               child: StatusWidget(
                 message: message,
                 isReceived: isReceived,
+                read: read,
                 onEditedTap: onEditedTap,
               ),
             ),
-          SizedBox(height: isBottom ? 12 : 4),
         ],
       ),
+    );
+
+    final content = Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        body,
+        if (readBy.isNotEmpty)
+          Align(
+            alignment: Alignment.centerRight,
+            child: Padding(
+              padding: const EdgeInsets.only(top: 2),
+              child: _ReadBy(uids: readBy),
+            ),
+          ),
+        SizedBox(height: isBottom || readBy.isNotEmpty ? 12 : 4),
+      ],
     );
 
     return AnimatedContainer(
@@ -301,6 +336,9 @@ class MessageBubble extends StatelessWidget {
 
   /// The message this one replies to, null when it isn't a reply.
   final QuotedMessage? quoted;
+
+  /// Every other member of the chat read it.
+  final bool read;
   final VoidCallback? onQuoteTap;
   final VoidCallback? onEditedTap;
 
@@ -311,6 +349,7 @@ class MessageBubble extends StatelessWidget {
     required this.me,
     this.position = MessagePosition.single,
     this.quoted,
+    this.read = false,
     this.onQuoteTap,
     this.onEditedTap,
   });
@@ -382,6 +421,7 @@ class MessageBubble extends StatelessWidget {
                 showStatus: true,
                 message: message,
                 isReceived: isReceived,
+                read: read,
               )
             else if (hasContent)
               _TextBubbleContent(
@@ -391,6 +431,7 @@ class MessageBubble extends StatelessWidget {
                 showStatus: isBottom || message.editedAt != null,
                 message: message,
                 isReceived: isReceived,
+                read: read,
                 onEditedTap: onEditedTap,
               ),
           ],
@@ -478,6 +519,43 @@ class _ReactionsPill extends StatelessWidget {
   }
 }
 
+/// Small avatars of the members who read up to a message.
+class _ReadBy extends StatelessWidget {
+  static const _shown = 5;
+  final List<String> uids;
+
+  const _ReadBy({required this.uids});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        for (final uid in uids.take(_shown))
+          Padding(
+            padding: const EdgeInsets.only(left: 2),
+            child: ProfilePicture(
+              uid: uid,
+              size: 16,
+              onlineIndicatorEnabled: false,
+            ),
+          ),
+        if (uids.length > _shown)
+          Padding(
+            padding: const EdgeInsets.only(left: 4),
+            child: Text(
+              '+${uids.length - _shown}',
+              style: TextStyle(
+                fontSize: 11,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
 class _TextBubbleContent extends StatelessWidget {
   final String content;
   final bool isEmojiOnly;
@@ -485,6 +563,7 @@ class _TextBubbleContent extends StatelessWidget {
   final bool showStatus;
   final ecp.StoredMessage message;
   final bool isReceived;
+  final bool read;
   final VoidCallback? onEditedTap;
 
   const _TextBubbleContent({
@@ -493,6 +572,7 @@ class _TextBubbleContent extends StatelessWidget {
     required this.showStatus,
     required this.message,
     required this.isReceived,
+    this.read = false,
     this.italic = false,
     this.onEditedTap,
   });
@@ -503,6 +583,7 @@ class _TextBubbleContent extends StatelessWidget {
         ? StatusWidget(
             message: message,
             isReceived: isReceived,
+            read: read,
             onEditedTap: onEditedTap,
           )
         : null;

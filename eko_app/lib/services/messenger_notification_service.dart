@@ -151,29 +151,36 @@ class MessengerNotificationService {
   }
 
   /// Shows one notification per group, unless the app is in the foreground.
-  /// Of reactions only those to our own messages are shown.
+  /// Of reactions only those to our own messages are shown. A group's
+  /// notification goes once it is read, also on another of our devices.
   static Future<void> showForMessages(
     List<ReceivedEvent> events, {
     required Uri me,
   }) async {
     if (!_supported || events.isEmpty) return;
-    if (WidgetsBinding.instance.lifecycleState == AppLifecycleState.resumed) {
-      return;
-    }
+    final foreground =
+        WidgetsBinding.instance.lifecycleState == AppLifecycleState.resumed;
 
     for (final event in events) {
       try {
         switch (event) {
-          case ReceivedMessage(:final message) when message.senderId != me:
+          case ReceivedRead(:final cursor) when cursor.reader == me:
+            await clearIfRead(cursor.groupId, me: me);
+          // sent from another of our devices, so read up to there
+          case ReceivedMessage(:final message) when message.senderId == me:
+            await clearIfRead(message.groupId, me: me);
+          case ReceivedMessage(:final message) when !foreground:
             await _show(message.groupId, message.senderId, _preview(message));
           case ReceivedReaction(:final reaction, :final message)
-              when reaction.senderId != me && message.senderId == me:
+              when !foreground &&
+                  reaction.senderId != me &&
+                  message.senderId == me:
             await _show(
               message.groupId,
               reaction.senderId,
               'Reacted ${reaction.emoji} to: ${_preview(message)}',
             );
-          case ReceivedMessage() || ReceivedReaction():
+          case ReceivedMessage() || ReceivedReaction() || ReceivedRead():
             break;
         }
       } catch (e, st) {
@@ -191,14 +198,27 @@ class MessengerNotificationService {
         : 'New message';
   }
 
+  /// Removes the notification of [groupId] once nothing in it is unread.
+  static Future<void> clearIfRead(Uint8List groupId, {required Uri me}) async {
+    if (!_supported) return;
+    if (await db.unreadCount(groupId, me).getSingle() > 0) return;
+    final group = await _group(groupId);
+    if (group == null) return;
+    await NotificationHelper.cancelLocalNotification(
+      _notificationIdBase + group.id,
+    );
+  }
+
+  static Future<MlsGroupRow?> _group(Uint8List groupId) => (db.select(
+    db.mlsGroups,
+  )..where((t) => t.groupIdBytes.equals(groupId))).getSingleOrNull();
+
   static Future<void> _show(
     Uint8List groupId,
     Uri senderId,
     String body,
   ) async {
-    final group = await (db.select(
-      db.mlsGroups,
-    )..where((t) => t.groupIdBytes.equals(groupId))).getSingleOrNull();
+    final group = await _group(groupId);
     if (group == null || !group.isActive) return;
 
     final sender = await username(uidFromActorId(senderId));

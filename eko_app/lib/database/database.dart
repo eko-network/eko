@@ -223,6 +223,19 @@ class MessageReactions extends Table {
   ];
 }
 
+/// How far each member read a group, see [ReadCursor].
+@DataClassName('ReadCursorRow')
+class ReadCursors extends Table {
+  BlobColumn get groupId => blob()();
+  TextColumn get reader => text().map(const UriTypeConverter())();
+  TextColumn get messageId => text().map(const InternalIdConverter())();
+  // when this device received that message, what the cursor compares by
+  DateTimeColumn get position => dateTime()();
+
+  @override
+  Set<Column> get primaryKey => {groupId, reader};
+}
+
 @DataClassName('MessageAttachmentRow')
 class MessageAttachments extends Table {
   TextColumn get messageId => text()
@@ -257,6 +270,7 @@ class MessageAttachments extends Table {
     MessageAttachments,
     MessageRevisions,
     MessageReactions,
+    ReadCursors,
   ],
 )
 class AppDatabase extends _$AppDatabase {

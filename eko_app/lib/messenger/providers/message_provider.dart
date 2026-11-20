@@ -4,6 +4,7 @@ import 'package:drift/drift.dart';
 import 'package:ecp/ecp.dart';
 import 'package:eko_app/database/database.dart';
 import 'package:eko_app/database/mappers.dart';
+import 'package:eko_app/database/storage.dart';
 import 'package:eko_app/providers/ecp_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -93,6 +94,23 @@ Stream<Map<InternalId, List<StoredReaction>>> reactions(
     }
     return byMessage;
   });
+}
+
+/// How far each member read a group, by reader.
+@riverpod
+Stream<Map<Uri, ReadCursor>> readCursors(Ref ref, Uint8List groupId) {
+  final query = db.select(db.readCursors)
+    ..where((t) => t.groupId.equals(groupId));
+  return query.watch().map(
+    (rows) => {for (final row in rows) row.reader: row.toCursor()},
+  );
+}
+
+/// How many messages of others in a group we have not read.
+@riverpod
+Stream<int> unreadCount(Ref ref, Uint8List groupId) {
+  final me = ref.watch(ecpClientProvider).me.id;
+  return db.unreadCount(groupId, me).watchSingle();
 }
 
 typedef MessageRevision = ({String? content, DateTime since});

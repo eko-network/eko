@@ -35,6 +35,7 @@ class AppStorage extends Storage {
       await _db.delete(_db.messageAttachments).go();
       await _db.delete(_db.messageRevisions).go();
       await _db.delete(_db.messageReactions).go();
+      await _db.delete(_db.readCursors).go();
       await _db.delete(_db.storedMessages).go();
       await _db.delete(_db.deviceChainPins).go();
     });
@@ -63,6 +64,32 @@ extension MessageDeletion on AppDatabase {
             ))
             .go();
       });
+}
+
+extension ReadState on AppDatabase {
+  /// How many messages of others in [groupId] [me] has not read, see
+  /// [ReadCursor].
+  Selectable<int> unreadCount(Uint8List groupId, Uri me) {
+    final m = storedMessages;
+    final count = m.serverActivityId.count();
+    final position = subqueryExpression<DateTime>(
+      selectOnly(readCursors)
+        ..addColumns([readCursors.position])
+        ..where(
+          readCursors.groupId.equals(groupId) &
+              readCursors.reader.equalsValue(me),
+        ),
+    );
+    final query = selectOnly(m)
+      ..addColumns([count])
+      ..where(
+        m.groupId.equals(groupId) &
+            m.senderId.equalsValue(me).not() &
+            m.deleted.not() &
+            (position.isNull() | m.receivedAt.isBiggerThan(position)),
+      );
+    return query.map((row) => row.read(count)!);
+  }
 }
 
 class _DriftApprovalRequestStore implements ApprovalRequestStore {
@@ -511,6 +538,42 @@ class _DriftMessageStore implements MessageStore {
   }
 
   @override
+  Future<ReadCursor?> getReadCursor(Uint8List groupId, Uri reader) async {
+    final row = await _cursor(groupId, reader).getSingleOrNull();
+    return row?.toCursor();
+  }
+
+  SimpleSelectStatement<$ReadCursorsTable, ReadCursorRow> _cursor(
+    Uint8List groupId,
+    Uri reader,
+  ) => _db.select(_db.readCursors)
+    ..where((t) => t.groupId.equals(groupId) & t.reader.equalsValue(reader));
+
+  @override
+  Future<ReadCursor?> advanceReadCursor(
+    Uint8List groupId,
+    Uri reader,
+    InternalId messageId,
+  ) {
+    return _db.transaction(() async {
+      final message = await _message(groupId, messageId).getSingleOrNull();
+      if (message == null) return null;
+      final current = await _cursor(groupId, reader).getSingleOrNull();
+      if (current != null && !message.receivedAt.isAfter(current.position)) {
+        return null;
+      }
+      final row = ReadCursorRow(
+        groupId: groupId,
+        reader: reader,
+        messageId: messageId,
+        position: message.receivedAt,
+      );
+      await _db.into(_db.readCursors).insertOnConflictUpdate(row);
+      return row.toCursor();
+    });
+  }
+
+  @override
   Future<void> moveMessages({
     required Uint8List from,
     required Uint8List to,
@@ -522,6 +585,19 @@ class _DriftMessageStore implements MessageStore {
       await (_db.update(_db.messageReactions)
             ..where((t) => t.groupId.equals(from)))
           .write(MessageReactionsCompanion(groupId: Value(to)));
+      final moved = await (_db.select(
+        _db.readCursors,
+      )..where((t) => t.groupId.equals(from))).get();
+      await (_db.delete(
+        _db.readCursors,
+      )..where((t) => t.groupId.equals(from))).go();
+      for (final cursor in moved) {
+        final kept = await _cursor(to, cursor.reader).getSingleOrNull();
+        if (kept != null && !cursor.position.isAfter(kept.position)) continue;
+        await _db
+            .into(_db.readCursors)
+            .insertOnConflictUpdate(cursor.copyWith(groupId: to));
+      }
     });
   }
 }

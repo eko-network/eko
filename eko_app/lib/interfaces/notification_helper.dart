@@ -96,6 +96,12 @@ class NotificationHelper {
     );
   }
 
+  /// Removes a notification [showLocalNotification] showed.
+  static Future<void> cancelLocalNotification(int id) async {
+    if (!platform.isAndroid && !platform.isLinux) return;
+    await UnifiedPushNotificationAdapter.cancelLocalNotification(id);
+  }
+
   /// For when a user clicks on a notification they received
   static void setupHandlersWithContext(
     BuildContext context,

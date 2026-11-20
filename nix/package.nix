@@ -43,7 +43,7 @@ pkgs.flutter.buildFlutterApplication {
   src = lib.cleanSource ../eko_app;
   autoPubspecLock = ../eko_app/pubspec.lock;
   gitHashes = {
-    ecp = "sha256-ZpRsrwsdQV2wwfRCVXKoe27gSJAdrNAAuzHYDeC9tEY=";
+    ecp = "sha256-hTq3bUMNAKeBmTQJIBeUCvJENbQueG0CyQFiuzBxJB4=";
     webcrypto = "sha256-XkZe7LcVyUtUJoTqeyd87xLENJIIExgyI9lym/aQBtw=";
     openmls = "sha256-7oz9fVZ6nK8zeUwjKofnVrrwvKf91K+JOjCTdkgT70I=";
   };

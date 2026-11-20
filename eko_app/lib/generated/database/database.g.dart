@@ -4101,6 +4101,326 @@ class MessageReactionsCompanion extends UpdateCompanion<MessageReactionRow> {
   }
 }
 
+class $ReadCursorsTable extends ReadCursors
+    with TableInfo<$ReadCursorsTable, ReadCursorRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ReadCursorsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _groupIdMeta = const VerificationMeta(
+    'groupId',
+  );
+  @override
+  late final GeneratedColumn<Uint8List> groupId = GeneratedColumn<Uint8List>(
+    'group_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.blob,
+    requiredDuringInsert: true,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<Uri, String> reader =
+      GeneratedColumn<String>(
+        'reader',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<Uri>($ReadCursorsTable.$converterreader);
+  @override
+  late final GeneratedColumnWithTypeConverter<InternalId, String> messageId =
+      GeneratedColumn<String>(
+        'message_id',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<InternalId>($ReadCursorsTable.$convertermessageId);
+  static const VerificationMeta _positionMeta = const VerificationMeta(
+    'position',
+  );
+  @override
+  late final GeneratedColumn<DateTime> position = GeneratedColumn<DateTime>(
+    'position',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [groupId, reader, messageId, position];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'read_cursors';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ReadCursorRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('group_id')) {
+      context.handle(
+        _groupIdMeta,
+        groupId.isAcceptableOrUnknown(data['group_id']!, _groupIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_groupIdMeta);
+    }
+    if (data.containsKey('position')) {
+      context.handle(
+        _positionMeta,
+        position.isAcceptableOrUnknown(data['position']!, _positionMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_positionMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {groupId, reader};
+  @override
+  ReadCursorRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ReadCursorRow(
+      groupId: attachedDatabase.typeMapping.read(
+        DriftSqlType.blob,
+        data['${effectivePrefix}group_id'],
+      )!,
+      reader: $ReadCursorsTable.$converterreader.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}reader'],
+        )!,
+      ),
+      messageId: $ReadCursorsTable.$convertermessageId.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}message_id'],
+        )!,
+      ),
+      position: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}position'],
+      )!,
+    );
+  }
+
+  @override
+  $ReadCursorsTable createAlias(String alias) {
+    return $ReadCursorsTable(attachedDatabase, alias);
+  }
+
+  static TypeConverter<Uri, String> $converterreader = const UriTypeConverter();
+  static TypeConverter<InternalId, String> $convertermessageId =
+      const InternalIdConverter();
+}
+
+class ReadCursorRow extends DataClass implements Insertable<ReadCursorRow> {
+  final Uint8List groupId;
+  final Uri reader;
+  final InternalId messageId;
+  final DateTime position;
+  const ReadCursorRow({
+    required this.groupId,
+    required this.reader,
+    required this.messageId,
+    required this.position,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['group_id'] = Variable<Uint8List>(groupId);
+    {
+      map['reader'] = Variable<String>(
+        $ReadCursorsTable.$converterreader.toSql(reader),
+      );
+    }
+    {
+      map['message_id'] = Variable<String>(
+        $ReadCursorsTable.$convertermessageId.toSql(messageId),
+      );
+    }
+    map['position'] = Variable<DateTime>(position);
+    return map;
+  }
+
+  ReadCursorsCompanion toCompanion(bool nullToAbsent) {
+    return ReadCursorsCompanion(
+      groupId: Value(groupId),
+      reader: Value(reader),
+      messageId: Value(messageId),
+      position: Value(position),
+    );
+  }
+
+  factory ReadCursorRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ReadCursorRow(
+      groupId: serializer.fromJson<Uint8List>(json['groupId']),
+      reader: serializer.fromJson<Uri>(json['reader']),
+      messageId: serializer.fromJson<InternalId>(json['messageId']),
+      position: serializer.fromJson<DateTime>(json['position']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'groupId': serializer.toJson<Uint8List>(groupId),
+      'reader': serializer.toJson<Uri>(reader),
+      'messageId': serializer.toJson<InternalId>(messageId),
+      'position': serializer.toJson<DateTime>(position),
+    };
+  }
+
+  ReadCursorRow copyWith({
+    Uint8List? groupId,
+    Uri? reader,
+    InternalId? messageId,
+    DateTime? position,
+  }) => ReadCursorRow(
+    groupId: groupId ?? this.groupId,
+    reader: reader ?? this.reader,
+    messageId: messageId ?? this.messageId,
+    position: position ?? this.position,
+  );
+  ReadCursorRow copyWithCompanion(ReadCursorsCompanion data) {
+    return ReadCursorRow(
+      groupId: data.groupId.present ? data.groupId.value : this.groupId,
+      reader: data.reader.present ? data.reader.value : this.reader,
+      messageId: data.messageId.present ? data.messageId.value : this.messageId,
+      position: data.position.present ? data.position.value : this.position,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ReadCursorRow(')
+          ..write('groupId: $groupId, ')
+          ..write('reader: $reader, ')
+          ..write('messageId: $messageId, ')
+          ..write('position: $position')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    $driftBlobEquality.hash(groupId),
+    reader,
+    messageId,
+    position,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ReadCursorRow &&
+          $driftBlobEquality.equals(other.groupId, this.groupId) &&
+          other.reader == this.reader &&
+          other.messageId == this.messageId &&
+          other.position == this.position);
+}
+
+class ReadCursorsCompanion extends UpdateCompanion<ReadCursorRow> {
+  final Value<Uint8List> groupId;
+  final Value<Uri> reader;
+  final Value<InternalId> messageId;
+  final Value<DateTime> position;
+  final Value<int> rowid;
+  const ReadCursorsCompanion({
+    this.groupId = const Value.absent(),
+    this.reader = const Value.absent(),
+    this.messageId = const Value.absent(),
+    this.position = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ReadCursorsCompanion.insert({
+    required Uint8List groupId,
+    required Uri reader,
+    required InternalId messageId,
+    required DateTime position,
+    this.rowid = const Value.absent(),
+  }) : groupId = Value(groupId),
+       reader = Value(reader),
+       messageId = Value(messageId),
+       position = Value(position);
+  static Insertable<ReadCursorRow> custom({
+    Expression<Uint8List>? groupId,
+    Expression<String>? reader,
+    Expression<String>? messageId,
+    Expression<DateTime>? position,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (groupId != null) 'group_id': groupId,
+      if (reader != null) 'reader': reader,
+      if (messageId != null) 'message_id': messageId,
+      if (position != null) 'position': position,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ReadCursorsCompanion copyWith({
+    Value<Uint8List>? groupId,
+    Value<Uri>? reader,
+    Value<InternalId>? messageId,
+    Value<DateTime>? position,
+    Value<int>? rowid,
+  }) {
+    return ReadCursorsCompanion(
+      groupId: groupId ?? this.groupId,
+      reader: reader ?? this.reader,
+      messageId: messageId ?? this.messageId,
+      position: position ?? this.position,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (groupId.present) {
+      map['group_id'] = Variable<Uint8List>(groupId.value);
+    }
+    if (reader.present) {
+      map['reader'] = Variable<String>(
+        $ReadCursorsTable.$converterreader.toSql(reader.value),
+      );
+    }
+    if (messageId.present) {
+      map['message_id'] = Variable<String>(
+        $ReadCursorsTable.$convertermessageId.toSql(messageId.value),
+      );
+    }
+    if (position.present) {
+      map['position'] = Variable<DateTime>(position.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ReadCursorsCompanion(')
+          ..write('groupId: $groupId, ')
+          ..write('reader: $reader, ')
+          ..write('messageId: $messageId, ')
+          ..write('position: $position, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -4130,6 +4450,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $MessageReactionsTable messageReactions = $MessageReactionsTable(
     this,
   );
+  late final $ReadCursorsTable readCursors = $ReadCursorsTable(this);
   late final Index storedMessagesGroupReceived = Index(
     'stored_messages_group_received',
     'CREATE INDEX stored_messages_group_received ON stored_messages (group_id, received_at)',
@@ -4156,6 +4477,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     messageAttachments,
     messageRevisions,
     messageReactions,
+    readCursors,
     storedMessagesGroupReceived,
     messageReactionsGroup,
   ];
@@ -7070,6 +7392,189 @@ typedef $$MessageReactionsTableProcessedTableManager =
       MessageReactionRow,
       PrefetchHooks Function()
     >;
+typedef $$ReadCursorsTableCreateCompanionBuilder =
+    ReadCursorsCompanion Function({
+      required Uint8List groupId,
+      required Uri reader,
+      required InternalId messageId,
+      required DateTime position,
+      Value<int> rowid,
+    });
+typedef $$ReadCursorsTableUpdateCompanionBuilder =
+    ReadCursorsCompanion Function({
+      Value<Uint8List> groupId,
+      Value<Uri> reader,
+      Value<InternalId> messageId,
+      Value<DateTime> position,
+      Value<int> rowid,
+    });
+
+class $$ReadCursorsTableFilterComposer
+    extends Composer<_$AppDatabase, $ReadCursorsTable> {
+  $$ReadCursorsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<Uint8List> get groupId => $composableBuilder(
+    column: $table.groupId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<Uri, Uri, String> get reader =>
+      $composableBuilder(
+        column: $table.reader,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
+  ColumnWithTypeConverterFilters<InternalId, InternalId, String>
+  get messageId => $composableBuilder(
+    column: $table.messageId,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnFilters<DateTime> get position => $composableBuilder(
+    column: $table.position,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$ReadCursorsTableOrderingComposer
+    extends Composer<_$AppDatabase, $ReadCursorsTable> {
+  $$ReadCursorsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<Uint8List> get groupId => $composableBuilder(
+    column: $table.groupId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get reader => $composableBuilder(
+    column: $table.reader,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get messageId => $composableBuilder(
+    column: $table.messageId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get position => $composableBuilder(
+    column: $table.position,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$ReadCursorsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ReadCursorsTable> {
+  $$ReadCursorsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<Uint8List> get groupId =>
+      $composableBuilder(column: $table.groupId, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<Uri, String> get reader =>
+      $composableBuilder(column: $table.reader, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<InternalId, String> get messageId =>
+      $composableBuilder(column: $table.messageId, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get position =>
+      $composableBuilder(column: $table.position, builder: (column) => column);
+}
+
+class $$ReadCursorsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ReadCursorsTable,
+          ReadCursorRow,
+          $$ReadCursorsTableFilterComposer,
+          $$ReadCursorsTableOrderingComposer,
+          $$ReadCursorsTableAnnotationComposer,
+          $$ReadCursorsTableCreateCompanionBuilder,
+          $$ReadCursorsTableUpdateCompanionBuilder,
+          (
+            ReadCursorRow,
+            BaseReferences<_$AppDatabase, $ReadCursorsTable, ReadCursorRow>,
+          ),
+          ReadCursorRow,
+          PrefetchHooks Function()
+        > {
+  $$ReadCursorsTableTableManager(_$AppDatabase db, $ReadCursorsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ReadCursorsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ReadCursorsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ReadCursorsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<Uint8List> groupId = const Value.absent(),
+                Value<Uri> reader = const Value.absent(),
+                Value<InternalId> messageId = const Value.absent(),
+                Value<DateTime> position = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ReadCursorsCompanion(
+                groupId: groupId,
+                reader: reader,
+                messageId: messageId,
+                position: position,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required Uint8List groupId,
+                required Uri reader,
+                required InternalId messageId,
+                required DateTime position,
+                Value<int> rowid = const Value.absent(),
+              }) => ReadCursorsCompanion.insert(
+                groupId: groupId,
+                reader: reader,
+                messageId: messageId,
+                position: position,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$ReadCursorsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ReadCursorsTable,
+      ReadCursorRow,
+      $$ReadCursorsTableFilterComposer,
+      $$ReadCursorsTableOrderingComposer,
+      $$ReadCursorsTableAnnotationComposer,
+      $$ReadCursorsTableCreateCompanionBuilder,
+      $$ReadCursorsTableUpdateCompanionBuilder,
+      (
+        ReadCursorRow,
+        BaseReferences<_$AppDatabase, $ReadCursorsTable, ReadCursorRow>,
+      ),
+      ReadCursorRow,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -7100,4 +7605,6 @@ class $AppDatabaseManager {
       $$MessageRevisionsTableTableManager(_db, _db.messageRevisions);
   $$MessageReactionsTableTableManager get messageReactions =>
       $$MessageReactionsTableTableManager(_db, _db.messageReactions);
+  $$ReadCursorsTableTableManager get readCursors =>
+      $$ReadCursorsTableTableManager(_db, _db.readCursors);
 }
