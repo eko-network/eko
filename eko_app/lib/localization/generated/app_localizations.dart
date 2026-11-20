@@ -1505,6 +1505,114 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'A device that isn\'t one of {owner}\'s current devices is in a chat. It will be removed.'**
   String messengerUnknownDeviceBody(String owner);
+
+  /// No description provided for @messageDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'This message was deleted'**
+  String get messageDeleted;
+
+  /// No description provided for @messageYouDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'You deleted this message'**
+  String get messageYouDeleted;
+
+  /// No description provided for @messageEdited.
+  ///
+  /// In en, this message translates to:
+  /// **'Edited'**
+  String get messageEdited;
+
+  /// No description provided for @messageEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get messageEdit;
+
+  /// No description provided for @messageEditing.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit message'**
+  String get messageEditing;
+
+  /// No description provided for @messageEditHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit history'**
+  String get messageEditHistory;
+
+  /// No description provided for @messageCopy.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy'**
+  String get messageCopy;
+
+  /// No description provided for @messageCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Copied'**
+  String get messageCopied;
+
+  /// No description provided for @messageDeleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete message?'**
+  String get messageDeleteTitle;
+
+  /// No description provided for @messageDeleteForMe.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete for me'**
+  String get messageDeleteForMe;
+
+  /// No description provided for @messageDeleteForEveryone.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete for everyone'**
+  String get messageDeleteForEveryone;
+
+  /// No description provided for @messageYou.
+  ///
+  /// In en, this message translates to:
+  /// **'You'**
+  String get messageYou;
+
+  /// No description provided for @messageOriginalNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Original message not found'**
+  String get messageOriginalNotFound;
+
+  /// No description provided for @messagePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo'**
+  String get messagePhoto;
+
+  /// No description provided for @messageReactions.
+  ///
+  /// In en, this message translates to:
+  /// **'Reactions'**
+  String get messageReactions;
+
+  /// No description provided for @messageReactionsAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get messageReactionsAll;
+
+  /// No description provided for @messageReactionTapToRemove.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to remove'**
+  String get messageReactionTapToRemove;
+
+  /// No description provided for @messageActionFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'That didn\'t go through. Try again.'**
+  String get messageActionFailed;
 }
 
 class _AppLocalizationsDelegate

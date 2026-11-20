@@ -4,9 +4,15 @@ import 'package:flutter/foundation.dart' as foundation;
 import 'package:flutter/material.dart';
 
 class StyledEmojiPicker extends StatefulWidget {
-  final TextEditingController textController;
+  /// Where picked emoji are typed, unless [onEmojiSelected] takes them.
+  final TextEditingController? textController;
+  final ValueChanged<String>? onEmojiSelected;
 
-  const StyledEmojiPicker({super.key, required this.textController});
+  const StyledEmojiPicker({
+    super.key,
+    this.textController,
+    this.onEmojiSelected,
+  });
 
   @override
   State<StyledEmojiPicker> createState() => _StyledEmojiPickerState();
@@ -22,6 +28,9 @@ class _StyledEmojiPickerState extends State<StyledEmojiPicker> {
 
     return EmojiPicker(
       textEditingController: widget.textController,
+      onEmojiSelected: widget.onEmojiSelected == null
+          ? null
+          : (_, emoji) => widget.onEmojiSelected!(emoji.emoji),
       customWidget: (config, state, showSearchView) =>
           _StyledEmojiLayout(config, state, showSearchView),
       config: Config(

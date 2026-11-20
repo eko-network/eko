@@ -18,6 +18,8 @@ class MemoryStorage extends Storage {
       );
 
   List<StoredMessage> get messages => (messageStore as _MessageStore).messages;
+  List<StoredReaction> get reactions =>
+      (messageStore as _MessageStore).reactions;
   List<MlsGroupRecord> get groups => (groupStore as _GroupStore).groups;
   List<StoredApprovalRequest> get approvalRequests =>
       (approvalRequestStore as _ApprovalRequestStore).requests;
@@ -25,6 +27,7 @@ class MemoryStorage extends Storage {
   @override
   Future<void> clear() async {
     messages.clear();
+    reactions.clear();
     groups.clear();
     (groupStore as _GroupStore).mergedInto.clear();
     approvalRequests.clear();
@@ -146,6 +149,7 @@ class _GroupStore implements GroupStore {
 
 class _MessageStore implements MessageStore {
   final messages = <StoredMessage>[];
+  final reactions = <StoredReaction>[];
 
   @override
   Future<void> saveMessage(StoredMessage message) async =>
@@ -154,6 +158,60 @@ class _MessageStore implements MessageStore {
   @override
   Future<bool> hasMessage(Uri serverActivityId) async =>
       messages.any((m) => m.serverActivityId == serverActivityId);
+
+  @override
+  Future<StoredMessage?> getMessage(Uint8List groupId, InternalId id) async =>
+      messages
+          .where((m) => m.id == id && bytesEqual(m.groupId, groupId))
+          .firstOrNull;
+
+  @override
+  Future<void> editMessage(
+    Uint8List groupId,
+    InternalId id, {
+    required String? content,
+    required DateTime editedAt,
+  }) async {
+    for (final (i, m) in messages.indexed.toList()) {
+      if (m.id != id || !bytesEqual(m.groupId, groupId)) continue;
+      messages[i] = _copy(m, content: content, editedAt: editedAt);
+    }
+  }
+
+  @override
+  Future<void> deleteMessage(Uint8List groupId, InternalId id) async {
+    reactions.removeWhere(
+      (r) => r.messageId == id && bytesEqual(r.groupId, groupId),
+    );
+    for (final (i, m) in messages.indexed.toList()) {
+      if (m.id != id || !bytesEqual(m.groupId, groupId)) continue;
+      messages[i] = _copy(m, content: null, deleted: true);
+    }
+  }
+
+  @override
+  Future<void> saveReaction(StoredReaction reaction) async {
+    reactions
+      ..removeWhere(
+        (r) =>
+            r.messageId == reaction.messageId &&
+            r.senderId == reaction.senderId &&
+            bytesEqual(r.groupId, reaction.groupId),
+      )
+      ..add(reaction);
+  }
+
+  @override
+  Future<StoredReaction?> getReaction(Uint8List groupId, InternalId id) async =>
+      reactions
+          .where((r) => r.id == id && bytesEqual(r.groupId, groupId))
+          .firstOrNull;
+
+  @override
+  Future<void> deleteReaction(Uint8List groupId, InternalId id) async =>
+      reactions.removeWhere(
+        (r) => r.id == id && bytesEqual(r.groupId, groupId),
+      );
 
   @override
   Future<bool> markMessageDelivered(Uri serverActivityId) async {
@@ -175,21 +233,43 @@ class _MessageStore implements MessageStore {
       if (!bytesEqual(m.groupId, from)) continue;
       messages[i] = _copy(m, groupId: to);
     }
+    for (final (i, r) in reactions.indexed.toList()) {
+      if (!bytesEqual(r.groupId, from)) continue;
+      reactions[i] = StoredReaction(
+        id: r.id,
+        messageId: r.messageId,
+        groupId: to,
+        senderId: r.senderId,
+        emoji: r.emoji,
+        receivedAt: r.receivedAt,
+      );
+    }
   }
 
-  StoredMessage _copy(StoredMessage m, {Uint8List? groupId, bool? delivered}) =>
-      StoredMessage(
-        serverActivityId: m.serverActivityId,
-        receivedAt: m.receivedAt,
-        senderId: m.senderId,
-        id: m.id,
-        content: m.content,
-        inReplyTo: m.inReplyTo,
-        attachment: m.attachment,
-        groupId: groupId ?? m.groupId,
-        delivered: delivered ?? m.delivered,
-      );
+  StoredMessage _copy(
+    StoredMessage m, {
+    Uint8List? groupId,
+    bool? delivered,
+    Object? content = _keep,
+    DateTime? editedAt,
+    bool deleted = false,
+  }) => StoredMessage(
+    serverActivityId: m.serverActivityId,
+    receivedAt: m.receivedAt,
+    senderId: m.senderId,
+    id: m.id,
+    content: content == _keep ? m.content : content as String?,
+    inReplyTo: m.inReplyTo,
+    attachment: deleted ? const [] : m.attachment,
+    groupId: groupId ?? m.groupId,
+    delivered: delivered ?? m.delivered,
+    editedAt: editedAt ?? m.editedAt,
+    deleted: deleted || m.deleted,
+  );
 }
+
+// [_MessageStore._copy] keeps the content unless it's given
+const _keep = Object();
 
 class _ProcessedObjectStore implements ProcessedObjectStore {
   final _ids = <Uri>{};

@@ -174,9 +174,53 @@ class StoredMessages extends Table {
   TextColumn get inReplyTo =>
       text().map(const InternalIdConverter()).nullable()();
   BoolColumn get delivered => boolean().withDefault(const Constant(false))();
+  DateTimeColumn get editedAt => dateTime().nullable()();
+  BoolColumn get deleted => boolean().withDefault(const Constant(false))();
 
   @override
   Set<Column> get primaryKey => {serverActivityId};
+
+  // replies, reactions, edits and deletes find a message by its object id
+  @override
+  List<Set<Column>> get uniqueKeys => [
+    {groupId, id},
+  ];
+}
+
+/// The earlier contents of an edited message, see
+/// [StoredMessage.editedAt].
+@DataClassName('MessageRevisionRow')
+class MessageRevisions extends Table {
+  IntColumn get rowId => integer().autoIncrement()();
+  TextColumn get messageId => text()
+      .map(const UriTypeConverter())
+      .references(
+        StoredMessages,
+        #serverActivityId,
+        onDelete: KeyAction.cascade,
+      )();
+  TextColumn get content => text().nullable()();
+  // since when this was the content: when it was sent or edited
+  DateTimeColumn get since => dateTime()();
+}
+
+@DataClassName('MessageReactionRow')
+@TableIndex(name: 'message_reactions_group', columns: {#groupId})
+class MessageReactions extends Table {
+  TextColumn get id => text().map(const InternalIdConverter())();
+  BlobColumn get groupId => blob()();
+  TextColumn get messageId => text().map(const InternalIdConverter())();
+  TextColumn get senderId => text().map(const UriTypeConverter())();
+  TextColumn get emoji => text()();
+  DateTimeColumn get receivedAt => dateTime()();
+
+  @override
+  Set<Column> get primaryKey => {groupId, id};
+
+  @override
+  List<Set<Column>> get uniqueKeys => [
+    {groupId, messageId, senderId},
+  ];
 }
 
 @DataClassName('MessageAttachmentRow')
@@ -211,6 +255,8 @@ class MessageAttachments extends Table {
     ProcessedObjects,
     StoredMessages,
     MessageAttachments,
+    MessageRevisions,
+    MessageReactions,
   ],
 )
 class AppDatabase extends _$AppDatabase {

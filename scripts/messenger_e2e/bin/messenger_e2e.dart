@@ -273,6 +273,57 @@ Future<void> main() async {
     );
   });
 
+  await step(
+    'replies, reactions, edits and deletes reach every device',
+    () async {
+      await alice1.sendText(dm, 'to be edited');
+      final original = await receives(bob1, (m) => m.content == 'to be edited');
+      await receives(alice2, (m) => m.content == 'to be edited');
+
+      await bob1.client.messages.sendMessage(
+        Activity.newCreate(
+          object: ActivityPubObject.newNote(
+            content: 'a reply',
+            inReplyTo: original.id,
+          ),
+        ),
+        dm,
+      );
+      final reply = await receives(alice1, (m) => m.content == 'a reply');
+      check(reply.inReplyTo == original.id, 'the reply lost its message');
+
+      await bob1.client.messages.react(original, '👍');
+      for (final device in [alice1, alice2]) {
+        await until('${device.name} to get the reaction', () async {
+          await device.sync();
+          return device.storage.reactions.any(
+            (r) => r.messageId == original.id && r.emoji == '👍',
+          );
+        });
+      }
+
+      final mine = alice1.storage.messages.firstWhere(
+        (m) => m.id == original.id,
+      );
+      await alice1.client.messages.editMessage(mine, 'edited');
+      for (final device in [bob1, alice2]) {
+        await receives(
+          device,
+          (m) => m.id == original.id && m.content == 'edited',
+        );
+      }
+
+      await alice1.client.messages.deleteForEveryone(mine);
+      for (final device in [bob1, alice2]) {
+        await receives(device, (m) => m.id == original.id && m.deleted);
+        check(
+          device.storage.reactions.every((r) => r.messageId != original.id),
+          "${device.name} kept the deleted message's reactions",
+        );
+      }
+    },
+  );
+
   await step('the notification service syncs with its own token', () async {
     final token = await bob1.client.mintNotificationToken();
     final service = _NotificationService(bob1, token);

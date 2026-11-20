@@ -1,7 +1,7 @@
 name: eko_app
 description: A new Flutter project.
 publish_to: 'none'
-version: 2.2.2+73
+version: 2.2.3+74
 environment:
   sdk: '>=3.8.0 <4.0.0'
 dependencies:
@@ -60,7 +60,7 @@ dependencies:
   ecp:
     git:
       url: https://github.com/eko-network/ecp-dart-sdk.git
-      ref: 132fd6b0155f8a5fe5b3b6c2325854a170e03aae
+      ref: cd505d656ba85cac61db3fa7ad21a5230e3cb3d6
   sqlite3: ^3.5.2
   drift: ^2.34.4
   lucide_icons_flutter: ^3.1.14+2

@@ -77,7 +77,44 @@ Future<void> _sendPendingDeliveryAcks(
   }
 }
 
-typedef LastMessagePreview = ({String? content, bool hasAttachment});
+/// The reactions in a group, by the message they react to, oldest first.
+@riverpod
+Stream<Map<InternalId, List<StoredReaction>>> reactions(
+  Ref ref,
+  Uint8List groupId,
+) {
+  final query = db.select(db.messageReactions)
+    ..where((t) => t.groupId.equals(groupId))
+    ..orderBy([(t) => OrderingTerm.asc(t.receivedAt)]);
+  return query.watch().map((rows) {
+    final byMessage = <InternalId, List<StoredReaction>>{};
+    for (final row in rows) {
+      byMessage.putIfAbsent(row.messageId, () => []).add(row.toReaction());
+    }
+    return byMessage;
+  });
+}
+
+typedef MessageRevision = ({String? content, DateTime since});
+
+/// The earlier contents of an edited message, oldest first.
+@riverpod
+Stream<List<MessageRevision>> messageRevisions(Ref ref, Uri serverActivityId) {
+  final query = db.select(db.messageRevisions)
+    ..where((t) => t.messageId.equalsValue(serverActivityId))
+    ..orderBy([(t) => OrderingTerm.asc(t.rowId)]);
+  return query.watch().map(
+    (rows) => [
+      for (final row in rows) (content: row.content, since: row.since),
+    ],
+  );
+}
+
+typedef LastMessagePreview = ({
+  String? content,
+  bool hasAttachment,
+  bool deleted,
+});
 
 /// The newest message in a group, for the chat list, or null when the group
 /// has none yet.
@@ -99,9 +136,11 @@ Stream<LastMessagePreview?> lastMessage(Ref ref, Uint8List groupId) {
         ..limit(1);
   return query.watchSingleOrNull().map((row) {
     if (row == null) return null;
+    final message = row.readTable(messages);
     return (
-      content: row.readTable(messages).content,
+      content: message.content,
       hasAttachment: row.readTableOrNull(attachments) != null,
+      deleted: message.deleted,
     );
   });
 }

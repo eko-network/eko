@@ -37,6 +37,21 @@ extension StoredMessageRowMapper on StoredMessageRow {
       attachment: attachment,
       groupId: groupId,
       delivered: delivered,
+      editedAt: editedAt,
+      deleted: deleted,
+    );
+  }
+}
+
+extension MessageReactionRowMapper on MessageReactionRow {
+  StoredReaction toReaction() {
+    return StoredReaction(
+      id: id,
+      messageId: messageId,
+      groupId: groupId,
+      senderId: senderId,
+      emoji: emoji,
+      receivedAt: receivedAt,
     );
   }
 }

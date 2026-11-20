@@ -274,5 +274,23 @@
         "type" : "String"
       }
     }
-  }
+  },
+  "messageDeleted" : "This message was deleted",
+  "messageYouDeleted" : "You deleted this message",
+  "messageEdited" : "Edited",
+  "messageEdit" : "Edit",
+  "messageEditing" : "Edit message",
+  "messageEditHistory" : "Edit history",
+  "messageCopy" : "Copy",
+  "messageCopied" : "Copied",
+  "messageDeleteTitle" : "Delete message?",
+  "messageDeleteForMe" : "Delete for me",
+  "messageDeleteForEveryone" : "Delete for everyone",
+  "messageYou" : "You",
+  "messageOriginalNotFound" : "Original message not found",
+  "messagePhoto" : "Photo",
+  "messageReactions" : "Reactions",
+  "messageReactionsAll" : "All",
+  "messageReactionTapToRemove" : "Tap to remove",
+  "messageActionFailed" : "That didn't go through. Try again."
 }

@@ -1,6 +1,7 @@
 import 'package:eko_app/messenger/widgets/emoji_picker.dart';
 import 'package:eko_app/messenger/widgets/gif_picker.dart';
 import 'package:eko_app/utilities/api_constants.dart' as ac;
+import 'package:eko_app/utilities/platform.dart' as platform;
 import 'package:flutter/material.dart';
 import 'package:klipy_dart/klipy_dart.dart';
 
@@ -34,7 +35,11 @@ class _MediaPickerState extends State<MediaPicker>
     super.initState();
     _tabController = klipyClient == null
         ? TabController(length: 1, vsync: this, initialIndex: 0)
-        : TabController(length: 2, vsync: this, initialIndex: 0);
+        : TabController(
+            length: 2,
+            vsync: this,
+            initialIndex: platform.isMobile ? 1 : 0,
+          );
   }
 
   @override

@@ -94,6 +94,8 @@ class GroupSubtitle extends ConsumerWidget {
     final content = last?.content?.trim() ?? '';
     final text = last == null
         ? l10n.noMessagesYet
+        : last.deleted
+        ? l10n.messageDeleted
         : content.isNotEmpty
         // one line in the list, so line breaks become spaces
         ? content.replaceAll(RegExp(r'\s+'), ' ')

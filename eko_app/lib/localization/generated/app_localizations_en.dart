@@ -758,4 +758,58 @@ class AppLocalizationsEn extends AppLocalizations {
   String messengerUnknownDeviceBody(String owner) {
     return 'A device that isn\'t one of $owner\'s current devices is in a chat. It will be removed.';
   }
+
+  @override
+  String get messageDeleted => 'This message was deleted';
+
+  @override
+  String get messageYouDeleted => 'You deleted this message';
+
+  @override
+  String get messageEdited => 'Edited';
+
+  @override
+  String get messageEdit => 'Edit';
+
+  @override
+  String get messageEditing => 'Edit message';
+
+  @override
+  String get messageEditHistory => 'Edit history';
+
+  @override
+  String get messageCopy => 'Copy';
+
+  @override
+  String get messageCopied => 'Copied';
+
+  @override
+  String get messageDeleteTitle => 'Delete message?';
+
+  @override
+  String get messageDeleteForMe => 'Delete for me';
+
+  @override
+  String get messageDeleteForEveryone => 'Delete for everyone';
+
+  @override
+  String get messageYou => 'You';
+
+  @override
+  String get messageOriginalNotFound => 'Original message not found';
+
+  @override
+  String get messagePhoto => 'Photo';
+
+  @override
+  String get messageReactions => 'Reactions';
+
+  @override
+  String get messageReactionsAll => 'All';
+
+  @override
+  String get messageReactionTapToRemove => 'Tap to remove';
+
+  @override
+  String get messageActionFailed => 'That didn\'t go through. Try again.';
 }

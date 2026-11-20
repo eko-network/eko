@@ -1,7 +1,10 @@
 import 'dart:async';
+import 'dart:math' show min;
 
 import 'package:cupertino_interactive_keyboard/cupertino_interactive_keyboard.dart'; // FIXME remove when this issue is closed https://github.com/flutter/flutter/issues/57609
 import 'package:ecp/ecp.dart' as ecp;
+import 'package:eko_app/database/database.dart';
+import 'package:eko_app/database/storage.dart';
 import 'package:eko_app/localization/generated/app_localizations.dart';
 import 'package:eko_app/messenger/ecp_helpers.dart';
 import 'package:eko_app/messenger/providers/message_provider.dart';
@@ -10,6 +13,8 @@ import 'package:eko_app/messenger/views/device_warning.dart';
 import 'package:eko_app/messenger/widgets/group_card.dart';
 import 'package:eko_app/messenger/widgets/media_picker.dart';
 import 'package:eko_app/messenger/widgets/message.dart';
+import 'package:eko_app/messenger/widgets/message_actions.dart';
+import 'package:eko_app/messenger/widgets/message_quote.dart';
 import 'package:eko_app/providers/ecp_provider.dart';
 import 'package:eko_app/providers/user_provider.dart';
 import 'package:eko_app/utilities/emoji_text_style.dart';
@@ -45,8 +50,18 @@ class _ChatViewState extends ConsumerState<ChatView>
   final TextEditingController _messageController = TextEditingController();
   final MenuController _menuController = MenuController();
   final FocusNode _focusNode = FocusNode();
+  final _scrollController = ScrollController();
   bool _showMediaPicker = false;
   Map<Uri, ecp.Image> _selectedGifs = {};
+
+  // at most one of them, the input sends a reply or the edit
+  ecp.StoredMessage? _replyingTo;
+  ecp.StoredMessage? _editing;
+
+  // to scroll to the message a reply quotes
+  final _messageKeys = <ecp.InternalId, GlobalKey>{};
+  ecp.InternalId? _highlighted;
+  Timer? _highlightTimer;
 
   // members whose devices were reset and not accepted yet, messages here
   // don't reach their new devices
@@ -87,6 +102,9 @@ class _ChatViewState extends ConsumerState<ChatView>
     super.didUpdateWidget(oldWidget);
     if (oldWidget.group.group.id != widget.group.group.id) {
       _changed.clear();
+      _replyingTo = null;
+      if (_editing != null) _messageController.clear();
+      _editing = null;
       _verifyMembers();
     }
   }
@@ -184,7 +202,9 @@ class _ChatViewState extends ConsumerState<ChatView>
   void dispose() {
     _warnings?.cancel();
     _accepted?.cancel();
+    _highlightTimer?.cancel();
     WidgetsBinding.instance.removeObserver(this);
+    _scrollController.dispose();
     _focusNode.dispose();
     _messageController.dispose();
     super.dispose();
@@ -201,7 +221,8 @@ class _ChatViewState extends ConsumerState<ChatView>
 
   void _onGifSelected(KlipyResultObject gif) {
     final obj = gif.media.tinyGif ?? gif.media.gif;
-    if (obj == null) {
+    // only the text of a message can be edited
+    if (obj == null || _editing != null) {
       return;
     }
     setState(() {
@@ -218,24 +239,28 @@ class _ChatViewState extends ConsumerState<ChatView>
   }
 
   Future<void> _sendMessage() async {
+    if (_editing != null) return _sendEdit();
     final text = _messageController.text.trim();
     final selected = _selectedGifs;
     final gifs = selected.values;
+    final replyingTo = _replyingTo;
     // held back until the reset is reviewed in the banner
     if (_changed.isNotEmpty || (text.isEmpty && gifs.isEmpty)) return;
     _messageController.clear();
     setState(() {
       _selectedGifs = {};
+      _replyingTo = null;
     });
 
     try {
       if (text.isEmpty && gifs.length == 1) {
-        await _dispatchMessage(gifs.first);
+        await _dispatchMessage(gifs.first.copyWith(inReplyTo: replyingTo?.id));
       } else {
         await _dispatchMessage(
           ecp.Note(
             content: text,
             id: ecp.InternalId.gen(),
+            inReplyTo: replyingTo?.id,
             attachments: gifs.isEmpty ? null : gifs.toList(),
           ),
         );
@@ -247,8 +272,213 @@ class _ChatViewState extends ConsumerState<ChatView>
         _changed.addAll(e.owners.where(_isMember));
         if (_messageController.text.isEmpty) _messageController.text = text;
         if (_selectedGifs.isEmpty) _selectedGifs = selected;
+        _replyingTo ??= replyingTo;
       });
     }
+  }
+
+  Future<void> _sendEdit() async {
+    final editing = _editing!;
+    final text = _messageController.text.trim();
+    if (text == (editing.content ?? '').trim()) return _stopComposing();
+    // a caption can go, the text of a text message can't
+    if (_changed.isNotEmpty || (text.isEmpty && editing.attachment.isEmpty)) {
+      return;
+    }
+    _stopComposing();
+    await _run((messages) => messages.editMessage(editing, text));
+  }
+
+  /// Leaves replying or editing.
+  void _stopComposing() {
+    if (_editing != null) _messageController.clear();
+    setState(() {
+      _editing = null;
+      _replyingTo = null;
+    });
+  }
+
+  /// Runs an action on a message, which fails like sending one.
+  Future<void> _run(
+    Future<void> Function(ecp.MessageHandler messages) action,
+  ) async {
+    try {
+      await action(ref.read(ecpClientProvider).messages);
+    } on ecp.EcpDevicesChangedException catch (e) {
+      if (mounted) setState(() => _changed.addAll(e.owners.where(_isMember)));
+    } catch (e) {
+      debugPrint('[ChatView] message action failed: $e');
+      if (!mounted) return;
+      showSnackBar(
+        text: AppLocalizations.of(context)!.messageActionFailed,
+        context: context,
+        variant: SnackBarVariant.destructive,
+      );
+    }
+  }
+
+  Future<void> _react(
+    ecp.StoredMessage message,
+    String emoji,
+    ecp.StoredReaction? mine,
+  ) {
+    // picking the current reaction again takes it back
+    if (mine != null && mine.emoji == emoji) {
+      return _run((messages) => messages.removeReaction(mine));
+    }
+    return _run((messages) => messages.react(message, emoji));
+  }
+
+  Future<void> _onActions(
+    ecp.StoredMessage message,
+    Rect bubbleRect, {
+    required ({ecp.StoredMessage? message})? quoted,
+    required List<ecp.StoredReaction> reactions,
+  }) async {
+    final me = ref.read(ecpClientProvider).me.id;
+    final isMine = message.senderId == me;
+    final isRecent = DateTime.now().difference(message.receivedAt) < editWindow;
+    final hasText = message.content?.trim().isNotEmpty ?? false;
+    final mine = reactions.where((r) => r.senderId == me).firstOrNull;
+
+    FocusScope.of(context).unfocus();
+    final choice = await showMessageActions(
+      context,
+      bubbleRect: bubbleRect,
+      bubble: MessageBubble(
+        isReceived: !isMine,
+        message: message,
+        me: me,
+        quoted: quoted,
+      ),
+      isReceived: !isMine,
+      myReaction: mine?.emoji,
+      canReact: !message.deleted,
+      actions: [
+        if (!message.deleted) MessageAction.reply,
+        // an image sent on its own has no text to edit
+        if (isMine && isRecent && !message.deleted && message.content != null)
+          MessageAction.edit,
+        if (!message.deleted && hasText) MessageAction.copy,
+        MessageAction.delete,
+      ],
+    );
+    if (!mounted) return;
+
+    switch (choice) {
+      case ReactChoice(:final emoji):
+        await _react(message, emoji, mine);
+      case MoreReactionsChoice():
+        final emoji = await pickReaction(context);
+        if (emoji != null) await _react(message, emoji, mine);
+      case ActionChoice(action: MessageAction.reply):
+        _reply(message);
+      case ActionChoice(action: MessageAction.edit):
+        setState(() {
+          _editing = message;
+          _replyingTo = null;
+          _selectedGifs = {};
+          _showMediaPicker = false;
+        });
+        _messageController.text = message.content ?? '';
+        _focusNode.requestFocus();
+      case ActionChoice(action: MessageAction.copy):
+        await Clipboard.setData(ClipboardData(text: message.content!.trim()));
+        if (!mounted) return;
+        showSnackBar(
+          text: AppLocalizations.of(context)!.messageCopied,
+          context: context,
+        );
+      case ActionChoice(action: MessageAction.delete):
+        final how = await confirmDelete(
+          context,
+          forEveryone: isMine && isRecent && !message.deleted,
+        );
+        if (how == null || !mounted) return;
+        if (_editing?.id == message.id || _replyingTo?.id == message.id) {
+          _stopComposing();
+        }
+        switch (how) {
+          case DeleteChoice.forMe:
+            await db.deleteMessageForMe(message);
+          case DeleteChoice.forEveryone:
+            await _run((messages) => messages.deleteForEveryone(message));
+        }
+      case null:
+        break;
+    }
+  }
+
+  void _reply(ecp.StoredMessage message) {
+    if (_editing != null) _messageController.clear();
+    setState(() {
+      _editing = null;
+      _replyingTo = message;
+    });
+    _focusNode.requestFocus();
+  }
+
+  /// Scrolls up to [id], building the older messages on the way, and
+  /// highlights it.
+  Future<void> _scrollToMessage(ecp.InternalId id) async {
+    for (var i = 0; i < 200 && mounted; i++) {
+      final target = _messageKeys[id]?.currentContext;
+      if (target != null && target.mounted) {
+        await Scrollable.ensureVisible(
+          target,
+          alignment: 0.5,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        );
+        if (!mounted) return;
+        _highlightTimer?.cancel();
+        setState(() => _highlighted = id);
+        _highlightTimer = Timer(const Duration(milliseconds: 1500), () {
+          if (mounted) setState(() => _highlighted = null);
+        });
+        return;
+      }
+      // the list is reversed, older messages are further along
+      final position = _scrollController.position;
+      if (position.pixels >= position.maxScrollExtent) return;
+      _scrollController.jumpTo(
+        min(
+          position.pixels + position.viewportDimension,
+          position.maxScrollExtent,
+        ),
+      );
+      await WidgetsBinding.instance.endOfFrame;
+    }
+  }
+
+  Future<void> _showReactions(List<ecp.StoredReaction> reactions) {
+    // or the keyboard comes back when the sheet closes
+    FocusScope.of(context).unfocus();
+    return showReactions(
+      context,
+      reactions: reactions,
+      me: ref.read(ecpClientProvider).me.id,
+      onRemove: (reaction) =>
+          _run((messages) => messages.removeReaction(reaction)),
+    );
+  }
+
+  Widget? _buildComposeBanner(BuildContext context) {
+    final me = ref.watch(ecpClientProvider).me.id;
+    final editing = _editing;
+    final replyingTo = _replyingTo;
+    if (editing == null && replyingTo == null) return null;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+      child: MessageQuote(
+        message: editing ?? replyingTo,
+        me: me,
+        title: editing != null
+            ? AppLocalizations.of(context)!.messageEditing
+            : null,
+        onClose: _stopComposing,
+      ),
+    );
   }
 
   Future<void> _dispatchMessage(ecp.ActivityPubObject object) async {
@@ -275,9 +505,13 @@ class _ChatViewState extends ConsumerState<ChatView>
 
   Widget _buildInputRow(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final editing = _editing;
     final canSend =
         _changed.isEmpty &&
-        (_messageController.text.trim().isNotEmpty || _selectedGifs.isNotEmpty);
+        (_messageController.text.trim().isNotEmpty ||
+            _selectedGifs.isNotEmpty ||
+            (editing != null && editing.attachment.isNotEmpty));
+    final banner = _buildComposeBanner(context);
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -292,6 +526,7 @@ class _ChatViewState extends ConsumerState<ChatView>
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                ?banner,
                 if (_selectedGifs.isNotEmpty)
                   Padding(
                     padding: const EdgeInsets.only(
@@ -359,6 +594,8 @@ class _ChatViewState extends ConsumerState<ChatView>
                     bindings: {
                       const SingleActivator(LogicalKeyboardKey.enter):
                           _sendMessage,
+                      const SingleActivator(LogicalKeyboardKey.escape):
+                          _stopComposing,
                     },
                     child: TextField(
                       focusNode: _focusNode,
@@ -412,7 +649,11 @@ class _ChatViewState extends ConsumerState<ChatView>
           CircleAvatar(
             backgroundColor: Color(0xFF115AEF),
             child: IconButton(
-              icon: const Icon(Icons.send, color: Colors.white, size: 20),
+              icon: Icon(
+                editing != null ? Icons.check : Icons.send,
+                color: Colors.white,
+                size: 20,
+              ),
               onPressed: _sendMessage,
             ),
           ),
@@ -447,6 +688,9 @@ class _ChatViewState extends ConsumerState<ChatView>
     final messagesAsync = ref.watch(
       messageProvider(widget.group.group.groupIdBytes),
     );
+    final reactions =
+        ref.watch(reactionsProvider(widget.group.group.groupIdBytes)).value ??
+        const {};
     final inputRow = _buildInputRow(context);
 
     return Scaffold(
@@ -487,8 +731,10 @@ class _ChatViewState extends ConsumerState<ChatView>
                   );
                 }
 
+                final byId = {for (final m in messages) m.id: m};
                 return CupertinoInteractiveKeyboard(
                   child: ListView.builder(
+                    controller: _scrollController,
                     padding: const EdgeInsets.all(16),
                     reverse: true,
                     itemCount: messages.length,
@@ -500,12 +746,18 @@ class _ChatViewState extends ConsumerState<ChatView>
                       final prevMsg = messages.getOrNull(chronoIndex - 1);
                       final nextMsg = messages.getOrNull(chronoIndex + 1);
 
+                      // reactions sit under a message, so they end its
+                      // group of bubbles
+                      bool hasReactions(ecp.StoredMessage m) =>
+                          reactions[m.id]?.isNotEmpty ?? false;
                       final DateTime? prevTime =
-                          (prevMsg?.senderId == message.senderId)
-                          ? prevMsg?.receivedAt
+                          prevMsg?.senderId == message.senderId &&
+                              !hasReactions(prevMsg!)
+                          ? prevMsg.receivedAt
                           : null;
                       final DateTime? nextTime =
-                          (nextMsg?.senderId == message.senderId)
+                          nextMsg?.senderId == message.senderId &&
+                              !hasReactions(message)
                           ? nextMsg?.receivedAt
                           : null;
 
@@ -520,14 +772,43 @@ class _ChatViewState extends ConsumerState<ChatView>
                             d1.month != d2.month ||
                             d1.day != d2.day;
                       }
+                      final inReplyTo = message.inReplyTo;
+                      final quoted = inReplyTo == null
+                          ? null
+                          : (message: byId[inReplyTo]);
+                      final messageReactions =
+                          reactions[message.id] ?? const [];
                       final messageWidget = MessageWidget(
+                        key: _messageKeys.putIfAbsent(
+                          message.id,
+                          GlobalKey.new,
+                        ),
                         isReceived: isReceived,
                         message: message,
+                        me: actorId,
                         position: _determinePosition(
                           prevTime,
                           message.receivedAt,
                           nextTime,
                         ),
+                        quoted: quoted,
+                        reactions: messageReactions,
+                        highlighted: _highlighted == message.id,
+                        onActions: (rect) => _onActions(
+                          message,
+                          rect,
+                          quoted: quoted,
+                          reactions: messageReactions,
+                        ),
+                        onReply: () => _reply(message),
+                        onQuoteTap: inReplyTo == null || byId[inReplyTo] == null
+                            ? null
+                            : () => _scrollToMessage(inReplyTo),
+                        onReactionsTap: () => _showReactions(messageReactions),
+                        onEditedTap: () {
+                          FocusScope.of(context).unfocus();
+                          showEditHistory(context, message: message);
+                        },
                       );
 
                       if (isFirstOfDate) {

@@ -225,8 +225,12 @@ class SimDevice {
     headers: {'Authorization': 'Bearer $_accessToken'},
   );
 
-  /// Pull the inbox and return the messages it produced.
-  Future<List<StoredMessage>> sync() => client.getInbox();
+  /// Pull the inbox and return the messages it produced. Reactions, edits
+  /// and deletes only land in [storage].
+  Future<List<StoredMessage>> sync() async => [
+    for (final event in await client.getInbox())
+      if (event case ReceivedMessage(:final message)) message,
+  ];
 
   /// Approves another device of this user, what the approval screen does.
   Future<void> approve(String otherDid, Uint8List publicKey) async {

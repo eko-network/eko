@@ -33,6 +33,8 @@ class AppStorage extends Storage {
       await _db.delete(_db.mlsEngineConfigs).go();
       await _db.delete(_db.processedObjects).go();
       await _db.delete(_db.messageAttachments).go();
+      await _db.delete(_db.messageRevisions).go();
+      await _db.delete(_db.messageReactions).go();
       await _db.delete(_db.storedMessages).go();
       await _db.delete(_db.deviceChainPins).go();
     });
@@ -43,6 +45,24 @@ class AppStorage extends Storage {
       }
     }
   }
+}
+
+extension MessageDeletion on AppDatabase {
+  /// Removes [message] from this device only, others keep it.
+  Future<void> deleteMessageForMe(StoredMessage message) =>
+      transaction(() async {
+        await (delete(messageReactions)..where(
+              (t) =>
+                  t.groupId.equals(message.groupId) &
+                  t.messageId.equalsValue(message.id),
+            ))
+            .go();
+        // attachments and revisions go with it
+        await (delete(storedMessages)..where(
+              (t) => t.serverActivityId.equalsValue(message.serverActivityId),
+            ))
+            .go();
+      });
 }
 
 class _DriftApprovalRequestStore implements ApprovalRequestStore {
@@ -344,6 +364,134 @@ class _DriftMessageStore implements MessageStore {
   }
 
   @override
+  Future<StoredMessage?> getMessage(Uint8List groupId, InternalId id) async {
+    final row = await _message(groupId, id).getSingleOrNull();
+    return row?.toMessage(await _attachments(row.serverActivityId));
+  }
+
+  SimpleSelectStatement<$StoredMessagesTable, StoredMessageRow> _message(
+    Uint8List groupId,
+    InternalId id,
+  ) =>
+      _db.select(_db.storedMessages)
+        ..where((t) => t.groupId.equals(groupId) & t.id.equalsValue(id));
+
+  Future<List<ActivityPubObject>> _attachments(Uri messageId) async {
+    final rows =
+        await (_db.select(_db.messageAttachments)
+              ..where((t) => t.messageId.equalsValue(messageId))
+              ..orderBy([(t) => OrderingTerm.asc(t.position)]))
+            .get();
+    return [
+      for (final row in rows)
+        if (row.object != null) ActivityPubObject.fromJson(row.object!),
+    ];
+  }
+
+  @override
+  Future<void> editMessage(
+    Uint8List groupId,
+    InternalId id, {
+    required String? content,
+    required DateTime editedAt,
+  }) async {
+    await _db.transaction(() async {
+      final row = await _message(groupId, id).getSingleOrNull();
+      if (row == null) return;
+      await _db
+          .into(_db.messageRevisions)
+          .insert(
+            MessageRevisionsCompanion.insert(
+              messageId: row.serverActivityId,
+              content: Value(row.content),
+              since: row.editedAt ?? row.receivedAt,
+            ),
+          );
+      await (_db.update(
+            _db.storedMessages,
+          )..where((t) => t.serverActivityId.equalsValue(row.serverActivityId)))
+          .write(
+            StoredMessagesCompanion(
+              content: Value(content),
+              editedAt: Value(editedAt),
+            ),
+          );
+    });
+  }
+
+  @override
+  Future<void> deleteMessage(Uint8List groupId, InternalId id) async {
+    await _db.transaction(() async {
+      final row = await _message(groupId, id).getSingleOrNull();
+      if (row == null) return;
+      final messageId = row.serverActivityId;
+      await (_db.delete(
+        _db.messageAttachments,
+      )..where((t) => t.messageId.equalsValue(messageId))).go();
+      await (_db.delete(
+        _db.messageRevisions,
+      )..where((t) => t.messageId.equalsValue(messageId))).go();
+      await (_db.delete(_db.messageReactions)..where(
+            (t) => t.groupId.equals(groupId) & t.messageId.equalsValue(id),
+          ))
+          .go();
+      await (_db.update(
+        _db.storedMessages,
+      )..where((t) => t.serverActivityId.equalsValue(messageId))).write(
+        const StoredMessagesCompanion(
+          content: Value(null),
+          deleted: Value(true),
+        ),
+      );
+    });
+  }
+
+  @override
+  Future<void> saveReaction(StoredReaction reaction) async {
+    await _db.transaction(() async {
+      await (_db.delete(_db.messageReactions)..where(
+            (t) =>
+                t.groupId.equals(reaction.groupId) &
+                t.messageId.equalsValue(reaction.messageId) &
+                t.senderId.equalsValue(reaction.senderId),
+          ))
+          .go();
+      await _db
+          .into(_db.messageReactions)
+          .insertOnConflictUpdate(
+            MessageReactionsCompanion.insert(
+              id: reaction.id,
+              groupId: reaction.groupId,
+              messageId: reaction.messageId,
+              senderId: reaction.senderId,
+              emoji: reaction.emoji,
+              receivedAt: reaction.receivedAt,
+            ),
+          );
+    });
+  }
+
+  @override
+  Future<StoredReaction?> getReaction(Uint8List groupId, InternalId id) async {
+    final row = await _reaction(groupId, id).getSingleOrNull();
+    return row?.toReaction();
+  }
+
+  SimpleSelectStatement<$MessageReactionsTable, MessageReactionRow> _reaction(
+    Uint8List groupId,
+    InternalId id,
+  ) =>
+      _db.select(_db.messageReactions)
+        ..where((t) => t.groupId.equals(groupId) & t.id.equalsValue(id));
+
+  @override
+  Future<void> deleteReaction(Uint8List groupId, InternalId id) async {
+    await (_db.delete(
+      _db.messageReactions,
+    )..where((t) => t.groupId.equals(groupId) & t.id.equalsValue(id))).go();
+  }
+
+  @override
   Future<bool> markMessageDelivered(Uri serverActivityId) async {
     // TODO there exists interleavings where the queue is empty when the message comes in and then the delivery message is added to the queue and the delivered query happens before the message is inserted. i dont want to introduce locks bc thats scary. and delivered markings are not very important.
     _pendingDeliveries.add(serverActivityId);
@@ -367,8 +515,14 @@ class _DriftMessageStore implements MessageStore {
     required Uint8List from,
     required Uint8List to,
   }) async {
-    await (_db.update(_db.storedMessages)..where((t) => t.groupId.equals(from)))
-        .write(StoredMessagesCompanion(groupId: Value(to)));
+    await _db.transaction(() async {
+      await (_db.update(_db.storedMessages)
+            ..where((t) => t.groupId.equals(from)))
+          .write(StoredMessagesCompanion(groupId: Value(to)));
+      await (_db.update(_db.messageReactions)
+            ..where((t) => t.groupId.equals(from)))
+          .write(MessageReactionsCompanion(groupId: Value(to)));
+    });
   }
 }
 

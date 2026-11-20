@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:isolate';
+import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:ecp/ecp.dart';
@@ -150,38 +151,57 @@ class MessengerNotificationService {
   }
 
   /// Shows one notification per group, unless the app is in the foreground.
+  /// Of reactions only those to our own messages are shown.
   static Future<void> showForMessages(
-    List<StoredMessage> messages, {
+    List<ReceivedEvent> events, {
     required Uri me,
   }) async {
-    if (!_supported || messages.isEmpty) return;
+    if (!_supported || events.isEmpty) return;
     if (WidgetsBinding.instance.lifecycleState == AppLifecycleState.resumed) {
       return;
     }
 
-    for (final message in messages) {
-      if (message.senderId == me) continue;
+    for (final event in events) {
       try {
-        await _show(message);
+        switch (event) {
+          case ReceivedMessage(:final message) when message.senderId != me:
+            await _show(message.groupId, message.senderId, _preview(message));
+          case ReceivedReaction(:final reaction, :final message)
+              when reaction.senderId != me && message.senderId == me:
+            await _show(
+              message.groupId,
+              reaction.senderId,
+              'Reacted ${reaction.emoji} to: ${_preview(message)}',
+            );
+          case ReceivedMessage() || ReceivedReaction():
+            break;
+        }
       } catch (e, st) {
         debugPrint('[MessengerNotifications] show failed: $e\n$st');
       }
     }
   }
 
-  static Future<void> _show(StoredMessage message) async {
-    final group = await (db.select(
-      db.mlsGroups,
-    )..where((t) => t.groupIdBytes.equals(message.groupId))).getSingleOrNull();
-    if (group == null || !group.isActive) return;
-
-    final sender = await username(uidFromActorId(message.senderId));
+  static String _preview(StoredMessage message) {
     final content = message.content?.trim() ?? '';
-    final body = content.isNotEmpty
+    return content.isNotEmpty
         ? content
         : message.attachment.isNotEmpty
         ? 'Sent an attachment'
         : 'New message';
+  }
+
+  static Future<void> _show(
+    Uint8List groupId,
+    Uri senderId,
+    String body,
+  ) async {
+    final group = await (db.select(
+      db.mlsGroups,
+    )..where((t) => t.groupIdBytes.equals(groupId))).getSingleOrNull();
+    if (group == null || !group.isActive) return;
+
+    final sender = await username(uidFromActorId(senderId));
 
     await NotificationHelper.showLocalNotification(
       id: _notificationIdBase + group.id,
