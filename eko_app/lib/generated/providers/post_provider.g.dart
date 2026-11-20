@@ -17,7 +17,7 @@ final class PostProvider extends $AsyncNotifierProvider<Post, PostModel> {
     : super(
         retry: null,
         name: r'postProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -47,7 +47,7 @@ final class PostProvider extends $AsyncNotifierProvider<Post, PostModel> {
   }
 }
 
-String _$postHash() => r'308fac0d580b399232c6f5379895669b0ea0d4b1';
+String _$postHash() => r'd03270713d701907113a95c0142a632aada1b8d0';
 
 final class PostFamily extends $Family
     with
@@ -64,7 +64,7 @@ final class PostFamily extends $Family
         name: r'postProvider',
         dependencies: null,
         $allTransitiveDependencies: null,
-        isAutoDispose: true,
+        isAutoDispose: false,
       );
 
   PostProvider call(int id) => PostProvider._(argument: id, from: this);

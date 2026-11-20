@@ -52,8 +52,9 @@ class SimDevice {
   Map<String, dynamic> get claims {
     final payload = _accessToken.split('.')[1];
     return jsonDecode(
-      utf8.decode(base64Url.decode(base64Url.normalize(payload))),
-    ) as Map<String, dynamic>;
+          utf8.decode(base64Url.decode(base64Url.normalize(payload))),
+        )
+        as Map<String, dynamic>;
   }
 
   Map<String, dynamic> get _appMetadata =>

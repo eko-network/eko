@@ -150,16 +150,18 @@ Future<void> main() async {
     final res = await bob1.takeKey(carol1.uid, carol1.did);
     check(res.statusCode != 200, 'got a stale key package');
     check(await carol1.refillKeyPackages(), 'carol-1 did not refill');
-    final left = await _service(
-      'GET',
-      'key_packages',
-      query: {
-        'select': 'id',
-        'device_id': 'eq.${carol1.did}',
-        'created_at':
-            'lt.${stale.add(const Duration(days: 1)).toUtc().toIso8601String()}',
-      },
-    ) as List;
+    final left =
+        await _service(
+              'GET',
+              'key_packages',
+              query: {
+                'select': 'id',
+                'device_id': 'eq.${carol1.did}',
+                'created_at':
+                    'lt.${stale.add(const Duration(days: 1)).toUtc().toIso8601String()}',
+              },
+            )
+            as List;
     check(left.isEmpty, '${left.length} stale key package(s) left');
     final fresh = await bob1.takeKey(carol1.uid, carol1.did);
     check(fresh.statusCode == 200, 'no key package after refill');
@@ -563,8 +565,9 @@ Future<void> main() async {
     final sub = carol1.client.groups.deviceWarnings.listen(warnings.add);
     try {
       final group = await alice1.core.createGroup(null);
-      final carolDevice = (await alice1.client.devices.fetch(carol))
-          .deviceFor(carol1.did)!;
+      final carolDevice = (await alice1.client.devices.fetch(
+        carol,
+      )).deviceFor(carol1.did)!;
       final carolKey = await alice1.client.devices.requestKey(
         carol,
         carolDevice,
@@ -589,11 +592,13 @@ Future<void> main() async {
   });
 
   await step('a chain entry the server forges is rejected', () async {
-    final rows = await _service(
-      'GET',
-      'device_chain',
-      query: {'uid': 'eq.${carol1.uid}', 'order': 'seq'},
-    ) as List;
+    final rows =
+        await _service(
+              'GET',
+              'device_chain',
+              query: {'uid': 'eq.${carol1.uid}', 'order': 'seq'},
+            )
+            as List;
     final last = rows.last as Map<String, dynamic>;
     final forged = await _forgedAdd(
       carol,
@@ -639,8 +644,9 @@ Future<void> main() async {
       'key_packages',
       body: {'device_id': carol1.did, 'key_package': _bytea(fake.keyPackage)},
     );
-    final device = (await bob1.client.devices.fetch(carol))
-        .deviceFor(carol1.did)!;
+    final device = (await bob1.client.devices.fetch(
+      carol,
+    )).deviceFor(carol1.did)!;
     try {
       await bob1.client.devices.requestKey(carol, device);
       throw _CheckFailed('the swapped key package was accepted');
@@ -926,9 +932,9 @@ Future<void> main() async {
   Future<List<Uint8List>> dmsWith(SimDevice device, Uri other) async {
     final found = <Uint8List>[];
     for (final g in await device.storage.groupStore.getActiveGroups()) {
-      final ids = (await device.client.groups.getMembers(g)).members
-          .map((p) => p.id)
-          .toSet();
+      final ids = (await device.client.groups.getMembers(
+        g,
+      )).members.map((p) => p.id).toSet();
       if (ids.length == 2 && ids.contains(other)) found.add(g.groupIdBytes);
     }
     return found;

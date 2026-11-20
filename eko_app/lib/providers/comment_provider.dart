@@ -7,29 +7,28 @@ import 'package:eko_app/types/comment.dart';
 import 'package:eko_app/utilities/supabase_ref.dart';
 part '../generated/providers/comment_provider.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 class Comment extends _$Comment {
-  Timer? _disposeTimer;
+  DateTime? _idleSince;
   bool _isLiking = false;
 
   @override
   FutureOr<CommentModel> build(int id) {
     // *** This block is for lifecycle management *** //
-    // Keep provider alive
-    final link = ref.keepAlive();
+    // Never disposed: if it were, scrolling back to the comment would show a
+    // loader, changing its height and shifting the list. Instead refresh it
+    // when it comes back on screen after being idle for a while.
     ref.onCancel(() {
-      // Start a 3-minute countdown when the last listener goes away
-      _disposeTimer = Timer(const Duration(minutes: 3), () {
-        link.close();
-      });
+      _idleSince = DateTime.now();
     });
     ref.onResume(() {
-      // Cancel the timer if a listener starts again
-      _disposeTimer?.cancel();
-    });
-    ref.onDispose(() {
-      // ckean up if the provider is somehow disposed
-      _disposeTimer?.cancel();
+      final idleSince = _idleSince;
+      _idleSince = null;
+      if (idleSince != null &&
+          DateTime.now().difference(idleSince) > const Duration(minutes: 3)) {
+        // ref can't be used inside life-cycles so refresh after this one
+        Future.microtask(() => _refresh(id));
+      }
     });
     // ********************************************* //
     // await Future.delayed(Duration(seconds: 100));
@@ -39,6 +38,19 @@ class Comment extends _$Comment {
     }
 
     return _fetchCommentModel(id);
+  }
+
+  /// Refetches in the background, keeping the current value on screen meanwhile
+  Future<void> _refresh(int id) async {
+    if (!ref.mounted) return;
+    final current = state.value;
+    try {
+      final fresh = await _fetchCommentModel(id);
+      // don't clobber changes made while fetching (e.g. a like)
+      if (ref.mounted && identical(state.value, current)) {
+        state = AsyncData(fresh);
+      }
+    } catch (_) {}
   }
 
   Future<CommentModel> _fetchCommentModel(int id) async {

@@ -20,7 +20,7 @@ final class CommentProvider
   }) : super(
          retry: null,
          name: r'commentProvider',
-         isAutoDispose: true,
+         isAutoDispose: false,
          dependencies: null,
          $allTransitiveDependencies: null,
        );
@@ -50,7 +50,7 @@ final class CommentProvider
   }
 }
 
-String _$commentHash() => r'a3a8c9977cde5910e25dd643ec510dbfae616163';
+String _$commentHash() => r'3866f8b62508dfddb922a0307136453ec127b5e6';
 
 final class CommentFamily extends $Family
     with
@@ -67,7 +67,7 @@ final class CommentFamily extends $Family
         name: r'commentProvider',
         dependencies: null,
         $allTransitiveDependencies: null,
-        isAutoDispose: true,
+        isAutoDispose: false,
       );
 
   CommentProvider call(int id) => CommentProvider._(argument: id, from: this);

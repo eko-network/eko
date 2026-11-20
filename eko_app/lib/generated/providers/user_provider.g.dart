@@ -19,7 +19,7 @@ final class UserProvider extends $AsyncNotifierProvider<User, UserModel> {
   }) : super(
          retry: null,
          name: r'userProvider',
-         isAutoDispose: true,
+         isAutoDispose: false,
          dependencies: null,
          $allTransitiveDependencies: null,
        );
@@ -49,7 +49,7 @@ final class UserProvider extends $AsyncNotifierProvider<User, UserModel> {
   }
 }
 
-String _$userHash() => r'74c1248da382a01c7e72b0ff99b61ea96d67cced';
+String _$userHash() => r'a644b7fd051e7ddfb1060f6968c483fcbf91bb42';
 
 final class UserFamily extends $Family
     with
@@ -66,7 +66,7 @@ final class UserFamily extends $Family
         name: r'userProvider',
         dependencies: null,
         $allTransitiveDependencies: null,
-        isAutoDispose: true,
+        isAutoDispose: false,
       );
 
   UserProvider call(String uid) => UserProvider._(argument: uid, from: this);
