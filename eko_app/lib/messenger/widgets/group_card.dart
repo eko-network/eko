@@ -1,58 +1,63 @@
+import 'package:ecp/ecp.dart';
 import 'package:eko_app/localization/generated/app_localizations.dart';
+import 'package:eko_app/messenger/providers/group_provider.dart';
 import 'package:eko_app/messenger/providers/message_provider.dart';
-import 'package:eko_app/messenger/types/group.dart';
 import 'package:eko_app/messenger/widgets/relative_time.dart';
 import 'package:eko_app/providers/current_user_provider.dart';
 import 'package:eko_app/providers/user_provider.dart';
+import 'package:eko_app/widgets/loading/profile_picture_loading.dart';
 import 'package:eko_app/widgets/users/profile_picture.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 part '../../generated/messenger/widgets/group_card.g.dart';
 
+/// Whether the group with row id [groupId] is a DM or a note to self, its
+/// members other than us, and whose picture it shows.
 @riverpod
-(bool, bool, Set<String>) groupMeta(Ref ref, GroupWithUsers group) {
+Future<(bool, bool, Set<String>, String)> groupMeta(
+  Ref ref,
+  int groupId,
+) async {
+  final users = await ref.watch(groupMembersProvider(groupId).future);
   final myUid = ref.watch(currentUserProvider).user.uid;
-  final otherUsers = group.users.where((uid) => uid != myUid).toSet();
+  final otherUsers = users.where((uid) => uid != myUid).toSet();
   final isDm = otherUsers.length == 1;
-  final isNoteToSelf =
-      group.users.length == 1 &&
-      group.users.first == ref.watch(currentUserProvider).user.uid;
-  return (isDm, isNoteToSelf, otherUsers);
+  final isNoteToSelf = users.length == 1 && users.first == myUid;
+  assert(
+    isNoteToSelf || otherUsers.isNotEmpty,
+    'Cannot display a group with no members',
+  );
+  return (isDm, isNoteToSelf, otherUsers, otherUsers.firstOrNull ?? myUid);
 }
 
 class GroupTitle extends ConsumerWidget {
-  final GroupWithUsers group;
+  final MlsGroupRecord group;
   const GroupTitle({super.key, required this.group});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final (isDm, isNoteToSelf, otherUsers) = ref.watch(
-      groupMetaProvider(group),
-    );
-    assert(
-      isNoteToSelf || otherUsers.isNotEmpty,
-      'Cannot display a group with no members',
-    );
-
     final l10n = AppLocalizations.of(context)!;
-    final String title = isNoteToSelf
-        ? l10n.noteToSelf
-        : (!isDm && group.group.displayName != null)
-        ? group.group.displayName!
-        : ref
-              .watch(
-                userProvider(
-                  otherUsers.isNotEmpty ? otherUsers.first : group.users.first,
-                ),
-              )
-              .when(
-                data: (data) => data.username.isNotEmpty
-                    ? '@${data.username}${isDm ? '' : ' + ${otherUsers.length - 1}'}'
-                    : l10n.error,
-                error: (_, _) => l10n.error,
-                loading: () => l10n.loadingEllipsis,
-              );
+    final String title = ref
+        .watch(groupMetaProvider(group.id))
+        .when(
+          data: (meta) {
+            final (isDm, isNoteToSelf, otherUsers, displayUid) = meta;
+            if (isNoteToSelf) return l10n.noteToSelf;
+            if (!isDm && group.displayName != null) return group.displayName!;
+            return ref
+                .watch(userProvider(displayUid))
+                .when(
+                  data: (data) => data.username.isNotEmpty
+                      ? '@${data.username}${isDm ? '' : ' + ${otherUsers.length - 1}'}'
+                      : l10n.error,
+                  error: (_, _) => l10n.error,
+                  loading: () => l10n.loadingEllipsis,
+                );
+          },
+          error: (_, _) => l10n.error,
+          loading: () => l10n.loadingEllipsis,
+        );
 
     return Text(
       title,
@@ -63,34 +68,25 @@ class GroupTitle extends ConsumerWidget {
 }
 
 class GroupIcon extends ConsumerWidget {
-  final GroupWithUsers group;
+  final MlsGroupRecord group;
   const GroupIcon({super.key, required this.group});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final (isDm, isNoteToSelf, otherUsers) = ref.watch(
-      groupMetaProvider(group),
-    );
-    assert(
-      isNoteToSelf || otherUsers.isNotEmpty,
-      'Cannot display a group with no members',
-    );
-    final displayUid = otherUsers.isNotEmpty
-        ? otherUsers.first
-        : group.users.first;
-
+    final displayUid = ref.watch(groupMetaProvider(group.id)).value?.$4;
+    if (displayUid == null) return ClipOval(child: LoadingProfileImage());
     return ProfilePicture(uid: displayUid);
   }
 }
 
 class GroupSubtitle extends ConsumerWidget {
-  final GroupWithUsers group;
+  final MlsGroupRecord group;
   const GroupSubtitle({super.key, required this.group});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
-    final last = ref.watch(lastMessageProvider(group.group.groupIdBytes)).value;
+    final last = ref.watch(lastMessageProvider(group.id)).value;
     final content = last?.content?.trim() ?? '';
     final text = last == null
         ? l10n.noMessagesYet
@@ -109,18 +105,17 @@ class GroupSubtitle extends ConsumerWidget {
 
 /// When the group last had activity, and how many messages are unread.
 class GroupTrailing extends ConsumerWidget {
-  final GroupWithUsers group;
+  final MlsGroupRecord group;
   const GroupTrailing({super.key, required this.group});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final unread =
-        ref.watch(unreadCountProvider(group.group.groupIdBytes)).value ?? 0;
+    final unread = ref.watch(unreadCountProvider(group.id)).value ?? 0;
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        RelativeTimeWidget(time: group.group.lastActivityAt!),
+        RelativeTimeWidget(time: group.lastActivityAt!),
         if (unread > 0)
           Padding(
             padding: const EdgeInsets.only(top: 4),
@@ -136,7 +131,7 @@ class GroupTrailing extends ConsumerWidget {
 }
 
 class GroupCard extends ConsumerWidget {
-  final GroupWithUsers group;
+  final MlsGroupRecord group;
   final bool isSelected;
   final VoidCallback onTap;
   final bool showOnlyAvatar;
@@ -152,7 +147,7 @@ class GroupCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final pfp = GroupIcon(group: group);
     final unread = showOnlyAvatar
-        ? ref.watch(unreadCountProvider(group.group.groupIdBytes)).value ?? 0
+        ? ref.watch(unreadCountProvider(group.id)).value ?? 0
         : 0;
 
     return ListTile(

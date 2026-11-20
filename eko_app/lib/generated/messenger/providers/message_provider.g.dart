@@ -8,6 +8,103 @@ part of '../../../messenger/providers/message_provider.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
+/// The MLS group ID of the group with row id [id], which it keeps for good.
+///
+/// The providers of a group are by row id, as the bytes of the same group
+/// read again are not equal to the ones read before.
+
+@ProviderFor(groupIdBytes)
+final groupIdBytesProvider = GroupIdBytesFamily._();
+
+/// The MLS group ID of the group with row id [id], which it keeps for good.
+///
+/// The providers of a group are by row id, as the bytes of the same group
+/// read again are not equal to the ones read before.
+
+final class GroupIdBytesProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<Uint8List>,
+          Uint8List,
+          FutureOr<Uint8List>
+        >
+    with $FutureModifier<Uint8List>, $FutureProvider<Uint8List> {
+  /// The MLS group ID of the group with row id [id], which it keeps for good.
+  ///
+  /// The providers of a group are by row id, as the bytes of the same group
+  /// read again are not equal to the ones read before.
+  GroupIdBytesProvider._({
+    required GroupIdBytesFamily super.from,
+    required int super.argument,
+  }) : super(
+         retry: null,
+         name: r'groupIdBytesProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$groupIdBytesHash();
+
+  @override
+  String toString() {
+    return r'groupIdBytesProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<Uint8List> $createElement($ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<Uint8List> create(Ref ref) {
+    final argument = this.argument as int;
+    return groupIdBytes(ref, argument);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is GroupIdBytesProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$groupIdBytesHash() => r'0e4312649ee4de595044e0297032fde3abffa38c';
+
+/// The MLS group ID of the group with row id [id], which it keeps for good.
+///
+/// The providers of a group are by row id, as the bytes of the same group
+/// read again are not equal to the ones read before.
+
+final class GroupIdBytesFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<Uint8List>, int> {
+  GroupIdBytesFamily._()
+    : super(
+        retry: null,
+        name: r'groupIdBytesProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  /// The MLS group ID of the group with row id [id], which it keeps for good.
+  ///
+  /// The providers of a group are by row id, as the bytes of the same group
+  /// read again are not equal to the ones read before.
+
+  GroupIdBytesProvider call(int id) =>
+      GroupIdBytesProvider._(argument: id, from: this);
+
+  @override
+  String toString() => r'groupIdBytesProvider';
+}
 
 @ProviderFor(message)
 final messageProvider = MessageFamily._();
@@ -24,7 +121,7 @@ final class MessageProvider
         $StreamProvider<List<StoredMessage>> {
   MessageProvider._({
     required MessageFamily super.from,
-    required Uint8List super.argument,
+    required int super.argument,
   }) : super(
          retry: null,
          name: r'messageProvider',
@@ -51,7 +148,7 @@ final class MessageProvider
 
   @override
   Stream<List<StoredMessage>> create(Ref ref) {
-    final argument = this.argument as Uint8List;
+    final argument = this.argument as int;
     return message(ref, argument);
   }
 
@@ -66,10 +163,10 @@ final class MessageProvider
   }
 }
 
-String _$messageHash() => r'aa8199afbe5a76e7254cc9ecd71d2ba8d9f22828';
+String _$messageHash() => r'6a549baae5610cdc1f4b06db75c61652566076d2';
 
 final class MessageFamily extends $Family
-    with $FunctionalFamilyOverride<Stream<List<StoredMessage>>, Uint8List> {
+    with $FunctionalFamilyOverride<Stream<List<StoredMessage>>, int> {
   MessageFamily._()
     : super(
         retry: null,
@@ -79,8 +176,7 @@ final class MessageFamily extends $Family
         isAutoDispose: true,
       );
 
-  MessageProvider call(Uint8List groupId) =>
-      MessageProvider._(argument: groupId, from: this);
+  MessageProvider call(int id) => MessageProvider._(argument: id, from: this);
 
   @override
   String toString() => r'messageProvider';
@@ -106,7 +202,7 @@ final class ReactionsProvider
   /// The reactions in a group, by the message they react to, oldest first.
   ReactionsProvider._({
     required ReactionsFamily super.from,
-    required Uint8List super.argument,
+    required int super.argument,
   }) : super(
          retry: null,
          name: r'reactionsProvider',
@@ -133,7 +229,7 @@ final class ReactionsProvider
 
   @override
   Stream<Map<InternalId, List<StoredReaction>>> create(Ref ref) {
-    final argument = this.argument as Uint8List;
+    final argument = this.argument as int;
     return reactions(ref, argument);
   }
 
@@ -148,7 +244,7 @@ final class ReactionsProvider
   }
 }
 
-String _$reactionsHash() => r'6d3d2dc48da3162d33487dd24376337407e98331';
+String _$reactionsHash() => r'14b51cb726c51feca84b67846509b97352c22e09';
 
 /// The reactions in a group, by the message they react to, oldest first.
 
@@ -156,7 +252,7 @@ final class ReactionsFamily extends $Family
     with
         $FunctionalFamilyOverride<
           Stream<Map<InternalId, List<StoredReaction>>>,
-          Uint8List
+          int
         > {
   ReactionsFamily._()
     : super(
@@ -169,8 +265,8 @@ final class ReactionsFamily extends $Family
 
   /// The reactions in a group, by the message they react to, oldest first.
 
-  ReactionsProvider call(Uint8List groupId) =>
-      ReactionsProvider._(argument: groupId, from: this);
+  ReactionsProvider call(int id) =>
+      ReactionsProvider._(argument: id, from: this);
 
   @override
   String toString() => r'reactionsProvider';
@@ -196,7 +292,7 @@ final class ReadCursorsProvider
   /// How far each member read a group, by reader.
   ReadCursorsProvider._({
     required ReadCursorsFamily super.from,
-    required Uint8List super.argument,
+    required int super.argument,
   }) : super(
          retry: null,
          name: r'readCursorsProvider',
@@ -223,7 +319,7 @@ final class ReadCursorsProvider
 
   @override
   Stream<Map<Uri, ReadCursor>> create(Ref ref) {
-    final argument = this.argument as Uint8List;
+    final argument = this.argument as int;
     return readCursors(ref, argument);
   }
 
@@ -238,12 +334,12 @@ final class ReadCursorsProvider
   }
 }
 
-String _$readCursorsHash() => r'058de0e212b300e1f9d4473118b2d490490d0108';
+String _$readCursorsHash() => r'6b90ef67aaa23deda42ef12e0f7b862a7ea11c4f';
 
 /// How far each member read a group, by reader.
 
 final class ReadCursorsFamily extends $Family
-    with $FunctionalFamilyOverride<Stream<Map<Uri, ReadCursor>>, Uint8List> {
+    with $FunctionalFamilyOverride<Stream<Map<Uri, ReadCursor>>, int> {
   ReadCursorsFamily._()
     : super(
         retry: null,
@@ -255,8 +351,8 @@ final class ReadCursorsFamily extends $Family
 
   /// How far each member read a group, by reader.
 
-  ReadCursorsProvider call(Uint8List groupId) =>
-      ReadCursorsProvider._(argument: groupId, from: this);
+  ReadCursorsProvider call(int id) =>
+      ReadCursorsProvider._(argument: id, from: this);
 
   @override
   String toString() => r'readCursorsProvider';
@@ -275,7 +371,7 @@ final class UnreadCountProvider
   /// How many messages of others in a group we have not read.
   UnreadCountProvider._({
     required UnreadCountFamily super.from,
-    required Uint8List super.argument,
+    required int super.argument,
   }) : super(
          retry: null,
          name: r'unreadCountProvider',
@@ -301,7 +397,7 @@ final class UnreadCountProvider
 
   @override
   Stream<int> create(Ref ref) {
-    final argument = this.argument as Uint8List;
+    final argument = this.argument as int;
     return unreadCount(ref, argument);
   }
 
@@ -316,12 +412,12 @@ final class UnreadCountProvider
   }
 }
 
-String _$unreadCountHash() => r'8bf3643a82fb64eb8166ae7be26ea88f19cfadea';
+String _$unreadCountHash() => r'ae77f4d8934e2022bc3b139abff0dbf500205e63';
 
 /// How many messages of others in a group we have not read.
 
 final class UnreadCountFamily extends $Family
-    with $FunctionalFamilyOverride<Stream<int>, Uint8List> {
+    with $FunctionalFamilyOverride<Stream<int>, int> {
   UnreadCountFamily._()
     : super(
         retry: null,
@@ -333,8 +429,8 @@ final class UnreadCountFamily extends $Family
 
   /// How many messages of others in a group we have not read.
 
-  UnreadCountProvider call(Uint8List groupId) =>
-      UnreadCountProvider._(argument: groupId, from: this);
+  UnreadCountProvider call(int id) =>
+      UnreadCountProvider._(argument: id, from: this);
 
   @override
   String toString() => r'unreadCountProvider';
@@ -449,7 +545,7 @@ final class LastMessageProvider
   /// has none yet.
   LastMessageProvider._({
     required LastMessageFamily super.from,
-    required Uint8List super.argument,
+    required int super.argument,
   }) : super(
          retry: null,
          name: r'lastMessageProvider',
@@ -476,7 +572,7 @@ final class LastMessageProvider
 
   @override
   Stream<LastMessagePreview?> create(Ref ref) {
-    final argument = this.argument as Uint8List;
+    final argument = this.argument as int;
     return lastMessage(ref, argument);
   }
 
@@ -491,13 +587,13 @@ final class LastMessageProvider
   }
 }
 
-String _$lastMessageHash() => r'25ddefb1f2c7983639393b4905fb32145e7f3a60';
+String _$lastMessageHash() => r'95950a3d852425fb61576eb9fb8ed5ba22374d3c';
 
 /// The newest message in a group, for the chat list, or null when the group
 /// has none yet.
 
 final class LastMessageFamily extends $Family
-    with $FunctionalFamilyOverride<Stream<LastMessagePreview?>, Uint8List> {
+    with $FunctionalFamilyOverride<Stream<LastMessagePreview?>, int> {
   LastMessageFamily._()
     : super(
         retry: null,
@@ -510,8 +606,8 @@ final class LastMessageFamily extends $Family
   /// The newest message in a group, for the chat list, or null when the group
   /// has none yet.
 
-  LastMessageProvider call(Uint8List groupId) =>
-      LastMessageProvider._(argument: groupId, from: this);
+  LastMessageProvider call(int id) =>
+      LastMessageProvider._(argument: id, from: this);
 
   @override
   String toString() => r'lastMessageProvider';

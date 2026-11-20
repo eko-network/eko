@@ -361,6 +361,7 @@ class _DriftMessageStore implements MessageStore {
               delivered: Value(isDelivered),
             ),
           );
+      await _bumpActivity(message.groupId, message.receivedAt);
       await (_db.delete(_db.messageAttachments)..where(
             (t) => t.messageId.equals(message.serverActivityId.toString()),
           ))
@@ -378,6 +379,17 @@ class _DriftMessageStore implements MessageStore {
             );
       }
     });
+  }
+
+  /// Moves [groupId]'s last activity up to [at], never back, as a message can
+  /// come in after newer ones.
+  Future<void> _bumpActivity(Uint8List groupId, DateTime at) async {
+    await (_db.update(_db.mlsGroups)..where(
+          (t) =>
+              t.groupIdBytes.equals(groupId) &
+              t.lastActivityAt.isSmallerThanValue(at),
+        ))
+        .write(MlsGroupsCompanion(lastActivityAt: Value(at)));
   }
 
   @override
@@ -579,9 +591,18 @@ class _DriftMessageStore implements MessageStore {
     required Uint8List to,
   }) async {
     await _db.transaction(() async {
+      final m = _db.storedMessages;
+      final newest = m.receivedAt.max();
+      final newestMoved =
+          await (_db.selectOnly(m)
+                ..addColumns([newest])
+                ..where(m.groupId.equals(from)))
+              .map((row) => row.read(newest))
+              .getSingle();
       await (_db.update(_db.storedMessages)
             ..where((t) => t.groupId.equals(from)))
           .write(StoredMessagesCompanion(groupId: Value(to)));
+      if (newestMoved != null) await _bumpActivity(to, newestMoved);
       await (_db.update(_db.messageReactions)
             ..where((t) => t.groupId.equals(from)))
           .write(MessageReactionsCompanion(groupId: Value(to)));

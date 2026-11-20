@@ -104,6 +104,9 @@ class StatusWidget extends StatelessWidget {
   final ecp.StoredMessage message;
   final bool isReceived;
 
+  /// Not sent yet, only shown on this device.
+  final bool sending;
+
   /// Every other member of the chat read it.
   final bool read;
   final VoidCallback? onEditedTap;
@@ -111,6 +114,7 @@ class StatusWidget extends StatelessWidget {
     super.key,
     required this.message,
     required this.isReceived,
+    this.sending = false,
     this.read = false,
     this.onEditedTap,
   });
@@ -141,7 +145,9 @@ class StatusWidget extends StatelessWidget {
             Padding(
               padding: EdgeInsetsGeometry.only(left: 4),
               child: StatusIcon(
-                status: read
+                status: sending
+                    ? MessageStatus.sending
+                    : read
                     ? MessageStatus.read
                     : message.delivered
                     ? MessageStatus.delivered
@@ -190,6 +196,9 @@ class MessageWidget extends StatelessWidget {
   final List<ecp.StoredReaction> reactions;
   final bool highlighted;
 
+  /// Not sent yet, only shown on this device.
+  final bool sending;
+
   /// Every other member of the chat read it.
   final bool read;
 
@@ -212,6 +221,7 @@ class MessageWidget extends StatelessWidget {
     this.quoted,
     this.reactions = const [],
     this.highlighted = false,
+    this.sending = false,
     this.read = false,
     this.readBy = const [],
     this.onActions,
@@ -246,6 +256,7 @@ class MessageWidget extends StatelessWidget {
           position: position,
           me: me,
           quoted: quoted,
+          sending: sending,
           read: read,
           onQuoteTap: onQuoteTap,
           onEditedTap: onEditedTap,
@@ -283,6 +294,7 @@ class MessageWidget extends StatelessWidget {
               child: StatusWidget(
                 message: message,
                 isReceived: isReceived,
+                sending: sending,
                 read: read,
                 onEditedTap: onEditedTap,
               ),
@@ -337,6 +349,9 @@ class MessageBubble extends StatelessWidget {
   /// The message this one replies to, null when it isn't a reply.
   final QuotedMessage? quoted;
 
+  /// Not sent yet, only shown on this device.
+  final bool sending;
+
   /// Every other member of the chat read it.
   final bool read;
   final VoidCallback? onQuoteTap;
@@ -349,6 +364,7 @@ class MessageBubble extends StatelessWidget {
     required this.me,
     this.position = MessagePosition.single,
     this.quoted,
+    this.sending = false,
     this.read = false,
     this.onQuoteTap,
     this.onEditedTap,
@@ -421,6 +437,7 @@ class MessageBubble extends StatelessWidget {
                 showStatus: true,
                 message: message,
                 isReceived: isReceived,
+                sending: sending,
                 read: read,
               )
             else if (hasContent)
@@ -431,6 +448,7 @@ class MessageBubble extends StatelessWidget {
                 showStatus: isBottom || message.editedAt != null,
                 message: message,
                 isReceived: isReceived,
+                sending: sending,
                 read: read,
                 onEditedTap: onEditedTap,
               ),
@@ -563,6 +581,7 @@ class _TextBubbleContent extends StatelessWidget {
   final bool showStatus;
   final ecp.StoredMessage message;
   final bool isReceived;
+  final bool sending;
   final bool read;
   final VoidCallback? onEditedTap;
 
@@ -572,6 +591,7 @@ class _TextBubbleContent extends StatelessWidget {
     required this.showStatus,
     required this.message,
     required this.isReceived,
+    this.sending = false,
     this.read = false,
     this.italic = false,
     this.onEditedTap,
@@ -583,6 +603,7 @@ class _TextBubbleContent extends StatelessWidget {
         ? StatusWidget(
             message: message,
             isReceived: isReceived,
+            sending: sending,
             read: read,
             onEditedTap: onEditedTap,
           )

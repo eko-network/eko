@@ -8,21 +8,30 @@ part of '../../../messenger/widgets/group_card.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
+/// Whether the group with row id [groupId] is a DM or a note to self, its
+/// members other than us, and whose picture it shows.
 
 @ProviderFor(groupMeta)
 final groupMetaProvider = GroupMetaFamily._();
 
+/// Whether the group with row id [groupId] is a DM or a note to self, its
+/// members other than us, and whose picture it shows.
+
 final class GroupMetaProvider
     extends
         $FunctionalProvider<
-          (bool, bool, Set<String>),
-          (bool, bool, Set<String>),
-          (bool, bool, Set<String>)
+          AsyncValue<(bool, bool, Set<String>, String)>,
+          (bool, bool, Set<String>, String),
+          FutureOr<(bool, bool, Set<String>, String)>
         >
-    with $Provider<(bool, bool, Set<String>)> {
+    with
+        $FutureModifier<(bool, bool, Set<String>, String)>,
+        $FutureProvider<(bool, bool, Set<String>, String)> {
+  /// Whether the group with row id [groupId] is a DM or a note to self, its
+  /// members other than us, and whose picture it shows.
   GroupMetaProvider._({
     required GroupMetaFamily super.from,
-    required GroupWithUsers super.argument,
+    required int super.argument,
   }) : super(
          retry: null,
          name: r'groupMetaProvider',
@@ -43,22 +52,14 @@ final class GroupMetaProvider
 
   @$internal
   @override
-  $ProviderElement<(bool, bool, Set<String>)> $createElement(
+  $FutureProviderElement<(bool, bool, Set<String>, String)> $createElement(
     $ProviderPointer pointer,
-  ) => $ProviderElement(pointer);
+  ) => $FutureProviderElement(pointer);
 
   @override
-  (bool, bool, Set<String>) create(Ref ref) {
-    final argument = this.argument as GroupWithUsers;
+  FutureOr<(bool, bool, Set<String>, String)> create(Ref ref) {
+    final argument = this.argument as int;
     return groupMeta(ref, argument);
-  }
-
-  /// {@macro riverpod.override_with_value}
-  Override overrideWithValue((bool, bool, Set<String>) value) {
-    return $ProviderOverride(
-      origin: this,
-      providerOverride: $SyncValueProvider<(bool, bool, Set<String>)>(value),
-    );
   }
 
   @override
@@ -72,10 +73,17 @@ final class GroupMetaProvider
   }
 }
 
-String _$groupMetaHash() => r'c5b7f63fbc20ecff238d4ba25783a4c88ebf68d1';
+String _$groupMetaHash() => r'23d72fed1256129bdf8ef640d219904d725d9a5c';
+
+/// Whether the group with row id [groupId] is a DM or a note to self, its
+/// members other than us, and whose picture it shows.
 
 final class GroupMetaFamily extends $Family
-    with $FunctionalFamilyOverride<(bool, bool, Set<String>), GroupWithUsers> {
+    with
+        $FunctionalFamilyOverride<
+          FutureOr<(bool, bool, Set<String>, String)>,
+          int
+        > {
   GroupMetaFamily._()
     : super(
         retry: null,
@@ -85,8 +93,11 @@ final class GroupMetaFamily extends $Family
         isAutoDispose: true,
       );
 
-  GroupMetaProvider call(GroupWithUsers group) =>
-      GroupMetaProvider._(argument: group, from: this);
+  /// Whether the group with row id [groupId] is a DM or a note to self, its
+  /// members other than us, and whose picture it shows.
+
+  GroupMetaProvider call(int groupId) =>
+      GroupMetaProvider._(argument: groupId, from: this);
 
   @override
   String toString() => r'groupMetaProvider';

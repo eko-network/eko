@@ -8,7 +8,7 @@ import 'package:eko_app/database/storage.dart';
 import 'package:eko_app/localization/generated/app_localizations.dart';
 import 'package:eko_app/messenger/ecp_helpers.dart';
 import 'package:eko_app/messenger/providers/message_provider.dart';
-import 'package:eko_app/messenger/types/group.dart';
+import 'package:eko_app/messenger/providers/group_provider.dart';
 import 'package:eko_app/messenger/views/device_warning.dart';
 import 'package:eko_app/messenger/widgets/group_card.dart';
 import 'package:eko_app/messenger/widgets/media_picker.dart';
@@ -37,7 +37,7 @@ extension SafeLookup<T> on List<T> {
 }
 
 class ChatView extends ConsumerStatefulWidget {
-  final GroupWithUsers group;
+  final ecp.MlsGroupRecord group;
   final VoidCallback? onBack;
 
   const ChatView({super.key, this.onBack, required this.group});
@@ -58,6 +58,10 @@ class _ChatViewState extends ConsumerState<ChatView>
   // at most one of them, the input sends a reply or the edit
   ecp.StoredMessage? _replyingTo;
   ecp.StoredMessage? _editing;
+
+  // our messages shown while they are sent, until the stored ones replace
+  // them
+  final _sending = <ecp.InternalId, ecp.StoredMessage>{};
 
   // to scroll to the message a reply quotes
   final _messageKeys = <ecp.InternalId, GlobalKey>{};
@@ -107,8 +111,9 @@ class _ChatViewState extends ConsumerState<ChatView>
   @override
   void didUpdateWidget(ChatView oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.group.group.id != widget.group.group.id) {
+    if (oldWidget.group.id != widget.group.id) {
       _changed.clear();
+      _sending.clear();
       _replyingTo = null;
       if (_editing != null) _messageController.clear();
       _editing = null;
@@ -152,13 +157,13 @@ class _ChatViewState extends ConsumerState<ChatView>
   /// show up through DeviceWarningHandler, unaccepted device resets also in
   /// a banner here.
   void _verifyMembers() {
-    final group = widget.group.group;
+    final group = widget.group;
     ref
         .read(ecpClientProvider)
         .groups
         .verifyGroup(group.groupIdBytes)
         .then<void>((unverified) {
-          if (!mounted || widget.group.group.id != group.id) return;
+          if (!mounted || widget.group.id != group.id) return;
           setState(
             () => _changed
               ..clear()
@@ -169,7 +174,8 @@ class _ChatViewState extends ConsumerState<ChatView>
   }
 
   bool _isMember(Uri owner) =>
-      widget.group.users.contains(uidFromActorId(owner));
+      (ref.read(groupMembersProvider(widget.group.id)).value ?? const [])
+          .contains(uidFromActorId(owner));
 
   // an old DM that is handed over is left by AdaptiveChat
   void _onResetAccepted(({Uri person, ecp.MlsGroupRecord? dm}) e) {
@@ -253,7 +259,7 @@ class _ChatViewState extends ConsumerState<ChatView>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      ref.invalidate(messageProvider(widget.group.group.groupIdBytes));
+      ref.invalidate(messageProvider(widget.group.id));
       // a contact may have reset their devices meanwhile
       _verifyMembers();
       _scheduleMarkRead();
@@ -523,19 +529,39 @@ class _ChatViewState extends ConsumerState<ChatView>
   }
 
   Future<void> _dispatchMessage(ecp.ActivityPubObject object) async {
+    final groupId = widget.group.groupIdBytes;
+    setState(
+      () => _sending[object.id] = ecp.StoredMessage(
+        serverActivityId: Uri(scheme: 'pending', path: object.id.toString()),
+        receivedAt: DateTime.now(),
+        senderId: ref.read(ecpClientProvider).me.id,
+        id: object.id,
+        content: object is ecp.Note ? object.content : null,
+        inReplyTo: switch (object) {
+          ecp.Note(:final inReplyTo) ||
+          ecp.Image(:final inReplyTo) => inReplyTo,
+          _ => null,
+        },
+        attachment: switch (object) {
+          ecp.Note(:final attachments) => attachments ?? [],
+          ecp.Image() => [object],
+          _ => [],
+        },
+        groupId: groupId,
+      ),
+    );
     try {
       await ref
           .read(ecpClientProvider)
           .messages
-          .sendMessage(
-            ecp.Activity.newCreate(object: object),
-            widget.group.group.groupIdBytes,
-          );
+          .sendMessage(ecp.Activity.newCreate(object: object), groupId);
     } on ecp.EcpDevicesChangedException {
+      if (mounted) setState(() => _sending.remove(object.id));
       rethrow;
     } catch (e) {
       debugPrint('[ChatView] send failed: $e');
       if (!mounted) return;
+      setState(() => _sending.remove(object.id));
       showSnackBar(
         text: AppLocalizations.of(context)!.messageSendFailed,
         context: context,
@@ -746,12 +772,13 @@ class _ChatViewState extends ConsumerState<ChatView>
   @override
   Widget build(BuildContext context) {
     final actorId = ref.watch(ecpClientProvider).me.id;
-    final groupId = widget.group.group.groupIdBytes;
+    final groupId = widget.group.id;
     final messagesAsync = ref.watch(messageProvider(groupId));
     final reactions = ref.watch(reactionsProvider(groupId)).value ?? const {};
     final cursors = ref.watch(readCursorsProvider(groupId)).value ?? const {};
+    final members = ref.watch(groupMembersProvider(groupId)).value ?? const [];
     final myUid = uidFromActorId(actorId);
-    final others = widget.group.users.where((uid) => uid != myUid).toList();
+    final others = members.where((uid) => uid != myUid).toList();
     bool readByAll(ecp.StoredMessage message) =>
         others.isNotEmpty &&
         others.every(
@@ -784,7 +811,11 @@ class _ChatViewState extends ConsumerState<ChatView>
           for (final owner in _changed) _buildChangedBanner(context, owner),
           Expanded(
             child: messagesAsync.when(
-              data: (messages) {
+              data: (stored) {
+                // the stored message replaces the one being sent
+                final storedIds = {for (final m in stored) m.id};
+                _sending.removeWhere((id, _) => storedIds.contains(id));
+                final messages = [...stored, ..._sending.values];
                 if (messages.isEmpty) {
                   return Center(
                     child: Text(
@@ -797,12 +828,13 @@ class _ChatViewState extends ConsumerState<ChatView>
                   );
                 }
 
-                if (messages.last.id != _newest?.id) {
-                  _newest = messages.last;
+                final newest = stored.lastOrNull;
+                if (newest != null && newest.id != _newest?.id) {
+                  _newest = newest;
                   _scheduleMarkRead();
                 }
                 final byId = {for (final m in messages) m.id: m};
-                final readBy = _readBy(messages, cursors, others);
+                final readBy = _readBy(stored, cursors, others);
                 return CupertinoInteractiveKeyboard(
                   child: ListView.builder(
                     controller: _scrollController,
@@ -813,6 +845,8 @@ class _ChatViewState extends ConsumerState<ChatView>
                       final chronoIndex = messages.length - 1 - index;
                       final message = messages[chronoIndex];
                       final isReceived = message.senderId != actorId;
+                      // others don't know its id yet to reply or react to it
+                      final sending = _sending.containsKey(message.id);
 
                       final prevMsg = messages.getOrNull(chronoIndex - 1);
                       final nextMsg = messages.getOrNull(chronoIndex + 1);
@@ -865,15 +899,18 @@ class _ChatViewState extends ConsumerState<ChatView>
                         quoted: quoted,
                         reactions: messageReactions,
                         highlighted: _highlighted == message.id,
+                        sending: sending,
                         read: !isReceived && readByAll(message),
                         readBy: readBy[message.id] ?? const [],
-                        onActions: (rect) => _onActions(
-                          message,
-                          rect,
-                          quoted: quoted,
-                          reactions: messageReactions,
-                        ),
-                        onReply: () => _reply(message),
+                        onActions: sending
+                            ? null
+                            : (rect) => _onActions(
+                                message,
+                                rect,
+                                quoted: quoted,
+                                reactions: messageReactions,
+                              ),
+                        onReply: sending ? null : () => _reply(message),
                         onQuoteTap: inReplyTo == null || byId[inReplyTo] == null
                             ? null
                             : () => _scrollToMessage(inReplyTo),

@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:ecp/ecp.dart';
 import 'package:eko_app/interfaces/search.dart';
 import 'package:eko_app/localization/generated/app_localizations.dart';
-import 'package:eko_app/messenger/types/group.dart';
 import 'package:eko_app/messenger/views/device_warning.dart';
 import 'package:eko_app/messenger/widgets/group_card.dart';
 import 'package:eko_app/providers/ecp_provider.dart';
@@ -20,7 +19,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class GroupList extends ConsumerStatefulWidget {
   final bool isWideScreen;
-  final List<GroupWithUsers> groups;
+  final List<MlsGroupRecord> groups;
   final int? selectedId;
   final ResizablePanelController? panelController;
   final void Function(int) onGroupTap;
@@ -251,13 +250,13 @@ class _ConversationListState extends ConsumerState<GroupList> {
                       child: ListView.builder(
                         itemCount: widget.groups.length,
                         itemBuilder: (context, index) {
-                          final gu = widget.groups[index];
-                          final isSelected = gu.group.id == widget.selectedId;
+                          final group = widget.groups[index];
+                          final isSelected = group.id == widget.selectedId;
                           return GroupCard(
                             showOnlyAvatar: showOnlyAvatar,
-                            group: gu,
+                            group: group,
                             isSelected: isSelected,
-                            onTap: () => widget.onGroupTap(gu.group.id),
+                            onTap: () => widget.onGroupTap(group.id),
                           );
                         },
                       ),

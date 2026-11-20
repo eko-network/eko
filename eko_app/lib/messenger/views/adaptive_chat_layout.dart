@@ -6,7 +6,6 @@ import 'package:ecp/ecp.dart';
 import 'package:eko_app/localization/generated/app_localizations.dart';
 import 'package:eko_app/messenger/providers/group_provider.dart';
 import 'package:eko_app/providers/ecp_provider.dart';
-import 'package:eko_app/messenger/types/group.dart';
 import 'package:eko_app/utilities/constants.dart' as c;
 import 'package:eko_app/messenger/views/chat_view.dart';
 import 'package:eko_app/messenger/views/group_list.dart';
@@ -30,7 +29,7 @@ class _AdaptiveChatState extends ConsumerState<AdaptiveChat> {
   StreamSubscription<({Uint8List from, MlsGroupRecord into})>? _merged;
 
   // the open chat as last shown, it is gone from the groups once merged
-  GroupWithUsers? _shown;
+  MlsGroupRecord? _shown;
 
   @override
   void initState() {
@@ -63,8 +62,8 @@ class _AdaptiveChatState extends ConsumerState<AdaptiveChat> {
   void _onDmMerged(({Uint8List from, MlsGroupRecord into}) e) {
     final shown = _shown;
     if (!mounted || shown == null) return;
-    if (shown.group.id != widget.selectedGroupId) return;
-    if (const ListEquality<int>().equals(shown.group.groupIdBytes, e.from)) {
+    if (shown.id != widget.selectedGroupId) return;
+    if (const ListEquality<int>().equals(shown.groupIdBytes, e.from)) {
       context.replace('/messages/${e.into.id}');
     }
   }
@@ -98,7 +97,7 @@ class _AdaptiveChatState extends ConsumerState<AdaptiveChat> {
   Widget _buildWideLayout(
     BuildContext context,
     BoxConstraints constraints,
-    List<GroupWithUsers> groups,
+    List<MlsGroupRecord> groups,
     AppLocalizations l10n,
   ) {
     const double minWidth = 200.0;
@@ -107,7 +106,7 @@ class _AdaptiveChatState extends ConsumerState<AdaptiveChat> {
     const double snapWidth = c.kConversationAvatarRadius * 2 + 20;
 
     final selectedGroup = groups.firstWhereOrNull(
-      (item) => item.group.id == widget.selectedGroupId,
+      (group) => group.id == widget.selectedGroupId,
     );
     if (selectedGroup != null) _shown = selectedGroup;
 
@@ -143,11 +142,11 @@ class _AdaptiveChatState extends ConsumerState<AdaptiveChat> {
 
   Widget _buildNarrowLayout(
     BuildContext context,
-    List<GroupWithUsers> groups,
+    List<MlsGroupRecord> groups,
     AppLocalizations l10n,
   ) {
     final selectedGroup = groups.firstWhereOrNull(
-      (item) => item.group.id == widget.selectedGroupId,
+      (group) => group.id == widget.selectedGroupId,
     );
     if (selectedGroup != null) _shown = selectedGroup;
 

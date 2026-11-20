@@ -59,4 +59,4 @@ final class NotificationServiceShareProvider
 }
 
 String _$notificationServiceShareHash() =>
-    r'064f49a208d3c094c8c84a8c15fc8d0395c4e0f5';
+    r'2301e371049d444a0f20691308daa6285013daea';

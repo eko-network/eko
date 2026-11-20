@@ -10,8 +10,21 @@ import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 part '../../generated/messenger/providers/message_provider.g.dart';
 
+/// The MLS group ID of the group with row id [id], which it keeps for good.
+///
+/// The providers of a group are by row id, as the bytes of the same group
+/// read again are not equal to the ones read before.
 @riverpod
-Stream<List<StoredMessage>> message(Ref ref, Uint8List groupId) {
+Future<Uint8List> groupIdBytes(Ref ref, int id) async {
+  final row = await (db.select(
+    db.mlsGroups,
+  )..where((t) => t.id.equals(id))).getSingle();
+  return row.groupIdBytes;
+}
+
+@riverpod
+Stream<List<StoredMessage>> message(Ref ref, int id) async* {
+  final groupId = await ref.watch(groupIdBytesProvider(id).future);
   final messages = db.storedMessages;
   final attachments = db.messageAttachments;
   final query =
@@ -26,7 +39,7 @@ Stream<List<StoredMessage>> message(Ref ref, Uint8List groupId) {
           OrderingTerm.asc(messages.receivedAt),
           OrderingTerm.asc(attachments.position),
         ]);
-  return query.watch().map((rows) {
+  yield* query.watch().map((rows) {
     // insertion ordered, so messages keep the query's order
     final grouped = <Uri, (StoredMessageRow, List<ActivityPubObject>)>{};
     for (final row in rows) {
@@ -82,12 +95,13 @@ Future<void> _sendPendingDeliveryAcks(
 @riverpod
 Stream<Map<InternalId, List<StoredReaction>>> reactions(
   Ref ref,
-  Uint8List groupId,
-) {
+  int id,
+) async* {
+  final groupId = await ref.watch(groupIdBytesProvider(id).future);
   final query = db.select(db.messageReactions)
     ..where((t) => t.groupId.equals(groupId))
     ..orderBy([(t) => OrderingTerm.asc(t.receivedAt)]);
-  return query.watch().map((rows) {
+  yield* query.watch().map((rows) {
     final byMessage = <InternalId, List<StoredReaction>>{};
     for (final row in rows) {
       byMessage.putIfAbsent(row.messageId, () => []).add(row.toReaction());
@@ -98,19 +112,21 @@ Stream<Map<InternalId, List<StoredReaction>>> reactions(
 
 /// How far each member read a group, by reader.
 @riverpod
-Stream<Map<Uri, ReadCursor>> readCursors(Ref ref, Uint8List groupId) {
+Stream<Map<Uri, ReadCursor>> readCursors(Ref ref, int id) async* {
+  final groupId = await ref.watch(groupIdBytesProvider(id).future);
   final query = db.select(db.readCursors)
     ..where((t) => t.groupId.equals(groupId));
-  return query.watch().map(
+  yield* query.watch().map(
     (rows) => {for (final row in rows) row.reader: row.toCursor()},
   );
 }
 
 /// How many messages of others in a group we have not read.
 @riverpod
-Stream<int> unreadCount(Ref ref, Uint8List groupId) {
+Stream<int> unreadCount(Ref ref, int id) async* {
   final me = ref.watch(ecpClientProvider).me.id;
-  return db.unreadCount(groupId, me).watchSingle();
+  final groupId = await ref.watch(groupIdBytesProvider(id).future);
+  yield* db.unreadCount(groupId, me).watchSingle();
 }
 
 typedef MessageRevision = ({String? content, DateTime since});
@@ -137,7 +153,8 @@ typedef LastMessagePreview = ({
 /// The newest message in a group, for the chat list, or null when the group
 /// has none yet.
 @riverpod
-Stream<LastMessagePreview?> lastMessage(Ref ref, Uint8List groupId) {
+Stream<LastMessagePreview?> lastMessage(Ref ref, int id) async* {
+  final groupId = await ref.watch(groupIdBytesProvider(id).future);
   final messages = db.storedMessages;
   final attachments = db.messageAttachments;
   // the join can repeat the message once per attachment, any one of those
@@ -152,7 +169,7 @@ Stream<LastMessagePreview?> lastMessage(Ref ref, Uint8List groupId) {
         ..where(messages.groupId.equals(groupId))
         ..orderBy([OrderingTerm.desc(messages.receivedAt)])
         ..limit(1);
-  return query.watchSingleOrNull().map((row) {
+  yield* query.watchSingleOrNull().map((row) {
     if (row == null) return null;
     final message = row.readTable(messages);
     return (

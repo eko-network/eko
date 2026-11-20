@@ -4,7 +4,7 @@ import 'dart:io';
 
 import 'package:ecp/ecp.dart';
 import 'package:eko_app/messenger/providers/group_provider.dart';
-import 'package:eko_app/messenger/types/group.dart';
+import 'package:eko_app/messenger/ecp_helpers.dart';
 import 'package:eko_app/providers/ecp_provider.dart';
 import 'package:eko_app/services/messenger_notification_service.dart';
 import 'package:eko_app/utilities/ecp_db_path.dart';
@@ -24,10 +24,17 @@ void notificationServiceShare(Ref ref) {
   ref.listen(asyncEcpClientProvider, (_, next) {
     if (next.hasValue) unawaited(NotificationServiceShare.save(next.value!));
   }, fireImmediately: true);
+  // the groups change with every message, the names only with which they are
+  var saved = '';
   ref.listen(groupProvider, (_, next) {
-    if (next.hasValue) {
-      unawaited(NotificationServiceShare.saveNames(next.value!));
-    }
+    final groups = next.value;
+    if (groups == null) return;
+    final ids = (groups.map((g) => g.id).toList()..sort()).join(',');
+    if (ids == saved) return;
+    saved = ids;
+    unawaited(
+      NotificationServiceShare.saveNames(ref.read(ecpClientProvider), groups),
+    );
   }, fireImmediately: true);
 }
 
@@ -64,10 +71,18 @@ abstract final class NotificationServiceShare {
 
   /// Only active groups are listed, the service shows no content for others,
   /// e.g. one hidden until a contact's reset is accepted.
-  static Future<void> saveNames(List<GroupWithUsers> groups) async {
+  static Future<void> saveNames(
+    EcpClient client,
+    List<MlsGroupRecord> groups,
+  ) async {
     try {
+      final members = <String>{};
+      for (final group in groups) {
+        final gm = await client.groups.getMembers(group);
+        members.addAll(gm.members.map((m) => m.uid()));
+      }
       final users = <String, String>{};
-      for (final uid in {for (final group in groups) ...group.users}) {
+      for (final uid in members) {
         final username = await MessengerNotificationService.username(uid);
         if (username != null) users[uid] = username;
       }
@@ -76,8 +91,8 @@ abstract final class NotificationServiceShare {
         jsonEncode({
           'groups': {
             for (final group in groups)
-              base64Url.encode(group.group.groupIdBytes).replaceAll('=', ''):
-                  '${group.group.id}',
+              base64Url.encode(group.groupIdBytes).replaceAll('=', ''):
+                  '${group.id}',
           },
           'users': users,
         }),
