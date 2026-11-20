@@ -42,6 +42,8 @@ class _ConversationListState extends ConsumerState<GroupList> {
   bool newChatScreen = false;
   bool newGroupMode = false;
   bool creatingGroup = false;
+  // the person whose DM is being opened, to show progress on their card
+  String? pendingUid;
   // keyed by uid, in the order they were picked
   final Map<String, UserModel> groupMembers = {};
   List<MapEntry<String, double>> searchData = [];
@@ -122,6 +124,7 @@ class _ConversationListState extends ConsumerState<GroupList> {
 
   void onUserSelected(UserModel user) {
     if (!newGroupMode) {
+      setState(() => pendingUid = user.uid);
       createGroup([user]);
       return;
     }
@@ -138,9 +141,13 @@ class _ConversationListState extends ConsumerState<GroupList> {
 
     setState(() => creatingGroup = true);
     try {
+      MlsGroupRecord? group;
       while (true) {
         try {
-          await client.groups.createGroup(peers);
+          final (created, _) = await client.groups.createGroup(peers);
+          group = await client.core.storage.groupStore.getGroupByGroupId(
+            created.groupId,
+          );
           break;
         } on EcpDeviceChainChangedException catch (e) {
           // a second change from the same person after accepting it is a
@@ -162,10 +169,8 @@ class _ConversationListState extends ConsumerState<GroupList> {
         }
       }
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(l10n.keysExchanged)));
       closeNewChat();
+      if (group != null) widget.onGroupTap(group.id);
     } catch (e, st) {
       debugPrint(e.toString());
       debugPrint(st.toString());
@@ -184,7 +189,12 @@ class _ConversationListState extends ConsumerState<GroupList> {
         ),
       );
     } finally {
-      if (mounted) setState(() => creatingGroup = false);
+      if (mounted) {
+        setState(() {
+          creatingGroup = false;
+          pendingUid = null;
+        });
+      }
     }
   }
 
@@ -311,7 +321,15 @@ class _ConversationListState extends ConsumerState<GroupList> {
                                       : () => createGroup(
                                           groupMembers.values.toList(),
                                         ),
-                                  child: Text(l10n.create),
+                                  child: creatingGroup
+                                      ? const SizedBox(
+                                          height: 20,
+                                          width: 20,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                          ),
+                                        )
+                                      : Text(l10n.create),
                                 ),
                               ),
                           ],
@@ -329,7 +347,15 @@ class _ConversationListState extends ConsumerState<GroupList> {
                             getter: onSearchLoadMore,
                             initialLoadingWidget: const UserLoader(),
                             widget: (uid) => UserCard(
-                              actionWidget: (_) => newGroupMode
+                              actionWidget: (_) => uid == pendingUid
+                                  ? const SizedBox(
+                                      height: 20,
+                                      width: 20,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : newGroupMode
                                   ? Icon(
                                       groupMembers.containsKey(uid)
                                           ? LucideIcons.circleCheck
