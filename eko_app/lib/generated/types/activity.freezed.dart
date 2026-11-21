@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // coverage:ignore-file
-// ignore_for_file: type=lint
+// ignore_for_file: type=lint, type=warning, deprecated_member_use, deprecated_member_use_from_same_package
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of '../../types/activity.dart';
@@ -9,6 +9,7 @@ part of '../../types/activity.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
 
@@ -28,16 +29,21 @@ $ActivityModelCopyWith<ActivityModel> get copyWith => _$ActivityModelCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ActivityModel&&(identical(other.sourceUid, sourceUid) || other.sourceUid == sourceUid)&&(identical(other.id, id) || other.id == id)&&(identical(other.postId, postId) || other.postId == postId)&&(identical(other.commentId, commentId) || other.commentId == commentId)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.type, type) || other.type == type));
+  final _this = this as ActivityModel;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ActivityModel&&(identical(other.sourceUid, _this.sourceUid) || other.sourceUid == _this.sourceUid)&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.postId, _this.postId) || other.postId == _this.postId)&&(identical(other.commentId, _this.commentId) || other.commentId == _this.commentId)&&(identical(other.createdAt, _this.createdAt) || other.createdAt == _this.createdAt)&&(identical(other.type, _this.type) || other.type == _this.type));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,sourceUid,id,postId,commentId,createdAt,type);
+int get hashCode {
+  final _this = this as ActivityModel;
+  return Object.hash(runtimeType,_this.sourceUid,_this.id,_this.postId,_this.commentId,_this.createdAt,_this.type);
+}
 
 @override
 String toString() {
-  return 'ActivityModel(sourceUid: $sourceUid, id: $id, postId: $postId, commentId: $commentId, createdAt: $createdAt, type: $type)';
+  final _this = this as ActivityModel;
+  return 'ActivityModel(sourceUid: ${_this.sourceUid}, id: ${_this.id}, postId: ${_this.postId}, commentId: ${_this.commentId}, createdAt: ${_this.createdAt}, type: ${_this.type})';
 }
 
 
@@ -66,7 +72,7 @@ class _$ActivityModelCopyWithImpl<$Res>
 /// Create a copy of ActivityModel
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? sourceUid = null,Object? id = null,Object? postId = freezed,Object? commentId = freezed,Object? createdAt = null,Object? type = null,}) {
-  return _then(_self.copyWith(
+  return _then(ActivityModel(
 sourceUid: null == sourceUid ? _self.sourceUid : sourceUid // ignore: cast_nullable_to_non_nullable
 as String,id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,postId: freezed == postId ? _self.postId : postId // ignore: cast_nullable_to_non_nullable
@@ -237,16 +243,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ActivityModel&&(identical(other.sourceUid, sourceUid) || other.sourceUid == sourceUid)&&(identical(other.id, id) || other.id == id)&&(identical(other.postId, postId) || other.postId == postId)&&(identical(other.commentId, commentId) || other.commentId == commentId)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.type, type) || other.type == type));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _ActivityModel&&(identical(other.sourceUid, sourceUid) || other.sourceUid == sourceUid)&&(identical(other.id, id) || other.id == id)&&(identical(other.postId, postId) || other.postId == postId)&&(identical(other.commentId, commentId) || other.commentId == commentId)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.type, type) || other.type == type));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,sourceUid,id,postId,commentId,createdAt,type);
+int get hashCode {
+    return Object.hash(runtimeType,sourceUid,id,postId,commentId,createdAt,type);
+}
 
 @override
 String toString() {
-  return 'ActivityModel(sourceUid: $sourceUid, id: $id, postId: $postId, commentId: $commentId, createdAt: $createdAt, type: $type)';
+    return 'ActivityModel(sourceUid: $sourceUid, id: $id, postId: $postId, commentId: $commentId, createdAt: $createdAt, type: $type)';
 }
 
 

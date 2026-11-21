@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // coverage:ignore-file
-// ignore_for_file: type=lint
+// ignore_for_file: type=lint, type=warning, deprecated_member_use, deprecated_member_use_from_same_package
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of '../../types/post.dart';
@@ -9,6 +9,7 @@ part of '../../types/post.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
 
@@ -27,23 +28,29 @@ $PostModelCopyWith<PostModel> get copyWith => _$PostModelCopyWithImpl<PostModel>
 
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  final _this = this as PostModel;
   properties
     ..add(DiagnosticsProperty('type', 'PostModel'))
-    ..add(DiagnosticsProperty('uid', uid))..add(DiagnosticsProperty('id', id))..add(DiagnosticsProperty('gifUrl', gifUrl))..add(DiagnosticsProperty('imageString', imageString))..add(DiagnosticsProperty('title', title))..add(DiagnosticsProperty('body', body))..add(DiagnosticsProperty('tags', tags))..add(DiagnosticsProperty('likes', likes))..add(DiagnosticsProperty('dislikes', dislikes))..add(DiagnosticsProperty('commentCount', commentCount))..add(DiagnosticsProperty('isLiked', isLiked))..add(DiagnosticsProperty('isDisliked', isDisliked))..add(DiagnosticsProperty('createdAt', createdAt))..add(DiagnosticsProperty('poll', poll))..add(DiagnosticsProperty('vote', vote))..add(DiagnosticsProperty('repostId', repostId));
+    ..add(DiagnosticsProperty('uid', _this.uid))..add(DiagnosticsProperty('id', _this.id))..add(DiagnosticsProperty('gifUrl', _this.gifUrl))..add(DiagnosticsProperty('imageString', _this.imageString))..add(DiagnosticsProperty('title', _this.title))..add(DiagnosticsProperty('body', _this.body))..add(DiagnosticsProperty('tags', _this.tags))..add(DiagnosticsProperty('likes', _this.likes))..add(DiagnosticsProperty('dislikes', _this.dislikes))..add(DiagnosticsProperty('commentCount', _this.commentCount))..add(DiagnosticsProperty('isLiked', _this.isLiked))..add(DiagnosticsProperty('isDisliked', _this.isDisliked))..add(DiagnosticsProperty('createdAt', _this.createdAt))..add(DiagnosticsProperty('poll', _this.poll))..add(DiagnosticsProperty('vote', _this.vote))..add(DiagnosticsProperty('repostId', _this.repostId));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is PostModel&&(identical(other.uid, uid) || other.uid == uid)&&(identical(other.id, id) || other.id == id)&&(identical(other.gifUrl, gifUrl) || other.gifUrl == gifUrl)&&(identical(other.imageString, imageString) || other.imageString == imageString)&&(identical(other.title, title) || other.title == title)&&(identical(other.body, body) || other.body == body)&&const DeepCollectionEquality().equals(other.tags, tags)&&(identical(other.likes, likes) || other.likes == likes)&&(identical(other.dislikes, dislikes) || other.dislikes == dislikes)&&(identical(other.commentCount, commentCount) || other.commentCount == commentCount)&&(identical(other.isLiked, isLiked) || other.isLiked == isLiked)&&(identical(other.isDisliked, isDisliked) || other.isDisliked == isDisliked)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&const DeepCollectionEquality().equals(other.poll, poll)&&(identical(other.vote, vote) || other.vote == vote)&&(identical(other.repostId, repostId) || other.repostId == repostId));
+  final _this = this as PostModel;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PostModel&&(identical(other.uid, _this.uid) || other.uid == _this.uid)&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.gifUrl, _this.gifUrl) || other.gifUrl == _this.gifUrl)&&(identical(other.imageString, _this.imageString) || other.imageString == _this.imageString)&&(identical(other.title, _this.title) || other.title == _this.title)&&(identical(other.body, _this.body) || other.body == _this.body)&&const DeepCollectionEquality().equals(other.tags, _this.tags)&&(identical(other.likes, _this.likes) || other.likes == _this.likes)&&(identical(other.dislikes, _this.dislikes) || other.dislikes == _this.dislikes)&&(identical(other.commentCount, _this.commentCount) || other.commentCount == _this.commentCount)&&(identical(other.isLiked, _this.isLiked) || other.isLiked == _this.isLiked)&&(identical(other.isDisliked, _this.isDisliked) || other.isDisliked == _this.isDisliked)&&(identical(other.createdAt, _this.createdAt) || other.createdAt == _this.createdAt)&&const DeepCollectionEquality().equals(other.poll, _this.poll)&&(identical(other.vote, _this.vote) || other.vote == _this.vote)&&(identical(other.repostId, _this.repostId) || other.repostId == _this.repostId));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,uid,id,gifUrl,imageString,title,body,const DeepCollectionEquality().hash(tags),likes,dislikes,commentCount,isLiked,isDisliked,createdAt,const DeepCollectionEquality().hash(poll),vote,repostId);
+int get hashCode {
+  final _this = this as PostModel;
+  return Object.hash(runtimeType,_this.uid,_this.id,_this.gifUrl,_this.imageString,_this.title,_this.body,const DeepCollectionEquality().hash(_this.tags),_this.likes,_this.dislikes,_this.commentCount,_this.isLiked,_this.isDisliked,_this.createdAt,const DeepCollectionEquality().hash(_this.poll),_this.vote,_this.repostId);
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'PostModel(uid: $uid, id: $id, gifUrl: $gifUrl, imageString: $imageString, title: $title, body: $body, tags: $tags, likes: $likes, dislikes: $dislikes, commentCount: $commentCount, isLiked: $isLiked, isDisliked: $isDisliked, createdAt: $createdAt, poll: $poll, vote: $vote, repostId: $repostId)';
+  final _this = this as PostModel;
+  return 'PostModel(uid: ${_this.uid}, id: ${_this.id}, gifUrl: ${_this.gifUrl}, imageString: ${_this.imageString}, title: ${_this.title}, body: ${_this.body}, tags: ${_this.tags}, likes: ${_this.likes}, dislikes: ${_this.dislikes}, commentCount: ${_this.commentCount}, isLiked: ${_this.isLiked}, isDisliked: ${_this.isDisliked}, createdAt: ${_this.createdAt}, poll: ${_this.poll}, vote: ${_this.vote}, repostId: ${_this.repostId})';
 }
 
 
@@ -72,7 +79,7 @@ class _$PostModelCopyWithImpl<$Res>
 /// Create a copy of PostModel
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? uid = null,Object? id = null,Object? gifUrl = freezed,Object? imageString = freezed,Object? title = freezed,Object? body = freezed,Object? tags = null,Object? likes = null,Object? dislikes = null,Object? commentCount = null,Object? isLiked = null,Object? isDisliked = null,Object? createdAt = null,Object? poll = freezed,Object? vote = freezed,Object? repostId = freezed,}) {
-  return _then(_self.copyWith(
+  return _then(PostModel(
 uid: null == uid ? _self.uid : uid // ignore: cast_nullable_to_non_nullable
 as String,id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,gifUrl: freezed == gifUrl ? _self.gifUrl : gifUrl // ignore: cast_nullable_to_non_nullable
@@ -230,7 +237,7 @@ return $default(_that.uid,_that.id,_that.gifUrl,_that.imageString,_that.title,_t
 @JsonSerializable()
 
 class _PostModel extends PostModel with DiagnosticableTreeMixin {
-  const _PostModel({@JsonKey(name: 'author_uid') required this.uid, required this.id, @JsonKey(name: 'gif') this.gifUrl, @JsonKey(name: 'image', fromJson: _asciiImageFromString, toJson: _asciiImageToString) this.imageString, this.title, this.body, final  List<String> tags = const ['public'], @JsonKey(name: 'like_count') this.likes = 0, @JsonKey(name: 'dislike_count') this.dislikes = 0, @JsonKey(name: 'comment_count') this.commentCount = 0, @JsonKey(name: 'is_liked') this.isLiked = false, @JsonKey(name: 'is_disliked') this.isDisliked = false, @JsonKey(name: 'created_at') required this.createdAt, final  List<PollOptionModel>? poll, this.vote, @JsonKey(name: 'ekoed_id') this.repostId}): _tags = tags,_poll = poll,super._();
+  const _PostModel({@JsonKey(name: 'author_uid') required this.uid, required this.id, @JsonKey(name: 'gif') this.gifUrl, @JsonKey(name: 'image', fromJson: _asciiImageFromString, toJson: _asciiImageToString) this.imageString, this.title, this.body,  List<String> tags = const ['public'], @JsonKey(name: 'like_count') this.likes = 0, @JsonKey(name: 'dislike_count') this.dislikes = 0, @JsonKey(name: 'comment_count') this.commentCount = 0, @JsonKey(name: 'is_liked') this.isLiked = false, @JsonKey(name: 'is_disliked') this.isDisliked = false, @JsonKey(name: 'created_at') required this.createdAt,  List<PollOptionModel>? poll, this.vote, @JsonKey(name: 'ekoed_id') this.repostId}): _tags = tags,_poll = poll,super._();
   factory _PostModel.fromJson(Map<String, dynamic> json) => _$PostModelFromJson(json);
 
 @override@JsonKey(name: 'author_uid') final  String uid;
@@ -276,23 +283,25 @@ Map<String, dynamic> toJson() {
 }
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-  properties
+    properties
     ..add(DiagnosticsProperty('type', 'PostModel'))
     ..add(DiagnosticsProperty('uid', uid))..add(DiagnosticsProperty('id', id))..add(DiagnosticsProperty('gifUrl', gifUrl))..add(DiagnosticsProperty('imageString', imageString))..add(DiagnosticsProperty('title', title))..add(DiagnosticsProperty('body', body))..add(DiagnosticsProperty('tags', tags))..add(DiagnosticsProperty('likes', likes))..add(DiagnosticsProperty('dislikes', dislikes))..add(DiagnosticsProperty('commentCount', commentCount))..add(DiagnosticsProperty('isLiked', isLiked))..add(DiagnosticsProperty('isDisliked', isDisliked))..add(DiagnosticsProperty('createdAt', createdAt))..add(DiagnosticsProperty('poll', poll))..add(DiagnosticsProperty('vote', vote))..add(DiagnosticsProperty('repostId', repostId));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PostModel&&(identical(other.uid, uid) || other.uid == uid)&&(identical(other.id, id) || other.id == id)&&(identical(other.gifUrl, gifUrl) || other.gifUrl == gifUrl)&&(identical(other.imageString, imageString) || other.imageString == imageString)&&(identical(other.title, title) || other.title == title)&&(identical(other.body, body) || other.body == body)&&const DeepCollectionEquality().equals(other._tags, _tags)&&(identical(other.likes, likes) || other.likes == likes)&&(identical(other.dislikes, dislikes) || other.dislikes == dislikes)&&(identical(other.commentCount, commentCount) || other.commentCount == commentCount)&&(identical(other.isLiked, isLiked) || other.isLiked == isLiked)&&(identical(other.isDisliked, isDisliked) || other.isDisliked == isDisliked)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&const DeepCollectionEquality().equals(other._poll, _poll)&&(identical(other.vote, vote) || other.vote == vote)&&(identical(other.repostId, repostId) || other.repostId == repostId));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _PostModel&&(identical(other.uid, uid) || other.uid == uid)&&(identical(other.id, id) || other.id == id)&&(identical(other.gifUrl, gifUrl) || other.gifUrl == gifUrl)&&(identical(other.imageString, imageString) || other.imageString == imageString)&&(identical(other.title, title) || other.title == title)&&(identical(other.body, body) || other.body == body)&&const DeepCollectionEquality().equals(other.tags, _tags)&&(identical(other.likes, likes) || other.likes == likes)&&(identical(other.dislikes, dislikes) || other.dislikes == dislikes)&&(identical(other.commentCount, commentCount) || other.commentCount == commentCount)&&(identical(other.isLiked, isLiked) || other.isLiked == isLiked)&&(identical(other.isDisliked, isDisliked) || other.isDisliked == isDisliked)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&const DeepCollectionEquality().equals(other.poll, _poll)&&(identical(other.vote, vote) || other.vote == vote)&&(identical(other.repostId, repostId) || other.repostId == repostId));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,uid,id,gifUrl,imageString,title,body,const DeepCollectionEquality().hash(_tags),likes,dislikes,commentCount,isLiked,isDisliked,createdAt,const DeepCollectionEquality().hash(_poll),vote,repostId);
+int get hashCode {
+    return Object.hash(runtimeType,uid,id,gifUrl,imageString,title,body,const DeepCollectionEquality().hash(_tags),likes,dislikes,commentCount,isLiked,isDisliked,createdAt,const DeepCollectionEquality().hash(_poll),vote,repostId);
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'PostModel(uid: $uid, id: $id, gifUrl: $gifUrl, imageString: $imageString, title: $title, body: $body, tags: $tags, likes: $likes, dislikes: $dislikes, commentCount: $commentCount, isLiked: $isLiked, isDisliked: $isDisliked, createdAt: $createdAt, poll: $poll, vote: $vote, repostId: $repostId)';
+    return 'PostModel(uid: $uid, id: $id, gifUrl: $gifUrl, imageString: $imageString, title: $title, body: $body, tags: $tags, likes: $likes, dislikes: $dislikes, commentCount: $commentCount, isLiked: $isLiked, isDisliked: $isDisliked, createdAt: $createdAt, poll: $poll, vote: $vote, repostId: $repostId)';
 }
 
 
@@ -361,23 +370,29 @@ $PollOptionModelCopyWith<PollOptionModel> get copyWith => _$PollOptionModelCopyW
 
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  final _this = this as PollOptionModel;
   properties
     ..add(DiagnosticsProperty('type', 'PollOptionModel'))
-    ..add(DiagnosticsProperty('value', value))..add(DiagnosticsProperty('optionId', optionId))..add(DiagnosticsProperty('voteCount', voteCount));
+    ..add(DiagnosticsProperty('value', _this.value))..add(DiagnosticsProperty('optionId', _this.optionId))..add(DiagnosticsProperty('voteCount', _this.voteCount));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is PollOptionModel&&(identical(other.value, value) || other.value == value)&&(identical(other.optionId, optionId) || other.optionId == optionId)&&(identical(other.voteCount, voteCount) || other.voteCount == voteCount));
+  final _this = this as PollOptionModel;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PollOptionModel&&(identical(other.value, _this.value) || other.value == _this.value)&&(identical(other.optionId, _this.optionId) || other.optionId == _this.optionId)&&(identical(other.voteCount, _this.voteCount) || other.voteCount == _this.voteCount));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,value,optionId,voteCount);
+int get hashCode {
+  final _this = this as PollOptionModel;
+  return Object.hash(runtimeType,_this.value,_this.optionId,_this.voteCount);
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'PollOptionModel(value: $value, optionId: $optionId, voteCount: $voteCount)';
+  final _this = this as PollOptionModel;
+  return 'PollOptionModel(value: ${_this.value}, optionId: ${_this.optionId}, voteCount: ${_this.voteCount})';
 }
 
 
@@ -406,7 +421,7 @@ class _$PollOptionModelCopyWithImpl<$Res>
 /// Create a copy of PollOptionModel
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? value = null,Object? optionId = null,Object? voteCount = null,}) {
-  return _then(_self.copyWith(
+  return _then(PollOptionModel(
 value: null == value ? _self.value : value // ignore: cast_nullable_to_non_nullable
 as String,optionId: null == optionId ? _self.optionId : optionId // ignore: cast_nullable_to_non_nullable
 as int,voteCount: null == voteCount ? _self.voteCount : voteCount // ignore: cast_nullable_to_non_nullable
@@ -570,23 +585,25 @@ Map<String, dynamic> toJson() {
 }
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-  properties
+    properties
     ..add(DiagnosticsProperty('type', 'PollOptionModel'))
     ..add(DiagnosticsProperty('value', value))..add(DiagnosticsProperty('optionId', optionId))..add(DiagnosticsProperty('voteCount', voteCount));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PollOptionModel&&(identical(other.value, value) || other.value == value)&&(identical(other.optionId, optionId) || other.optionId == optionId)&&(identical(other.voteCount, voteCount) || other.voteCount == voteCount));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _PollOptionModel&&(identical(other.value, value) || other.value == value)&&(identical(other.optionId, optionId) || other.optionId == optionId)&&(identical(other.voteCount, voteCount) || other.voteCount == voteCount));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,value,optionId,voteCount);
+int get hashCode {
+    return Object.hash(runtimeType,value,optionId,voteCount);
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'PollOptionModel(value: $value, optionId: $optionId, voteCount: $voteCount)';
+    return 'PollOptionModel(value: $value, optionId: $optionId, voteCount: $voteCount)';
 }
 
 

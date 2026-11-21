@@ -39,7 +39,7 @@ abstract class _$EcpCoreHolder extends $AsyncNotifier<EcpCore?> {
   FutureOr<EcpCore?> build();
   @$mustCallSuper
   @override
-  void runBuild() {
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<AsyncValue<EcpCore?>, EcpCore?>;
     final element =
         ref.element
@@ -49,7 +49,7 @@ abstract class _$EcpCoreHolder extends $AsyncNotifier<EcpCore?> {
               Object?,
               Object?
             >;
-    element.handleCreate(ref, build);
+    return element.handleCreate(ref, build);
   }
 }
 
@@ -102,7 +102,7 @@ abstract class _$DeviceRemovedNotice extends $Notifier<bool> {
   bool build();
   @$mustCallSuper
   @override
-  void runBuild() {
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<bool, bool>;
     final element =
         ref.element
@@ -112,6 +112,6 @@ abstract class _$DeviceRemovedNotice extends $Notifier<bool> {
               Object?,
               Object?
             >;
-    element.handleCreate(ref, build);
+    return element.handleCreate(ref, build);
   }
 }
