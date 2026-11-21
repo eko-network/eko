@@ -47,7 +47,7 @@ abstract class _$FollowingFeed extends $Notifier<(List<int>, bool)> {
   (List<int>, bool) build();
   @$mustCallSuper
   @override
-  void runBuild() {
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<(List<int>, bool), (List<int>, bool)>;
     final element =
         ref.element
@@ -57,6 +57,6 @@ abstract class _$FollowingFeed extends $Notifier<(List<int>, bool)> {
               Object?,
               Object?
             >;
-    element.handleCreate(ref, build);
+    return element.handleCreate(ref, build);
   }
 }

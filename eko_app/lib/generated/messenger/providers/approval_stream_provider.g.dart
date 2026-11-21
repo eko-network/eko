@@ -88,7 +88,7 @@ abstract class _$ValidatedApproval extends $Notifier<StoredApprovalRequest?> {
   StoredApprovalRequest? build();
   @$mustCallSuper
   @override
-  void runBuild() {
+  WhenComplete runBuild() {
     final ref =
         this.ref as $Ref<StoredApprovalRequest?, StoredApprovalRequest?>;
     final element =
@@ -99,6 +99,6 @@ abstract class _$ValidatedApproval extends $Notifier<StoredApprovalRequest?> {
               Object?,
               Object?
             >;
-    element.handleCreate(ref, build);
+    return element.handleCreate(ref, build);
   }
 }

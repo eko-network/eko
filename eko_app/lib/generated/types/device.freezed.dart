@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // coverage:ignore-file
-// ignore_for_file: type=lint
+// ignore_for_file: type=lint, type=warning, deprecated_member_use, deprecated_member_use_from_same_package
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of '../../types/device.dart';
@@ -9,6 +9,7 @@ part of '../../types/device.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
 /// @nodoc
@@ -25,16 +26,21 @@ $DeviceModelCopyWith<DeviceModel> get copyWith => _$DeviceModelCopyWithImpl<Devi
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is DeviceModel&&(identical(other.did, did) || other.did == did)&&(identical(other.dat, dat) || other.dat == dat)&&(identical(other.isRegistering, isRegistering) || other.isRegistering == isRegistering));
+  final _this = this as DeviceModel;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is DeviceModel&&(identical(other.did, _this.did) || other.did == _this.did)&&(identical(other.dat, _this.dat) || other.dat == _this.dat)&&(identical(other.isRegistering, _this.isRegistering) || other.isRegistering == _this.isRegistering));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,did,dat,isRegistering);
+int get hashCode {
+  final _this = this as DeviceModel;
+  return Object.hash(runtimeType,_this.did,_this.dat,_this.isRegistering);
+}
 
 @override
 String toString() {
-  return 'DeviceModel(did: $did, dat: $dat, isRegistering: $isRegistering)';
+  final _this = this as DeviceModel;
+  return 'DeviceModel(did: ${_this.did}, dat: ${_this.dat}, isRegistering: ${_this.isRegistering})';
 }
 
 
@@ -63,7 +69,7 @@ class _$DeviceModelCopyWithImpl<$Res>
 /// Create a copy of DeviceModel
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? did = freezed,Object? dat = freezed,Object? isRegistering = null,}) {
-  return _then(_self.copyWith(
+  return _then(DeviceModel(
 did: freezed == did ? _self.did : did // ignore: cast_nullable_to_non_nullable
 as String?,dat: freezed == dat ? _self.dat : dat // ignore: cast_nullable_to_non_nullable
 as DateTime?,isRegistering: null == isRegistering ? _self.isRegistering : isRegistering // ignore: cast_nullable_to_non_nullable
@@ -225,16 +231,18 @@ _$DeviceModelCopyWith<_DeviceModel> get copyWith => __$DeviceModelCopyWithImpl<_
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _DeviceModel&&(identical(other.did, did) || other.did == did)&&(identical(other.dat, dat) || other.dat == dat)&&(identical(other.isRegistering, isRegistering) || other.isRegistering == isRegistering));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _DeviceModel&&(identical(other.did, did) || other.did == did)&&(identical(other.dat, dat) || other.dat == dat)&&(identical(other.isRegistering, isRegistering) || other.isRegistering == isRegistering));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,did,dat,isRegistering);
+int get hashCode {
+    return Object.hash(runtimeType,did,dat,isRegistering);
+}
 
 @override
 String toString() {
-  return 'DeviceModel(did: $did, dat: $dat, isRegistering: $isRegistering)';
+    return 'DeviceModel(did: $did, dat: $dat, isRegistering: $isRegistering)';
 }
 
 

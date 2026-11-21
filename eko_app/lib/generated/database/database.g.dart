@@ -4644,7 +4644,16 @@ class $$ApprovalRequestTableTableManager
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .map(
+                (e) => (
+                  e.readTable<$ApprovalRequestTable, ApprovalRequestRow>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $ApprovalRequestTable,
+                    ApprovalRequestRow
+                  >(db, table, e),
+                ),
+              )
               .toList(),
           prefetchHooksCallback: null,
         ),
@@ -4812,7 +4821,16 @@ class $$CapabilitiesTableTableManager
                 time: time,
               ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .map(
+                (e) => (
+                  e.readTable<$CapabilitiesTable, CapabilityRow>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $CapabilitiesTable,
+                    CapabilityRow
+                  >(db, table, e),
+                ),
+              )
               .toList(),
           prefetchHooksCallback: null,
         ),
@@ -4962,7 +4980,16 @@ class $$DeviceChainPinsTableTableManager
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .map(
+                (e) => (
+                  e.readTable<$DeviceChainPinsTable, DeviceChainPin>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $DeviceChainPinsTable,
+                    DeviceChainPin
+                  >(db, table, e),
+                ),
+              )
               .toList(),
           prefetchHooksCallback: null,
         ),
@@ -5113,7 +5140,16 @@ class $$MergedGroupsTableTableManager
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .map(
+                (e) => (
+                  e.readTable<$MergedGroupsTable, DeviceChainPinRow>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $MergedGroupsTable,
+                    DeviceChainPinRow
+                  >(db, table, e),
+                ),
+              )
               .toList(),
           prefetchHooksCallback: null,
         ),
@@ -5321,7 +5357,16 @@ class $$MlsCredentialsTableTableManager
                 signerPublicKey: signerPublicKey,
               ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .map(
+                (e) => (
+                  e.readTable<$MlsCredentialsTable, MlsCredentialRow>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $MlsCredentialsTable,
+                    MlsCredentialRow
+                  >(db, table, e),
+                ),
+              )
               .toList(),
           prefetchHooksCallback: null,
         ),
@@ -5463,7 +5508,16 @@ class $$MlsKeyPackagesTableTableManager
                 keyPackage: keyPackage,
               ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .map(
+                (e) => (
+                  e.readTable<$MlsKeyPackagesTable, MlsKeyPackageRow>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $MlsKeyPackagesTable,
+                    MlsKeyPackageRow
+                  >(db, table, e),
+                ),
+              )
               .toList(),
           prefetchHooksCallback: null,
         ),
@@ -5682,7 +5736,16 @@ class $$MlsGroupsTableTableManager
                 isActive: isActive,
               ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .map(
+                (e) => (
+                  e.readTable<$MlsGroupsTable, MlsGroupRow>(table),
+                  BaseReferences<_$AppDatabase, $MlsGroupsTable, MlsGroupRow>(
+                    db,
+                    table,
+                    e,
+                  ),
+                ),
+              )
               .toList(),
           prefetchHooksCallback: null,
         ),
@@ -5846,7 +5909,18 @@ class $$MlsEngineConfigsTableTableManager
                 encryptionKey: encryptionKey,
               ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .map(
+                (e) => (
+                  e.readTable<$MlsEngineConfigsTable, MlsEngineConfigRow>(
+                    table,
+                  ),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $MlsEngineConfigsTable,
+                    MlsEngineConfigRow
+                  >(db, table, e),
+                ),
+              )
               .toList(),
           prefetchHooksCallback: null,
         ),
@@ -5966,7 +6040,18 @@ class $$ProcessedObjectsTableTableManager
               ({required Uri id, Value<int> rowid = const Value.absent()}) =>
                   ProcessedObjectsCompanion.insert(id: id, rowid: rowid),
           withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .map(
+                (e) => (
+                  e.readTable<$ProcessedObjectsTable, ProcessedObjectRow>(
+                    table,
+                  ),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $ProcessedObjectsTable,
+                    ProcessedObjectRow
+                  >(db, table, e),
+                ),
+              )
               .toList(),
           prefetchHooksCallback: null,
         ),
@@ -6443,7 +6528,7 @@ class $$StoredMessagesTableTableManager
           withReferenceMapper: (p0) => p0
               .map(
                 (e) => (
-                  e.readTable(table),
+                  e.readTable<$StoredMessagesTable, StoredMessageRow>(table),
                   $$StoredMessagesTableReferences(db, table, e),
                 ),
               )
@@ -6460,10 +6545,11 @@ class $$StoredMessagesTableTableManager
                   getPrefetchedDataCallback: (items) async {
                     return [
                       if (messageAttachmentsRefs)
-                        await $_getPrefetchedData<
+                        await $_getPrefetchedDataByColumns<
                           StoredMessageRow,
                           $StoredMessagesTable,
-                          MessageAttachmentRow
+                          MessageAttachmentRow,
+                          $MessageAttachmentsTable
                         >(
                           currentTable: table,
                           referencedTable: $$StoredMessagesTableReferences
@@ -6474,17 +6560,16 @@ class $$StoredMessagesTableTableManager
                                 table,
                                 p0,
                               ).messageAttachmentsRefs,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.messageId == item.serverActivityId,
-                              ),
+                          currentColumn: 'server_activity_id',
+                          referencedColumn: 'message_id',
                           typedResults: items,
                         ),
                       if (messageRevisionsRefs)
-                        await $_getPrefetchedData<
+                        await $_getPrefetchedDataByColumns<
                           StoredMessageRow,
                           $StoredMessagesTable,
-                          MessageRevisionRow
+                          MessageRevisionRow,
+                          $MessageRevisionsTable
                         >(
                           currentTable: table,
                           referencedTable: $$StoredMessagesTableReferences
@@ -6495,10 +6580,8 @@ class $$StoredMessagesTableTableManager
                                 table,
                                 p0,
                               ).messageRevisionsRefs,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.messageId == item.serverActivityId,
-                              ),
+                          currentColumn: 'server_activity_id',
+                          referencedColumn: 'message_id',
                           typedResults: items,
                         ),
                     ];
@@ -6785,7 +6868,9 @@ class $$MessageAttachmentsTableTableManager
           withReferenceMapper: (p0) => p0
               .map(
                 (e) => (
-                  e.readTable(table),
+                  e.readTable<$MessageAttachmentsTable, MessageAttachmentRow>(
+                    table,
+                  ),
                   $$MessageAttachmentsTableReferences(db, table, e),
                 ),
               )
@@ -7092,7 +7177,9 @@ class $$MessageRevisionsTableTableManager
           withReferenceMapper: (p0) => p0
               .map(
                 (e) => (
-                  e.readTable(table),
+                  e.readTable<$MessageRevisionsTable, MessageRevisionRow>(
+                    table,
+                  ),
                   $$MessageRevisionsTableReferences(db, table, e),
                 ),
               )
@@ -7364,7 +7451,18 @@ class $$MessageReactionsTableTableManager
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .map(
+                (e) => (
+                  e.readTable<$MessageReactionsTable, MessageReactionRow>(
+                    table,
+                  ),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $MessageReactionsTable,
+                    MessageReactionRow
+                  >(db, table, e),
+                ),
+              )
               .toList(),
           prefetchHooksCallback: null,
         ),
@@ -7551,7 +7649,16 @@ class $$ReadCursorsTableTableManager
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .map(
+                (e) => (
+                  e.readTable<$ReadCursorsTable, ReadCursorRow>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $ReadCursorsTable,
+                    ReadCursorRow
+                  >(db, table, e),
+                ),
+              )
               .toList(),
           prefetchHooksCallback: null,
         ),

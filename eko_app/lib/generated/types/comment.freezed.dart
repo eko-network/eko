@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // coverage:ignore-file
-// ignore_for_file: type=lint
+// ignore_for_file: type=lint, type=warning, deprecated_member_use, deprecated_member_use_from_same_package
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of '../../types/comment.dart';
@@ -9,6 +9,7 @@ part of '../../types/comment.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
 
@@ -28,16 +29,21 @@ $CommentModelCopyWith<CommentModel> get copyWith => _$CommentModelCopyWithImpl<C
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CommentModel&&(identical(other.uid, uid) || other.uid == uid)&&(identical(other.id, id) || other.id == id)&&(identical(other.postId, postId) || other.postId == postId)&&(identical(other.gifUrl, gifUrl) || other.gifUrl == gifUrl)&&(identical(other.body, body) || other.body == body)&&(identical(other.likes, likes) || other.likes == likes)&&(identical(other.dislikes, dislikes) || other.dislikes == dislikes)&&(identical(other.isLiked, isLiked) || other.isLiked == isLiked)&&(identical(other.isDisliked, isDisliked) || other.isDisliked == isDisliked)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
+  final _this = this as CommentModel;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CommentModel&&(identical(other.uid, _this.uid) || other.uid == _this.uid)&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.postId, _this.postId) || other.postId == _this.postId)&&(identical(other.gifUrl, _this.gifUrl) || other.gifUrl == _this.gifUrl)&&(identical(other.body, _this.body) || other.body == _this.body)&&(identical(other.likes, _this.likes) || other.likes == _this.likes)&&(identical(other.dislikes, _this.dislikes) || other.dislikes == _this.dislikes)&&(identical(other.isLiked, _this.isLiked) || other.isLiked == _this.isLiked)&&(identical(other.isDisliked, _this.isDisliked) || other.isDisliked == _this.isDisliked)&&(identical(other.createdAt, _this.createdAt) || other.createdAt == _this.createdAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,uid,id,postId,gifUrl,body,likes,dislikes,isLiked,isDisliked,createdAt);
+int get hashCode {
+  final _this = this as CommentModel;
+  return Object.hash(runtimeType,_this.uid,_this.id,_this.postId,_this.gifUrl,_this.body,_this.likes,_this.dislikes,_this.isLiked,_this.isDisliked,_this.createdAt);
+}
 
 @override
 String toString() {
-  return 'CommentModel(uid: $uid, id: $id, postId: $postId, gifUrl: $gifUrl, body: $body, likes: $likes, dislikes: $dislikes, isLiked: $isLiked, isDisliked: $isDisliked, createdAt: $createdAt)';
+  final _this = this as CommentModel;
+  return 'CommentModel(uid: ${_this.uid}, id: ${_this.id}, postId: ${_this.postId}, gifUrl: ${_this.gifUrl}, body: ${_this.body}, likes: ${_this.likes}, dislikes: ${_this.dislikes}, isLiked: ${_this.isLiked}, isDisliked: ${_this.isDisliked}, createdAt: ${_this.createdAt})';
 }
 
 
@@ -66,7 +72,7 @@ class _$CommentModelCopyWithImpl<$Res>
 /// Create a copy of CommentModel
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? uid = null,Object? id = null,Object? postId = null,Object? gifUrl = freezed,Object? body = freezed,Object? likes = null,Object? dislikes = null,Object? isLiked = null,Object? isDisliked = null,Object? createdAt = null,}) {
-  return _then(_self.copyWith(
+  return _then(CommentModel(
 uid: null == uid ? _self.uid : uid // ignore: cast_nullable_to_non_nullable
 as String,id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,postId: null == postId ? _self.postId : postId // ignore: cast_nullable_to_non_nullable
@@ -245,16 +251,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CommentModel&&(identical(other.uid, uid) || other.uid == uid)&&(identical(other.id, id) || other.id == id)&&(identical(other.postId, postId) || other.postId == postId)&&(identical(other.gifUrl, gifUrl) || other.gifUrl == gifUrl)&&(identical(other.body, body) || other.body == body)&&(identical(other.likes, likes) || other.likes == likes)&&(identical(other.dislikes, dislikes) || other.dislikes == dislikes)&&(identical(other.isLiked, isLiked) || other.isLiked == isLiked)&&(identical(other.isDisliked, isDisliked) || other.isDisliked == isDisliked)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _CommentModel&&(identical(other.uid, uid) || other.uid == uid)&&(identical(other.id, id) || other.id == id)&&(identical(other.postId, postId) || other.postId == postId)&&(identical(other.gifUrl, gifUrl) || other.gifUrl == gifUrl)&&(identical(other.body, body) || other.body == body)&&(identical(other.likes, likes) || other.likes == likes)&&(identical(other.dislikes, dislikes) || other.dislikes == dislikes)&&(identical(other.isLiked, isLiked) || other.isLiked == isLiked)&&(identical(other.isDisliked, isDisliked) || other.isDisliked == isDisliked)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,uid,id,postId,gifUrl,body,likes,dislikes,isLiked,isDisliked,createdAt);
+int get hashCode {
+    return Object.hash(runtimeType,uid,id,postId,gifUrl,body,likes,dislikes,isLiked,isDisliked,createdAt);
+}
 
 @override
 String toString() {
-  return 'CommentModel(uid: $uid, id: $id, postId: $postId, gifUrl: $gifUrl, body: $body, likes: $likes, dislikes: $dislikes, isLiked: $isLiked, isDisliked: $isDisliked, createdAt: $createdAt)';
+    return 'CommentModel(uid: $uid, id: $id, postId: $postId, gifUrl: $gifUrl, body: $body, likes: $likes, dislikes: $dislikes, isLiked: $isLiked, isDisliked: $isDisliked, createdAt: $createdAt)';
 }
 
 

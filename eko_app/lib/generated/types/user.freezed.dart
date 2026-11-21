@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // coverage:ignore-file
-// ignore_for_file: type=lint
+// ignore_for_file: type=lint, type=warning, deprecated_member_use, deprecated_member_use_from_same_package
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of '../../types/user.dart';
@@ -9,6 +9,7 @@ part of '../../types/user.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
 /// @nodoc
@@ -25,16 +26,21 @@ $UserModelCopyWith<UserModel> get copyWith => _$UserModelCopyWithImpl<UserModel>
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is UserModel&&(identical(other.name, name) || other.name == name)&&(identical(other.username, username) || other.username == username)&&(identical(other.profilePicture, profilePicture) || other.profilePicture == profilePicture)&&(identical(other.bio, bio) || other.bio == bio)&&(identical(other.uid, uid) || other.uid == uid)&&(identical(other.isVerified, isVerified) || other.isVerified == isVerified)&&(identical(other.verificationUrl, verificationUrl) || other.verificationUrl == verificationUrl)&&(identical(other.shareOnlineStatus, shareOnlineStatus) || other.shareOnlineStatus == shareOnlineStatus)&&(identical(other.isFollowing, isFollowing) || other.isFollowing == isFollowing));
+  final _this = this as UserModel;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is UserModel&&(identical(other.name, _this.name) || other.name == _this.name)&&(identical(other.username, _this.username) || other.username == _this.username)&&(identical(other.profilePicture, _this.profilePicture) || other.profilePicture == _this.profilePicture)&&(identical(other.bio, _this.bio) || other.bio == _this.bio)&&(identical(other.uid, _this.uid) || other.uid == _this.uid)&&(identical(other.isVerified, _this.isVerified) || other.isVerified == _this.isVerified)&&(identical(other.verificationUrl, _this.verificationUrl) || other.verificationUrl == _this.verificationUrl)&&(identical(other.shareOnlineStatus, _this.shareOnlineStatus) || other.shareOnlineStatus == _this.shareOnlineStatus)&&(identical(other.isFollowing, _this.isFollowing) || other.isFollowing == _this.isFollowing));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,name,username,profilePicture,bio,uid,isVerified,verificationUrl,shareOnlineStatus,isFollowing);
+int get hashCode {
+  final _this = this as UserModel;
+  return Object.hash(runtimeType,_this.name,_this.username,_this.profilePicture,_this.bio,_this.uid,_this.isVerified,_this.verificationUrl,_this.shareOnlineStatus,_this.isFollowing);
+}
 
 @override
 String toString() {
-  return 'UserModel(name: $name, username: $username, profilePicture: $profilePicture, bio: $bio, uid: $uid, isVerified: $isVerified, verificationUrl: $verificationUrl, shareOnlineStatus: $shareOnlineStatus, isFollowing: $isFollowing)';
+  final _this = this as UserModel;
+  return 'UserModel(name: ${_this.name}, username: ${_this.username}, profilePicture: ${_this.profilePicture}, bio: ${_this.bio}, uid: ${_this.uid}, isVerified: ${_this.isVerified}, verificationUrl: ${_this.verificationUrl}, shareOnlineStatus: ${_this.shareOnlineStatus}, isFollowing: ${_this.isFollowing})';
 }
 
 
@@ -63,7 +69,7 @@ class _$UserModelCopyWithImpl<$Res>
 /// Create a copy of UserModel
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? name = null,Object? username = null,Object? profilePicture = null,Object? bio = null,Object? uid = null,Object? isVerified = null,Object? verificationUrl = freezed,Object? shareOnlineStatus = null,Object? isFollowing = null,}) {
-  return _then(_self.copyWith(
+  return _then(UserModel(
 name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,username: null == username ? _self.username : username // ignore: cast_nullable_to_non_nullable
 as String,profilePicture: null == profilePicture ? _self.profilePicture : profilePicture // ignore: cast_nullable_to_non_nullable
@@ -237,16 +243,18 @@ _$UserModelCopyWith<_UserModel> get copyWith => __$UserModelCopyWithImpl<_UserMo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UserModel&&(identical(other.name, name) || other.name == name)&&(identical(other.username, username) || other.username == username)&&(identical(other.profilePicture, profilePicture) || other.profilePicture == profilePicture)&&(identical(other.bio, bio) || other.bio == bio)&&(identical(other.uid, uid) || other.uid == uid)&&(identical(other.isVerified, isVerified) || other.isVerified == isVerified)&&(identical(other.verificationUrl, verificationUrl) || other.verificationUrl == verificationUrl)&&(identical(other.shareOnlineStatus, shareOnlineStatus) || other.shareOnlineStatus == shareOnlineStatus)&&(identical(other.isFollowing, isFollowing) || other.isFollowing == isFollowing));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _UserModel&&(identical(other.name, name) || other.name == name)&&(identical(other.username, username) || other.username == username)&&(identical(other.profilePicture, profilePicture) || other.profilePicture == profilePicture)&&(identical(other.bio, bio) || other.bio == bio)&&(identical(other.uid, uid) || other.uid == uid)&&(identical(other.isVerified, isVerified) || other.isVerified == isVerified)&&(identical(other.verificationUrl, verificationUrl) || other.verificationUrl == verificationUrl)&&(identical(other.shareOnlineStatus, shareOnlineStatus) || other.shareOnlineStatus == shareOnlineStatus)&&(identical(other.isFollowing, isFollowing) || other.isFollowing == isFollowing));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,name,username,profilePicture,bio,uid,isVerified,verificationUrl,shareOnlineStatus,isFollowing);
+int get hashCode {
+    return Object.hash(runtimeType,name,username,profilePicture,bio,uid,isVerified,verificationUrl,shareOnlineStatus,isFollowing);
+}
 
 @override
 String toString() {
-  return 'UserModel(name: $name, username: $username, profilePicture: $profilePicture, bio: $bio, uid: $uid, isVerified: $isVerified, verificationUrl: $verificationUrl, shareOnlineStatus: $shareOnlineStatus, isFollowing: $isFollowing)';
+    return 'UserModel(name: $name, username: $username, profilePicture: $profilePicture, bio: $bio, uid: $uid, isVerified: $isVerified, verificationUrl: $verificationUrl, shareOnlineStatus: $shareOnlineStatus, isFollowing: $isFollowing)';
 }
 
 
