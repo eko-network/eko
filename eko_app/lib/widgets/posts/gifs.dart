@@ -1,7 +1,7 @@
 import 'package:eko_app/utilities/api_constants.dart' as ac;
 import 'package:eko_app/widgets/scaffolds/app_scaffold.dart';
 import 'package:eko_app/localization/generated/app_localizations.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';

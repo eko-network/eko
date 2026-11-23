@@ -21,7 +21,7 @@ import 'package:eko_app/services/messenger_notification_service.dart';
 import 'package:eko_app/utilities/emoji_text_style.dart';
 import 'package:eko_app/utilities/platform.dart' as platform;
 import 'package:eko_app/widgets/errors/snack_bar.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:klipy_dart/klipy_dart.dart';

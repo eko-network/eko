@@ -7,7 +7,7 @@ import 'package:eko_app/providers/current_user_provider.dart';
 import 'package:eko_app/providers/user_provider.dart';
 import 'package:eko_app/widgets/loading/profile_picture_loading.dart';
 import 'package:eko_app/widgets/users/profile_picture.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 part '../../generated/messenger/widgets/group_card.g.dart';

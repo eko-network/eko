@@ -14,7 +14,7 @@ import 'package:eko_app/utilities/ecp_db_path.dart';
 import 'package:eko_app/utilities/platform.dart' as platform;
 import 'package:eko_app/utilities/shared_pref_service.dart';
 import 'package:eko_app/utilities/supabase_ref.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:cupertino_ui/cupertino_ui.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:path/path.dart' as p;
 import 'package:riverpod_annotation/riverpod_annotation.dart';

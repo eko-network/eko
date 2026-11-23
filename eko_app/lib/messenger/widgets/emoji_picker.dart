@@ -1,7 +1,7 @@
 import 'package:eko_app/utilities/emoji_text_style.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/foundation.dart' as foundation;
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class StyledEmojiPicker extends StatefulWidget {
   /// Where picked emoji are typed, unless [onEmojiSelected] takes them.

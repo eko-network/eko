@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Simple horizontal line divider for auth forms
 /// Used to separate sections (e.g., before social auth buttons)

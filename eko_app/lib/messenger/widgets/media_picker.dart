@@ -2,7 +2,7 @@ import 'package:eko_app/messenger/widgets/emoji_picker.dart';
 import 'package:eko_app/messenger/widgets/gif_picker.dart';
 import 'package:eko_app/utilities/api_constants.dart' as ac;
 import 'package:eko_app/utilities/platform.dart' as platform;
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:klipy_dart/klipy_dart.dart';
 
 class MediaPicker extends StatefulWidget {

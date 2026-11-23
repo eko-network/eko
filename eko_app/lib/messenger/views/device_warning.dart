@@ -6,7 +6,7 @@ import 'package:eko_app/messenger/ecp_helpers.dart';
 import 'package:eko_app/providers/ecp_core_provider.dart';
 import 'package:eko_app/providers/ecp_provider.dart';
 import 'package:eko_app/providers/user_provider.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Asks whether to go ahead with [name] although their device chain no

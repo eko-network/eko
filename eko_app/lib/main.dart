@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:eko_app/interfaces/notification_helper.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:overlay_support/overlay_support.dart';
@@ -12,7 +12,6 @@ import 'package:eko_app/utilities/logo_service.dart';
 import 'package:eko_app/utilities/provider_debugger.dart';
 import 'package:eko_app/utilities/shared_pref_service.dart';
 import 'package:eko_app/utilities/supabase_ref.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:eko_app/localization/generated/app_localizations.dart';
 import 'package:eko_app/widgets/scaffolds/check_version.dart';
 import 'utilities/router.dart';
@@ -85,9 +84,7 @@ class MyApp extends ConsumerWidget {
         ),
         localizationsDelegates: const [
           AppLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
+          ...GlobalMaterialLocalizations.delegates,
         ],
         supportedLocales: const [
           Locale('en'), // English
@@ -95,7 +92,11 @@ class MyApp extends ConsumerWidget {
           Locale('hi'), // Hindi
           Locale('id'), // Indonesian
         ],
-        builder: (context, child) => CheckVersion(child: child),
+        // Bridges theme and localizations to dependencies still on
+        // package:flutter/material.dart
+        // ignore: deprecated_member_use
+        builder: (context, child) =>
+            MaterialUiCompatibilityBridge(child: CheckVersion(child: child)),
         routerConfig: ref.watch(goRouterProvider),
       ),
     );

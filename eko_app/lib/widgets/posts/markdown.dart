@@ -1,6 +1,10 @@
 import 'package:eko_app/providers/current_user_provider.dart';
 import 'package:eko_app/utilities/constants.dart' as c;
-import 'package:flutter/material.dart';
+// flutter_markdown_plus still takes the SDK ThemeData, provided by
+// MaterialUiCompatibilityBridge in main.dart
+// ignore: deprecated_member_use
+import 'package:flutter/material.dart' as legacy;
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:flutter_math_fork/flutter_math.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -122,7 +126,7 @@ String _format(String content) {
 }
 
 MarkdownStyleSheet getTheme(BuildContext context, MarkdownType type) {
-  final theme = MarkdownStyleSheet.fromTheme(Theme.of(context));
+  final theme = MarkdownStyleSheet.fromTheme(legacy.Theme.of(context));
   final plain = type == MarkdownType.base
       ? theme.p
       : theme.p?.copyWith(fontSize: 16);

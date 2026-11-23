@@ -13,7 +13,7 @@ import 'package:eko_app/messenger/widgets/resizable_panel.dart';
 import 'package:eko_app/messenger/ecp_helpers.dart';
 import 'package:eko_app/widgets/search/user_search_bar.dart';
 import 'package:eko_app/widgets/users/user_card.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 

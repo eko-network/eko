@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:eko_app/widgets/common/max_width_content.dart';
 
 class MaxWidthAppBar extends StatelessWidget implements PreferredSizeWidget {

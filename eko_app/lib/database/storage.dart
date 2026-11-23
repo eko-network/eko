@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:drift/drift.dart';
 import 'package:ecp/ecp.dart';
-import 'package:eko_app/utilities/constants.dart' as c;
 import 'package:flutter/foundation.dart';
 import 'database.dart';
 import 'mappers.dart';
@@ -670,7 +669,7 @@ class _DriftProcessedObjectStore implements ProcessedObjectStore {
     final row = await (_db.select(
       _db.processedObjects,
     )..where((t) => t.id.equals(id.toString()))).getSingleOrNull();
-    print("checking if message id: $id exists: $row");
+    print('checking if message id: $id exists: $row');
     return row != null;
   }
 
