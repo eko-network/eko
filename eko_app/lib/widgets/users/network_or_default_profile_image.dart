@@ -1,5 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:eko_app/utilities/default_profile_asset.dart';
 import 'package:eko_app/widgets/loading/profile_picture_loading.dart';
 

@@ -4,7 +4,7 @@ import 'package:eko_app/providers/post_provider.dart';
 import 'package:eko_app/types/post.dart';
 import 'package:eko_app/widgets/common/count.dart';
 import 'package:eko_app/widgets/posts/like_buttons.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';

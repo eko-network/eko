@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:shimmer/shimmer.dart' as s;
 import 'package:eko_app/utilities/constants.dart' as c;
 import 'package:eko_app/widgets/common/divider.dart';

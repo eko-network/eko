@@ -5,7 +5,7 @@ import 'package:eko_app/messenger/views/messenger_setup_page.dart';
 import 'package:eko_app/providers/ecp_core_provider.dart';
 import 'package:eko_app/providers/ecp_provider.dart';
 import 'package:eko_app/utilities/platform.dart' as platform;
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:eko_app/providers/auth_provider.dart';

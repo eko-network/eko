@@ -6,7 +6,7 @@ import 'package:eko_app/messenger/providers/message_provider.dart';
 import 'package:eko_app/messenger/widgets/emoji_picker.dart';
 import 'package:eko_app/messenger/widgets/message_quote.dart';
 import 'package:eko_app/utilities/emoji_text_style.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';

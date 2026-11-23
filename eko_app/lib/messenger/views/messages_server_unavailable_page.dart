@@ -3,7 +3,7 @@ import 'package:eko_app/providers/ecp_provider.dart';
 import 'package:eko_app/utilities/constants.dart' as c;
 import 'package:eko_app/widgets/auth/auth_button.dart';
 import 'package:eko_app/widgets/common/icons.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class MessagesServerUnavailablePage extends ConsumerWidget {

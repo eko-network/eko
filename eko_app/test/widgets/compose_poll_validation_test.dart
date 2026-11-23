@@ -4,8 +4,7 @@ import 'package:eko_app/utilities/constants.dart' as c;
 import 'package:eko_app/views/compose_page.dart';
 import 'package:eko_app/widgets/posts/poll_creator.dart';
 import 'package:eko_app/widgets/posts/poll_widget.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -44,9 +43,7 @@ Future<void> _pumpCompose(
       child: MaterialApp(
         localizationsDelegates: const [
           AppLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
+          ...GlobalMaterialLocalizations.delegates,
         ],
         supportedLocales: const [
           Locale('en'),

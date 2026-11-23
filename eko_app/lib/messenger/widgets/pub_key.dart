@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:eko_app/localization/generated/app_localizations.dart';
 import 'package:eko_app/widgets/errors/snack_bar.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 
 class PubKey extends StatelessWidget {

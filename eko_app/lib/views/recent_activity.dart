@@ -1,5 +1,5 @@
 import 'package:eko_app/utilities/supabase_ref.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:eko_app/types/activity.dart';
 import 'package:eko_app/utilities/constants.dart' as c;

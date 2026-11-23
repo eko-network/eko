@@ -4,7 +4,7 @@ import 'package:eko_app/localization/generated/app_localizations.dart';
 import 'package:eko_app/providers/ecp_core_provider.dart';
 import 'package:eko_app/utilities/api_constants.dart' as ac;
 import 'package:eko_app/utilities/supabase_ref.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 

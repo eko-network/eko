@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:eko_app/localization/generated/app_localizations.dart';
 import 'package:eko_app/widgets/loading/loading_spinner.dart';
 import 'package:eko_app/widgets/common/max_width_content.dart';

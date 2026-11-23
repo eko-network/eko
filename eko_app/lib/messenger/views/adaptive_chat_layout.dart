@@ -10,7 +10,7 @@ import 'package:eko_app/utilities/constants.dart' as c;
 import 'package:eko_app/messenger/views/chat_view.dart';
 import 'package:eko_app/messenger/views/group_list.dart';
 import 'package:eko_app/messenger/widgets/resizable_panel.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:eko_app/providers/nav_bar_provider.dart';
